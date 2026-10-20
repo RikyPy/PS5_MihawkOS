@@ -1,0 +1,70 @@
+{
+  "launch_readiness": {
+    "ready": true,
+    "seconds": 0.152,
+    "settle_seconds": 0.0,
+    "census_seconds": 0.141,
+    "previous_cleanup_verified": true
+  },
+  "session_marker_left": null,
+  "title": "PPSA99170",
+  "identity": "09fd8096c2384239b20512264de472e2",
+  "frames_requested": 1500,
+  "eboot_sha256": "6b75da1bb5d2598629662d55e4c0ea0dcad6fe2e8c49e367b2ff85b28094e8d0",
+  "fresh_identity_seen": true,
+  "shell_idle_after_run": true,
+  "title_finished_successfully": true,
+  "picture_and_log_check_passed": true,
+  "post_launch_fault_records": 0,
+  "post_launch_driver_errors": 0,
+  "elevation": [
+    "ok (filesystem access)"
+  ],
+  "sample": [
+    "starts",
+    "ok, 1500 frames in 25.44 s, 59.9 fps after the first half"
+  ],
+  "library": [
+    "1 game(s); No games installed. searched: /data/ps5proton/games (0 entries); /data/homebrew/PPSA99170/games (not there)",
+    "library shows 1 of 1 (Mihawk OS and entries with a prefix of their own; /data/ps5proton/library-show-all shows them all)"
+  ],
+  "notices": [],
+  "startup_seconds": {
+    "exec": 0.0,
+    "starts": 0.51,
+    "elevation": 0.51,
+    "library": 0.57,
+    "ui": 0.64
+  },
+  "probe": null,
+  "probe_passed": null,
+  "probe_records": [],
+  "controls_preview": null,
+  "passed": true,
+  "capture": "klog/release-v2-pro-01-setup-tour",
+  "forced_close": false,
+  "storage_errors": 0,
+  "setup": {
+    "steps": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "language_ja": true,
+    "installed": true,
+    "sky_gpu_ms": [
+      0.513,
+      0.518,
+      0.52,
+      0.516,
+      0.513,
+      0.514
+    ],
+    "fps": [
+      "59.9"
+    ]
+  }
+}

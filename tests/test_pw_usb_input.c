@@ -91,6 +91,14 @@ int main(void)
     assert(pw_usb_keyboard_events(&none, &twice, events, PW_USB_KEYBOARD_EVENTS) == 1);
     assert(pw_usb_keyboard_events(&none, &shift_w, events, 1) == 1);
     assert(!pw_usb_keyboard_events(NULL, &shift_w, events, 4));
+    /* Two keyboards merged: both modifiers, the second's keys in the free slots; a full state keeps its own. */
+    PwUsbKeyboard merged = {0, {0x04}}, other = {0x02, {0, 0x05, 0x06}}, full = {0};
+    pw_usb_keyboard_merge(&merged, &other);
+    assert(merged.modifiers == 0x02 && merged.keys[0] == 0x04 && merged.keys[1] == 0x05 && merged.keys[2] == 0x06 &&
+           !merged.keys[3]);
+    for (int i = 0; i < PW_USB_KEYS; i++) full.keys[i] = (uint16_t)(0x04 + i);
+    pw_usb_keyboard_merge(&full, &other);
+    assert(full.modifiers == 0x02 && full.keys[0] == 0x04 && full.keys[PW_USB_KEYS - 1] == 0x04 + PW_USB_KEYS - 1);
 
     /* Mouse records: motion and wheels summed, the newest record's buttons, disconnected records skipped. */
     uint8_t records[3 * PW_USB_MOUSE_RECORD];
@@ -115,6 +123,6 @@ int main(void)
     assert(count == 2 && mouse_events[0].code == 3 && mouse_events[1].code == 4);
     assert(!pw_usb_mouse_events(0x18, &side, mouse_events, PW_USB_MOUSE_EVENTS));
     puts("usb input: key and scan codes, keyboard state, press/release order, both Shifts, unplug, "
-         "mouse records, motion, wheels, five buttons");
+         "keyboards merged, mouse records, motion, wheels, five buttons");
     return 0;
 }

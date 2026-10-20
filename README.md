@@ -28,7 +28,7 @@
   <a href="#credits-and-licences">Credits</a>
 </p>
 
-<p align="center"><sub><code>PPSA99170</code> · firmware 10.01 · 64-bit and 32-bit Windows programs · in development · status of 2026-10-19</sub></p>
+<p align="center"><sub><code>PPSA99170</code> · firmware 10.01 and 13.40 · 64-bit and 32-bit Windows programs · in development · status of 2026-10-20</sub></p>
 
 ---
 
@@ -49,8 +49,9 @@ and start a program from its desktop shortcut, as on a PC. A full-screen game ta
 
 ## Where it stands
 
-MihawkOS runs on the console today, built and installed from a Linux PC. Every claim below is something the console
-showed; it is not a compatibility list, and each program needs its own evidence. The proof behind each line, and its
+MihawkOS runs on the console today, on a PS5 Pro (firmware 10.01) and a standard PS5 (firmware 13.40). Prebuilt
+releases are on the [Releases](https://github.com/mihawk-99/PS5_MihawkOS/releases) page; you can also build it from a
+Linux PC. Every claim below is something the console showed; it is not a compatibility list, and each program needs its own evidence. The proof behind each line, and its
 limits, are in [docs/FEATURES.md](docs/FEATURES.md) and [docs/PLAN.md](docs/PLAN.md).
 
 **What the console has shown**
@@ -70,17 +71,18 @@ the console, in Japanese, up to Preparing with a simulated install; the nine lan
 only), installing the runtime from a USB stick or over HTTPS with no PC, the title setting itself up on its first
 start, and signed self-updates.
 
-**Not yet, or out of scope:** a prebuilt release (you build MihawkOS yourself today), kernel drivers and anti-cheat,
-rumble, moving the desktop focus with the D&#8209;pad, and any console but a PS5 Pro on firmware 10.01.
+**Not yet, or out of scope:** kernel drivers and anti-cheat, rumble, moving the desktop focus with the D&#8209;pad, and
+consoles other than the two tested ones (a PS5 Pro on 10.01, a standard PS5 on 13.40), which are untested.
 
-The last full console battery, `gate-2026-10-18-item3-01` (2026-10-18, commit `3cbc744`), passed 86 of 86. Commits
-after `3cbc744` were made, at the owner's instruction, after host tests and a production build but without a console
-battery; each one says so.
+The last full console battery passed 94 of 94 on both tested consoles on one release build, made in a clean checkout
+of commit `e15960a` (2026-10-20): `release-v2-base-01` on the standard PS5 (13.40) and `release-v2-pro-01` on the PS5
+Pro (10.01). The records are in `evidence/`.
 
 ## What you need
 
-- **A PS5 Pro on firmware 10.01.** It is the only console MihawkOS has run on. A standard PS5, a Slim and any other
-  firmware are untested. The setup tool stops once the console reports another firmware.
+- **A PS5 on a firmware MihawkOS's payloads accept (1.00 to 13.60).** Tested: a PS5 Pro on 10.01 and a standard PS5
+  on 13.40; a Slim and other firmwares are untested. The PC setup tool (`tools/console-setup.py`) still stops on a
+  firmware other than 10.01; the release's install without a PC does not.
 - **A console that already runs homebrew**, with the payloads under [Payloads](#payloads) loaded on every boot, and
   your own copy of **ShadowMountPlus** to mount the title. You set these up yourself, with tools from their own
   authors. This project does not provide, link to or explain a jailbreak, and whether you may modify your console is
@@ -102,10 +104,10 @@ battery; each one says so.
 The owner builds on CachyOS (Arch Linux). Other distributions are untested; the names below are the upstream
 projects, so look up your distribution's package for each.
 
-- **clang, clang++, lld and LLVM 23.1.1** (`llvm-ar`, `llvm-ranlib`, `llvm-objcopy`, `llvm-config`). The version
+- **clang, clang++, lld and LLVM 23.1.3** (`llvm-ar`, `llvm-ranlib`, `llvm-objcopy`, `llvm-config`). The version
   matters: the Lapy daemon the title ships is pinned by SHA-256, and another compiler version gives another file. The
   payload SDK finds LLVM through `llvm-config`: `LLVM_CONFIG` if set, else `llvm-config-21` down to `-15`, else plain
-  `llvm-config`. If your system has one of those numbered ones, set `LLVM_CONFIG` to the 23.1.1 one.
+  `llvm-config`. If your system has one of those numbered ones, set `LLVM_CONFIG` to the 23.1.3 one.
 - **Build tools:** git, curl, wget, unzip, tar, xz, zstd, patch, make, cmake, ninja, meson, pkg-config, autoconf,
   bison, flex, perl, glslang (`glslangValidator`), a C compiler named `cc` (or one named in `CC`), the zlib headers and
   the FreeType development files.
@@ -152,14 +154,12 @@ console to recover.
 
 ## Known gaps
 
-What still stands between a fresh clone and a working console, as of 2026-10-19:
+What still stands between a fresh clone and a working console, as of 2026-10-20:
 
-- **The Lapy daemon needs exactly clang and LLD 23.1.1 to rebuild.** A clean room built fresh clones of `5c5728e` and
-  `33c587a` through the whole production build (2026-10-19; fetch 788 s, build 1922 s), after three build gaps were
-  fixed: the licence staging order, stripping only PE images, and extracting DXVK and VKD3D-Proton. Its one open gap is
-  the daemon: `tools/build-production.sh` refuses any other compiler version, current CachyOS ships 23.1.3, so the
-  clean room used the pinned ELF (`c9710b7a`). Every production build since 2026-10-16 carries that daemon, and the
-  later console batteries, which need `/data`, passed with it; no record names it starting.
+- **The Lapy daemon rebuilds byte-identically only with clang and LLD 23.1.3.** It is pinned at
+  `5651f2ade61731a302e2a630344e6bd893a33f6503c90237d0abed699364bd7f` (payload SDK v0.42), and the clean room of
+  2026-10-20 rebuilt it from source to exactly that file; another compiler version gives another file, which
+  `tools/build-production.sh` refuses.
 - **ImageMagick outside Arch-based hosts**: no pinned build with librsvg runs there yet.
 - **The setup tool's own Mihawk OS prefix session (S9) has never run**, and no apply run has yet ended *ready*.
 
@@ -211,7 +211,7 @@ bash tools/fetch-all.sh            # downloads, the PRX tool, the Lapy daemon, t
 bash tools/fetch-all.sh --check    # changes nothing: each pin's SHA-256 and a HEAD request to each URL
 ```
 
-It fetches llvm-mingw, the DXVK sources, GE-Proton11-7, the OpenGL SDK, the payload SDK v0.40 and ImageMagick
+It fetches llvm-mingw, the DXVK sources, GE-Proton11-7, the OpenGL SDK, the payload SDK v0.42 and ImageMagick
 7.1.2-32, each checked by SHA-256, then builds the PRX converter, the Lapy daemon, the Wine sources at their pins and
 the host Wine build. Running it again skips what is there. `PS5_PROTON_CACHE=/path/to/folder` reuses files you
 downloaded before when their name and SHA-256 match. `tools/build-production.sh` fetches the remaining pins itself,

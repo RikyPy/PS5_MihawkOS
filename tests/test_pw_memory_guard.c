@@ -128,6 +128,23 @@ int main(void)
     assert(feed(&guard, &now, 4, 2000, NULL) == PW_MEMORY_FINE);
     assert(feed(&guard, &now, 10, 2000, NULL) == PW_MEMORY_END);
 
+    /* Firmware 12.00 and later has its own limit, whatever the first census was (the base PS5's read 731 to 1223 MiB at
+     * the start of launches, a Wine start took ten helpers and the census to 1237-1537 MiB: all of it is under the marks,
+     * and a climb past the end mark still ends the game). The Pro's firmware 10.01, and none known, keep theirs. */
+    assert(pw_memory_guard_default_limit_mib(0x13400002u) == 1600 && pw_memory_guard_default_limit_mib(0x12000000u) == 1600);
+    assert(pw_memory_guard_default_limit_mib(0x10010001u) == 870 && pw_memory_guard_default_limit_mib(0x11000000u) == 870);
+    assert(pw_memory_guard_default_limit_mib(0) == 870);
+    for (unsigned idle = 731; idle <= 1223; idle += 164) {
+        pw_memory_guard_init(&guard, pw_memory_guard_default_limit_mib(0x13400002u), 0);
+        assert(guard.limit == MIB(1600) && guard.end == MIB(1670));
+        now = 1000;
+        assert(feed(&guard, &now, 20, idle, NULL) == PW_MEMORY_FINE);
+        assert(feed(&guard, &now, 8, idle + 250, NULL) == PW_MEMORY_FINE);
+        assert(feed(&guard, &now, 60, idle + 314 < 1537 ? idle + 314 : 1537, NULL) == PW_MEMORY_FINE);
+        assert(feed(&guard, &now, 40, idle, NULL) == PW_MEMORY_FINE);
+    }
+    assert(feed(&guard, &now, 20, 2000, NULL) == PW_MEMORY_END);
+
     puts("pw_memory_guard: ok");
     return 0;
 }

@@ -1,0 +1,50 @@
+Adapt ucred attrs to the v0.42+ payload SDK API.
+
+The daemon was built with payload SDK v0.40, whose kernel_get_ucred_attrs /
+kernel_set_ucred_attrs treated the SCE attrs as a single uint64_t. v0.42 is the
+oldest release whose crt accepts firmware 13.40, 13.42 and 13.60 (the set the
+Wine helper already accepts), and it changed the attrs to a 32-byte blob passed
+by pointer, and moved the field: v0.40 read a uint64 from ucred+0x83, v0.42
+reads 32 bytes from ucred+0x80. Copy the donor's full 32 bytes onto the target
+and compare all of them. The elevation bit (old "attrs |= 0x80" set bit 0x80 of
+the uint64 at ucred+0x83) is therefore the byte at ucred+0x83, i.e. attrs[3].
+
+--- a/source/owned_root_daemon.c
++++ b/source/owned_root_daemon.c
+@@ -77,7 +77,8 @@
+     uid_t uid, ruid, svuid;
+     gid_t rgid, svgid;
+     uint32_t ngroups;
+-    uint64_t authid, attrs;
++    uint64_t authid;
++    uint8_t attrs[32];
+     uint8_t caps[16];
+ };
+ 
+@@ -490,7 +491,7 @@
+     out->rgid = kernel_get_ucred_rgid(pid);
+     out->svgid = kernel_get_ucred_svgid(pid);
+     out->authid = kernel_get_ucred_authid(pid);
+-    out->attrs = kernel_get_ucred_attrs(pid);
++    kernel_get_ucred_attrs(pid, out->attrs);
+     return kernel_get_ucred_caps(pid, out->caps) ||
+            kernel_copyout(ucred + UCRED_NGROUPS, &out->ngroups,
+                           sizeof(out->ngroups)) ? EFAULT : 0;
+@@ -508,7 +509,7 @@
+            found.svgid == expected->svgid &&
+            found.ngroups == expected->ngroups &&
+            found.authid == expected->authid &&
+-           found.attrs == expected->attrs &&
++           !memcmp(found.attrs, expected->attrs, sizeof(found.attrs)) &&
+            !memcmp(found.caps, expected->caps, sizeof(found.caps));
+ }
+ 
+@@ -664,7 +665,7 @@
+     elevated.ngroups = 0;
+     elevated.authid = SYSTEM_AUTHID;
+     memset(elevated.caps, 0xff, sizeof(elevated.caps));
+-    elevated.attrs |= UINT64_C(0x80);
++    elevated.attrs[3] |= 0x80;  // v0.40 set bit 0x80 of the uint64 at ucred+0x83; v0.42 reads 32 bytes from ucred+0x80, so that byte is attrs[3]
+     cred_changed = 1;
+     if ((error = set_credentials(pid, stopped.ucred, &elevated))) {
+         if (set_credentials(pid, stopped.ucred, &original)) {

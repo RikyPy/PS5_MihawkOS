@@ -746,7 +746,7 @@ if [ "$prx_status" = 0 ]; then
         cwd_wraps="$cwd_wraps --wrap=$name"
     done
     python3 "$root/tools/gen_prx_descriptor.py" "$prx/obj/ntdll_desc.c" \
-        __wine_main pw_wine_dl_adopt dlopen dlsym dlerror \
+        __wine_main pw_wine_dl_configure pw_wine_dl_adopt dlopen dlsym dlerror \
         pw_wine_heap_stats pw_wine_heap_malloc pw_wine_heap_free \
         pw_wine_set_present_sink pw_wine_set_frame_allocator pw_wine_post_input pw_wine_sink_stats pw_wine_present_origin pw_ps5_set_frame_sink pw_ps5_set_window_sink pw_wine_window_present pw_wine_window_present_surface pw_wine_window_drop pw_ps5_set_resolver pw_wine_resolve pw_ps5_set_dns_config pw_wine_dns_config \
         pw_wine_present pw_wine_next_input pw_wine_input_fd \

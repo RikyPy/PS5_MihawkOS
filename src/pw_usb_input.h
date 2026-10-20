@@ -62,6 +62,9 @@ int pw_usb_keyboard_decode(const uint8_t state[PW_USB_KEYBOARD_STATE], PwUsbKeyb
 /* count mouse records added into *mouse (motion and wheels summed, the buttons of the newest); how many were
  * connected. Records older than *mouse's newest still add their motion: their order is not established. */
 int pw_usb_mouse_decode(const uint8_t *records, int count, PwUsbMouse *mouse);
+/* Adds one keyboard's state into merged, the state of every keyboard read: its modifiers, and its keys in merged's
+ * free slots while there are any (a key held on two keyboards is pressed once, pw_usb_keyboard_events). */
+void pw_usb_keyboard_merge(PwUsbKeyboard *merged, const PwUsbKeyboard *one);
 /* The key events from previous to current, releases first; at most PW_USB_KEYBOARD_EVENTS. */
 size_t pw_usb_keyboard_events(const PwUsbKeyboard *previous, const PwUsbKeyboard *current, PwWineInput *out,
                               size_t capacity);

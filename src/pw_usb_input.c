@@ -102,6 +102,19 @@ int pw_usb_mouse_decode(const uint8_t *records, int count, PwUsbMouse *mouse)
     return connected;
 }
 
+void pw_usb_keyboard_merge(PwUsbKeyboard *merged, const PwUsbKeyboard *one)
+{
+    size_t slot = 0;
+
+    merged->modifiers |= one->modifiers;
+    for (size_t i = 0; i < PW_USB_KEYS; i++) {
+        if (!one->keys[i]) continue;
+        while (slot < PW_USB_KEYS && merged->keys[slot]) slot++;
+        if (slot == PW_USB_KEYS) return;
+        merged->keys[slot] = one->keys[i];
+    }
+}
+
 static int holds(const PwUsbKeyboard *k, uint16_t usage)
 {
     for (size_t i = 0; i < PW_USB_KEYS; i++)

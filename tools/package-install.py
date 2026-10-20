@@ -24,7 +24,7 @@ ROOT = Path(__file__).resolve().parents[1]
 LEFTOVERS = {'install-source.txt', 'update-source.txt', 'test-run.txt', 'wine-run.txt', 'elevation-retry',
              'session-running', 'session-notices', 'install-probe.txt', 'install-probe-results.txt', 'title-pack.txt'}
 NEEDED = ('eboot.bin', 'sce_sys/param.json', 'runtime-pack.txt', 'runtime-stamp')
-README = """MihawkOS: install it on a jailbroken PS5 (firmware 10.01)
+README = """MihawkOS: install it on a jailbroken PS5 (tested on firmware 10.01 and 13.40; supported up to 13.60)
 
 1. Copy PPSA99170 into /data/homebrew on the console: over FTP from a phone or a PC, or with a file manager from a USB
    stick. ShadowMountPlus shows its tile on the home screen within about 45 seconds.

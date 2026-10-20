@@ -344,16 +344,19 @@ def main():
               'target':appearance['target'],'sha256':hashlib.sha256(theme.read_bytes()).hexdigest(),'passed':True,'runtime_qualified':False, 'appearance_revision':appearance_revision}
     (OUTPUT/'build.json').write_text(json.dumps(record,indent=1)+'\n')
     # The desktop's wallpaper is the project's own Aero Meadow (tools/make-mihawk-wallpaper.py, original artwork; it
-    # replaced the owner's local copy of Windows 11's Bloom on 2026-10-18), drawn again only when its generator changed.
+    # replaced the owner's local copy of Windows 11's Bloom on 2026-10-18), drawn again only when its generator or its
+    # corner note changed. The note, top right, is the release's version (VERSION) and the community link (the owner's
+    # choice, 2026-10-20).
     destination = OUTPUT / 'proton.bmp'
     stamp = OUTPUT / 'proton.bmp.sha256'
     generator = ROOT / 'tools/make-mihawk-wallpaper.py'
-    want = hashlib.sha256(generator.read_bytes()).hexdigest()
+    note = [f'MihawkOS v{(ROOT / "VERSION").read_text().strip()}', 'https://discord.gg/mihawk']
+    want = hashlib.sha256(generator.read_bytes() + '\n'.join(note).encode()).hexdigest()
     if not destination.is_file() or not stamp.is_file() or stamp.read_text().strip() != want:
         spec = importlib.util.spec_from_file_location('mihawk_wallpaper', generator)
         wallpaper = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(wallpaper)
-        wallpaper.wallpaper(1920, 1080).save(destination)
+        wallpaper.stamp(wallpaper.wallpaper(1920, 1080), note).save(destination)
         stamp.write_text(want + '\n')
     print(json.dumps(record,indent=1))
 

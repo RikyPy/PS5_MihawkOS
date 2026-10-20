@@ -1,0 +1,109 @@
+From: PS5_Proton
+Subject: [PATCH] ntdll: the console's address-space budget is "not enough memory", not "invalid address" (PS5)
+
+anon_mmap_tryfixed turned every refusal of sceKernelReserveVirtualRange into EEXIST, so a fixed reservation the kernel refused
+for want of address space (SCE_KERNEL_ERROR_ENOMEM, 0x8002000c) reached the Windows program as STATUS_CONFLICTING_ADDRESSES
+(ERROR_INVALID_ADDRESS, 487), the answer for a mapping in the way. late-library reserves every range VirtualQuery calls free: on
+the base PS5 (13.40) the seventh, 0x811000000 bytes at 0x7ef000000 with 31 GiB already reserved, was refused with ENOMEM while
+the kernel held no entry in it and no Wine view overlapped (base-cycle-12 to -14). It now stays ENOMEM (STATUS_NO_MEMORY, error
+8) and the refused fixed area of 1 GiB or more says which mapping step and which kernel code refused it, as the view overlap it
+may meet does.
+---
+diff --git a/dlls/ntdll/unix/virtual.c b/dlls/ntdll/unix/virtual.c
+--- a/dlls/ntdll/unix/virtual.c
++++ b/dlls/ntdll/unix/virtual.c
+@@ -1020,10 +1020,21 @@
+     /* The kernel ignores MAP_EXCL, so claim the range with a reservation
+      * that refuses to overwrite, then map over it if needed. */
+     ptr = start;
+-    if (sceKernelReserveVirtualRange( &ptr, size, PS5_MAP_FIXED | PS5_MAP_NO_OVERWRITE, host_page_size ))
+     {
+-        errno = EEXIST;
+-        return MAP_FAILED;
++        const int reserved = sceKernelReserveVirtualRange( &ptr, size, PS5_MAP_FIXED | PS5_MAP_NO_OVERWRITE, host_page_size );
++
++        if (reserved)
++        {
++            /* Every refusal reads as EEXIST below, whatever the kernel said: a range of 1 GiB or more says what it said
++             * (late-library on the base PS5, 13.40: the kernel's entries in the range were none). */
++            if (size >= ((size_t)1 << 30))
++                fprintf( stderr, "wine-ps5: the kernel refused a fixed reservation of %#lx bytes at %p: %#x\n",
++                         (unsigned long)size, start, reserved );
++            /* SCE_KERNEL_ERROR_ENOMEM is the console's budget of address space, not a mapping in the way: the caller
++             * (VirtualAlloc, a Windows program) is told "not enough memory", not "invalid address". */
++            errno = reserved == (int)0x8002000c ? ENOMEM : EEXIST;
++            return MAP_FAILED;
++        }
+     }
+     /* Fixed allocations such as CLR's near-code heaps can lie outside the
+      * startup reservations. A bare kernel reservation cannot be committed
+@@ -2996,9 +3007,24 @@
+     struct reserved_area *area;
+     NTSTATUS status;
+     char *start = base, *end = (char *)base + ROUND_SIZE( 0, size, host_page_mask );
++#ifdef __PROSPERO__
++    int step = 0;  /* which of the mappings below refused, for the line at failed: */
++#endif
+ 
+     if ((UINT_PTR)base & host_page_mask) return STATUS_CONFLICTING_ADDRESSES;
++#ifdef __PROSPERO__
++    {
++        struct file_view *overlap = find_view_range( base, size );
++
++        /* A refusal that Windows scanners cannot tell from a free range: which view it was (late-library, base PS5 13.40). */
++        if (overlap && size >= ((size_t)1 << 30))
++            fprintf( stderr, "wine-ps5: a fixed area %p-%p overlaps view %p-%p (protect %#x)\n", base, (char *)base + size,
++                     overlap->base, (char *)overlap->base + overlap->size, overlap->protect );
++        if (overlap) return STATUS_CONFLICTING_ADDRESSES;
++    }
++#else
+     if (find_view_range( base, size )) return STATUS_CONFLICTING_ADDRESSES;
++#endif
+ 
+     LIST_FOR_EACH_ENTRY( area, &reserved_areas, struct reserved_area, entry )
+     {
+@@ -3009,25 +3035,44 @@
+         if (area_end <= start) continue;
+         if (area_start > start)
+         {
++#ifdef __PROSPERO__
++            step = 1;
++#endif
+             if (anon_mmap_tryfixed( start, area_start - start, unix_prot, 0 ) == MAP_FAILED) goto failed;
+             start = area_start;
+         }
+         if (area_end >= end)
+         {
++#ifdef __PROSPERO__
++            step = 2;
++#endif
+             if (reserved_area_mmap( start, end - start, unix_prot ) == MAP_FAILED) goto failed;
+             return STATUS_SUCCESS;
+         }
++#ifdef __PROSPERO__
++        step = 3;
++#endif
+         if (reserved_area_mmap( start, area_end - start, unix_prot ) == MAP_FAILED) goto failed;
+         start = area_end;
+     }
+ 
++#ifdef __PROSPERO__
++    step = 4;
++#endif
+     if (anon_mmap_tryfixed( start, end - start, unix_prot, 0 ) == MAP_FAILED) goto failed;
+     return STATUS_SUCCESS;
+ 
+ failed:
++#ifdef __PROSPERO__
++    if (size >= ((size_t)1 << 30))
++        fprintf( stderr, "wine-ps5: a fixed area %p-%p refused at step %d from %p: errno %d\n", base, (char *)base + size, step,
++                 start, errno );
++#endif
+     if (errno == ENOMEM)
+     {
++#ifndef __PROSPERO__
+         ERR( "out of memory for %p-%p\n", base, (char *)base + size );
++#endif
+         status = STATUS_NO_MEMORY;
+     }
+     else if (errno == EEXIST) status = STATUS_CONFLICTING_ADDRESSES;

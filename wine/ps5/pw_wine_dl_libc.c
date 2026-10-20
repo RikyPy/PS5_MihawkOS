@@ -62,8 +62,10 @@ static int self;
 extern ssize_t wine_write_stderr(const void *,size_t);
 static void report(const char *line)
 {
-    wine_write_stderr(line,strlen(line));
-    wine_write_stderr("\n",1);
+    /* One write with its newline: a second one let other threads' records land before it (gate-release-2026-10-19-01). */
+    char text[PW_WINE_DL_REPORT+1];
+    int length=snprintf(text,sizeof(text),"%s\n",line);
+    if(length>0)wine_write_stderr(text,(size_t)length<sizeof(text)?(size_t)length:sizeof(text)-1);
 }
 static void configure(void)
 {

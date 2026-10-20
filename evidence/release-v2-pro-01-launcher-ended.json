@@ -1,0 +1,36 @@
+{
+  "case": "launcher-ended",
+  "legs": {
+    "ended": {
+      "run": "release-v2-pro-01-launcher-ended-ended",
+      "runner_status": 0,
+      "launcher_passed": true,
+      "said": true,
+      "runtime_matched": true,
+      "marker_left": false,
+      "launcher_lines": [
+        "1 game(s); No games installed. searched: /data/ps5proton/games (0 entries); /data/homebrew/PPSA99170/games (not there)",
+        "library shows 1 of 1 (Mihawk OS and entries with a prefix of their own; /data/ps5proton/library-show-all shows them all)",
+        "Last session ended: Wine: requested profile gate-no-such-entry is not in the library"
+      ],
+      "passed": true
+    },
+    "marker": {
+      "run": "release-v2-pro-01-launcher-ended-marker",
+      "runner_status": 0,
+      "launcher_passed": true,
+      "said": true,
+      "runtime_matched": true,
+      "marker_left": false,
+      "launcher_lines": [
+        "1 game(s); No games installed. searched: /data/ps5proton/games (0 entries); /data/homebrew/PPSA99170/games (not there)",
+        "library shows 1 of 1 (Mihawk OS and entries with a prefix of their own; /data/ps5proton/library-show-all shows them all)",
+        "The last session (Gate marker) did not end normally: it crashed, froze or lost power. Its log: /data/ps5proton/logs/title-last.log"
+      ],
+      "passed": true
+    }
+  },
+  "passed": true,
+  "result": "finished",
+  "returned_to_launcher": true
+}

@@ -6,12 +6,18 @@ with iridescent rims, and rolling green hills under a horizon haze. Seeded, so e
 
   tools/make-mihawk-wallpaper.py OUT.png [--size 1920x1080] [--dark]   rendered at twice the size and downsampled
                                                                      (antialiasing); --dark: the same meadow at night
+                                      [--stamp LINE ...] [--on IMAGE]   the build's corner note, top right (stamp());
+                                                                     --on: stamp an existing picture instead
 """
 import argparse
 import math
+from pathlib import Path
 
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageDraw, ImageFont
+
+# Selawik, the shell's own face (OFL, vendored with its notice in NOTICE.md).
+FONTS = Path(__file__).resolve().parents[1] / 'themes/windows11/fonts/upstream'
 
 SEED = 20261018
 # The colours each layer is drawn in. Dark is the same meadow at night: a navy sky, the moon where the sun is, an aurora
@@ -200,14 +206,42 @@ def wallpaper(w, h, theme='light'):
     return render(w * 2, h * 2, theme).resize((w, h), Image.Resampling.LANCZOS)
 
 
+def stamp(image, lines):
+    """The build's corner note, top right: the lines right-aligned on a dark glass panel, which keeps them readable over
+    the brightest sky, by the sun. Sizes are for 1080 lines and scale with the picture."""
+    image = image.convert('RGB')
+    scale = image.height / 1080
+    faces = [ImageFont.truetype(str(FONTS / ('selawksb.ttf' if i == 0 else 'selawk.ttf')), round((22 if i == 0 else 18)
+                                * scale)) for i in range(len(lines))]
+    measure = ImageDraw.Draw(image)
+    boxes = [measure.textbbox((0, 0), line, font=face) for line, face in zip(lines, faces)]
+    gap, pad_x, pad_y = round(5 * scale), round(16 * scale), round(10 * scale)
+    width = max(b[2] - b[0] for b in boxes) + 2 * pad_x
+    height = sum(b[3] - b[1] for b in boxes) + gap * (len(lines) - 1) + 2 * pad_y
+    right, top = image.width - round(24 * scale), round(20 * scale)
+    overlay = Image.new('RGBA', image.size, (0, 0, 0, 0))
+    draw = ImageDraw.Draw(overlay)
+    draw.rounded_rectangle((right - width, top, right, top + height), radius=round(10 * scale),
+                           fill=(10, 22, 44, 150), outline=(255, 255, 255, 70), width=max(1, round(scale)))
+    y = top + pad_y
+    for i, (line, face, box) in enumerate(zip(lines, faces, boxes)):
+        draw.text((right - pad_x - (box[2] - box[0]) - box[0], y - box[1]), line, font=face,
+                  fill=(255, 255, 255, 245) if i == 0 else (214, 232, 255, 235))
+        y += box[3] - box[1] + gap
+    return Image.alpha_composite(image.convert('RGBA'), overlay).convert('RGB')
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('out')
     parser.add_argument('--size', default='1920x1080')
     parser.add_argument('--dark', action='store_true', help='the same meadow at night')
+    parser.add_argument('--stamp', action='append', default=[], help='a line of the corner note (repeat for more)')
+    parser.add_argument('--on', help='stamp this picture instead of drawing the meadow')
     args = parser.parse_args()
     w, h = (int(v) for v in args.size.split('x'))
-    wallpaper(w, h, 'dark' if args.dark else 'light').save(args.out)
+    image = Image.open(args.on) if args.on else wallpaper(w, h, 'dark' if args.dark else 'light')
+    (stamp(image, args.stamp) if args.stamp else image).save(args.out)
 
 
 if __name__ == '__main__':

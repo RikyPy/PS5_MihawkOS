@@ -62,9 +62,34 @@ void mainCRTStartup(void)
                 void *at = alloc(GetCurrentProcess(), (void *)(uintptr_t)start,
                                  (SIZE_T)(aligned_end - start), MEM_RESERVE | MEM_RESERVE_PLACEHOLDER,
                                  PAGE_NOACCESS, NULL, 0);
+                if (!at && GetLastError() == ERROR_NOT_ENOUGH_MEMORY && count)
+                {
+                    /* The console gives a process a finite budget of address space (the base PS5, 13.40, stopped after 31 GiB):
+                     * what it allowed is what the libraries are loaded around. Said, and not a failure. */
+                    char budget[160];
+                    wsprintfA(budget, "PS5_PROTON_LATE_LIBRARY_STAGE stage=budget start=%I64x size=%I64x error=%lu\n", start,
+                              aligned_end - start, GetLastError());
+                    OutputDebugStringA(budget);
+                    band = 2;
+                    break;
+                }
                 if (at != (void *)(uintptr_t)start)
                 {
+                    char where[200];
                     error = GetLastError();
+                    wsprintfA(where, "PS5_PROTON_LATE_LIBRARY_STAGE stage=reserve-refused start=%I64x size=%I64x query_base=%I64x query_size=%I64x error=%lu\n",
+                              start, aligned_end - start, (uint64_t)(uintptr_t)info.BaseAddress, (uint64_t)info.RegionSize, error);
+                    OutputDebugStringA(where);
+                    {
+                        /* The refusal is what the engine learns a mapping that is not Wine's from: asked again, the
+                         * range that was reported free is split around it. */
+                        MEMORY_BASIC_INFORMATION again = {0};
+                        char note[200];
+                        BOOL asked = VirtualQuery((void *)(uintptr_t)start, &again, sizeof(again));
+                        wsprintfA(note, "PS5_PROTON_LATE_LIBRARY_STAGE stage=asked-again start=%I64x asked=%d base=%I64x size=%I64x state=%lx\n", start, (int)asked,
+                                  (uint64_t)(uintptr_t)again.BaseAddress, (uint64_t)again.RegionSize, again.State);
+                        OutputDebugStringA(note);
+                    }
                     if (at)
                         VirtualFree(at, 0, MEM_RELEASE);
                     passed = 0;

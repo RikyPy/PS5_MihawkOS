@@ -24,7 +24,8 @@ typedef struct PwWineDlOps {
     int (*stop_unload)(int32_t handle,size_t argc,const void *argv,uint32_t flags,
                        const void *option,int *result);
     /* Optional: called with one line when an open fails, naming the module,
-     * every path tried and why, so the console log says what went wrong. */
+     * every path tried and why, so the console log says what went wrong; in a
+     * helper (WINE_PS5_CHILD) also before and after each module load. */
     void (*report)(const char *line);
     /* Optional: a table handed to every module that exports pw_module_share,
      * as it loads (the open-file budget, which is one per process). */

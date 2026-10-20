@@ -171,6 +171,51 @@ class BatteryTests(unittest.TestCase):
         for name in 'de':
             self.assertEqual((own[name]['status'], own[name]['probe_verdict'], own[name]['probe_passed']), (None, None, False))
 
+    def test_sequence_outcomes_read_records_spliced_behind_native_text(self):
+        # gate-release-2026-10-19-01-probes-wine-child-297.log, its address masked: kill-convert's PASS landed behind
+        # an unbuffered fprintf's pieces ("wine-ps5: kill thread 18bee", ": ", "0", "\n") and the battery missed it.
+        release = ('2340.733:05d4:05e0:trace:plugplay:get_device_instance_id Returning ID L"HID\\\\VID_054C&PID_0CE6".\n'
+                   'wine-ps5: kill thread 18f242340.735:05d4:05e0:trace:plugplay:get_device_instance_id Returning ID '
+                   'L"USB\\\\VID_054C&PID_0CE6".\n'
+                   ': 0\n'
+                   'wine-ps5: thread 0358 killed, 42 left\n'
+                   'wine-ps5: kill thread 18bee2342.839:05d4:05d8:warn:debugstr:OutputDebugStringA '
+                   '"PS5_PROTON_KILL_CONVERT PASS: kills=300 stuck=0 worst_ms=26\\n"\n'
+                   ': 2342.839:05d4:05d8:warn:seh:dispatch_exception "PS5_PROTON_KILL_CONVERT PASS: kills=300 stuck=0 '
+                   'worst_ms=26\\n"\n'
+                   '02342.839:05d4:05d8:trace:seh:dispatch_exception code=40010006 (DBG_PRINTEXCEPTION_C) flags=0 '
+                   'addr=<masked>\n'
+                   '\n')
+        # The tid's last digits ran into the seconds: "18f24" + "2340.735", and "0" + "2342.839".
+        self.assertEqual([at for at, _ in battery.wine_records(release)], [2340.733, 2340.735, 2342.839, 2342.839, 2342.839])
+        sequence = '{:.3f}:0020:0024:warn:debugstr:OutputDebugStringA "PS5_PROTON_GATE_SEQUENCE {}\\n"\n'
+        sequencer = ('2300.000:0020:0024:trace:process:start\n' + sequence.format(2339.811, 'begin case=kill-convert') +
+                     'wine-ps5: kill thread 18f2' + sequence.format(2342.881, 'end case=kill-convert status=0') +
+                     ''.join(sequence.format(at, line) for at, line in (
+                         (2343, 'begin case=fail'), (2344, 'end case=fail status=1'),
+                         (2345, 'begin case=clean'), (2346, 'end case=clean status=0'),
+                         (2347, 'begin case=prefix'), (2348, 'end case=prefix status=0'))))
+        probe = '{:.3f}:0030:0034:warn:debugstr:OutputDebugStringA "{}\\n"\n'
+        logs = {247: sequencer, 297: release,
+                298: 'wine-ps5: kill thread 18bef' + probe.format(2343.5, 'PS5_PROTON_FAIL FAIL: stuck=1'),
+                299: probe.format(2345.5, 'PS5_PROTON_CLEAN PASS'),
+                # A marker in the native text before a record is not the record's.
+                300: 'PS5_PROTON_PREFIX PASS ' + probe.format(2347.5, 'something else')}
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / 'klog').mkdir()
+            for pid, text in logs.items():
+                (root / 'klog' / f'run-wine-child-{pid}.log').write_text(text)
+            with patch.object(battery, 'ROOT', root):
+                own = battery.sequence_outcomes('run', [('kill-convert', 'PS5_PROTON_KILL_CONVERT'),
+                                                        ('fail', 'PS5_PROTON_FAIL'), ('clean', 'PS5_PROTON_CLEAN'),
+                                                        ('prefix', 'PS5_PROTON_PREFIX')])
+        self.assertEqual(own['kill-convert'], {'status': '0', 'probe_verdict': 'PASS', 'exit_stall': False,
+                                               'seconds': 3.1, 'helpers': [297], 'probe_passed': True})
+        self.assertEqual((own['fail']['probe_verdict'], own['fail']['probe_passed']), ('FAIL', False))
+        self.assertEqual((own['clean']['probe_verdict'], own['clean']['probe_passed']), ('PASS', True))
+        self.assertEqual((own['prefix']['probe_verdict'], own['prefix']['probe_passed']), (None, False))
+
     def test_gate_cannot_skip_cases(self):
         with self.assertRaises(SystemExit) as caught:
             self.run_fake(extra=('--skip', 'memory-classes'))

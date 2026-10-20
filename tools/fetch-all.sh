@@ -13,7 +13,7 @@
 # In order:
 #   1 downloads     llvm-mingw (unpacked into .deps/llvm-mingw), the seven DXVK source archives of
 #                   platform/dxvk/pins.json, GE-Proton11-7 (fonts, ICU and licences for the prefix baseline), the
-#                   OpenGL SDK (tools/fetch-opengl-sdk.sh), the payload SDK v0.40 and prospero-win's ps5log.h for the
+#                   OpenGL SDK (tools/fetch-opengl-sdk.sh), the payload SDK v0.42 and prospero-win's ps5log.h for the
 #                   Lapy daemon, ImageMagick 7.1.2-32 (Arch's package) for the Mihawk OS icons, CEF 150 for MihawkBrowser
 #                   (tools/fetch-cef.py)
 #   2 prx tools     tools/fetch-prx-tools.sh: the PRX converter at its pin, built with the host clang++
@@ -108,11 +108,11 @@ opengl_sha256=$(sed -n 's/^digest=//p' "$root/tools/fetch-opengl-sdk.sh")
 fetch "$deps/ps5-opengl-sdk-1.0.0.tar.gz" \
     https://github.com/blackbearreloaded/ps5-opengl/releases/download/v1.0.0/ps5-opengl-sdk-1.0.0.tar.gz "$opengl_sha256"
 $check || bash "$root/tools/fetch-opengl-sdk.sh"
-# The Lapy daemon's inputs, pinned in tools/build-lapy-validation.py: the upstream payload SDK v0.40, and the logger
+# The Lapy daemon's inputs, pinned in tools/build-lapy-validation.py: the upstream payload SDK v0.42, and the logger
 # header at prospero-win e665a2c (that revision carries no licence, so it is fetched, never vendored).
 lapy_sdk_sha256=$(sed -n "s/^SDK_SHA = '\([0-9a-f]*\)'$/\1/p" "$root/tools/build-lapy-validation.py")
-fetch "$deps/ps5-payload-sdk-v0.40.zip" \
-    https://github.com/ps5-payload-dev/sdk/releases/download/v0.40/ps5-payload-sdk.zip "$lapy_sdk_sha256"
+fetch "$deps/ps5-payload-sdk-v0.42.zip" \
+    https://github.com/ps5-payload-dev/sdk/releases/download/v0.42/ps5-payload-sdk.zip "$lapy_sdk_sha256"
 log_sha256=$(sed -n "s/^LOG_SHA = '\([0-9a-f]*\)'$/\1/p" "$root/tools/build-lapy-validation.py")
 fetch "$deps/prospero-win-e665a2c/native/ps5log/ps5log.h" \
     https://raw.githubusercontent.com/mpereiraesaa/prospero-win/e665a2c1f9168c911cf1f6131b832f89a5582fb4/native/ps5log/ps5log.h \
@@ -170,7 +170,7 @@ if $check; then head_ok https://github.com/mpereiraesaa/ps5-native-app-boilerpla
 # 3. The resident Lapy daemon the title ships, from ../PS5-Lapy-JB-Daemon at its pin.
 daemon=$deps/lapy-validation/source/build/owned_root_daemon-service-verified-client
 step "lapy daemon (${daemon#"$root"/})" "$daemon/manifest.json" \
-    python3 "$root/tools/build-lapy-validation.py" --resident --sdk-zip "$deps/ps5-payload-sdk-v0.40.zip"
+    python3 "$root/tools/build-lapy-validation.py" --resident --sdk-zip "$deps/ps5-payload-sdk-v0.42.zip"
 if [[ -f $daemon/lapy-root-daemon.elf ]] &&
         ! sha_ok "$(sed -n 's/^daemon_sha256=//p' "$root/tools/build-production.sh")" "$daemon/lapy-root-daemon.elf"; then
     echo "  the Lapy daemon differs from tools/build-production.sh's pin (README.md, 'Known gaps')" >&2

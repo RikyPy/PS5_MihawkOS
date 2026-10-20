@@ -36,9 +36,9 @@ releases, pacbrew) were not downloaded again; their pins are recorded, not re-ve
   file. The `libSce*.so` files are the upstream link stubs, not console modules.
 - **Pinned.** The fork at `611893fc25ef3e138f5bc2c90d829d8b58174cd2` (`ps5/tools/setup-sdk.sh`), which installs upstream's payload SDK v0.42, SHA-256
   `8cfbc7cd5811e719eb4f0c47eea668d3dc7b40bc8ab11c4a5031d40c23ec02da`, and lays its headers and platform layer over it.
-  The Lapy daemon builds with upstream's v0.40 archive, SHA-256
-  `617fb702df3551f709b2db0a014e618cf39334c9348395a9b005e6504d076a42` (`tools/fetch-all.sh`,
-  `tools/build-lapy-validation.py`).
+  The Lapy daemon builds with the same upstream v0.42 archive, SHA-256
+  `8cfbc7cd5811e719eb4f0c47eea668d3dc7b40bc8ab11c4a5031d40c23ec02da` (`tools/fetch-all.sh`,
+  `tools/build-lapy-validation.py`); v0.42 is the oldest release whose crt accepts firmware 13.40, 13.42 and 13.60.
 - **Evidence for clean.** The fork is one public upstream (github.com/ps5-payload-dev/sdk) plus the author's own
   GPL-3.0-or-later layer, whose headers name their source of each behaviour and whose host tests run with
   `make -C platform test`; the release archives are checked by SHA-256 and used unchanged.
@@ -119,12 +119,13 @@ releases, pacbrew) were not downloaded again; their pins are recorded, not re-ve
 - **Proprietary material.** None found: no Sony or SCE marker, no official SDK header. Upstream tracks one prebuilt
   release ELF; this project does not use it and builds the daemon from source.
 - **Pinned.** Revision `5b8397b9f2b5f12a7bc2f9c8745a00d1c2dd01ad` with the patches in `platform/lapy/`; the resident
-  build is pinned by SHA-256 `c9710b7addda8615c995113c5db3f32334a3cb5814ec8053391108da41621ab4`
-  (`tools/build-production.sh`), reproducible from any folder with clang and LLD 23.1.1
+  build is pinned by SHA-256 `5651f2ade61731a302e2a630344e6bd893a33f6503c90237d0abed699364bd7f`
+  (`tools/build-production.sh`; payload SDK v0.42), reproducible from any folder with clang and LLD 23.1.3
   (`platform/lapy/deterministic-build.patch`). Licence: `platform/lapy/LICENSE` (MIT), equal to upstream's.
 - **Evidence for clean.** Built from public source at a pinned revision, reproducibly. The daemon raises a title's
-  privileges on a console that already runs homebrew; it is a jailbreak-side component by nature. This project's six
-  patches in `platform/lapy/` add no offsets or console constants. The cooperative owned-root backend MihawkOS builds
+  privileges on a console that already runs homebrew; it is a jailbreak-side component by nature. This project's seven
+  patches in `platform/lapy/` add no new console constants; `sdk042-ucred-attrs.patch` adapts an existing field
+  access to payload SDK v0.42's interface. The cooperative owned-root backend MihawkOS builds
   finds the credential slot at run time and refuses unless exactly one slot matches (upstream `owned_root_daemon.c`,
   `README.md`). Upstream credits named public projects for the offsets of its legacy backend (`README.txt`,
   `docs/ELEVATION.md`), which MihawkOS does not build.

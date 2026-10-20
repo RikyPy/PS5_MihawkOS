@@ -87,6 +87,21 @@ phases are in [SELF_INSTALL.md](SELF_INSTALL.md). In short:
     strips CR (`test_pw_setup`). `-04` reruns the first session with no prefix to prove it.
   - Not proven yet: Done → Enter Mihawk OS, and the new-console path after a PS5 restart.
 
+## Parked: native stderr lines spliced by Wine's records in helper logs (2026-10-19, console; after the hotfix)
+
+A gate verdict behind spliced native text is read since 84aefbf (`wine_records` in `tools/run-battery.py`;
+gate-2026-10-19-splice-01 94/94). The splices themselves remain: 848 spliced lines in 558 helper logs, against 945
+in 564 for gate-release-2026-10-19-01. A native `fprintf(stderr, ...)` writes each piece apart, and Wine's whole
+records (`wine_write_stderr`) land between them.
+- Fixed: `pw_wine_dl`'s report now goes out in one write (70 spliced lines to 0).
+- Not fixed: the line-buffered stderr in `native/proton_wine_child.c` left the counts unchanged. Its comment's
+  "564 spliced lines" is the number of logs; the lines were 945. Find out why (another FILE or libc, or
+  `setvbuf` ignored). Then revert the hunk or make it work, and correct the comment.
+- To do, in a gated batch: one write per line, as `pw_wine_dl_libc.c` `report()` does, for
+  `wine/ps5/pw_wine_threads.c` ("kill thread", 334 lines), the "thread … killed" writer (193), `wine/ps5/pw_wine_process.c`
+  ("child signal") and the GPU client's "gpu-client present link=" (platform/graphics patch 0026).
+  Done when the helper logs show 0 spliced lines from these writers.
+
 ## A fixed-base 32-bit installer at 0x400000: its helper gives the carrier's image back (2026-10-19, console)
 
 Old 32-bit installers (many NSIS setup programs; the browser's C4) can load only at `0x400000`, held in every
@@ -5462,3 +5477,53 @@ wallpaper fallback are integrated. All 47 sanitized host suites and 145 patch
 replays pass; paired Linux Wine checks pass 13/13 with the asset present and
 absent. Build04, focused console qualification and the complete gate are next.
 Code remains uncommitted; the previous 49/50 gate does not authorize a commit.
+
+## 2026-10-20: the base PS5 (firmware 13.40) and the Pro (10.01) on one tree
+
+One tree passes the whole mandatory gate on both consoles, on exact fingerprint
+`fd8dd9e63d7219188200de96d16b10951b8b745171e3681ad87ab00698723080`: **94/94 on the base PS5
+(`base-gate-05`)** and **94/94 on the Pro (`pro-gate-01`)**. The gate has 94 cases in this tree (an earlier "98" was a miscount).
+`base-gate-01` to `-04` are the failed gates on the way (17, 8, 20 and 86 of 94), kept at the same detail; their cause was the
+memory guard, then two prefixes it had left half-initialised.
+
+What each console proved, and nothing more:
+
+- **errno 92 (a helper killed in the kernel's loader on firmware 12.00 and later):** proven only by runs on the base PS5. Its
+  helpers load the Wine modules themselves from the staged `<name>.prx.elf` files (`native/pw_prx_elf_ps5.c`, the portable core
+  `src/pw_prx_elf.c`), ntdll first and every module Wine opens after it, and a helper that does die in a load now leaves the
+  module and the firmware in the title's notice (`src/pw_start_failure.c`). The klog of the base runs holds none of "Decrypt error
+  in SELF block", "pager error" or SYSTEM_INTERNAL_DATA_ACCESS_ERROR. The Pro (10.01) keeps the kernel's loader: its helpers
+  never reach this code, and its gate shows the Pro unchanged by it. Every errno 92 run before 2026-10-20 07:00 went to the second
+  console of this checkout's tooling (firmware word 0x13590001, the PS5_Vulkan configuration), not to the base PS5: none of them
+  proves the fix.
+  *Correction, release review of 2026-10-20:* the Pro's helpers take this loader too: 517 of its helper logs in
+  `release-v2-pro-01` show `pw_prx_elf: loaded`, since the version word the Pro reports to programs is 0x12090001. And
+  0x13590001 is the base PS5's own word (all 558 of its helper logs in `release-v2-base-01`), so it does not show that the
+  earlier runs went to another console. Those earlier runs are simply not counted.
+- **`/data` on 13.40:** the access daemon on payload SDK v0.42 (commit e6c9497, daemon sha256 `5651f2ad...bd7f`), granted on the
+  base PS5 on every launch of the gates.
+- **USB keyboard on every index:** proven on the Pro only (3 of 3 replugs, by the owner); on 13.40 only the gate's non-replug
+  cases cover it.
+- **The memory guard (`src/pw_memory_guard.h`):** its 870/940 MiB marks are the Pro's. The base PS5's census reads 731 to
+  1223 MiB with no Wine process (the same 87 processes: no first reading can scale from it), a Wine start is ten helpers holding
+  270-430 MiB, and the console took 1447 MiB over a whole gate with swap-out at 13.4 to 19.5 MiB. The limit is now the firmware
+  generation's: 1600 MiB from 12.00 on, 870 below; a limit a run sets itself is held to that firmware's. Marks scaled from the first
+  census (+200, +300, +400, half the difference) each ended the helpers of every launch.
+  *Correction, release review of 2026-10-20:* the limit is keyed on the version word programs see, so the Pro (word
+  0x12090001) also ran with 1600/1670 MiB in `pro-gate-01` and `release-v2-pro-01`, not 870/940. Whether a Pro can stall
+  before that limit is open; the fix is to key the limit on the installed firmware, then run the Pro again.
+- **late-library (a fixed 0x811000000-byte reservation) on 13.40:** the kernel refuses it with SCE_KERNEL_ERROR_ENOMEM (the
+  process's address-space budget: 31 GiB were reserved before it) while it holds no entry in the range and no Wine view overlaps.
+  Wine told the program ERROR_INVALID_ADDRESS (anon_mmap_tryfixed turned every refusal into EEXIST); patch 1231 keeps ENOMEM
+  (error 8) and the probe stops at the budget, as it would at the end of the free space. Passes on both consoles.
+  *Correction, release review of 2026-10-20:* on this build the Pro stops at the same budget (6 spans, about 31 GiB),
+  where alpha-1-era Pro gates reserved 17 spans (about 917 GiB). The cause is not established; the new module loader,
+  which the Pro now uses, is the leading suspect. The changed probe counts a stop at the budget as a pass, so it no longer
+  catches such a drop. Open.
+
+Two lessons kept for the next agent. (1) The shared tooling's console is PS5_Vulkan's configured one, not this project's
+`ORIGINAL_PS5_HOST`: set PS5_HOST for the base PS5 and point `.deps/console-guard.json` and `.deps/last-console-run` at
+`.deps/consoles/original/`. (2) A wineboot that is ended in the middle (here, by the memory guard) leaves a prefix with a
+`.update-timestamp` and an incomplete registry (no `.lnk` class, no mmdevapi or mfplat classes) that nothing repairs: the
+base PS5's `probe` and `mihawk` prefixes were moved aside (`probe-stale-20261020`, `mihawk-partial-20261020`) and made again.
+A prefix that is half made should be detected and rebuilt by the title (open).

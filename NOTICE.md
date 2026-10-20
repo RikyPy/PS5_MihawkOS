@@ -16,7 +16,7 @@ LGPL-2.1-or-later and is the origin of the PS5 platform work this project builds
   Wine `490f6d5dcbb2a5047345b8af88d114bbcaad69a8` (wine-mirror/wine). Every patch that
   comes from there keeps its authorship and records the rebase it needed for the Proton
   Wine tree. The series is LGPL-2.1-or-later, as Wine, at directory level
-  ([`LICENSING.md`](LICENSING.md)); only 13 of its 208 patches contain
+  ([`LICENSING.md`](LICENSING.md)); only 13 of its 303 patches contain
   an SPDX line, and the ones from prospero-win had none upstream either.
 - the **`/data` grant protocol** (the same-UID call, the atomic `{"PID":<pid>}` request) comes from
   its `native/pw_data_mount.{c,h}`; the client this title now runs is the platform layer's
@@ -111,9 +111,11 @@ upstream root-transfer code and are described in `platform/lapy/README.md`.
 The read-only prospero-win logger header is LGPL-2.1-or-later under that project's
 licence, pinned by SHA-256
 `394af67d0f8b60b3335deb53396e52855ea2daa50ca914a456ea7663f48900c6`.
-The external PS5 payload SDK v0.40 archive is pinned by SHA-256
-`617fb702df3551f709b2db0a014e618cf39334c9348395a9b005e6504d076a42`;
-its toolchain and libraries retain their upstream licences. No payload binary
+The daemon is linked with the upstream PS5 payload SDK v0.42 (github.com/ps5-payload-dev/sdk, tag `v0.42`, commit
+`4eb701204fc3f8d31e84cf8ca272974e2be9c867`; release archive `ps5-payload-sdk.zip`, SHA-256
+`8cfbc7cd5811e719eb4f0c47eea668d3dc7b40bc8ab11c4a5031d40c23ec02da`). Its crt and libc system-call stubs are
+GPL-3.0-or-later (John Törnblom and contributors), so the shipped `lapy-root-daemon.elf` is GPL-3.0-or-later as a
+whole, while Lapy's own code is MIT; the GPL text ships as `licenses/ps5-proton/LICENSE`. No payload binary
 is in the current tree; the history holds the two helper builds described next.
 
 ## Historical helper binaries
@@ -244,7 +246,10 @@ UI nor Segoe UI Variable is bundled or used to build this derivative.
 
 The desktop wallpaper, Aero Meadow (a sky with a sun glow, soap bubbles and green hills), is original artwork drawn
 only by `tools/make-mihawk-wallpaper.py` (LGPL-2.1-or-later, seeded: the same pixels on every run), with no
-photograph or third-party image as input; `tools/build-wine-theme.py` stages it as `proton.bmp`. It replaced Windows
+photograph or third-party image as input; `tools/build-wine-theme.py` stages it as `proton.bmp`. Its top-right note
+(MihawkOS v<VERSION> and the community link) is set in Selawik Semibold and Regular from
+`themes/windows11/fonts/upstream/` (OFL-1.1, listed with the fonts); the OFL does not extend to images made with the
+font. It replaced Windows
 11's Bloom, the owner's local copy, which was never part of the redistributable package.
 
 The launcher's music, Bubble Garden, Glass Meadow and Sky Lounge (Frutiger Aero pieces: Lydian and major pads, glassy
@@ -516,7 +521,7 @@ LGPL, Cascadia Mono's OFL, the Fluent icons' `LICENSE` and `NOTICE`, c-ares, FFm
 build unpacks (`COPYING`, `COPYING.LESSERv2`; `COPYING.LESSERv3`, `COPYINGv2`, `COPYINGv3`; their `AUTHORS`); FreeType's
 `LICENSE.TXT`, `FTL.TXT` and `GPLv2.TXT`; Mesa's `docs/license.rst` (the same at its RADV and WGL/Zink revisions); and
 llvm-mingw's `LICENSE.TXT`. The title folder's `licenses/` holds this project's three files, the Lapy daemon's MIT
-`LICENSE`, Mesa's page for RADV, Sascha Willems' `base/LICENSE.md`, volk, Dear ImGui, libktx, tinygltf, nlohmann/json,
+`LICENSE` (the payload SDK runtime linked into the daemon is covered by this project's GPL text), Mesa's page for RADV, Sascha Willems' `base/LICENSE.md`, volk, Dear ImGui, libktx, tinygltf, nlohmann/json,
 Zstandard's BSD licence, Mbed TLS's `LICENSE` and GLM's manual (its licences are its section 0; the pinned revision has no `copying.txt`). The title's `libc.prx` is
 ps5-native-app-boilerplate's (GPL-3.0-or-later), covered by the GPL text.
 

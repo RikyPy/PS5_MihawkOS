@@ -28,6 +28,7 @@
 #include <sys/socket.h>
 #include <sys/time.h>
 #include <ps5platform/elevation.h>
+#include <ps5platform/kernel.h>
 #include "../../src/pw_elfldr.h"
 #endif
 #include "../../src/pw_pe_arch.h"
@@ -433,6 +434,20 @@ const char *proton_data_note()
 	return gDataNote.c_str();
 }
 
+#if !defined(PS5_HOST_REFERENCE)
+/* This console's firmware as "13.40.0.0", or empty if the call fails. The daemon's crt rejects a firmware it was
+ * not built for and faults before main, so no grant comes; naming it tells a too-new console apart from a dev.conf
+ * fault (base PS5 on 13.40, 2026-10-20). sceKernelGetSystemSwVersion is a plain libkernel call the title may make. */
+static std::string system_firmware()
+{
+	struct ps5_kernel_sw_version version = {};
+	version.size = sizeof(version);
+	if (sceKernelGetSystemSwVersion(&version) == 0 && version.text[0])
+		return std::string(version.text, strnlen(version.text, sizeof(version.text)));
+	return {};
+}
+#endif
+
 std::string proton_data_problem()
 {
 #if defined(PS5_HOST_REFERENCE)
@@ -440,6 +455,8 @@ std::string proton_data_problem()
 #else
 	if (gDataGranted) return {};
 	std::string why;
+	const std::string firmware = system_firmware();
+	const std::string onFirmware = firmware.empty() ? "" : " This console runs firmware " + firmware + ".";
 	/* A loader that mounts /data into the sandbox (ShadowMountPlus) lets the title see dev.conf before it is root. */
 	if (path_exists("/data/homebrew") && !path_exists("/data/homebrew/dev.conf"))
 		why = "/data/homebrew/dev.conf is missing (a format removes it), and the access daemon stops without it. "
@@ -448,8 +465,9 @@ std::string proton_data_problem()
 		why = "websrv is not answering, so the access daemon could not be started. Load elfldr and websrv, then reopen "
 			PS5_TITLE_NAME ".";
 	else if (gDataRetry)
-		why = "the access daemon was started but did not grant it within 15 s. Check that /data/homebrew/dev.conf "
-			"holds DEV_SERVER=127.0.0.1 and DEV_PORT=8080, then reopen " PS5_TITLE_NAME ".";
+		why = "the access daemon was started but did not grant it within 15 s." + onFirmware +
+			" Check that /data/homebrew/dev.conf holds DEV_SERVER=127.0.0.1 and DEV_PORT=8080, then reopen "
+			PS5_TITLE_NAME ".";
 	else if (!gDataNote.empty())
 		why = gDataNote + ".";
 	else

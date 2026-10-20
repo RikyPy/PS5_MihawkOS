@@ -27,18 +27,20 @@ the exact ELF and its no-duplicate/no-launch-this-boot checks.
 | `service-lifecycle.patch` | Finite validation waits for target exit and root-counter baseline |
 | `deterministic-build.patch` | Repeatable build ID and byte-identical payload builds: a SHA-1 linker build ID, and the build identity keyed by each input's path relative to the source, or its file name outside it (the logger header), never by absolute path. Since 2026-10-16 the resident ELF is the same from any folder with the same clang/LLD; the ELF records their versions, so another version gives another file |
 | `resident-log.patch` | Resident diagnostics under `/data/ps5proton/logs/lapy-service.log` |
+| `sdk042-ucred-attrs.patch` | Adapt the ucred attrs calls to the v0.42+ SDK API (a 32-byte blob, not a uint64); v0.42 is the oldest release whose crt accepts firmware 13.40, 13.42 and 13.60 |
 
 ## Build and evidence
 
 ```sh
-python3 tools/build-lapy-validation.py --sdk-zip /path/to/ps5-payload-sdk-v0.40.zip
-python3 tools/build-lapy-validation.py --sdk-zip /path/to/ps5-payload-sdk-v0.40.zip --resident
+python3 tools/build-lapy-validation.py --sdk-zip /path/to/ps5-payload-sdk-v0.42.zip
+python3 tools/build-lapy-validation.py --sdk-zip /path/to/ps5-payload-sdk-v0.42.zip --resident
 ```
 
 Run from the repository root. Inputs are hash-pinned; production validates the
 resident ELF hash/mode/title before packaging. These commands build, not deploy.
-The resident pin re-made on 2026-10-16 (`c9710b7a...`, path-independent) has not
-run on the console yet; the measurements below are of the earlier pin.
+The resident pin re-made on 2026-10-20 (`5651f2ad...`) moved to payload SDK v0.42,
+whose crt accepts firmware 13.40, 13.42 and 13.60 (v0.40 faulted with SIGILL in
+`_start` on 13.40); the measurements below are of an earlier v0.40 pin.
 
 Kstuff-only finite validation completed 11 elevations across six runs, reaped
 28 donors and restored counters. Automatic startup and subsequent reuse were

@@ -84,6 +84,7 @@ declare -A sources=(
     [test_pw_physical_shared]=""
     [test_pw_wine_vm]="wine/ps5/pw_wine_vm.c"
     [test_pw_wine_start]="src/pw_wine_start.c wine/ps5/pw_wine_prx.c"
+    [test_pw_prx_elf]="src/pw_prx_elf.c wine/ps5/pw_wine_prx.c"
     [test_pw_wine_perf]="wine/ps5/pw_wine_perf.c"
     [test_pw_gpu_broker]=""
     # Graphics patch 0018's staging.h, from the applied foundation (setup-graphics-foundation.sh, above).
@@ -103,6 +104,7 @@ declare -A sources=(
     [test_pw_update]="src/pw_update.c src/pw_pack.c src/pw_sha256.c external/zstd/zstddeclib.c"
     [test_pw_release]="src/pw_release.c external/monocypher/monocypher.c external/monocypher/monocypher-ed25519.c"
     [test_pw_pe_arch]="src/pw_pe_arch.c"
+    [test_pw_start_failure]="src/pw_start_failure.c"
     [test_pw_game_folders]="src/pw_game_folders.c src/pw_pe_arch.c"
     [test_pw_pad_script]="src/pw_pad_script.c"
     [test_pw_thread_alert]=""
@@ -225,7 +227,7 @@ if (( $# == 0 )) || [[ "$*" == *console_guard* ]]; then
     for test in console_guard battery_runner shell_capture window_compose_runner appearance_runner profile_report \
             desktop_session_runner desktop_input_runner tls_fixture telemetry_teardown \
             window_material_tokens window_effects_runner frame_pacing_runner deploy_folder console_setup sched_watch run_console_verdicts \
-            placed_unmap_order module_wiring helper_opengl privacy_check dll_overrides prx_exports taskbar_logo stage_licences publication_check title_icon pack_runtime pw_https mihawk_wallpaper mihawk_music browser_lines sign_release package_install check_title_imports carrier_image_probe; do
+            placed_unmap_order module_wiring helper_opengl privacy_check dll_overrides prx_exports taskbar_logo stage_licences publication_check title_icon pack_runtime pw_https mihawk_wallpaper mihawk_music browser_lines sign_release package_install check_title_imports carrier_image_probe payload_firmware; do
         python3 "$root/tests/test_$test.py"
         ran=$((ran + 1))
     done

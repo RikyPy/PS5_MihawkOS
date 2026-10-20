@@ -29,6 +29,17 @@ extern "C" {
 #endif
 
 #define PW_MEMORY_GUARD_LIMIT_MIB 870u      /* the default limit */
+/* The limit on firmware 12.00 and later, measured on the base PS5 (13.40, 2026-10-20) and checked on a second 13.x
+ * console. The census there is not the Pro's: with nothing of Wine's running it read 731 to 1223 MiB at the start of
+ * launches on one console, 87 processes each time (the user's own payloads and services; about 245 MiB on the Pro),
+ * and a Wine start is ten helpers holding 270-430 MiB, so the census went to 1237-1537 MiB in every gate launch. The
+ * console took it: its own resident total reached 1447 MiB over a whole gate (1453 on the second) with swap-out at
+ * 13.4 to 19.5 MiB throughout, so its swap does not begin where the Pro's does. A mark from the first census cannot
+ * follow it (marks of +200, +300, +400 over it, and one that grew with it, ended the helpers of every launch:
+ * base-desktop-01, -02, base-gate-01, -02, -03); the mark is the console generation's. The Pro (firmware 10.01) keeps
+ * PW_MEMORY_GUARD_LIMIT_MIB. */
+#define PW_MEMORY_GUARD_FIRMWARE_MIN 0x12u   /* the version word's high byte, as BCD: 12.00 and later */
+#define PW_MEMORY_GUARD_LIMIT_13_MIB 1600u
 #define PW_MEMORY_GUARD_END_MARGIN_MIB 70u   /* how far past it a game is ended at once */
 #define PW_MEMORY_GUARD_WINDOW_MS 30000u     /* the window the limit is counted over */
 #define PW_MEMORY_GUARD_CLOSE_MS 20000u      /* how long at the limit, within it, asks the game to close */
@@ -61,6 +72,10 @@ struct pw_memory_guard {
 void pw_memory_guard_init(struct pw_memory_guard *guard, unsigned limit_mib, unsigned end_mib);
 /* A census of system bytes taken at now_ms (the census's own time; one not newer than the last is ignored). */
 enum pw_memory_verdict pw_memory_guard_sample(struct pw_memory_guard *guard, uint64_t system, uint64_t now_ms);
+/* The default limit of a console, MiB, from its firmware's version word (sceKernelGetSystemSwVersion): the Pro's for
+ * an earlier firmware than 12.00 or none known (0), PW_MEMORY_GUARD_LIMIT_13_MIB from 12.00 on. The end mark's default
+ * is PW_MEMORY_GUARD_END_MARGIN_MIB past it. */
+unsigned pw_memory_guard_default_limit_mib(unsigned firmware);
 /* After the guard acted on one process in the desktop session (the title ends the process that holds the memory, not
  * the session): it starts over, so the next process that holds the memory is acted on too, after the same times. */
 void pw_memory_guard_rearm(struct pw_memory_guard *guard);

@@ -302,6 +302,14 @@ def main():
     if not client_manifest.get('wsi') or hashlib.sha256(image).hexdigest() != client_manifest['sha256']:
         raise SystemExit('The GPU broker client (.deps/gpu-wsi-client) differs from its manifest')
     (unix / 'libvulkan-helper.prx').write_bytes(image)
+    # The unsigned module ELFs, beside the fake-signed SELFs: the payload helper's user-space loader (13.59, where
+    # the kernel refuses a fake-signed SELF in a payload, errno 92) maps these instead of calling the kernel.
+    for source in sorted((DEPS / 'wine-ps5/prx').glob('*.elf')):
+        if source.name.endswith('.shared.elf'):
+            continue
+        shutil.copy2(source, unix / (source.stem + '.prx.elf'))
+    shutil.copy2(helper / 'prx/win32u.elf', unix / 'win32u-helper.prx.elf')
+    shutil.copy2(client / 'client.elf', unix / 'libvulkan-helper.prx.elf')
     if not (DEPS / 'prefix-probe/system.reg').is_file():
         raise SystemExit('.deps/prefix-probe, the check prefix template, is missing: run tools/fetch-all.sh')
     copy_prefix(DEPS / 'prefix-probe', prefix)

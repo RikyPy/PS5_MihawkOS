@@ -12,7 +12,7 @@ import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 REV = '5b8397b9f2b5f12a7bc2f9c8745a00d1c2dd01ad'
-SDK_SHA = '617fb702df3551f709b2db0a014e618cf39334c9348395a9b005e6504d076a42'
+SDK_SHA = '8cfbc7cd5811e719eb4f0c47eea668d3dc7b40bc8ab11c4a5031d40c23ec02da'
 LOG_SHA = '394af67d0f8b60b3335deb53396e52855ea2daa50ca914a456ea7663f48900c6'
 
 
@@ -38,7 +38,7 @@ def main():
     archive = subprocess.check_output(['git', '-C', str(ROOT.parent / 'PS5-Lapy-JB-Daemon'), 'archive', REV])
     with tarfile.open(fileobj=io.BytesIO(archive)) as tar:
         tar.extractall(source, filter='data')
-    patches = ['stdout-mirror.patch', 'donor-wait.patch', 'donor-release.patch', 'service-lifecycle.patch', 'deterministic-build.patch', 'resident-log.patch']
+    patches = ['stdout-mirror.patch', 'donor-wait.patch', 'donor-release.patch', 'service-lifecycle.patch', 'deterministic-build.patch', 'resident-log.patch', 'sdk042-ucred-attrs.patch']
     for patch in patches:
         subprocess.run(['patch', '-p1', '-i', str(ROOT / 'platform/lapy' / patch)], cwd=source, check=True)
     sdk = work / 'sdk'

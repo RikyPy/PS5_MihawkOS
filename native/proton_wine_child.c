@@ -38,6 +38,9 @@
 #include <sys/param.h>
 #include <sys/cpuset.h>
 #include <sys/rtprio.h>
+#include <ps5platform/kernel.h>
+#include "pw_prx_elf_ps5.h"
+#include "../wine/ps5/pw_wine_dl.h"
 #include <sys/sysctl.h>
 #include <sys/thr.h>
 #include <sys/user.h>
@@ -53,6 +56,7 @@ extern int sceKernelDlsym(int,const char *,void **);
 extern int sceSysmoduleLoadModuleByNameInternal(const char *,unsigned long,unsigned long,unsigned long,unsigned long,unsigned long);
 #endif
 static int output_fd = -1;
+static unsigned child_firmware;
 static void output(const char *text, size_t size)
 {
     while (size && output_fd >= 0) {
@@ -1349,6 +1353,39 @@ static int doom_tick(PwControlDoom *watch, long long now)
     return 1;
 }
 
+/* The staged unsigned ELF beside the fake-signed SELF: load it in this helper's address space (13.59 and later
+ * cannot load the SELF through the kernel). The same fields pw_wine_start_load fills, without a kernel handle or
+ * the ntdll adopt; the caller goes on to the protocol check and the Wine entry. */
+static int wine_start_elf(const char *prx_path)
+{
+    char elf_path[1300], error[192], line[1500];
+    PwPrxElfImage image;
+    int status;
+    snprintf(elf_path, sizeof(elf_path), "%s.elf", prx_path);
+    status = pw_prx_elf_ps5_load(elf_path, &image, error, sizeof(error));
+    if (status) {
+        snprintf(line, sizeof(line), "wine-child: elf load %s status=%d %s\n", elf_path, status, error);
+        stage(line); fsync(output_fd);
+        return status;
+    }
+    wine.module = -1;
+    wine.stage = PW_WINE_START_LOAD;
+    wine.segment_count = image.segment_count < PW_PRX_MAX_SEGMENTS ? image.segment_count : PW_PRX_MAX_SEGMENTS;
+    memcpy(wine.segments, image.segments, sizeof(wine.segments[0]) * wine.segment_count);
+    wine.descriptor = image.descriptor;
+    wine.wine_main = (void (*)(int, char **))pw_prx_lookup(image.descriptor, "__wine_main");
+    wine.virtual_stats = (unsigned int (*)(uint64_t *, unsigned int))pw_prx_lookup(image.descriptor, "__wine_virtual_stats");
+    wine.memory_stats = (unsigned int (*)(uint64_t *, unsigned int))pw_prx_lookup(image.descriptor, "__wine_ps5_memory_stats");
+    wine.fault_top = (unsigned int (*)(uint64_t *, unsigned int))pw_prx_lookup(image.descriptor, "__wine_virtual_fault_top");
+    snprintf(line, sizeof(line), "wine-child: elf load %s base=%#lx segments=%u descriptor=%p module_start=%p\n",
+             elf_path, (unsigned long)image.base, image.segment_count, (const void *)image.descriptor,
+             (void *)image.module_start);
+    stage(line); fsync(output_fd);
+    if (!wine.wine_main) return PW_ERR_NOT_FOUND;
+    if (image.module_start && (wine.module_start_result = image.module_start(0, NULL))) return wine.module_start_result;
+    return 0;
+}
+
 static void wine_child_run(void)
 {
     unsigned mxcsr = 0x1f80;
@@ -1357,6 +1394,18 @@ static void wine_child_run(void)
     snprintf(log_path, sizeof(log_path), PW_LOG_SESSIONS_ROOT "/0/wine-child-%d.log", (int)getpid());
     output_fd = open(log_path, O_WRONLY | O_CREAT | O_TRUNC, 0666);
     stage("wine-child: entry\n");
+    {
+        /* Which console this helper runs on, once per helper: a module load that the kernel stops (errno 92) is a
+         * per-firmware question, and the title's notice names it (src/pw_start_failure.h). */
+        struct ps5_kernel_sw_version firmware = {0};
+        firmware.size = sizeof(firmware);
+        const int status = sceKernelGetSystemSwVersion(&firmware);
+        child_firmware = firmware.version;
+        char firmware_line[96];
+        snprintf(firmware_line, sizeof(firmware_line), "wine-child: firmware status=%d version=%#08x\n",
+                 status, (unsigned)firmware.version);
+        stage(firmware_line);
+    }
     {
         /* native/proton_payload_child.c released the console's TTY before the rendezvous; say what fd 0 was and what
          * became of it (its fstat: what the kernel's TTY(STDIN) slot was registered for). */
@@ -1374,7 +1423,11 @@ static void wine_child_run(void)
     int diagnostic_fd = output_fd >= 0 ? dup(output_fd) : -1;
     FILE *diagnostics = diagnostic_fd >= 0 ? fdopen(diagnostic_fd, "w") : NULL;
     if (diagnostics) {
-        setvbuf(diagnostics, NULL, _IONBF, 0);
+        /* Line-buffered, so a line is one write: unbuffered, fprintf wrote each piece apart and Wine's records from
+         * other threads landed between them (564 spliced lines in gate-release-2026-10-19-01's helper logs). The
+         * buffer is static: allocator diagnostics print through stderr. */
+        static char diagnostics_buffer[4096];
+        setvbuf(diagnostics, diagnostics_buffer, _IOLBF, sizeof(diagnostics_buffer));
         stderr = diagnostics;
         stage("wine-child: native stderr captured\n");
     } else {
@@ -1600,7 +1653,26 @@ static void wine_child_run(void)
         set_env("WINESERVERSOCKET", fd_value) || set_env("WINE_PS5_CHILD", "1") ||
         set_env("WINE_PS5_CHILDREN", "1") ||
         set_env("WINEDLLPATH", boot.dllpath) || set_env("WINEDLLOVERRIDES", boot.overrides) ||
-        set_env("WINEDEBUG", boot.debug) || pw_wine_start_load(&wine, &config, &ops)) {
+        set_env("WINEDEBUG", boot.debug)) {
+        stage("wine-child: environment failed\n"); goto done;
+    }
+    {
+        /* Before the kernel's module loader, which can stop this process inside the call (the pager error at
+         * ntdll.prx's text, errno 92): the line must be on disk first. */
+        char load_line[1300];
+        snprintf(load_line, sizeof(load_line), "wine-child: loading ntdll path=%s\n", ntdll);
+        stage(load_line);
+    }
+    int elf_ntdll_handle = -1;
+    if (pw_prx_elf_ps5_needed(child_firmware)) {
+        const int elf_status = wine_start_elf(ntdll);
+        elf_ntdll_handle = pw_prx_elf_ps5_last_handle();
+        if (elf_status) {
+            char fail_line[128];
+            snprintf(fail_line, sizeof(fail_line), "wine-child: ntdll elf load failed status=%d\n", elf_status);
+            stage(fail_line); goto done;
+        }
+    } else if (pw_wine_start_load(&wine, &config, &ops)) {
         stage("wine-child: ntdll load failed\n"); goto done;
     }
     stage("wine-child: ntdll loaded\n");
@@ -1616,6 +1688,18 @@ static void wine_child_run(void)
             stage("wine-child: ntdll and loader differ; deploy the title and the runtime together\n");
             goto done;
         }
+    }
+    if (pw_prx_elf_ps5_needed(child_firmware)) {
+        static PwWineDlOps elf_dl_ops;
+        elf_dl_ops.load_start = pw_prx_elf_ps5_load_start;
+        elf_dl_ops.module_info = pw_prx_elf_ps5_module_info;
+        void (*dl_configure)(const PwWineDlOps *, const char *) =
+            (void *)pw_prx_lookup(wine.descriptor, "pw_wine_dl_configure");
+        void *(*dl_adopt)(const char *, int32_t) = (void *)pw_prx_lookup(wine.descriptor, "pw_wine_dl_adopt");
+        if (dl_configure) dl_configure(&elf_dl_ops, config.ntdll_dir);
+        if (dl_adopt && elf_ntdll_handle > 0) dl_adopt(ntdll, elf_ntdll_handle);
+        stage(dl_configure ? "wine-child: sibling modules load through the user-space loader\n"
+                           : "wine-child: ntdll has no dl configure; siblings use the kernel\n");
     }
     int (*set_application)(const char *,size_t)=
         (void *)pw_prx_lookup(wine.descriptor,"pw_ps5_set_initial_environment");
@@ -1686,7 +1770,10 @@ static void wine_child_run(void)
         if (payload_raw_sigaction(SIGUSR1, &action, NULL)) goto done;
     }
     int (*adopt_module)(int (*)(int32_t)) = (void *)pw_prx_lookup(wine.descriptor,"__wine_ps5_set_payload_module");
-    if(!adopt_module || adopt_module(payload_prepare_module) || payload_prepare_module(wine.module))goto done;
+    /* A user-space module (wine.module < 0) has no kernel handle to wire: its text is JIT memory and its data is
+     * anonymous memory this loader owns. The hook still goes to ntdll for the kernel-loaded modules of a title. */
+    if(!adopt_module || adopt_module(payload_prepare_module) ||
+       (wine.module >= 0 && payload_prepare_module(wine.module)))goto done;
     if(program_plan.change) {
         int (*thread_start)(void (*)(void))=(void *)pw_prx_lookup(wine.descriptor,"__wine_ps5_set_payload_thread_start");
         if(!thread_start || thread_start(program_thread_start)) {

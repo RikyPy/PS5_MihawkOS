@@ -455,7 +455,8 @@ four sibling repositories beside it, by the README's steps (`tools/package-insta
    Fixed in `5c5728e`.
 4. **The Lapy daemon is not reproducible on this PC any more.** Its pin needs clang/LLD 23.1.1; the host has 23.1.3
    and builds `aa30237b...`, so `build-production.sh` refuses it. The clean room uses the pinned ELF, checked by
-   SHA-256. Open, for the owner (PLAN.md).
+   SHA-256. Closed on 2026-10-20: the daemon now pins payload SDK v0.42 (`5651f2ad...`) and the clean room rebuilt it
+   from source to exactly that file with clang and LLD 23.1.3.
 5. **Found by code review, not by the build:** the daemon opens `/data/ps5proton/logs/lapy-service.log` first, and
    before root the title made only `/data/ps5proton`. A new console would never have been granted `/data`. Fixed in
    `33c587a`.

@@ -34,7 +34,7 @@ title=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["titleId
 # the title folder. tools/build-lapy-validation.py --resident builds it (platform/lapy/README.md),
 # checked first, so a build that cannot ship stops before hours of building.
 daemon=$root/.deps/lapy-validation/source/build/owned_root_daemon-service-verified-client
-daemon_sha256=c9710b7addda8615c995113c5db3f32334a3cb5814ec8053391108da41621ab4
+daemon_sha256=5651f2ade61731a302e2a630344e6bd893a33f6503c90237d0abed699364bd7f
 python3 - "$daemon" "$daemon_sha256" "$title" <<'EOF'
 import hashlib, json, sys
 from pathlib import Path
@@ -47,7 +47,7 @@ if (actual != pinned or manifest['elf_sha256'] != pinned or manifest['mode'] != 
         or manifest['max_requests'] is not None or manifest['target_title'] != title):
     sys.exit('the resident Lapy daemon is not the pinned build (tools/fetch-all.sh keeps one that is there): '
              'rebuild it from the checkout with python3 tools/build-lapy-validation.py --resident '
-             '--sdk-zip .deps/ps5-payload-sdk-v0.40.zip (clang/LLD 23.1.1; README.md, Host tools)')
+             '--sdk-zip .deps/ps5-payload-sdk-v0.42.zip (clang/LLD 23.1.3; README.md, Host tools)')
 EOF
 # PS5_Vulkan at the pinned revision, with its RADV release archive built there (tools/setup-pinned-radv.sh): the
 # sibling checkout's own working tree moves on by itself.
@@ -94,6 +94,11 @@ python3 "$root/tools/extract-dxvk.py"
 "${CC:-cc}" -std=gnu11 -O2 -Wall -Wextra -Werror -I"$root/src" \
     "$root/tools/controls-id.c" "$root/src/pw_controls.c" -o "$root/.deps/controls-id"
 python3 "$root/tools/stage-wine.py"
+# Every payload ELF the install ships must accept the same firmwares in its crt, incl. 10.01 and 13.40: a payload
+# whose crt rejects the running firmware faults in _start before main, so the console silently never gets /data
+# (the v0.40 daemon on 13.40, 2026-10-20). tests/test_payload_firmware.py covers the reader on the host.
+python3 "$root/tools/check-payload-firmware.py" --check \
+    "$root/dist/$title/lapy-root-daemon.elf" "$root/.deps/staged/run/proton-payload-child.elf"
 # The runtime this title was built with: the launcher compares the installed runtime's stamp with this copy.
 cp "$root/.deps/staged/runtime/ge11-7/runtime-stamp" "$root/dist/$title/runtime-stamp"
 # The runtime's pieces (dist/runtime) and their manifest, pinned in the title folder: what the title installs from.

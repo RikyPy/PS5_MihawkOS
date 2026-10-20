@@ -16,6 +16,7 @@
 #include "../ps5/src/proton_launch.h"
 #include "../ps5/src/platform.h"
 #include <ps5platform/memory.h>
+#include <ps5platform/kernel.h>
 #include <sys/resource.h>
 extern "C" {
 #include "../src/pw_wine_start.h"
@@ -28,6 +29,7 @@ extern "C" {
 #include "../src/pw_memory_guard.h"
 #include "../src/pw_hang_breaker.h"
 #include "../src/pw_log_sessions.h"
+#include "../src/pw_start_failure.h"
 #include "../src/pw_desktop_session.h"
 #include "../src/pw_app_environment.h"
 #include "../src/pw_shell_link.h"
@@ -145,7 +147,7 @@ enum NoticeKind { NOTICE_MEMORY_CLOSE, NOTICE_MEMORY_END, NOTICE_SPAWN, NOTICE_G
 // 0 empty, 1 being written, 2 ready, 3 kept for the launcher and posted
 struct Notice { std::atomic<int> state{0}; char text[512]; };
 Notice notices[NOTICE_KINDS];
-std::atomic<int> spawn_errno{0}, gpu_lost_pid{0};   // from Wine's helpers (pw_ps5_set_child_notice), for the loop
+std::atomic<int> spawn_errno{0}, spawn_pid{0}, gpu_lost_pid{0};   // from Wine's helpers (pw_ps5_set_child_notice), for the loop
 std::atomic<bool> spawn_said{false};
 std::string session_prefix;                         // the session's prefix, set before Wine starts
 
@@ -164,7 +166,11 @@ __attribute__((format(printf, 2, 3))) void notice_set(NoticeKind kind, const cha
 void child_notice(int kind, int pid, int value)
 {
     int none = 0;
-    if (kind == PW_CHILD_NOTICE_SPAWN) spawn_errno.compare_exchange_strong(none, value ? value : -1);
+    if (kind == PW_CHILD_NOTICE_SPAWN) {
+        // The pid of the failure whose errno is kept, so the notice reads that helper's log.
+        if (spawn_errno.compare_exchange_strong(none, value ? value : -1) && pid > 0)
+            spawn_pid.store(pid, std::memory_order_relaxed);
+    }
     else if (kind == PW_CHILD_NOTICE_GPU) gpu_lost_pid.compare_exchange_strong(none, pid > 0 ? pid : -1);
 }
 
@@ -175,9 +181,23 @@ void notices_post()
         // fresh pipe's buffer shows it (src/pw_pipe_memory.h; the kernel's own totals are refused to the title).
         const long buffer = pw_pipe_buffer_probe();
         const bool pipes = pw_pipe_memory_low(buffer);
-        say("Wine: a helper could not start (errno %d); a fresh pipe takes %ld bytes%s", error, buffer,
-            pipes ? " (low: more than half the console's pipe memory is used)" : "");
-        if (error == EIO || pipes)
+        // A helper that died inside a module load (errno 92: the kernel's pager error at a fake-signed module's text)
+        // leaves nothing but its own log, which names the module and the firmware (src/pw_start_failure.h).
+        PwStartFailure failure{};
+        char helper_log[96], described[512];
+        const int pid = spawn_pid.load(std::memory_order_relaxed);
+        bool named = false;
+        if (pid > 0) {
+            snprintf(helper_log, sizeof(helper_log), PW_LOG_SESSIONS_ROOT "/0/wine-child-%d.log", pid);
+            named = pw_start_failure_read(helper_log, &failure) == 0 && failure.module[0];
+            if (named) pw_start_failure_describe(&failure, error, described, sizeof(described));
+        }
+        say("Wine: a helper could not start (errno %d); a fresh pipe takes %ld bytes%s%s%s", error, buffer,
+            pipes ? " (low: more than half the console's pipe memory is used)" : "",
+            named ? "; its log says: " : "", named ? described : "");
+        if (named)
+            notice_set(NOTICE_SPAWN, "%s", described);
+        else if (error == EIO || pipes)
             notice_set(NOTICE_SPAWN, "A program could not start (errno %d)%s. Restart the PS5.", error,
                        pipes ? ": the PS5's pipe memory is running out" : "");
         else
@@ -1774,24 +1794,30 @@ void proton_run_wine()
     // The console's system memory, which helpers draw on and the title does not (src/pw_memory_guard.h).
     // PROTON_SYSTEM_MEMORY_LIMIT, in MiB, lowers the limit (0 turns the guard off), and PROTON_SYSTEM_MEMORY_END the
     // mark past which a game is ended at once.
+    // The defaults are the Pro's (firmware 10.01); 12.00 and later has its own (src/pw_memory_guard.h), and a limit the run
+    // sets itself is held to that firmware's, as the Pro's was.
+    struct ps5_kernel_sw_version firmware = {};
+    firmware.size = sizeof(firmware);
+    if (sceKernelGetSystemSwVersion(&firmware) != 0) firmware.version = 0;
+    const unsigned default_limit = pw_memory_guard_default_limit_mib(firmware.version);
     const char *memory_limit_setting = getenv("PROTON_SYSTEM_MEMORY_LIMIT");
     const char *memory_end_setting = getenv("PROTON_SYSTEM_MEMORY_END");
     const unsigned memory_limit_asked = memory_limit_setting ? (unsigned)strtoul(memory_limit_setting, nullptr, 10)
-                                                             : PW_MEMORY_GUARD_LIMIT_MIB;
+                                                             : default_limit;
     // Helpers' code is JIT memory, charged to their resident flexible memory with no cap but this guard, and a limit
     // past the console's ~989 MiB (the earlier emulator experiment's runs asked 1250) is never reached before it swaps: a guard that never acts.
-    const unsigned memory_limit = std::min(memory_limit_asked, PW_MEMORY_GUARD_LIMIT_MIB);
+    unsigned memory_limit = std::min(memory_limit_asked, default_limit);
     if (memory_limit != memory_limit_asked)
         say("Wine: PROTON_SYSTEM_MEMORY_LIMIT=%u MiB is past the guard's %u MiB; using %u MiB", memory_limit_asked,
-            PW_MEMORY_GUARD_LIMIT_MIB, memory_limit);
+            default_limit, memory_limit);
     const unsigned memory_end_asked = memory_end_setting ? (unsigned)strtoul(memory_end_setting, nullptr, 10)
                                                          : memory_limit + PW_MEMORY_GUARD_END_MARGIN_MIB;
     // An end mark past the guard's own is past the console's ~989 MiB before it is reached, and turns the steep-climb
     // rule off. Not the lowered limit plus the margin: the gate's memory-guard case keeps its end out of reach.
-    const unsigned memory_end = std::min(memory_end_asked, PW_MEMORY_GUARD_LIMIT_MIB + PW_MEMORY_GUARD_END_MARGIN_MIB);
+    unsigned memory_end = std::min(memory_end_asked, default_limit + PW_MEMORY_GUARD_END_MARGIN_MIB);
     if (memory_end != memory_end_asked)
         say("Wine: PROTON_SYSTEM_MEMORY_END=%u MiB is past the guard's %u MiB; using %u MiB", memory_end_asked,
-            PW_MEMORY_GUARD_LIMIT_MIB + PW_MEMORY_GUARD_END_MARGIN_MIB, memory_end);
+            default_limit + PW_MEMORY_GUARD_END_MARGIN_MIB, memory_end);
     pw_memory_guard memory_guard{};
     pw_memory_guard_init(&memory_guard, memory_limit, memory_end);
     pw_memory_census census{}, census_peak{};
@@ -2109,12 +2135,13 @@ void proton_run_wine()
                 }
             } else {
                 const uint64_t age = monotonic_ms() - census.taken_ms;
-                if (!census_seen)
+                if (!census_seen) {
                     say("Wine: system memory %llu MiB in %u processes at the start; a game is asked to close when its "
                         "helpers hold it at %u MiB for %u of %u s, and ended when they hold it past %u MiB for %u s",
                         (unsigned long long)(census.system >> 20), census.processes, memory_limit,
                         PW_MEMORY_GUARD_CLOSE_MS / 1000, PW_MEMORY_GUARD_WINDOW_MS / 1000, memory_end,
                         PW_MEMORY_GUARD_END_MS / 1000);
+                }
                 census_seen = true;
                 if (census.system > census_peak.system) census_peak = census;
                 if (age > 5000 && !census_stale_said)
@@ -2230,8 +2257,8 @@ void proton_run_wine()
                 (unsigned long long)stats.inputs_posted, (unsigned long long)stats.inputs_dropped, files.live,
                 files.parked, files.parks, files.unparks, files.limit_hits, files.failures,
                 files.disabled ? " (budget off)" : "");
-            if (usb.keyboard >= 0 || usb.mouse >= 0)
-                say("usb: keyboard=%s mouse=%s key events=%llu mouse events=%llu", usb.keyboard >= 0 ? "open" : "none",
+            if (usb.keyboards || usb.mouse >= 0)
+                say("usb: keyboards=%u mouse=%s key events=%llu mouse events=%llu", usb.keyboards,
                     usb.mouse >= 0 ? "open" : "none", (unsigned long long)usb.keys_sent,
                     (unsigned long long)usb.mouse_sent);
             if (census_seen)

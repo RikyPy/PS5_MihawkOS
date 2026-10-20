@@ -2,6 +2,7 @@
 #include "pw_wine_dl.h"
 #include "pw_wine_prx.h"
 #include <pthread.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -87,11 +88,26 @@ static Module *find(const char *path)
     for(uint32_t i=0;i<loaded;i++)if(!strcmp(modules[order[i]].path,path))return &modules[order[i]];
     return NULL;
 }
+/* A helper's own log gets one line before and one after each module load (src/pw_start_failure.h): a load the kernel
+ * stops (errno 92, the pager error at a module's text) never returns, and the last "loading" line names the module.
+ * Through report, one write each: ntdll's fprintf reaches the log in pieces (848 spliced lines in
+ * gate-2026-10-19-splice-01). Only a helper, whose report is the loader's plain log write, so it may run under lock. */
+static void trace_load(const char *path,int loading,int32_t handle)
+{
+    char line[PW_WINE_DL_REPORT];
+    if(!ops.report || !getenv("WINE_PS5_CHILD"))return;
+    if(loading)snprintf(line,sizeof(line),"pw_wine_dl: loading %s",path);
+    else snprintf(line,sizeof(line),"pw_wine_dl: %s %s handle=%#x",handle>=0?"loaded":"refused",path,(unsigned)handle);
+    ops.report(line);
+}
 static int32_t load_one(const char *path)
 {
     int result=0;
     append(" ");append(path);
-    return ops.load_start?ops.load_start(path,0,NULL,0,NULL,&result):-1;
+    trace_load(path,1,0);
+    const int32_t handle=ops.load_start?ops.load_start(path,0,NULL,0,NULL,&result):-1;
+    trace_load(path,0,handle);
+    return handle;
 }
 /* A Windows program in a Sony-managed helper process (WINE_PS5_CHILD) loads a module's helper build when the
  * runtime has one beside it: "name-helper.prx" for "name.prx". win32u's has no OpenGL driver, whose system

@@ -348,6 +348,60 @@ static BOOL shortcut_icon_location(const WCHAR *prefix, WCHAR *file, DWORD size,
     return found;
 }
 
+/* What the shell link object itself says of one shortcut file, read as the shell reads it: the next run on a console where
+ * the shell's icon location is the generic one (base PS5 13.40, 2026-10-20) shows which step lost it. */
+static void shortcut_load_notes(int folder, const WCHAR *name)
+{
+    WCHAR path[MAX_PATH], target[MAX_PATH], icon[MAX_PATH];
+    IShellLinkW *link = NULL;
+    IPersistFile *file = NULL;
+    int index = 0;
+    char text[600];
+    HRESULT created, loaded = E_FAIL, got_icon = E_FAIL, got_path = E_FAIL;
+    DWORD attributes, size = 0;
+    HANDLE handle;
+
+    path[0] = target[0] = icon[0] = 0;
+    if (FAILED(SHGetFolderPathW(NULL, folder, NULL, 0, path))) return;
+    PathAppendW(path, name);
+    attributes = GetFileAttributesW(path);
+    handle = CreateFileW(path, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
+    if (handle != INVALID_HANDLE_VALUE) { size = GetFileSize(handle, NULL); CloseHandle(handle); }
+    created = CoCreateInstance(&CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER, &IID_IShellLinkW, (void **)&link);
+    if (SUCCEEDED(created) && SUCCEEDED(IShellLinkW_QueryInterface(link, &IID_IPersistFile, (void **)&file))) {
+        loaded = IPersistFile_Load(file, path, STGM_READ);
+        if (SUCCEEDED(loaded)) {
+            got_icon = IShellLinkW_GetIconLocation(link, icon, MAX_PATH, &index);
+            got_path = IShellLinkW_GetPath(link, target, MAX_PATH, NULL, 0);
+        }
+        IPersistFile_Release(file);
+    }
+    {
+        /* The registry the shell consults for a .lnk file's icon: its class, the class's own default icon and handler. */
+        static const WCHAR *const keys[] = { L".lnk", L"lnkfile", L"lnkfile\\DefaultIcon", L"lnkfile\\shellex\\IconHandler" };
+        for (int i = 0; i < 4; ++i) {
+            WCHAR value[260];
+            DWORD bytes = sizeof(value), type = 0;
+            HKEY key;
+            LONG opened, status = -1;
+            value[0] = 0;
+            opened = RegOpenKeyExW(HKEY_CLASSES_ROOT, keys[i], 0, KEY_READ, &key);
+            if (!opened) {
+                status = RegQueryValueExW(key, NULL, NULL, &type, (BYTE *)value, &bytes);
+                RegCloseKey(key);
+            }
+            wsprintfA(text, "desktop-view note: HKCR\\%ls open=%ld default status=%ld type=%lu '%ls'\n", keys[i], (long)opened, (long)status,
+                      (unsigned long)type, value);
+            line(text);
+        }
+    }
+    wsprintfA(text, "desktop-view note: link %ls attributes=%08lx size=%lu create=%08lx load=%08lx icon=%08lx '%ls' index %d path=%08lx '%ls'\n",
+              name, attributes, size, (unsigned long)created, (unsigned long)loaded, (unsigned long)got_icon, icon, index,
+              (unsigned long)got_path, target);
+    line(text);
+    if (link) IShellLinkW_Release(link);
+}
+
 /* Whether the icon a shortcut names can be taken out of its file, the step after the location (what the view does to draw it). */
 static void icon_extraction_notes(const WCHAR *file, int index)
 {
@@ -523,6 +577,7 @@ void mainCRTStartup(void)
         wsprintfA(text, "desktop-view note: Appearance icon location %ls index %d\n", file, index);
         line(text);
         check(found && file[0] && !StrStrIW(file, L"shell32"), "a shortcut on the Desktop has its own icon location");
+        shortcut_load_notes(CSIDL_DESKTOPDIRECTORY, L"Appearance.lnk");
         icon_extraction_notes(file, index);
         check(shell_icon_notes(CSIDL_DESKTOPDIRECTORY, L"Appearance.lnk"), "a Desktop shortcut's icon shows its picture and not the arrow alone");
         {

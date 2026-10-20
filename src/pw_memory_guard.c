@@ -11,6 +11,11 @@ void pw_memory_guard_init(struct pw_memory_guard *guard, unsigned limit_mib, uns
     guard->end = (uint64_t)(end_mib ? end_mib : limit_mib + PW_MEMORY_GUARD_END_MARGIN_MIB) << 20;
 }
 
+unsigned pw_memory_guard_default_limit_mib(unsigned firmware)
+{
+    return (firmware >> 24) >= PW_MEMORY_GUARD_FIRMWARE_MIN ? PW_MEMORY_GUARD_LIMIT_13_MIB : PW_MEMORY_GUARD_LIMIT_MIB;
+}
+
 void pw_memory_guard_rearm(struct pw_memory_guard *guard)
 {
     pw_memory_guard_init(guard, (unsigned)(guard->limit >> 20), (unsigned)(guard->end >> 20));

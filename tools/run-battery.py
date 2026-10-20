@@ -362,9 +362,26 @@ GROUPS = {
 }
 OWNER = 'PS5_PROTON_OWNER_BOOTSTRAP'
 EXIT_STALL = 15   # run-console.py --exit-stall's default
-SEQUENCE_LINE = re.compile(r'^(\d+\.\d{3}):.*:debugstr:OutputDebugStringA "PS5_PROTON_GATE_SEQUENCE (begin|end) '
-                           r'case=([\w-]+)(?: status=([\w-]+))?', re.M)
+SEQUENCE_RECORD = re.compile(r':debugstr:OutputDebugStringA "PS5_PROTON_GATE_SEQUENCE (begin|end) '
+                             r'case=([\w-]+)(?: status=([\w-]+))?')
 WINE_TIME = re.compile(r'^(\d+\.\d{3}):[\da-f]{4}:', re.M)
+WINE_RECORD = re.compile(r'(\d+)\.(\d{3}):[\da-f]{4,}:[\da-f]{4,}:')
+
+
+def wine_records(text):
+    """Each line's Wine debug record, (time, the line from its timestamp on), wherever in the line it starts: native
+    text written in pieces can land in front of a record another thread wrote whole (gate-release-2026-10-19-01's
+    kill-convert PASS behind "wine-ps5: kill thread 18bee"). Text that ends in digits runs them into the record's
+    seconds ("18f24" + "2340.735"), so a record that does not start its line takes the reading of its seconds nearest
+    the record before it. Text before a record is never read as the record's."""
+    last = None
+    for line in text.splitlines():
+        if not (m := WINE_RECORD.search(line)):
+            continue
+        seconds, millis = m.groups()
+        readings = [float(f'{seconds[i:]}.{millis}') for i in range(len(seconds))]
+        last = readings[0] if not m.start() or last is None else min(readings, key=lambda at: abs(at - last))
+        yield last, line[m.start():]
 
 
 def sequence_entry(name, case):
@@ -394,12 +411,15 @@ def sequence_outcomes(run, members):
     that started in its window. members: (case, marker)."""
     logs = {int(path.stem.rsplit('-', 1)[1]): path.read_text(errors='replace')
             for path in (ROOT / 'klog').glob(run + '-wine-child-*.log')}
+    records = {pid: list(wine_records(text)) for pid, text in logs.items()}
     windows = {}
-    for text in logs.values():
-        for at, what, case, status in SEQUENCE_LINE.findall(text):
-            windows.setdefault(case, {})[what] = float(at)
-            if what == 'end':
-                windows[case]['status'] = status
+    for found in records.values():
+        for at, record in found:
+            if m := SEQUENCE_RECORD.search(record):
+                what, case, status = m.groups()
+                windows.setdefault(case, {})[what] = at
+                if what == 'end':
+                    windows[case]['status'] = status
     starts = {pid: float(m.group(1)) for pid, text in logs.items() if (m := WINE_TIME.search(text))}
     outcomes = {}
     for name, marker in members:
@@ -409,11 +429,10 @@ def sequence_outcomes(run, members):
         if end is not None and marker == OWNER:
             verdict = 'PASS' if status == '0' else 'FAIL'
         elif end is not None:
-            for pid in sorted(logs):
-                for line in logs[pid].splitlines():
-                    if (f'{marker} PASS' in line or f'{marker} FAIL' in line) and (m := WINE_TIME.match(line)) and \
-                            begin <= float(m.group(1)) <= end:
-                        verdict, verdict_at = 'PASS' if f'{marker} PASS' in line else 'FAIL', float(m.group(1))
+            for pid in sorted(records):
+                for at, record in records[pid]:
+                    if (f'{marker} PASS' in record or f'{marker} FAIL' in record) and begin <= at <= end:
+                        verdict, verdict_at = 'PASS' if f'{marker} PASS' in record else 'FAIL', at
                         break
                 if verdict:
                     break

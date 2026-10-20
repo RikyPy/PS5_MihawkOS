@@ -28,7 +28,8 @@ The repository and any build of it contain no:
 - Sony SDK files, official Sony headers or libraries, or leaked documents.
 
 It does carry one program that only works on a console that already runs homebrew, built from its public source: the
-Lapy daemon (MIT), which lets this title read `/data`. ShadowMountPlus, which mounts the title's folder, is a separate
+Lapy daemon (MIT source, linked with the payload SDK's GPL-3.0-or-later runtime), which lets this title read
+`/data`. ShadowMountPlus, which mounts the title's folder, is a separate
 project that the user installs; MihawkOS does not ship or change it.
 
 The tested setup needs a console that runs homebrew. The user sets that up, with tools from their own authors; the

@@ -1,0 +1,92 @@
+{
+  "battery": "base-fix-03",
+  "expected_cases": [
+    "desktop-session",
+    "desktop-view"
+  ],
+  "revision": "13aa9b3ec97dcb9120b6f021ce5b679b8236d964",
+  "dirty": true,
+  "cases": [
+    {
+      "case": "desktop-session",
+      "run": "base-fix-03-desktop-session",
+      "runner_status": 0,
+      "seconds": 240.2,
+      "result": "finished",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "run_seconds": 167.3,
+      "launch_readiness": {
+        "ready": true,
+        "seconds": 0.165,
+        "settle_seconds": 0.0,
+        "census_seconds": 0.152,
+        "previous_cleanup_verified": true
+      },
+      "stages": {
+        "launched": 2.9,
+        "title_started": 3.4,
+        "elevated": 3.4,
+        "wine_loaded": 3.82,
+        "wineboot_started": 8.77,
+        "wineboot_ended": 115.58,
+        "program_started": 131.89,
+        "marker": 161.67,
+        "program_ended": 161.73,
+        "wine_ended": 163.4,
+        "launcher_started": 164.81,
+        "launcher_ended": 165.14,
+        "closed": 167.29
+      },
+      "runner_overhead_seconds": 72.9,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 26,
+      "protocol_errors": 0
+    },
+    {
+      "case": "desktop-view",
+      "run": "base-fix-03-desktop-view",
+      "runner_status": 0,
+      "seconds": 44.3,
+      "result": "finished",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "run_seconds": 39.1,
+      "launch_readiness": {
+        "ready": true,
+        "seconds": 0.156,
+        "settle_seconds": 0.0,
+        "census_seconds": 0.144,
+        "previous_cleanup_verified": true
+      },
+      "stages": {
+        "launched": 2.91,
+        "title_started": 3.39,
+        "elevated": 3.39,
+        "wine_loaded": 3.57,
+        "wineboot_started": 8.58,
+        "wineboot_ended": 12.27,
+        "program_started": 12.31,
+        "marker": 33.52,
+        "program_ended": 33.64,
+        "wine_ended": 35.05,
+        "launcher_started": 36.57,
+        "launcher_ended": 36.91,
+        "closed": 39.12
+      },
+      "runner_overhead_seconds": 5.2,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 12,
+      "protocol_errors": 0
+    }
+  ],
+  "complete": true,
+  "seconds": 284.5,
+  "passed": true
+}
