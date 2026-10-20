@@ -152,9 +152,9 @@ static void test_profile_dirs(void)
     assert(mkdir(path, 0777) == 0);
     /* Parents come before children, so one pass makes the whole tree; a second pass changes nothing. */
     assert(pw_wine_launch_profile_dirs(base, make_dir, &calls) == 0 && calls == 24);
-    snprintf(path, sizeof(path), "%s/drive_c/users/steamuser/AppData/Roaming", base);
+    snprintf(path, sizeof(path), "%s/drive_c/users/Mihawk/AppData/Roaming", base);
     assert(stat(path, &status) == 0 && S_ISDIR(status.st_mode));
-    snprintf(path, sizeof(path), "%s/drive_c/users/steamuser/Saved Games", base);
+    snprintf(path, sizeof(path), "%s/drive_c/users/Mihawk/Saved Games", base);
     assert(stat(path, &status) == 0 && S_ISDIR(status.st_mode));
     snprintf(path, sizeof(path), "%s/drive_c/users/Public/Videos", base);
     assert(stat(path, &status) == 0 && S_ISDIR(status.st_mode));

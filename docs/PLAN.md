@@ -1,5 +1,119 @@
 # Plan
 
+## The combined alpha-3 gates (2026-10-20, console: both, one build)
+
+One tree with every alpha-3 change (the user Mihawk, Settings > Logging, the taskbar fix, the firmware-keyed decisions,
+the address-space and free-area-search fixes, the contributor docs), built in a clean room, build fingerprint
+`4fd9c7f4f502f44a`, 146 host tests, 96 gate cases (new: `detailed-logs`, `mihawk-browser`):
+- `alpha3-base-01` (standard PS5, 13.40): 96/96, 2167.7 s. Its klogs hold 352 "kern.ipc.maxpipekva exceeded" lines in 43
+  launches (base-gate-05 on the same console: 337); no TTY(STDIN) or errno=5 line. The console needs a full restart before any
+  further use.
+- `alpha3-pro-01` (PS5 Pro, 10.01): 96/96, 1862.6 s; 0 such lines.
+- On both: `search_errors` 0 in every case; `late-library` reserved 917 GiB (floor 900); `mihawk-browser` passed.
+- Each console's own mihawk prefix moved to the user Mihawk during its gate; their registries were backed up off the
+  tree first.
+
+## The Windows user is Mihawk; older prefixes move once (2026-10-20, console: base PS5, a new and a moved prefix pass)
+
+The owner wants the Windows user to be Mihawk, not Proton's `steamuser`, for v3.0.0-alpha-3. Every profile path Wine
+makes follows GetUserNameW (shell32's `%USERPROFILE%`, so Documents, AppData and Saved Games; wineboot's ProfileList
+ProfileImagePath and Volatile Environment; LookupAccountSid), which Proton fixed at `steamuser`. Patch 1240 makes it
+Mihawk, and the title's Unix `USER` (Wine's `WINEUSERNAME`) agrees. The title's user folders, `tools/deploy-wine.py`
+and the staged probe prefix (its template is a host wineboot's) use the same name.
+- A prefix of alpha-1 or alpha-2 holds the user's saves in `C:\users\steamuser`. Before Wine starts on a prefix, the
+  title moves it once (`src/pw_wine_profile.h`): the folder (one rename, or name by name into an existing Mihawk; a
+  file both hold stays in steamuser), a link `C:\users\steamuser` to Mihawk for stored absolute paths (a line of
+  `users/.pw-symlinks`, since a title cannot make links), every registry reference (paths after `users\`, the saved
+  `USERNAME`), each file synced and renamed over the old, then the marker `.pw-profile-user`. Each step is safe to
+  repeat, so an interrupted move finishes on the next start; an error is logged and Wine starts anyway.
+- Host proof: `tests/test_pw_wine_profile.c` moves a prefix laid out as an alpha-2 one and finishes each interrupted
+  state (after the rename, mid-merge, mid-registry with a half-written copy, before the marker, a torn marker). A copy
+  of a console prefix's registry (`PW_PROFILE_REAL_REGISTRY`, 4,153,452 bytes, 2026-10-12) had 36 references, all
+  moved, every other byte kept; the probe template had 61, all moved, and the staging's Python rules give the same
+  bytes as the C ones on both.
+- On the console (base PS5, 2026-10-20; the owner's mihawk prefix untouched, its registry backed up off the tree; no
+  desktop session, no gate):
+  - `profile-new-base-01` (`tools/run-prefix-test.py`) passed 16/16: a prefix the console's wineboot made has the user
+    Mihawk, USERPROFILE `C:\users\Mihawk` and no steamuser folder, and an MSI installed and ran; the title wrote only
+    the marker.
+  - `profile-move-base-01` failed 1 of its 10 checks. The probe prefix had been put back in alpha-2's layout
+    (`users/steamuser`, the registry as alpha-2's staging wrote it, a save planted in Documents). The title moved it
+    (1 rename, the link, 3 registry files, 61 references), and the user, USERPROFILE, the save in the new Documents
+    and a `C:\users` listing without steamuser all passed. But the old path `C:\users\steamuser\Documents\...` was not found:
+    Wine's Unix side read link tables only along the path as named (`dosdevices/c:/users`, which the kernel does not
+    have), never along the followed one (`drive_c/users`). It now reads both (`wine/ps5/pw_wine_cwd_libc.c`, reload;
+    `tests/test_pw_wine_cwd_links.c` fails without it).
+  - `profile-move-base-02`, the fix deployed and the prefix reset to the old layout (63 references), passed 10/10:
+    the save is found through the profile and through the old steamuser path.
+- Not shown on the console: Explorer and Start drawing the name (they read the same GetUserNameW the probe checks;
+  that needs a desktop session, left to the combined alpha-3 gate). Limits: the link matches the exact old name (a
+  stored `C:\Users\SteamUser` is not followed), and registry hex values keep the old path (the link covers them).
+
+## Settings > Logging: one folder of a session's logs for a player to post (2026-10-20; host-tested, ran on the standard PS5)
+
+The owner wants non-technical players to send logs without a PC running a klog client. With Settings > Logging on
+(default off, `logging.txt`), each session writes `/data/ps5proton/logs/detailed/<UTC start>/`
+([src/pw_detailed_logs.h](../src/pw_detailed_logs.h)):
+- **At the session's start:** README.txt (what to zip and post, mask the IP, program folder names show), the process's
+  title-early.log, and klog.txt.
+- **At the next title start, after the grant:** the session's other logs (title-last, wine-last, lapy-service, wine-stdout,
+  DXVK's, wine-child-*, flight-recorder, setup.txt). Copying then also covers a session that crashed or froze.
+- **The kernel log** comes only from klogsrv on 127.0.0.1:3232. klogsrv serves several clients at once and opens
+  /dev/klog only while one is connected, so the PC's client keeps its stream. Without klogsrv the connect is refused
+  and the folder has no klog.txt; README.txt says so.
+- **Detail:** while on, WINEDEBUG adds `+process,warn+all` (warn-seh stays last) and the sync device keeps its last
+  8192 operations for a hang's dump.
+- **Privacy:** every copy masks dotted IPv4 addresses. On random text, chunked masking is fuzzed against whole-text
+  masking and never masks less.
+- **Bounds:** 5 folders, 96 MiB each, 480 MiB in all.
+- **Console check:** `tools/run-detailed-logs.py` runs one session with Logging off and then on, and checks the
+  folder. It is in `GATE_CASES` as `detailed-logs` (the coordinator, 2026-10-20), which runs the on leg only.
+
+**On the standard PS5 (13.40), 2026-10-20, build cc9508d2, the Mihawk desktop for 30 s:**
+- **Run `loud-failures-logging-2026-10-20-02`:** both sessions passed (closed on request, back to the launcher).
+  - The folder `2026-10-20_16-16-56` held 19 files, 436 KB in all: README.txt, title-early.log, title-last.log,
+    wine-last.log, flight-recorder.log, 11 wine-child logs, setup.txt, wine-stdout.txt and klog.txt (51 KB).
+  - The launcher said "16 files copied, 0 left out (status 0)".
+  - lapy-service.log was not on this console's /data/ps5proton/logs, so it was not copied.
+  - The PC's own klog of the run kept going while the title read klogsrv.
+- **The runner's verdict was FAILED**, from its own scan: the numeric example address in README.txt.
+  - README.txt now shows only the placeholder 192.168.x.y, and a host test checks that it holds no address. The
+    scan still covers every file, since a player's folder must pass it too.
+  - On the host, a re-scan of the downloaded folder found no other address, and the console's own address in no file.
+- **The cost, off against on:**
+  - The helpers wrote 228,749 and 355,094 bytes (+55%).
+  - The additions were trace:process 40 KB, warn:font 40 KB, warn:wgl 28 KB and warn:file 7 KB. The wgl and font
+    lines are one-time start-up lines in each process, not per frame.
+  - The sessions took 55.9 and 56.3 s. The desktop session has no pacing record.
+  - A game at 120 Hz is not measured yet: it is planned for the combined alpha-3 cycle.
+- **Run `-01`:**
+  - Its off leg was the first session on the newly deployed runtime. Its prefix was updated, and its desktop did not
+    close on request: the title ended 6 helpers after the stop, so the run failed.
+  - Its on leg passed.
+  - The symptom may be real: the first session on a freshly deployed runtime did not end on request. The combined
+    gate's desktop-stop case will show whether it repeats.
+  - The runner then counted FTP's `.` and `..` as new folders (fixed), so its folder `2026-10-20_16-14-25` was not
+    checked.
+- **Not run:** a session without klogsrv.
+
+## Done: no File Explorer button on the taskbar of an idle desktop (2026-10-20, console; patch 1215)
+
+The owner saw a File Explorer "tab" open in every Mihawk OS session: the taskbar's File Explorer pin carried its running
+pill with no File Explorer window (pro-gate-01's desktop-session captures 01 and 02, only the probe's window on screen).
+A window lights a pin when the taskbar counts it and its process image is the pin's, and the shell itself is
+explorer.exe. The window was the desktop's own folder view (SHELLDLL_DefView, a visible child of Progman): Progman hands
+the messages it does not handle to the desktop window's procedure, whose WM_PARENTNOTIFY case adopted the new child as a
+program's window, and the taskbar never asked whether a window is top-level. Patch 1215 counts only top-level windows, as
+Windows does, and logs one line (warn+explorer) the first time it counts each window: what it lights or why it has no
+button, with its class, process, styles, parent and owner.
+
+Proof, `taskbar-pill-01` (standard PS5, 60 Hz, tools/run-frame-pacing.py on 67d0b55 + 1215): no pill on the start-up and
+idle captures; the probe's window has its own button; File Explorer opened lights its pin (capture 11). The log names the
+folder view (0x1007A, the shell's pid 0020) as having no button for not being top-level. The run passed: 571 steady
+compositions, 2,742 us mean, 8,723 us max; File Explorer's opening 14,087 us max (the Pro at 120 Hz on 2026-10-18:
+14,654). Game Mode was not in this run (the combined gate's cases cover it). Not changed: Progman still forwards its
+children's WM_PARENTNOTIFY, so the folder view stays in the taskbar's list, uncounted.
+
 ## MihawkOS without a PC: installs itself, says what failed, adds games easily (2026-10-18; phases 1-3 ran, 5-7 built)
 
 The owner's goal: a user with a jailbroken PS5 and no PC installs MihawkOS over the console's internet connection,
@@ -5527,3 +5641,45 @@ Two lessons kept for the next agent. (1) The shared tooling's console is PS5_Vul
 `.update-timestamp` and an incomplete registry (no `.lnk` class, no mmdevapi or mfplat classes) that nothing repairs: the
 base PS5's `probe` and `mihawk` prefixes were moved aside (`probe-stale-20261020`, `mihawk-partial-20261020`) and made again.
 A prefix that is half made should be detected and rebuilt by the title (open).
+
+## 2026-10-20: alpha-3 — firmware-keyed decisions, the address-space regression, the search regression
+
+Written plainly, so the next agent does not rebuild the history from the log. Measurements are in `evidence/` and the helper
+logs of the named runs; the alpha-3 build has had no gate of its own yet (the combined gates run from the integration branch).
+
+**1. Decisions that depend on the console's firmware now read the installed firmware.** The version word programs see
+(`sceKernelGetSystemSwVersion`) is spoofed by the enabler: 0x12090001 on the Pro (installed 10.01), 0x13590001 on the base PS5
+(installed 13.40). Keying on it made the Pro take the base PS5's memory-guard limit (1600/1670 MiB, not 870/940) and the
+user-space module loader in alpha-2, which the earlier text above says. `src/pw_firmware.[ch]` + `native/pw_firmware_ps5.c`
+read `sysctl kern.sdk_version` (the installed firmware, BCD) and fall back to the reported word. The memory guard's default limit
+(`pw_memory_guard_default_limit_mib`), the helpers' module loader (`prx_loader_wanted`: `pw_prx_elf_ps5_needed` on the
+installed firmware; `WINE_PS5_PRX_LOADER=1|0` overrides it for an A/B), the launcher's firmware line and the late-library probe's floor
+all take it. Verified on the console: Pro "firmware 10.01 installed (the system reports 12.09), limit 870 MiB, kernel loader";
+base PS5 "13.40 installed (13.59), limit 1600 MiB, user-space loader".
+
+**2. The address-space regression of alpha-2 (introduced in e15960a, shipped in alpha-2, found 2026-10-20, fixed in alpha-3).**
+alpha-1 reserved 17 spans (about 917 GiB) in `late-library-probe` on the Pro; alpha-2 reserved 6 (about 31 GiB) and the probe
+still passed, because it counted any stop as the end of the free space. Cause: the kernel keeps JIT-arena holds that are not
+Wine views, not in its entry list, and that refuse `sceKernelReserveVirtualRange` with ENOMEM — at 32 GiB (0x800000000) and each
+2 GiB above, up to about 230 MiB each. The user-space loader ran at those addresses on the Pro (item 1), where alpha-1's kernel
+loader had put its own views over them. Not the budget, RLIMIT_DATA (32 GiB on both consoles; vmem and as unlimited) or the
+per-mapping size. Fix, patch 1231 (`...find-the-holds-the-kernel-keeps-in-a-refused-reservation`): after a refused fixed
+reservation of 1 GiB or more, scan the range in 256 MiB windows (refused windows in 64 KiB steps), claim each hold as a native
+`VPROT_SYSTEM` view that skips Wine's own views and reserved areas, retry once. About 40 ms the first time a process asks for 34 GB,
+microseconds after. Measured: 917 GiB on both consoles (16 spans in the development runs, 17 in the gates' klogs), three holds claimed in 7ef000000-1000000000 on the base PS5.
+The probe now records the reserved total and fails below a per-console floor (900 GiB for 10.01 and 13.40); a console with no
+floor line fails and says so.
+
+**3. The search regression of alpha-2 (patch 1231's first version, e15960a; found 2026-10-20; fixed in alpha-3).** That version
+returned the kernel's ENOMEM from `anon_mmap_tryfixed`. Wine's `try_map_free_area` goes on to the next window only on EEXIST and
+aborts the search on any other answer ("err:virtual:try_map_free_area mmap() error Cannot allocate memory"), so every search that
+met a hold failed "out of memory". libcef's 1 TiB sandbox reservation is one: MihawkBrowser failed to start identically on the Pro
+and the base PS5, and this is very likely the failure the owner saw on the standard PS5. `anon_mmap_tryfixed` answers EEXIST for
+every refusal again. **A permanent check:** `launch_outcome()` in `tools/run-battery.py` counts that error line in each launch's
+helper logs (`search_errors`), and a launch with any fails — in every gate case except the inner sessions of `detailed-logs` and `games-autodetect`,
+whose `<run>-on-` and `<run>-session-` helper logs the glob does not reach yet (release review, 2026-10-20; to fix in the next
+gated code commit). Whether MihawkBrowser starts on both
+consoles after the fix is recorded in its own run, not here.
+
+**Open:** a prefix left half-initialised by a wineboot that was ended midway has nothing that repairs it (title-side
+detection and rebuild).

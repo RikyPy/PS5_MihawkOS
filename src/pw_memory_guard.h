@@ -72,9 +72,10 @@ struct pw_memory_guard {
 void pw_memory_guard_init(struct pw_memory_guard *guard, unsigned limit_mib, unsigned end_mib);
 /* A census of system bytes taken at now_ms (the census's own time; one not newer than the last is ignored). */
 enum pw_memory_verdict pw_memory_guard_sample(struct pw_memory_guard *guard, uint64_t system, uint64_t now_ms);
-/* The default limit of a console, MiB, from its firmware's version word (sceKernelGetSystemSwVersion): the Pro's for
- * an earlier firmware than 12.00 or none known (0), PW_MEMORY_GUARD_LIMIT_13_MIB from 12.00 on. The end mark's default
- * is PW_MEMORY_GUARD_END_MARGIN_MIB past it. */
+/* The default limit of a console, MiB, from the INSTALLED firmware's version word (pw_firmware_installed, src/pw_firmware.h;
+ * never sceKernelGetSystemSwVersion, which an enabler spoofs: the Pro said 12.09 and ran with the 12.00-and-later limit
+ * through alpha-2): the Pro's for an earlier firmware than 12.00 or none known (0), PW_MEMORY_GUARD_LIMIT_13_MIB from 12.00
+ * on. The end mark's default is PW_MEMORY_GUARD_END_MARGIN_MIB past it. */
 unsigned pw_memory_guard_default_limit_mib(unsigned firmware);
 /* After the guard acted on one process in the desktop session (the title ends the process that holds the memory, not
  * the session): it starts over, so the next process that holds the memory is acted on too, after the same times. */

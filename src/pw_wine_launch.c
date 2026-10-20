@@ -1,5 +1,6 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
 #include "pw_wine_launch.h"
+#include "pw_wine_profile.h"
 #include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
@@ -169,16 +170,17 @@ int pw_wine_launch_host_dir(const char *prefix, const char *windows_path, char *
 }
 
 /* tools/deploy-wine.py makes the same folders when it deploys a prefix. */
+#define PROFILE "users/" PW_WINE_PROFILE_USER
 static const char *const profile_dirs[] = {
-    "users", "users/steamuser", "users/steamuser/AppData", "users/steamuser/AppData/Local",
-    "users/steamuser/AppData/Local/Temp", "users/steamuser/AppData/Local/Microsoft",
-    "users/steamuser/AppData/Local/Microsoft/Windows", "users/steamuser/AppData/Local/Microsoft/Windows/INetCache",
-    "users/steamuser/AppData/LocalLow", "users/steamuser/AppData/Roaming", "users/steamuser/Desktop",
-    "users/steamuser/Documents", "users/steamuser/Downloads", "users/steamuser/Music", "users/steamuser/Pictures",
-    "users/steamuser/Videos", "users/steamuser/Saved Games", "users/Public", "users/Public/Desktop",
+    "users", PROFILE, PROFILE "/AppData", PROFILE "/AppData/Local", PROFILE "/AppData/Local/Temp",
+    PROFILE "/AppData/Local/Microsoft", PROFILE "/AppData/Local/Microsoft/Windows",
+    PROFILE "/AppData/Local/Microsoft/Windows/INetCache", PROFILE "/AppData/LocalLow", PROFILE "/AppData/Roaming",
+    PROFILE "/Desktop", PROFILE "/Documents", PROFILE "/Downloads", PROFILE "/Music", PROFILE "/Pictures",
+    PROFILE "/Videos", PROFILE "/Saved Games", "users/Public", "users/Public/Desktop",
     "users/Public/Documents", "users/Public/Downloads", "users/Public/Music", "users/Public/Pictures",
     "users/Public/Videos",
 };
+#undef PROFILE
 
 int pw_wine_launch_profile_dirs(const char *prefix, int (*make)(const char *path, void *context), void *context)
 {

@@ -150,6 +150,9 @@ CASES = [
     # A game folder copied into C:\Games gets its desktop shortcut with no game.json; one with two programs gets none
     # (tools/run-games-autodetect.py, src/pw_game_folders.h; docs/SELF_INSTALL.md, phase 2).
     ('games-autodetect', []),
+    # Settings > Logging: the desktop session's folder, complete and masked, once on; its off leg is skipped here
+    # (tools/run-detailed-logs.py, src/pw_detailed_logs.h).
+    ('detailed-logs', ['--only', 'on']),
     # The guided setup walked as a first run, in Japanese, to Preparing, on a set-up console: nothing of the owner's is
     # touched (tools/run-launcher.py --setup; docs/GUIDED_SETUP.md).
     ('setup-tour', ['--setup', '--frames', '1500']),
@@ -242,6 +245,10 @@ CASES = [
     ('desktop-stop', ['--path', r'C:\windows\system32\mihawk.exe', '--seconds', '30', '--env', 'MIHAWK_DESKTOP=1'] + LAUNCHER),
     # The Mihawk desktop as the shell's folder view: input drives it, the shell's behaviour and its pictures are checked (patches 1100 to 1103).
     ('desktop-view', []),
+    # MihawkBrowser starts, shows its window, loads a page that needs no network (about:blank, which still takes a renderer
+    # process and CEF's whole start-up, V8's 1 TiB reservation included) and closes. alpha-2 shipped a browser that never
+    # started on the standard PS5 because no case started it.
+    ('mihawk-browser', ['--script', 'load about:blank; wait 5000; exit', '--seconds', '90']),
     # Game mode: a full-screen window flipped directly, Explorer unloaded while it holds the screen and restored.
     ('game-mode64', ['--api', 'opengl']),
     ('game-mode-dxvk64', ['--api', 'dxvk']),
@@ -317,8 +324,8 @@ GATE_CASES = ['shell32', 'shell64', 'work-area32', 'work-area64', 'wallpaper32',
               'vm-truth32', 'vm-truth64',
               # The touchpad's pointer and clicks reaching a window in a helper: the person at the console found
               # the pointer frozen in the triangle test and over a game launcher's desktop (2026-10-07), where it had worked.
-              'launcher-desktop', 'desktop-overlap', 'desktop-session', 'desktop-stop', 'desktop-view', 'game-mode64', 'game-mode-dxvk64', 'mouse-controls',
-              'controls-menu', 'launcher-ended', 'games-autodetect', 'setup-tour',
+              'launcher-desktop', 'desktop-overlap', 'desktop-session', 'desktop-stop', 'desktop-view', 'mihawk-browser', 'game-mode64', 'game-mode-dxvk64', 'mouse-controls',
+              'controls-menu', 'launcher-ended', 'games-autodetect', 'detailed-logs', 'setup-tour',
               # A game whose helpers fill the console's system memory is closed before the console swaps itself to a
               # stop: a game launcher's did that on 2026-10-07.
               'memory-guard',
@@ -465,8 +472,14 @@ def launch_outcome(run, result, started):
                                                   text, re.I))
         outcome['helpers'] = len(re.findall(r'wine-ps5: child ready native=', text))
         outcome['protocol_errors'] = len(re.findall(r'Protocol error: process', text))
+    # Wine's search for room (try_map_free_area) goes on to the next window when a reservation is refused (EEXIST) and prints this
+    # line, and stops, on any other answer. Patch 1231's first version passed the kernel's ENOMEM on for a hold of its own in the
+    # range: every search that met one failed (libcef's 1 TiB sandbox reservation, MihawkBrowser on both consoles, alpha-2). A line
+    # of it in any helper's log of any launch fails the launch.
+    outcome['search_errors'] = sum(len(re.findall(r'err:virtual:try_map_free_area mmap\(\) error', child.read_text(errors='replace')))
+                                   for child in (ROOT / 'klog').glob(run + '-wine-child-*.log'))
     outcome['passed'] = result.returncode == 0 and bool(outcome.get('passed')) and not outcome.get('fault_records') and \
-        not outcome.get('protocol_errors')
+        not outcome.get('protocol_errors') and not outcome['search_errors']
     return outcome
 
 
@@ -559,12 +572,14 @@ def main():
                   'run-launcher.py' if name in ('controls-menu', 'setup-tour') else
                   'run-launcher-ended.py' if name == 'launcher-ended' else
                   'run-games-autodetect.py' if name == 'games-autodetect' else
+                  'run-detailed-logs.py' if name == 'detailed-logs' else
                   'run-mouse-controls.py' if name == 'mouse-controls' else
                   'run-window-compose.py' if name in ('window-compose32','window-compose64','gpu-window32','gpu-window64','dxvk-window32','dxvk-window64','host-dmem64','host-dmem-fallback64') else
                   'run-window-effects.py' if name in ('window-effects32','window-effects64') else
                   'run-desktop-overlap.py' if name == 'desktop-overlap' else
                   'run-desktop-session.py' if name == 'desktop-session' else
                   'run-desktop-view.py' if name == 'desktop-view' else
+                  'run-browser.py' if name == 'mihawk-browser' else
                   'run-game-mode.py' if name.startswith('game-mode') else
                   'run-desktop-input.py' if name == 'launcher-desktop' else
                   'run-tls-fixture.py' if name == 'launcher-tls' else 'run-console.py')

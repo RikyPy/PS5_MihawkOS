@@ -40,6 +40,7 @@
 #include <sys/rtprio.h>
 #include <ps5platform/kernel.h>
 #include "pw_prx_elf_ps5.h"
+#include "../src/pw_firmware.h"
 #include "../wine/ps5/pw_wine_dl.h"
 #include <sys/sysctl.h>
 #include <sys/thr.h>
@@ -1386,6 +1387,17 @@ static int wine_start_elf(const char *prx_path)
     return 0;
 }
 
+/* Whether this helper loads Wine's modules itself (native/pw_prx_elf_ps5.c): the installed firmware's answer
+ * (12.00 and later: the kernel's loader stops at the pager, errno 92), unless the run says otherwise with
+ * WINE_PS5_PRX_LOADER=1 or 0, which exists to measure what the loader costs on a console that needs neither
+ * (alpha-3: the Pro's address space shrank from 917 to 31 GiB when it was taken for firmware 12). */
+static int prx_loader_wanted(const char *environment, size_t bytes)
+{
+    for (const char *entry = environment; *entry && entry < environment + bytes; entry += strlen(entry) + 1)
+        if (!strncmp(entry, "WINE_PS5_PRX_LOADER=", 20)) return entry[20] == '1';
+    return pw_prx_elf_ps5_needed(child_firmware);
+}
+
 static void wine_child_run(void)
 {
     unsigned mxcsr = 0x1f80;
@@ -1395,16 +1407,36 @@ static void wine_child_run(void)
     output_fd = open(log_path, O_WRONLY | O_CREAT | O_TRUNC, 0666);
     stage("wine-child: entry\n");
     {
-        /* Which console this helper runs on, once per helper: a module load that the kernel stops (errno 92) is a
-         * per-firmware question, and the title's notice names it (src/pw_start_failure.h). */
-        struct ps5_kernel_sw_version firmware = {0};
-        firmware.size = sizeof(firmware);
-        const int status = sceKernelGetSystemSwVersion(&firmware);
-        child_firmware = firmware.version;
-        char firmware_line[96];
-        snprintf(firmware_line, sizeof(firmware_line), "wine-child: firmware status=%d version=%#08x\n",
-                 status, (unsigned)firmware.version);
+        /* Which firmware this helper runs on, once per helper: a module load that the kernel stops (errno 92) is a
+         * per-firmware question, and the title's notice names it (src/pw_start_failure.h). The INSTALLED firmware, not
+         * the word an enabler reports (src/pw_firmware.h): the Pro reported 12.09 and took the user-space loader. */
+        unsigned reported = 0;
+        child_firmware = pw_firmware_installed(&reported);
+        char firmware_line[128];
+        snprintf(firmware_line, sizeof(firmware_line), "wine-child: firmware status=%d version=%#08x reported=%#08x\n",
+                 child_firmware ? 0 : -1, child_firmware, reported);
         stage(firmware_line);
+    }
+    {
+        /* What the kernel lets this process map, as the process starts: a fixed reservation that Wine asks for later is
+         * refused with ENOMEM once the total reaches a limit (late-library, alpha-3), and which one it is decides the fix. */
+        static const struct { int resource; const char *name; } limits[] = {
+            {RLIMIT_DATA, "data"}, {RLIMIT_STACK, "stack"}, {RLIMIT_RSS, "rss"}, {RLIMIT_MEMLOCK, "memlock"},
+#ifdef RLIMIT_VMEM
+            {RLIMIT_VMEM, "vmem"},
+#endif
+            {RLIMIT_AS, "as"}};
+        char limit_line[256];
+        size_t at = (size_t)snprintf(limit_line, sizeof(limit_line), "wine-child: limits");
+        for (unsigned i = 0; i < sizeof(limits) / sizeof(limits[0]) && at < sizeof(limit_line); i++) {
+            struct rlimit value;
+            if (getrlimit(limits[i].resource, &value)) at += (size_t)snprintf(limit_line + at, sizeof(limit_line) - at, " %s=err", limits[i].name);
+            else at += (size_t)snprintf(limit_line + at, sizeof(limit_line) - at, " %s=%lld/%lld", limits[i].name,
+                                        value.rlim_cur == RLIM_INFINITY ? -1LL : (long long)value.rlim_cur,
+                                        value.rlim_max == RLIM_INFINITY ? -1LL : (long long)value.rlim_max);
+        }
+        snprintf(limit_line + at, sizeof(limit_line) - at, "\n");
+        stage(limit_line);
     }
     {
         /* native/proton_payload_child.c released the console's TTY before the rendezvous; say what fd 0 was and what
@@ -1664,7 +1696,7 @@ static void wine_child_run(void)
         stage(load_line);
     }
     int elf_ntdll_handle = -1;
-    if (pw_prx_elf_ps5_needed(child_firmware)) {
+    if (prx_loader_wanted(boot.environment, sizeof(boot.environment))) {
         const int elf_status = wine_start_elf(ntdll);
         elf_ntdll_handle = pw_prx_elf_ps5_last_handle();
         if (elf_status) {
@@ -1689,7 +1721,7 @@ static void wine_child_run(void)
             goto done;
         }
     }
-    if (pw_prx_elf_ps5_needed(child_firmware)) {
+    if (prx_loader_wanted(boot.environment, sizeof(boot.environment))) {
         static PwWineDlOps elf_dl_ops;
         elf_dl_ops.load_start = pw_prx_elf_ps5_load_start;
         elf_dl_ops.module_info = pw_prx_elf_ps5_module_info;

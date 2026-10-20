@@ -32,6 +32,7 @@
 #include "../../src/pw_elfldr.h"
 #endif
 #include "../../src/pw_pe_arch.h"
+#include "../../src/pw_firmware.h"
 extern "C" {
 #include "../../src/pw_wine_launch.h"
 }
@@ -102,6 +103,15 @@ std::string proton_game_mode_path()
 	return std::string(PS5_APP_ROOT) + "/game-mode.txt";
 #else
 	return proton_data_grant() ? PROTON_DATA_ROOT "/game-mode.txt" : proton_title_path("/app0/game-mode.txt");
+#endif
+}
+
+std::string proton_logging_path()
+{
+#if defined(PS5_HOST_REFERENCE)
+	return std::string(PS5_APP_ROOT) + "/logging.txt";
+#else
+	return proton_data_grant() ? PROTON_DATA_ROOT "/logging.txt" : proton_title_path("/app0/logging.txt");
 #endif
 }
 
@@ -435,15 +445,14 @@ const char *proton_data_note()
 }
 
 #if !defined(PS5_HOST_REFERENCE)
-/* This console's firmware as "13.40.0.0", or empty if the call fails. The daemon's crt rejects a firmware it was
+/* This console's INSTALLED firmware as "13.40", or empty when it cannot be read. The daemon's crt rejects a firmware it was
  * not built for and faults before main, so no grant comes; naming it tells a too-new console apart from a dev.conf
- * fault (base PS5 on 13.40, 2026-10-20). sceKernelGetSystemSwVersion is a plain libkernel call the title may make. */
+ * fault (base PS5 on 13.40, 2026-10-20). Not sceKernelGetSystemSwVersion's text: an enabler spoofs it (the Pro said 12.09,
+ * the standard PS5 13.59), and a message that names the wrong firmware sends people after the wrong fix (src/pw_firmware.h). */
 static std::string system_firmware()
 {
-	struct ps5_kernel_sw_version version = {};
-	version.size = sizeof(version);
-	if (sceKernelGetSystemSwVersion(&version) == 0 && version.text[0])
-		return std::string(version.text, strnlen(version.text, sizeof(version.text)));
+	char text[8];
+	if (pw_firmware_text(pw_firmware_installed(nullptr), text, sizeof(text))) return text;
 	return {};
 }
 #endif

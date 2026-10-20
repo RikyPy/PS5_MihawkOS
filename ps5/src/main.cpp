@@ -29,6 +29,8 @@
 #include "proton_update.h"
 #include "ps5_samples.h"
 #include "../../src/pw_first_run.h"
+#include "../../src/pw_detailed_logs.h"
+#include "../../src/pw_log_sessions.h"
 #if !defined(PS5_HOST_REFERENCE)
 #include "../../native/proton_wine.h"
 #if defined(PS5_CHILD_PROBE)
@@ -386,6 +388,18 @@ int main(int argc, char **argv)
 	if (data)
 		for (const char *folder : { "", "/logs", "/prefixes", "/games", "/caches", "/run" })
 			mkdir((std::string(PROTON_DATA_ROOT) + folder).c_str(), 0777);
+	// Settings > Logging (src/pw_detailed_logs.h): the folder the last session began gets that session's logs now, before
+	// a session moves them, so a session that crashed or froze the console is covered too.
+	if (data) {
+		char folder[PW_DETAILED_LOGS_PATH];
+		if (!pw_detailed_logs_pending(PW_DETAILED_LOGS_ROOT, folder, sizeof(folder))) {
+			const char *sources[] = { PROTON_DATA_ROOT "/logs", PW_LOG_SESSIONS_ROOT "/0", PROTON_DATA_ROOT "/setup.txt" };
+			unsigned copied = 0, left = 0;
+			const int status = pw_detailed_logs_fill(folder, sources, 3, &copied, &left);
+			say("Logging: the last session's folder %s: %u files copied, %u left out (status %d)", folder, copied, left,
+				status);
+		}
+	}
 	// A staged update is switched in before anything reads the title folder, then the title restarts into it
 	// (proton_update.h). It returns when there is none, or the switch stopped (the old title goes on and says why).
 	if (data) proton_update_on_start(argc, argv);

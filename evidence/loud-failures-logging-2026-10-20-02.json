@@ -1,0 +1,88 @@
+{
+ "case": "detailed-logs",
+ "session": [
+  "--profile",
+  "mihawk-os",
+  "--seconds",
+  "30"
+ ],
+ "legs": {
+  "off": {
+   "run": "loud-failures-logging-2026-10-20-02-off",
+   "runner_status": 0,
+   "session_passed": true,
+   "seconds": 55.9,
+   "returned_to_launcher": true,
+   "log_bytes": {
+    "title_last": 12059,
+    "wine_last": 54,
+    "helpers": 245131,
+    "helper_files": 12
+   },
+   "pacing": [],
+   "title_said": [
+    "Logging: off"
+   ],
+   "passed": true
+  },
+  "on": {
+   "run": "loud-failures-logging-2026-10-20-02-on",
+   "runner_status": 0,
+   "session_passed": true,
+   "seconds": 56.3,
+   "returned_to_launcher": true,
+   "log_bytes": {
+    "title_last": 12217,
+    "wine_last": 54,
+    "helpers": 371546,
+    "helper_files": 12
+   },
+   "pacing": [],
+   "title_said": [
+    "Logging: on; folder /data/ps5proton/logs/detailed/2026-10-20_16-16-56 status=0 removed=0 title-early=0",
+    "Logging: the kernel log comes from klogsrv on the loopback",
+    "Logging: the last session's folder /data/ps5proton/logs/detailed/2026-10-20_16-16-56: 16 files copied, 0 left out (status 0)"
+   ],
+   "folders_made": [
+    "2026-10-20_16-16-56"
+   ],
+   "folder": "2026-10-20_16-16-56",
+   "files": {
+    "README.txt": 1328,
+    "title-early.log": 374,
+    "klog.txt": 50699,
+    "wine-last.log": 54,
+    "title-last.log": 12217,
+    "wine-stdout.txt": 0,
+    "wine-child-6218.log": 1301,
+    "wine-child-6219.log": 87510,
+    "flight-recorder.log": 16452,
+    "wine-child-6220.log": 50052,
+    "wine-child-6221.log": 50271,
+    "wine-child-6222.log": 17113,
+    "wine-child-6223.log": 40437,
+    "wine-child-6224.log": 23361,
+    "wine-child-6225.log": 27486,
+    "wine-child-6226.log": 17198,
+    "wine-child-6227.log": 17100,
+    "wine-child-6228.log": 23265,
+    "setup.txt": 22
+   },
+   "other_files": 0,
+   "other_bytes": 0,
+   "total_bytes": 436240,
+   "missing": [],
+   "wine_children": 11,
+   "unmasked_files": [
+    "README.txt"
+   ],
+   "console_address_found": false,
+   "readme_says_mask": true,
+   "folder_passed": false,
+   "passed": false
+  }
+ },
+ "passed": false,
+ "result": "finished",
+ "returned_to_launcher": true
+}

@@ -87,6 +87,11 @@ def main():
             log = render('updates-panel', 60, [(2, 'triangle')] + [(6 + i * 2, 'down') for i in range(6)] + [(20, 'cross')])
             assert 'update:' not in log, 'a scripted run must not check for updates'
             print(f'Updates panel rendered. Pictures: {out}')
+            # Settings > Logging (src/pw_detailed_logs.h): row 7, off by default; a scripted press previews it, saving nothing.
+            log = render('logging-panel', 60, [(2, 'triangle')] + [(6 + i * 2, 'down') for i in range(7)] + [(22, 'cross')])
+            assert 'Logging: preview on' in log, log[-2000:]
+            assert not (APP / 'logging.txt').exists(), 'a scripted run must not save Logging'
+            print(f'Logging panel rendered. Pictures: {out}')
     finally:
         for path, content in backup.items():
             if content is None:

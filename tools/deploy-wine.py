@@ -22,7 +22,7 @@ import console_guard
 # on the console gets them from the title (wineboot in a helper, patch 0933, and pw_wine_launch_profile_dirs).
 # A Java launcher's single-instance lock file, for one, is created in AppData\Local\Temp and it quits when it is not
 # there. Creating a folder that exists is a no-op.
-PROFILE_USER = 'steamuser'
+PROFILE_USER = 'Mihawk'   # Wine's GetUserNameW (patch 1240, src/pw_wine_profile.h)
 PROFILE_DIRECTORIES = (
     'AppData/Local/Temp', 'AppData/Local/Microsoft/Windows/INetCache', 'AppData/LocalLow', 'AppData/Roaming',
     'Desktop', 'Documents', 'Downloads', 'Music', 'Pictures', 'Videos', 'Saved Games',

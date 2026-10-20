@@ -21,6 +21,7 @@ class VulkanExample : public ps5ui::KitExample
 	pw_controls controls{};
 	std::string controlsNotice;
 	int gameMode{1};
+	int detailedLogs{0};   // Settings > Logging (src/pw_detailed_logs.h)
 	enum class Page { library, themes, settings, controls, buttons };
 	Page page{Page::library};
 	unsigned mouseAction{0};
@@ -99,6 +100,30 @@ class VulkanExample : public ps5ui::KitExample
 			proton_say("Game Mode: %s %s", ps5.frameBudget ? "preview" : "saved", gameMode ? "on" : "off");
 		}
 		syncGameMode();
+	}
+
+	void syncLogging()
+	{
+		settingsList.item(7).subtitle = detailedLogs ? "On: each session's logs go to one folder, for a report" :
+			"Off: only the usual logs are kept";
+		settingsList.item(7).badge = detailedLogs ? "ON" : "OFF";
+	}
+
+	void toggleLogging()
+	{
+		const int changed = !detailedLogs;
+		// Scripted UI runs preview the choice without overwriting the player's file.
+		const int error = ps5.frameBudget ? 0 : pw_detailed_logs_save(changed, proton_logging_path().c_str());
+		if (error) {
+			controlsNotice = "Could not save Logging. Your previous choice is unchanged.";
+			proton_say("Logging: save failed (%d)", error);
+		} else {
+			detailedLogs = changed;
+			controlsNotice = detailedLogs ? "Logging on. Applies from the next session." : "Logging off. Applies from the next session.";
+			feedback.play(hui::audio::Cue::saved);
+			proton_say("Logging: %s %s", ps5.frameBudget ? "preview" : "saved", detailedLogs ? "on" : "off");
+		}
+		syncLogging();
 	}
 
 	void syncUpdates()
@@ -189,6 +214,8 @@ class VulkanExample : public ps5ui::KitExample
 						startSetup(PW_SETUP_WELCOME);
 					} else if (settingsList.focus() == 1) {
 						toggleGameMode();
+					} else if (settingsList.focus() == 7) {
+						toggleLogging();
 					} else if (settingsList.focus() == 3) {
 						// Look again each time (a stick may have been plugged in), then start when the pieces are all there.
 						if (!ps5.frameBudget && proton_install_find().phase == ProtonInstall::ready) proton_install_start();
@@ -443,6 +470,20 @@ class VulkanExample : public ps5ui::KitExample
 				  { hui::ui::Button::cross, updates.phase == ProtonUpdate::available ? "Download" :
 					updates.phase == ProtonUpdate::ready ? "Restart" : "Check" },
 				  { hui::ui::Button::circle, "Back" } }, 120, 1040);
+		} else if (page == Page::settings && settingsList.focus() == 7) {
+			paint.heading("Logging", 1240, y, 38, look.text);
+			y += 65;
+			paragraph(paint, "On: every session writes all of " PS5_TITLE_NAME "'s logs, in more detail, to its own folder in "
+				PW_DETAILED_LOGS_ROOT ". To report a problem, zip that session's folder and post it; its README.txt says what to "
+				"check first.", 1240, y, 24, look.text_muted);
+			y += 30;
+			paragraph(paint, "Sessions write more while it is on: turn it off when you are done. The 5 newest folders are kept, "
+				"at most 96 MB each.", 1240, y, 24, look.text_muted);
+			y += 30;
+			paragraph(paint, controlsNotice, 1240, y, 24, look.text);
+			ps5ui::draw_hints(scene, kit.fonts, look,
+				{ { hui::ui::Button::dpad, "Choose" }, { hui::ui::Button::cross, detailedLogs ? "Turn off" : "Turn on" },
+				  { hui::ui::Button::circle, "Back" } }, 120, 1040);
 		} else if (configuring) {
 			paint.heading("Mouse controls", 1240, y, 38, look.text);
 			y += 65;
@@ -623,6 +664,9 @@ public:
 		item = {};
 		item.title = "Check for updates";
 		rows.push_back(item);
+		item = {};
+		item.title = "Logging";
+		rows.push_back(item);
 		settingsList.set_items(rows);
 		rows.clear();
 		for (const char *label : {"Left mouse click", "Right mouse click", "Middle mouse click", "Restore defaults"}) {
@@ -643,6 +687,8 @@ public:
 		syncControls();
 		if (!ps5.frameBudget) pw_game_mode_load(&gameMode, proton_game_mode_path().c_str());
 		syncGameMode();
+		if (!ps5.frameBudget) pw_detailed_logs_load(&detailedLogs, proton_logging_path().c_str());
+		syncLogging();
 		syncInstall();
 		syncMusic();
 		syncUpdates();

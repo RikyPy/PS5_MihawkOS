@@ -20,6 +20,7 @@
 #include "ps5_samples.h"
 #include "../../src/pw_controls.h"
 #include "../../src/pw_game_mode.h"
+#include "../../src/pw_detailed_logs.h"
 #include "../../src/pw_setup.h"
 
 #include "app/concept.hpp"

@@ -16,7 +16,7 @@ LGPL-2.1-or-later and is the origin of the PS5 platform work this project builds
   Wine `490f6d5dcbb2a5047345b8af88d114bbcaad69a8` (wine-mirror/wine). Every patch that
   comes from there keeps its authorship and records the rebase it needed for the Proton
   Wine tree. The series is LGPL-2.1-or-later, as Wine, at directory level
-  ([`LICENSING.md`](LICENSING.md)); only 13 of its 303 patches contain
+  ([`LICENSING.md`](LICENSING.md)); only 13 of its 305 patches contain
   an SPDX line, and the ones from prospero-win had none upstream either.
 - the **`/data` grant protocol** (the same-UID call, the atomic `{"PID":<pid>}` request) comes from
   its `native/pw_data_mount.{c,h}`; the client this title now runs is the platform layer's

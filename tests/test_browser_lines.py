@@ -50,6 +50,17 @@ class Summary(unittest.TestCase):
         lines = [l for l in RUN if 'download' not in l and 'handoff' not in l]
         self.assertTrue(browser_lines.summary(lines, 'load https://example.com/; wait 1000; exit', SHA)['passed'])
 
+    def test_a_local_page_run(self):
+        lines = ['browser: process type=browser pid=32', 'browser: window ms=654', 'browser: created ms=666',
+                 'browser: load scheme=about status=0 ms=5 at=900', 'browser: exit ms=6000']
+        script = 'load about:blank; wait 5000; exit'
+        self.assertTrue(browser_lines.summary(lines, script, SHA)['passed'])
+        self.assertFalse(browser_lines.summary([l for l in lines if 'window' not in l], script, SHA)['passed'])  # no window
+        self.assertFalse(browser_lines.summary([l for l in lines if 'exit' not in l], script, SHA)['passed'])  # no clean close
+        self.assertFalse(browser_lines.summary([l.replace('status=0', 'status=-1') for l in lines], script, SHA)['passed'])
+        https = [l.replace('scheme=about status=0', 'scheme=https host=example.com path=0 status=0') for l in lines]
+        self.assertFalse(browser_lines.summary(https, script, SHA)['passed'])  # status 0 is only for about:
+
 
 if __name__ == '__main__':
     unittest.main()

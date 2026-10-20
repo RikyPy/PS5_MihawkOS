@@ -1,0 +1,95 @@
+From: PS5_Proton <local>
+Subject: [PATCH] explorer: the taskbar counts only top-level windows, and logs what each window counts as
+
+In every Mihawk OS session the taskbar's File Explorer pin showed a running pill with no File Explorer window open
+(pro-gate-01's desktop-session captures 01 and 02: only the probe's own window on the screen). A window lights a pin
+when the taskbar finds it eligible and its process image is the pin's, and the shell itself is explorer.exe, so any
+eligible window of the shell's own process lights File Explorer's pin. taskbar_eligible asked whether a window is
+visible, unowned and not a tool window, but never whether it is a top-level window, and the list holds windows that
+are not: the desktop's folder view (patch 1100's SHELLDLL_DefView, a visible WS_CHILD of Progman) joins it when it is
+made, because Progman hands the messages it does not handle to the desktop window's procedure, whose WM_PARENTNOTIFY
+case adopts the new window as a program's (handle_parent_notify); and a notification icon's window is made a WS_POPUP
+(its creation event adds it) and then parented to the taskbar or the hidden-icons flyout.
+
+As on Windows ("Managing Taskbar Buttons": a button stands for an unowned top-level window), the taskbar now counts a
+window only while its parent is the desktop window. And each window in the list writes one line, the first time the
+taskbar counts it, on the explorer channel the session's log already carries (warn+explorer): the pin it lights or
+its own button, or that it has none for not being top-level, with its class, process, styles, parent and owner, so
+whatever lights a pin or takes a slot is in the record.
+
+Console (standard PS5, taskbar-pill-01, tools/run-frame-pacing.py on 67d0b55 + this patch, 60 Hz): the start-up and
+idle captures show no pill on File Explorer's pin, File Explorer opened lights it (capture 11), and the log has three
+lines: the folder view 0x1007A (SHELLDLL_DefView, the shell's pid 0020, style 50010000, parent Progman) has no button,
+not being top-level; the probe's window has its own; File Explorer's ExplorerWClass window counts for its pin. The
+run passed: 571 steady compositions, 2,742 us mean, 8,723 us max; File Explorer's opening 14,087 us max.
+---
+diff --git a/programs/explorer/systray.c b/programs/explorer/systray.c
+index 54b0e68..e0d01a5 100644
+--- a/programs/explorer/systray.c
++++ b/programs/explorer/systray.c
+@@ -37,6 +37,7 @@
+ #include "resource.h"
+ 
+ WINE_DEFAULT_DEBUG_CHANNEL(systray);
++WINE_DECLARE_DEBUG_CHANNEL(explorer);  /* on in the Mihawk session's log (warn+explorer) */
+ 
+ #define TRAY_MINIMIZE_ALL 419
+ #define TRAY_MINIMIZE_ALL_UNDO 416
+@@ -113,6 +114,7 @@ struct taskbar_button
+     RECT        placed;        /* where the button was last shown, if placed_shown */
+     BOOL        placed_shown;
+     int         pin;           /* the pinned app its process is, -1 none, -2 not looked up yet */
++    BOOL        logged;        /* what the taskbar made of it is in the log */
+ };
+ 
+ static struct list taskbar_buttons = LIST_INIT( taskbar_buttons );
+@@ -922,11 +924,13 @@ static void taskbar_surfaces(void)
+     taskbar_theme = tray_window ? OpenThemeData(tray_window, L"WINDOW") : NULL;
+ }
+ 
++/* As on Windows, a button stands for a top-level window: one made top-level and parented later (a notification
++ * icon, moved into the taskbar) is the taskbar's own part, not a program's window. */
+ static BOOL taskbar_eligible(HWND hwnd)
+ {
+     LONG_PTR style = GetWindowLongPtrW(hwnd, GWL_EXSTYLE);
+     if (!IsWindow(hwnd) || !IsWindowVisible(hwnd) || hwnd == tray_window || hwnd == GetShellWindow() ||
+-        hwnd == GetDesktopWindow()) return FALSE;
++        hwnd == GetDesktopWindow() || GetAncestor(hwnd, GA_PARENT) != GetDesktopWindow()) return FALSE;
+     if (style & WS_EX_APPWINDOW) return TRUE;
+     if (style & (WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE)) return FALSE;
+     return !GetWindow(hwnd, GW_OWNER);
+@@ -1175,6 +1179,18 @@ static int taskbar_window_pin(struct taskbar_button *win)
+     return win->pin;
+ }
+ 
++/* What the taskbar made of a window, once per window, so the log names whatever lights a pin or takes a slot. */
++static void taskbar_log(struct taskbar_button *win, const WCHAR *what)
++{
++    WCHAR class[64] = L""; DWORD pid = 0;
++    GetClassNameW(win->hwnd, class, ARRAY_SIZE(class)); GetWindowThreadProcessId(win->hwnd, &pid);
++    WARN_(explorer)("Mihawk taskbar: %p %s (class %s, pid %04lx, style %08lx, exstyle %08lx, parent %p, owner %p)\n",
++                    win->hwnd, debugstr_w(what), debugstr_w(class), pid, (DWORD)GetWindowLongPtrW(win->hwnd, GWL_STYLE),
++                    (DWORD)GetWindowLongPtrW(win->hwnd, GWL_EXSTYLE), GetAncestor(win->hwnd, GA_PARENT),
++                    GetWindow(win->hwnd, GW_OWNER));
++    win->logged = TRUE;
++}
++
+ /* A window moved or shown only when its place changed, and repainted then. */
+ static void taskbar_put(HWND hwnd, const PwTaskbarRect *r, RECT *placed)
+ {
+@@ -1224,8 +1240,14 @@ static void taskbar_layout_prototype(void)
+                 SendMessageW(win->tooltip, TTM_UPDATETIPTEXTW, 0, (LPARAM)&tip);
+             }
+         }
+-        if (!win->visible) continue;
++        if (!win->visible)
++        {
++            if (!win->logged && IsWindowVisible(win->hwnd) && GetAncestor(win->hwnd, GA_PARENT) != GetDesktopWindow())
++                taskbar_log(win, L"has no button: it is not a top-level window");
++            continue;
++        }
+         int pin = taskbar_window_pin(win);
++        if (!win->logged) taskbar_log(win, pin >= 0 ? pw_taskbar_pin_apps[pin].name : L"has its own button");
+         if (pin < 0) { ++slots; continue; }
+         running[pin] = TRUE;
+         if (win->active) { active[pin] = TRUE; pin_window[pin] = win->hwnd; }

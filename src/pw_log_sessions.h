@@ -30,6 +30,10 @@
 extern "C" {
 #endif
 int pw_log_sessions_rotate(const char *root, unsigned keep, unsigned *removed);
+/* Empty a folder of its regular files and remove it, adding them to *removed (may be NULL); 0 when it is missing.
+ * ENOTDIR, or ENOTEMPTY when it holds anything but regular files, and then nothing in it is removed. Also used for the
+ * detailed log folders (src/pw_detailed_logs.h). */
+int pw_log_sessions_drop(const char *folder, unsigned *removed);
 #ifdef __cplusplus
 }
 #endif

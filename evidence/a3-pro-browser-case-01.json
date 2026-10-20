@@ -1,0 +1,52 @@
+{
+  "battery": "a3-pro-browser-case-01",
+  "expected_cases": [
+    "mihawk-browser"
+  ],
+  "revision": "67d0b5523a603cbfeb19b3b07c7eed521e49f7ed",
+  "dirty": true,
+  "cases": [
+    {
+      "case": "mihawk-browser",
+      "run": "a3-pro-browser-case-01-mihawk-browser",
+      "runner_status": 0,
+      "seconds": 29.4,
+      "result": "finished",
+      "probe_verdict": null,
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "run_seconds": 27.8,
+      "launch_readiness": {
+        "ready": true,
+        "seconds": 0.151,
+        "settle_seconds": 0.0,
+        "census_seconds": 0.14,
+        "previous_cleanup_verified": true
+      },
+      "stages": {
+        "launched": 1.03,
+        "title_started": 1.53,
+        "elevated": 1.53,
+        "wine_loaded": 1.7,
+        "wineboot_started": 4.32,
+        "program_started": 7.66,
+        "wineboot_ended": 7.68,
+        "program_ended": 23.15,
+        "wine_ended": 25.53,
+        "launcher_started": 26.98,
+        "launcher_ended": 27.26,
+        "closed": 27.81
+      },
+      "runner_overhead_seconds": 1.6,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 11,
+      "protocol_errors": 0,
+      "search_errors": 0
+    }
+  ],
+  "complete": true,
+  "seconds": 29.5,
+  "passed": true
+}

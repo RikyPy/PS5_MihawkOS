@@ -70,6 +70,8 @@ declare -A sources=(
     [test_pw_wine_window]="wine/ps5/pw_wine_window.c wine/ps5/pw_wine_pages.c src/pw_window_page.c"
     [test_pw_environment]="src/pw_environment.c"
     [test_pw_wine_launch]="src/pw_wine_launch.c"
+    [test_pw_wine_profile]="src/pw_wine_profile.c"
+    [test_pw_wine_cwd_links]="wine/ps5/pw_wine_cwd.c wine/ps5/pw_wine_cwd_libc.c"
     [test_pw_wine_prefix]="wine/ps5/pw_wine_prefix.c src/pw_wine_launch.c"
     [test_pw_civil_time]=""
     [test_pw_wine_wallpaper]="wine/ps5/pw_wine_wallpaper.c"
@@ -94,6 +96,7 @@ declare -A sources=(
     [test_pw_memory_guard]="src/pw_memory_guard.c"
     [test_pw_hang_breaker]="src/pw_hang_breaker.c"
     [test_pw_log_sessions]="src/pw_log_sessions.c"
+    [test_pw_detailed_logs]="src/pw_detailed_logs.c src/pw_log_sessions.c"
     [test_pw_flight_probe]="src/pw_flight_probe.c"
     [test_pw_helper_sched]="src/pw_helper_sched.c"
     [test_pw_cpu_placement]="src/pw_cpu_placement.c"
@@ -105,6 +108,7 @@ declare -A sources=(
     [test_pw_release]="src/pw_release.c external/monocypher/monocypher.c external/monocypher/monocypher-ed25519.c"
     [test_pw_pe_arch]="src/pw_pe_arch.c"
     [test_pw_start_failure]="src/pw_start_failure.c"
+    [test_pw_firmware]="src/pw_firmware.c"
     [test_pw_game_folders]="src/pw_game_folders.c src/pw_pe_arch.c"
     [test_pw_pad_script]="src/pw_pad_script.c"
     [test_pw_thread_alert]=""
@@ -152,6 +156,9 @@ declare -A flags=(
     [test_pw_ws2_32_libc]="-D_DEFAULT_SOURCE -Dgetaddrinfo=pw_test_getaddrinfo -Dfreeaddrinfo=pw_test_freeaddrinfo
         -Dgetnameinfo=pw_test_getnameinfo -Dgethostbyname=pw_test_gethostbyname -Dgethostbyaddr=pw_test_gethostbyaddr"
 )
+# The libc calls pw_wine_cwd_libc.c wraps, as tools/build-wine-ps5.sh links them, so the test's own calls reach them.
+flags[test_pw_wine_cwd_links]="-I$root/wine/ps5 $(grep -oh '__wrap_[a-z_0-9]*' "$root/wine/ps5/pw_wine_cwd_libc.c" |
+    sed 's/__wrap_//' | grep . | sort -u | sed 's/^/-Wl,--wrap=/' | tr '\n' ' ')"
 ran=0
 for test in "$root"/tests/test_*.c; do
     name=$(basename "$test" .c)

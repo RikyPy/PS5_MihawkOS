@@ -39,7 +39,7 @@ addresses from `ip addr`, and personal e-mail addresses through `tools/privacy_c
 | Access tokens, API keys, private keys | 0 |
 | MAC addresses, serial numbers, console ids | 0 |
 | This PC's home path | 0 (one `/home/<other user>/` example in a test fixture) |
-| `C:\Users\<name>` | `steamuser`, `public`, and the prototype's demo user `Mihawk` |
+| `C:\Users\<name>` | `steamuser` (Proton's, in older prefixes), `public`, and `Mihawk` (the prototype's demo user, and the Windows user since v3.0.0-alpha-3) |
 
 ## 2. Private values in history
 

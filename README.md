@@ -74,9 +74,9 @@ start, and signed self-updates.
 **Not yet, or out of scope:** kernel drivers and anti-cheat, rumble, moving the desktop focus with the D&#8209;pad, and
 consoles other than the two tested ones (a PS5 Pro on 10.01, a standard PS5 on 13.40), which are untested.
 
-The last full console battery passed 94 of 94 on both tested consoles on one release build, made in a clean checkout
-of commit `e15960a` (2026-10-20): `release-v2-base-01` on the standard PS5 (13.40) and `release-v2-pro-01` on the PS5
-Pro (10.01). The records are in `evidence/`.
+The last full console battery passed 96 of 96 on both tested consoles on one build (fingerprint `4fd9c7f4f502f44a`,
+2026-10-20): `alpha3-base-01` on the standard PS5 (13.40) and `alpha3-pro-01` on the PS5 Pro (10.01). The records are
+in `evidence/`.
 
 ## What you need
 
@@ -96,8 +96,8 @@ Pro (10.01). The records are in `evidence/`.
 - **Time and space on the PC.** A first build downloads well over 1 GB and builds Wine for hours.
 
 > [!IMPORTANT]
-> There is no prebuilt package yet: you build MihawkOS on the PC and the tools put it on the console. Read
-> [Known gaps](#known-gaps) first.
+> Prebuilt packages are on the [Releases](https://github.com/mihawk-99/PS5_MihawkOS/releases) page. To build MihawkOS
+> yourself on a PC, read [Known gaps](#known-gaps) first.
 
 ### Host tools
 
@@ -420,6 +420,13 @@ python3 tools/deploy-folder.py --source /path/to/MyProgram --folder MyProgram \
 `--dry-run` previews; `--folder` and `--id` take only letters, digits, `-` and `_`. An entry with a problem gets no
 desktop shortcut, and its reason is in `logs/title-last.log` (`game <id> (<name>): <reason>`). Only x86 programs are
 accepted, 64-bit or 32-bit; a 32-bit one runs through WoW64.
+
+**Starting a program from the launcher, without the desktop.** The launcher lists Mihawk OS, and any entry with a
+prefix of its own. To list the entries that share Mihawk OS's prefix as well, create an empty file named
+`library-show-all` in `/data/ps5proton/`. An entry is a folder `/data/ps5proton/games/<id>/` holding a `game.json`
+like the one above, with the program's folder in `C:\Games` as usual. Choose the entry in the launcher, and the program
+starts full screen, without the desktop, and returns to the launcher when it ends. The entry's line in
+`logs/title-last.log` (`game <id> (<name>): <reason>`) says why one is not listed or cannot start.
 
 ## Controls
 

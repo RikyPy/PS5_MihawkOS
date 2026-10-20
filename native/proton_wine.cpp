@@ -27,6 +27,7 @@ extern "C" {
 #include "../src/pw_pipe_memory.h"
 #include "../src/pw_pad_script.h"
 #include "../src/pw_memory_guard.h"
+#include "../src/pw_firmware.h"
 #include "../src/pw_hang_breaker.h"
 #include "../src/pw_log_sessions.h"
 #include "../src/pw_start_failure.h"
@@ -34,6 +35,7 @@ extern "C" {
 #include "../src/pw_app_environment.h"
 #include "../src/pw_shell_link.h"
 #include "../src/pw_game_folders.h"
+#include "../src/pw_wine_profile.h"
 #include "../src/pw_pe_arch.h"
 #include "../src/pw_memory_helper.h"
 #include "../src/pw_ntsync.h"
@@ -46,6 +48,7 @@ extern "C" {
 #include "pw_audio_ps5.h"
 #include "pw_usb_input_ps5.h"
 #include "../src/pw_game_mode.h"
+#include "../src/pw_detailed_logs.h"
 #ifdef PS5_GPU_BROKER
 #include "../src/pw_window_direct.h"
 #endif
@@ -78,6 +81,8 @@ void catchReturnFromMain(int);
 #include <cstdarg>
 #include <cctype>
 #include <netdb.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
 #include <cstring>
 #include <ctime>
 
@@ -1141,6 +1146,49 @@ int play_audio(void *, const int16_t *frames)
     // AudioOut returns the accepted frame count on success; Wine's sink uses 0.
     return result < 0 ? result : 0;
 }
+
+// Settings > Logging (src/pw_detailed_logs.h): this session's folder, with this process's title-early.log (its lines
+// before the session; the next title start empties it) and the kernel log. The rest is copied at the next title start
+// (ps5/src/main.cpp). The kernel log comes only from klogsrv, when the PC side loaded it: it serves every client at
+// once and opens /dev/klog only while one is connected, so this takes nothing from the PC's client. Nothing here opens
+// /dev/klog.
+void detailed_logs_begin()
+{
+    char folder[PW_DETAILED_LOGS_PATH] = "";
+    unsigned removed = 0, copied = 0, left_out = 0;
+    const int status = pw_detailed_logs_begin(PW_DETAILED_LOGS_ROOT, PW_DETAILED_LOGS_KEEP, time(nullptr), folder,
+                                              sizeof(folder), &removed);
+    const std::string early = proton_title_path("/app0/title-early.log");
+    const char *sources[] = {early.c_str()};
+    const int filled = folder[0] ? pw_detailed_logs_fill(folder, sources, 1, &copied, &left_out) : -1;
+    say("Logging: on; folder %s status=%d removed=%u title-early=%d", folder[0] ? folder : "(none)", status, removed,
+        filled);
+    if (!folder[0]) return;
+    const int klog = socket(AF_INET, SOCK_STREAM, 0);
+    sockaddr_in address{};
+    address.sin_family = AF_INET;
+    address.sin_port = htons(3232);   // klogsrv's port (ps5-payload-dev/klogsrv)
+    address.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+    if (klog < 0 || connect(klog, reinterpret_cast<sockaddr *>(&address), sizeof(address))) {
+        say("Logging: no kernel log: klogsrv is not loaded (errno %d)", errno);
+        if (klog >= 0) close(klog);
+        return;
+    }
+    const int file = open((std::string(folder) + "/klog.txt").c_str(), O_WRONLY | O_CREAT | O_TRUNC | O_APPEND, 0644);
+    if (file < 0) {
+        say("Logging: no kernel log: klog.txt could not be made (errno %d)", errno);
+        close(klog);
+        return;
+    }
+    std::thread([klog, file] {
+        unsigned long long written = 0;
+        const int error = pw_detailed_logs_stream(klog, file, PW_DETAILED_LOGS_KLOG_BYTES, &written);
+        close(klog);
+        close(file);
+        say("Logging: the kernel log stopped after %llu bytes (status %d)", written, error);
+    }).detach();
+    say("Logging: the kernel log comes from klogsrv on the loopback");
+}
 }
 
 void proton_run_wine()
@@ -1174,6 +1222,10 @@ void proton_run_wine()
     // The contract with tools/run-console.py, which fails a run whose status is not 0.
     say("Wine: session logs status=%d removed=%u title=%d wine=%d broker-results=%d", session_status, session_removed,
         kept_title, kept_wine, broker_results);
+    int detailed = 0;
+    const int detailed_setting = pw_detailed_logs_load(&detailed, proton_logging_path().c_str());
+    if (detailed) detailed_logs_begin();
+    else say("Logging: off%s", detailed_setting == ENOENT ? " (default)" : detailed_setting ? " (setting unreadable)" : "");
     {
         // The player's Game Mode setting (src/pw_game_mode.h): off composes every frame, so the desktop never unloads.
         int game_mode = 1;
@@ -1236,6 +1288,12 @@ void proton_run_wine()
     // of a program's environment (WINE_PS5_OPENGL for OpenGL, SDL_XINPUT_ENABLED
     // to make SDL use the DualSense's HID device) is its game.json "env".
     setenv("WINE_PS5_HID", "1", 1);
+    {
+        // The installed firmware ("13.40") for Windows programs that need a per-console figure: tests/late-library-probe.c's
+        // floor of reservable address space is one (src/pw_firmware.h: the system's own word is spoofed by enablers).
+        char text[8];
+        if (pw_firmware_text(pw_firmware_installed(nullptr), text, sizeof(text))) setenv("WINE_PS5_FIRMWARE", text, 1);
+    }
     const std::string prefix = proton_game_prefix(game);
     if (prefix.empty()) {
         fail("Wine: invalid prefix ID");
@@ -1289,6 +1347,18 @@ void proton_run_wine()
             say("Wine: Windows programs speak %s (%s); the shell stays English", language->tag, language->locale);
         }
     }
+    // The Windows user is Mihawk (patch 1240); a prefix made before v2.0.0-alpha-3 has Proton's C:\users\steamuser,
+    // which moves once, with its registry's paths and a link from the old name, before Wine starts on it
+    // (src/pw_wine_profile.h). Before the user folders below, which would otherwise make an empty Mihawk beside it.
+    PwWineProfileMove profile_move;
+    if (pw_wine_profile_migrate(prefix.c_str(), &profile_move)) {
+        say("Wine: the profile's move to %s stopped at its %s step (%s); Wine starts, the next start goes on",
+            PW_WINE_PROFILE_USER, profile_move.step, strerror(errno));
+    } else if (!profile_move.already) {
+        say("Wine: profile %s: %u renames, %u kept in %s, link %s, %u registry files rewritten (%zu references)",
+            PW_WINE_PROFILE_USER, profile_move.moved, profile_move.kept, PW_WINE_PROFILE_FORMER,
+            profile_move.linked ? "from " PW_WINE_PROFILE_FORMER : "none", profile_move.files, profile_move.replaced);
+    }
     // wineboot makes the user folders, but not in the single layout (no child processes) nor in a prefix copied
     // from a PC; without AppData\Roaming a .NET program gets an empty application-data folder (src/pw_wine_launch.h).
     int folders_made = 0;
@@ -1318,12 +1388,20 @@ void proton_run_wine()
     } else {
         for (int i = 0; i < count; ++i) args[2 + i] = split[i];
     }
+    // Settings > Logging adds process starts and ends and every channel's warnings; warn-seh stays last, so a game's own
+    // exceptions are still not logged.
+    const char *winedebug = game.id.empty() ?
+        (detailed ? "+timestamp,+pid,+tid,+seh,+debugstr,+loaddll,+process,+thread,+plugplay,+winebus,warn+all" :
+                    "+timestamp,+pid,+tid,+seh,+debugstr,+loaddll,+process,+thread,+plugplay,+winebus,warn+explorer") :
+        // warn-seh: a game's exceptions are its own control flow (an emulator's write tracker takes thousands), and
+        // each one was symbolized and logged twice (WINE_BACKTRACE_LOG_ON is WARN_ON(seh)); crashes still log as err.
+        detailed ? "+timestamp,+pid,+tid,+debugstr,+loaddll,+process,+ps5audio,warn+all,warn-seh" :
+                   "+timestamp,+pid,+tid,+debugstr,+loaddll,+ps5audio,warn+explorer,warn-seh";
+    // Logging also keeps the synchronization device's last 8192 operations (256 KiB a process) for a hang's dump.
+    if (detailed) setenv("WINE_PS5_NTSYNC_TRACE", "8192", 0);
     const PwWineStartEnv env[] = {
-        {"WINEDEBUG", game.id.empty() ? "+timestamp,+pid,+tid,+seh,+debugstr,+loaddll,+process,+thread,+plugplay,+winebus,warn+explorer" :
-            // warn-seh: a game's exceptions are its own control flow (an emulator's write tracker takes thousands), and
-            // each one was symbolized and logged twice (WINE_BACKTRACE_LOG_ON is WARN_ON(seh)); crashes still log as err.
-            "+timestamp,+pid,+tid,+debugstr,+loaddll,+ps5audio,warn+explorer,warn-seh"}, {"WINEARCH", "wow64"},
-        {"HOME", prefix.c_str()}, {"USER", "prospero"}, {"WINE_PS5_TRACE_STARTUP", "1"},
+        {"WINEDEBUG", winedebug}, {"WINEARCH", "wow64"},
+        {"HOME", prefix.c_str()}, {"USER", PW_WINE_PROFILE_USER}, {"WINE_PS5_TRACE_STARTUP", "1"},
         {"WINE_PS5_VIEW", "desktop"}, {"WINEDLLOVERRIDES", default_overrides},
         // Manual launches need usable standard handles too; only the initial
         // client opens this file, and children retain inherited/redirected pipes.
@@ -1795,11 +1873,18 @@ void proton_run_wine()
     // PROTON_SYSTEM_MEMORY_LIMIT, in MiB, lowers the limit (0 turns the guard off), and PROTON_SYSTEM_MEMORY_END the
     // mark past which a game is ended at once.
     // The defaults are the Pro's (firmware 10.01); 12.00 and later has its own (src/pw_memory_guard.h), and a limit the run
-    // sets itself is held to that firmware's, as the Pro's was.
-    struct ps5_kernel_sw_version firmware = {};
-    firmware.size = sizeof(firmware);
-    if (sceKernelGetSystemSwVersion(&firmware) != 0) firmware.version = 0;
-    const unsigned default_limit = pw_memory_guard_default_limit_mib(firmware.version);
+    // sets itself is held to that firmware's, as the Pro's was. The INSTALLED firmware decides, not the word an enabler
+    // reports: the Pro reported 12.09 and ran with the 12.00-and-later limit through alpha-2 (src/pw_firmware.h).
+    unsigned firmware_reported = 0;
+    const unsigned firmware_installed = pw_firmware_installed(&firmware_reported);
+    const unsigned default_limit = pw_memory_guard_default_limit_mib(firmware_installed);
+    {
+        char installed_text[8] = "?", reported_text[8] = "?";
+        pw_firmware_text(firmware_installed, installed_text, sizeof(installed_text));
+        pw_firmware_text(firmware_reported, reported_text, sizeof(reported_text));
+        say("Wine: firmware %s installed (the system reports %s); the memory guard's limit is %u MiB", installed_text,
+            reported_text, default_limit);
+    }
     const char *memory_limit_setting = getenv("PROTON_SYSTEM_MEMORY_LIMIT");
     const char *memory_end_setting = getenv("PROTON_SYSTEM_MEMORY_END");
     const unsigned memory_limit_asked = memory_limit_setting ? (unsigned)strtoul(memory_limit_setting, nullptr, 10)

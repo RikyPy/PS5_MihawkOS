@@ -1,0 +1,1625 @@
+{
+ "telemetry_hold": null,
+ "launch_readiness": {
+  "ready": true,
+  "seconds": 0.195,
+  "settle_seconds": 0.0,
+  "census_seconds": 0.181,
+  "previous_cleanup_verified": true
+ },
+ "native_close_failures": [],
+ "run": "alpha3-base-01-gpu-window32",
+ "what": "C:\\windows\\system32\\mihawk.exe",
+ "env": [
+  "PROTON_LAYOUT=launcher",
+  "WINE_PS5_WINDOW_SURFACES=1",
+  "PROTON_STOP_TERMINATE=0"
+ ],
+ "result": "finished",
+ "seconds": 34.3,
+ "probe_verdict": "PASS",
+ "stages": {
+  "launched": 3.03,
+  "title_started": 3.55,
+  "elevated": 3.55,
+  "wine_loaded": 3.77,
+  "wineboot_started": 8.72,
+  "program_started": 12.49,
+  "wineboot_ended": 12.55,
+  "marker": 28.24,
+  "program_ended": 28.31,
+  "wine_ended": 30.29,
+  "launcher_started": 31.78,
+  "launcher_ended": 32.11,
+  "closed": 34.26
+ },
+ "clean_owner_restart": true,
+ "launcher_end_status": 0,
+ "initial_status": 0,
+ "closed_on_request": false,
+ "child_logs": [
+  "klog/alpha3-base-01-gpu-window32-wine-child-6430.log",
+  "klog/alpha3-base-01-gpu-window32-wine-child-6431.log",
+  "klog/alpha3-base-01-gpu-window32-wine-child-6432.log",
+  "klog/alpha3-base-01-gpu-window32-wine-child-6433.log",
+  "klog/alpha3-base-01-gpu-window32-wine-child-6434.log",
+  "klog/alpha3-base-01-gpu-window32-wine-child-6435.log",
+  "klog/alpha3-base-01-gpu-window32-wine-child-6436.log",
+  "klog/alpha3-base-01-gpu-window32-wine-child-6437.log",
+  "klog/alpha3-base-01-gpu-window32-wine-child-6438.log",
+  "klog/alpha3-base-01-gpu-window32-wine-child-6439.log",
+  "klog/alpha3-base-01-gpu-window32-wine-child-6440.log",
+  "klog/alpha3-base-01-gpu-window32-wine-child-6441.log",
+  "klog/alpha3-base-01-gpu-window32-wine-child-6442.log"
+ ],
+ "child_logs_missing": [],
+ "session_logs_status": 0,
+ "storage_errors": 0,
+ "stop_terminate": "0",
+ "injected_fault": null,
+ "exec_protection": {
+  "refused": 0,
+  "conversions": 1091,
+  "converted_kib": 62800,
+  "convert_failed": 0,
+  "exec_refused": 0,
+  "grant_retries": 0,
+  "modules": 0,
+  "sdk_refused": 0
+ },
+ "helpers": [
+  {
+   "program": null,
+   "libcef": false,
+   "resident_peak_mib": null,
+   "resident_last_mib": null,
+   "images_held_mib": null,
+   "vm_last": null,
+   "exec": null
+  },
+  {
+   "program": null,
+   "libcef": false,
+   "resident_peak_mib": 87,
+   "resident_last_mib": 87,
+   "images_held_mib": 32,
+   "vm_last": {
+    "resident_mib": 54,
+    "direct_resident_mib": 97,
+    "flexible_mib": 91
+   },
+   "exec": {
+    "refused": 0,
+    "conversions": 98,
+    "converted_kib": 5728,
+    "convert_failed": 0,
+    "exec_refused": 0,
+    "grant_retries": 0,
+    "modules": 0,
+    "sdk_refused": 0
+   }
+  },
+  {
+   "program": null,
+   "libcef": false,
+   "resident_peak_mib": null,
+   "resident_last_mib": null,
+   "images_held_mib": null,
+   "vm_last": null,
+   "exec": {
+    "refused": 0,
+    "conversions": 71,
+    "converted_kib": 4096,
+    "convert_failed": 0,
+    "exec_refused": 0,
+    "grant_retries": 0,
+    "modules": 0,
+    "sdk_refused": 0
+   }
+  },
+  {
+   "program": null,
+   "libcef": false,
+   "resident_peak_mib": 30,
+   "resident_last_mib": 30,
+   "images_held_mib": 6,
+   "vm_last": {
+    "resident_mib": 23,
+    "direct_resident_mib": 38,
+    "flexible_mib": 44
+   },
+   "exec": {
+    "refused": 0,
+    "conversions": 54,
+    "converted_kib": 2976,
+    "convert_failed": 0,
+    "exec_refused": 0,
+    "grant_retries": 0,
+    "modules": 0,
+    "sdk_refused": 0
+   }
+  },
+  {
+   "program": null,
+   "libcef": false,
+   "resident_peak_mib": null,
+   "resident_last_mib": null,
+   "images_held_mib": null,
+   "vm_last": null,
+   "exec": {
+    "refused": 0,
+    "conversions": 49,
+    "converted_kib": 2816,
+    "convert_failed": 0,
+    "exec_refused": 0,
+    "grant_retries": 0,
+    "modules": 0,
+    "sdk_refused": 0
+   }
+  },
+  {
+   "program": null,
+   "libcef": false,
+   "resident_peak_mib": 37,
+   "resident_last_mib": 37,
+   "images_held_mib": 8,
+   "vm_last": {
+    "resident_mib": 28,
+    "direct_resident_mib": 30,
+    "flexible_mib": 49
+   },
+   "exec": {
+    "refused": 0,
+    "conversions": 55,
+    "converted_kib": 3200,
+    "convert_failed": 0,
+    "exec_refused": 0,
+    "grant_retries": 0,
+    "modules": 0,
+    "sdk_refused": 0
+   }
+  },
+  {
+   "program": null,
+   "libcef": false,
+   "resident_peak_mib": 29,
+   "resident_last_mib": 29,
+   "images_held_mib": 6,
+   "vm_last": {
+    "resident_mib": 23,
+    "direct_resident_mib": 18,
+    "flexible_mib": 44
+   },
+   "exec": {
+    "refused": 0,
+    "conversions": 47,
+    "converted_kib": 2672,
+    "convert_failed": 0,
+    "exec_refused": 0,
+    "grant_retries": 0,
+    "modules": 0,
+    "sdk_refused": 0
+   }
+  },
+  {
+   "program": null,
+   "libcef": false,
+   "resident_peak_mib": 30,
+   "resident_last_mib": 30,
+   "images_held_mib": 7,
+   "vm_last": {
+    "resident_mib": 23,
+    "direct_resident_mib": 25,
+    "flexible_mib": 45
+   },
+   "exec": {
+    "refused": 0,
+    "conversions": 61,
+    "converted_kib": 3296,
+    "convert_failed": 0,
+    "exec_refused": 0,
+    "grant_retries": 0,
+    "modules": 0,
+    "sdk_refused": 0
+   }
+  },
+  {
+   "program": null,
+   "libcef": false,
+   "resident_peak_mib": 38,
+   "resident_last_mib": 38,
+   "images_held_mib": 9,
+   "vm_last": {
+    "resident_mib": 28,
+    "direct_resident_mib": 29,
+    "flexible_mib": 50
+   },
+   "exec": {
+    "refused": 0,
+    "conversions": 68,
+    "converted_kib": 3664,
+    "convert_failed": 0,
+    "exec_refused": 0,
+    "grant_retries": 0,
+    "modules": 0,
+    "sdk_refused": 0
+   }
+  },
+  {
+   "program": "gpu-window32-probe.exe",
+   "libcef": false,
+   "resident_peak_mib": 104,
+   "resident_last_mib": 104,
+   "images_held_mib": 42,
+   "vm_last": {
+    "resident_mib": 75,
+    "direct_resident_mib": 120,
+    "flexible_mib": 110
+   },
+   "exec": {
+    "refused": 0,
+    "conversions": 195,
+    "converted_kib": 11152,
+    "convert_failed": 0,
+    "exec_refused": 0,
+    "grant_retries": 0,
+    "modules": 0,
+    "sdk_refused": 0
+   }
+  },
+  {
+   "program": null,
+   "libcef": false,
+   "resident_peak_mib": 29,
+   "resident_last_mib": 29,
+   "images_held_mib": 6,
+   "vm_last": {
+    "resident_mib": 23,
+    "direct_resident_mib": 27,
+    "flexible_mib": 44
+   },
+   "exec": {
+    "refused": 0,
+    "conversions": 46,
+    "converted_kib": 2656,
+    "convert_failed": 0,
+    "exec_refused": 0,
+    "grant_retries": 0,
+    "modules": 0,
+    "sdk_refused": 0
+   }
+  },
+  {
+   "program": "gpu-window64-probe.exe",
+   "libcef": false,
+   "resident_peak_mib": null,
+   "resident_last_mib": null,
+   "images_held_mib": null,
+   "vm_last": null,
+   "exec": {
+    "refused": 0,
+    "conversions": 174,
+    "converted_kib": 10304,
+    "convert_failed": 0,
+    "exec_refused": 0,
+    "grant_retries": 0,
+    "modules": 0,
+    "sdk_refused": 0
+   }
+  },
+  {
+   "program": "gpu-window64-probe.exe",
+   "libcef": false,
+   "resident_peak_mib": null,
+   "resident_last_mib": null,
+   "images_held_mib": null,
+   "vm_last": null,
+   "exec": {
+    "refused": 0,
+    "conversions": 173,
+    "converted_kib": 10240,
+    "convert_failed": 0,
+    "exec_refused": 0,
+    "grant_retries": 0,
+    "modules": 0,
+    "sdk_refused": 0
+   }
+  }
+ ],
+ "foreign_mappings": {
+  "found": 0,
+  "skipped_unmaps": 0,
+  "refused_maps": 0,
+  "query_failed": 0,
+  "holes": 0,
+  "hole_list": []
+ },
+ "helper_sched": {
+  "helpers": [
+   {
+    "kind": "memory",
+    "mode": "rr",
+    "main_tid": "101397",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xea00",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xea00",
+    "service": "700",
+    "program": "767",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "3/700",
+    "now_kernel": "2/700"
+   },
+   {
+    "kind": "program",
+    "mode": "rr",
+    "main_tid": "101640",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xffff",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xffff",
+    "service": "700",
+    "program": "767",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "3/700",
+    "now_kernel": "2/700"
+   },
+   {
+    "kind": "program",
+    "mode": "rr",
+    "main_tid": "101707",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xffff",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xffff",
+    "service": "700",
+    "program": "767",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "3/700",
+    "now_kernel": "2/700"
+   },
+   {
+    "kind": "program",
+    "mode": "rr",
+    "main_tid": "101706",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xffff",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xffff",
+    "service": "700",
+    "program": "767",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "3/700",
+    "now_kernel": "2/700"
+   },
+   {
+    "kind": "program",
+    "mode": "rr",
+    "main_tid": "102377",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xffff",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xffff",
+    "service": "700",
+    "program": "767",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "3/700",
+    "now_kernel": "2/700"
+   },
+   {
+    "kind": "program",
+    "mode": "rr",
+    "main_tid": "102310",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xffff",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xffff",
+    "service": "700",
+    "program": "767",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "3/700",
+    "now_kernel": "2/700"
+   },
+   {
+    "kind": "program",
+    "mode": "rr",
+    "main_tid": "101455",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xffff",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xffff",
+    "service": "700",
+    "program": "767",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "3/700",
+    "now_kernel": "2/700"
+   },
+   {
+    "kind": "program",
+    "mode": "rr",
+    "main_tid": "100657",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xffff",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xffff",
+    "service": "700",
+    "program": "767",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "3/700",
+    "now_kernel": "2/700"
+   },
+   {
+    "kind": "program",
+    "mode": "rr",
+    "main_tid": "102384",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xffff",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xffff",
+    "service": "700",
+    "program": "767",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "3/700",
+    "now_kernel": "2/700"
+   },
+   {
+    "kind": "program",
+    "mode": "rr",
+    "main_tid": "101719",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xffff",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xffff",
+    "service": "700",
+    "program": "767",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "3/700",
+    "now_kernel": "2/700"
+   },
+   {
+    "kind": "program",
+    "mode": "rr",
+    "main_tid": "101725",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xffff",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xffff",
+    "service": "700",
+    "program": "767",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "3/700",
+    "now_kernel": "2/700"
+   },
+   {
+    "kind": "program",
+    "mode": "rr",
+    "main_tid": "101068",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xffff",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xffff",
+    "service": "700",
+    "program": "767",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "3/700",
+    "now_kernel": "2/700"
+   },
+   {
+    "kind": "program",
+    "mode": "rr",
+    "main_tid": "101707",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xffff",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xffff",
+    "service": "700",
+    "program": "767",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "3/700",
+    "now_kernel": "2/700"
+   }
+  ],
+  "workers": [
+   {
+    "worker": "3/767",
+    "worker_kernel": "2/767",
+    "worker_cpus": "0xffff",
+    "status": "0",
+    "inherit": "3/767",
+    "inherit_kernel": "2/767",
+    "inherit_cpus": "0xffff"
+   },
+   {
+    "worker": "3/767",
+    "worker_kernel": "2/767",
+    "worker_cpus": "0xffff",
+    "status": "0",
+    "inherit": "3/767",
+    "inherit_kernel": "2/767",
+    "inherit_cpus": "0xffff"
+   },
+   {
+    "worker": "3/767",
+    "worker_kernel": "2/767",
+    "worker_cpus": "0xffff",
+    "status": "0",
+    "inherit": "3/767",
+    "inherit_kernel": "2/767",
+    "inherit_cpus": "0xffff"
+   },
+   {
+    "worker": "3/767",
+    "worker_kernel": "2/767",
+    "worker_cpus": "0xffff",
+    "status": "0",
+    "inherit": "3/767",
+    "inherit_kernel": "2/767",
+    "inherit_cpus": "0xffff"
+   },
+   {
+    "worker": "3/767",
+    "worker_kernel": "2/767",
+    "worker_cpus": "0xffff",
+    "status": "0",
+    "inherit": "3/767",
+    "inherit_kernel": "2/767",
+    "inherit_cpus": "0xffff"
+   },
+   {
+    "worker": "3/767",
+    "worker_kernel": "2/767",
+    "worker_cpus": "0xffff",
+    "status": "0",
+    "inherit": "3/767",
+    "inherit_kernel": "2/767",
+    "inherit_cpus": "0xffff"
+   },
+   {
+    "worker": "3/767",
+    "worker_kernel": "2/767",
+    "worker_cpus": "0xffff",
+    "status": "0",
+    "inherit": "3/767",
+    "inherit_kernel": "2/767",
+    "inherit_cpus": "0xffff"
+   },
+   {
+    "worker": "3/767",
+    "worker_kernel": "2/767",
+    "worker_cpus": "0xffff",
+    "status": "0",
+    "inherit": "3/767",
+    "inherit_kernel": "2/767",
+    "inherit_cpus": "0xffff"
+   },
+   {
+    "worker": "3/767",
+    "worker_kernel": "2/767",
+    "worker_cpus": "0xffff",
+    "status": "0",
+    "inherit": "3/767",
+    "inherit_kernel": "2/767",
+    "inherit_cpus": "0xffff"
+   },
+   {
+    "worker": "3/767",
+    "worker_kernel": "2/767",
+    "worker_cpus": "0xffff",
+    "status": "0",
+    "inherit": "3/767",
+    "inherit_kernel": "2/767",
+    "inherit_cpus": "0xffff"
+   },
+   {
+    "worker": "3/767",
+    "worker_kernel": "2/767",
+    "worker_cpus": "0xffff",
+    "status": "0",
+    "inherit": "3/767",
+    "inherit_kernel": "2/767",
+    "inherit_cpus": "0xffff"
+   },
+   {
+    "worker": "3/767",
+    "worker_kernel": "2/767",
+    "worker_cpus": "0xffff",
+    "status": "0",
+    "inherit": "3/767",
+    "inherit_kernel": "2/767",
+    "inherit_cpus": "0xffff"
+   }
+  ],
+  "program_threads": {
+   "set": 21,
+   "failed": 0
+  },
+  "census": null,
+  "census_processes": 0,
+  "row": null,
+  "scheduled": {
+   "ok": true,
+   "reasons": []
+  }
+ },
+ "helpers_ended": {
+  "why": null,
+  "count": 0,
+  "signals": {},
+  "gone_ms": {},
+  "still_there": [],
+  "after_kill": null,
+  "stalled": null,
+  "wedge_s": null,
+  "recorder_rows": "process rows from kern.proc (the title's own: state=3 pri=10/0 cpu=15 threads=20)"
+ },
+ "helper_doom": [
+  {
+   "seen": [
+    "exit"
+   ],
+   "doomed": null,
+   "stamped_ms_ago": null,
+   "ended": true
+  },
+  {
+   "seen": [
+    "exit"
+   ],
+   "doomed": null,
+   "stamped_ms_ago": null,
+   "ended": true
+  },
+  {
+   "seen": [
+    "exit"
+   ],
+   "doomed": null,
+   "stamped_ms_ago": null,
+   "ended": true
+  },
+  {
+   "seen": [
+    "exit"
+   ],
+   "doomed": null,
+   "stamped_ms_ago": null,
+   "ended": true
+  },
+  {
+   "seen": [
+    "exit"
+   ],
+   "doomed": null,
+   "stamped_ms_ago": null,
+   "ended": true
+  },
+  {
+   "seen": [
+    "exit"
+   ],
+   "doomed": null,
+   "stamped_ms_ago": null,
+   "ended": true
+  },
+  {
+   "seen": [
+    "exit"
+   ],
+   "doomed": null,
+   "stamped_ms_ago": null,
+   "ended": true
+  }
+ ],
+ "broker_phases": null,
+ "memory_helper_slowest": {
+  "census": 1,
+  "alloc": 1,
+  "shared": 0,
+  "touch": 3,
+  "dmem": 3,
+  "grant": 0,
+  "free": 1,
+  "stall": 0
+ },
+ "memory_helper": {
+  "dead": [],
+  "stall_tests": 0,
+  "sections_mib": [],
+  "given_back": 0,
+  "lost": 0,
+  "gave_back_lines": 0
+ },
+ "assertion": false,
+ "chunk_maps": null,
+ "mapped_mib": null,
+ "ask_failures_max": null,
+ "misplaced_max": null,
+ "rep_step_us": null,
+ "exec_rewrites_us": null,
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": true,
+ "bench": {},
+ "steady": {
+  "server": {
+   "calls": 0.0,
+   "per_s": 0.0,
+   "avg_us": 0.0,
+   "selects": 0.0,
+   "blocked": 0.0,
+   "block_avg_us": 0.0,
+   "waits": 0.0,
+   "handles_avg": 0.0,
+   "wait_all": 0.0,
+   "polled": 0.0,
+   "delays": 0.0,
+   "yields": 0.0,
+   "intervals": 2
+  }
+ },
+ "intervals": {
+  "frames": [],
+  "server": [
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   }
+  ],
+  "top": []
+ },
+ "shown": {
+  "frames": 268,
+  "per_10s": [
+   1,
+   267
+  ],
+  "longest_gap_ms": 1516
+ },
+ "broker": {
+  "local_offer": 8589934592,
+  "host_limit": 1073741824,
+  "windows": {
+   "presents": 779,
+   "effect_bytes": 0,
+   "mica_builds": 0,
+   "thumbnail_builds": 0,
+   "compositions": 770,
+   "compose_avg_us": 2964,
+   "compose_max_us": 4086
+  },
+  "refused": [],
+  "refused_count": 0,
+  "clients": [
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": 6441,
+    "frames": 212,
+    "submissions": 434
+   },
+   {
+    "pid": 6442,
+    "frames": 65,
+    "submissions": 133
+   },
+   {
+    "pid": 6431,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": 6439,
+    "frames": 370,
+    "submissions": 758
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   }
+  ],
+  "wedged": false,
+  "failure_reasons": [],
+  "host_peak": 26034176,
+  "local_peak": 199065600
+ },
+ "pacing": {
+  "windows": [
+   {
+    "cookie": 11,
+    "pid": 6441,
+    "route": "composed",
+    "final": true,
+    "refused": "not-fullscreen",
+    "direct": 0.0,
+    "composed": 212.0,
+    "seconds": 7.0,
+    "frames": 212.0,
+    "hidden": 0.0,
+    "fps": 30.3,
+    "mean": 32.02,
+    "p50": 33.25,
+    "p95": 33.75,
+    "p99": 50.75,
+    "max": 1139.59,
+    "over20": 121.0,
+    "over34": 6.0,
+    "present_avg": 26.33,
+    "present_max": 50.65
+   },
+   {
+    "cookie": 9,
+    "pid": 6439,
+    "route": "composed",
+    "final": false,
+    "refused": "not-fullscreen",
+    "direct": 0.0,
+    "composed": 285.0,
+    "seconds": 10.0,
+    "frames": 285.0,
+    "hidden": 0.0,
+    "fps": 28.5,
+    "mean": 35.24,
+    "p50": 20.75,
+    "p95": 50.25,
+    "p99": 785.05,
+    "max": 785.05,
+    "over20": 147.0,
+    "over34": 18.0,
+    "present_avg": 20.32,
+    "present_max": 50.08
+   },
+   {
+    "cookie": 12,
+    "pid": 6442,
+    "route": "composed",
+    "final": true,
+    "refused": "no-window",
+    "direct": 0.0,
+    "composed": 65.0,
+    "seconds": 2.3,
+    "frames": 65.0,
+    "hidden": 0.0,
+    "fps": 28.0,
+    "mean": 31.87,
+    "p50": 33.5,
+    "p95": 33.75,
+    "p99": 50.5,
+    "max": 50.48,
+    "over20": 58.0,
+    "over34": 1.0,
+    "present_avg": 31.34,
+    "present_max": 50.41
+   },
+   {
+    "cookie": 9,
+    "pid": 6439,
+    "route": "composed",
+    "final": true,
+    "refused": "not-fullscreen",
+    "direct": 0.0,
+    "composed": 85.0,
+    "seconds": 3.5,
+    "frames": 85.0,
+    "hidden": 0.0,
+    "fps": 24.4,
+    "mean": 31.33,
+    "p50": 33.5,
+    "p95": 33.75,
+    "p99": 217.0,
+    "max": 217.01,
+    "over20": 66.0,
+    "over34": 3.0,
+    "present_avg": 26.74,
+    "present_max": 51.54
+   }
+  ],
+  "clients": {
+   "11": {
+    "pid": 6441,
+    "route": "composed",
+    "routes": {
+     "composed": 212
+    },
+    "windows": 1,
+    "seconds": 7.0,
+    "frames": 212,
+    "hidden": 0,
+    "direct": 0,
+    "composed": 212,
+    "refused": [
+     "not-fullscreen"
+    ],
+    "fps": 30.3,
+    "p50_median_ms": 33.25,
+    "p95_worst_ms": 33.75,
+    "p99_worst_ms": 50.75,
+    "max_ms": 1139.59,
+    "over20": 121,
+    "over34": 6,
+    "present_avg_ms": 26.33,
+    "present_max_ms": 50.65
+   },
+   "9": {
+    "pid": 6439,
+    "route": "composed",
+    "routes": {
+     "composed": 370
+    },
+    "windows": 2,
+    "seconds": 13.5,
+    "frames": 370,
+    "hidden": 0,
+    "direct": 0,
+    "composed": 370,
+    "refused": [
+     "not-fullscreen"
+    ],
+    "fps": 27.4,
+    "p50_median_ms": 27.125,
+    "p95_worst_ms": 50.25,
+    "p99_worst_ms": 785.05,
+    "max_ms": 785.05,
+    "over20": 213,
+    "over34": 21,
+    "present_avg_ms": 21.79,
+    "present_max_ms": 51.54
+   },
+   "12": {
+    "pid": 6442,
+    "route": "composed",
+    "routes": {
+     "composed": 65
+    },
+    "windows": 1,
+    "seconds": 2.3,
+    "frames": 65,
+    "hidden": 0,
+    "direct": 0,
+    "composed": 65,
+    "refused": [
+     "no-window"
+    ],
+    "fps": 28.3,
+    "p50_median_ms": 33.5,
+    "p95_worst_ms": 33.75,
+    "p99_worst_ms": 50.5,
+    "max_ms": 50.48,
+    "over20": 58,
+    "over34": 1,
+    "present_avg_ms": 31.34,
+    "present_max_ms": 50.41
+   }
+  }
+ },
+ "captures": [
+  "klog/alpha3-base-01-gpu-window32-capture-01.png",
+  "klog/alpha3-base-01-gpu-window32-capture-02.png",
+  "klog/alpha3-base-01-gpu-window32-capture-03.png",
+  "klog/alpha3-base-01-gpu-window32-capture-04.png",
+  "klog/alpha3-base-01-gpu-window32-capture-05.png",
+  "klog/alpha3-base-01-gpu-window32-capture-06.png"
+ ],
+ "cleanup_verified": true,
+ "hooks_removed": true,
+ "semantics_passed": true,
+ "window_pixels": [
+  {
+   "capture": "klog/alpha3-base-01-gpu-window32-capture-01.png",
+   "number": 1,
+   "pixels": [
+    {
+     "phase": "gpu-controls",
+     "point": [
+      1801,
+      102
+     ],
+     "expected": [
+      255,
+      255,
+      255
+     ],
+     "actual": [
+      255,
+      255,
+      255
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-controls",
+     "point": [
+      304,
+      436
+     ],
+     "expected": [
+      30,
+      180,
+      70
+     ],
+     "actual": [
+      30,
+      180,
+      70
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-controls",
+     "point": [
+      634,
+      316
+     ],
+     "expected": [
+      240,
+      180,
+      30
+     ],
+     "actual": [
+      240,
+      180,
+      30
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-controls",
+     "point": [
+      754,
+      406
+     ],
+     "expected": [
+      220,
+      50,
+      60
+     ],
+     "actual": [
+      220,
+      50,
+      60
+     ],
+     "passed": true
+    }
+   ],
+   "desktop_background": [
+    161,
+    220,
+    142
+   ],
+   "expected_background": [
+    161,
+    220,
+    142
+   ],
+   "passed": true
+  },
+  {
+   "capture": "klog/alpha3-base-01-gpu-window32-capture-02.png",
+   "number": 2,
+   "pixels": [
+    {
+     "phase": "gpu-modal",
+     "point": [
+      1801,
+      102
+     ],
+     "expected": [
+      255,
+      255,
+      255
+     ],
+     "actual": [
+      255,
+      255,
+      255
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-modal",
+     "point": [
+      304,
+      436
+     ],
+     "expected": [
+      30,
+      110,
+      210
+     ],
+     "actual": [
+      30,
+      110,
+      210
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-modal",
+     "point": [
+      634,
+      316
+     ],
+     "expected": [
+      240,
+      180,
+      30
+     ],
+     "actual": [
+      240,
+      180,
+      30
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-modal",
+     "point": [
+      754,
+      406
+     ],
+     "expected": [
+      220,
+      50,
+      60
+     ],
+     "actual": [
+      220,
+      50,
+      60
+     ],
+     "passed": true
+    }
+   ],
+   "desktop_background": [
+    161,
+    220,
+    142
+   ],
+   "expected_background": [
+    161,
+    220,
+    142
+   ],
+   "passed": true
+  },
+  {
+   "capture": "klog/alpha3-base-01-gpu-window32-capture-03.png",
+   "number": 3,
+   "pixels": [
+    {
+     "phase": "gpu-resize-hidden",
+     "point": [
+      1801,
+      102
+     ],
+     "expected": [
+      255,
+      255,
+      255
+     ],
+     "actual": [
+      255,
+      255,
+      255
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-resize-hidden",
+     "point": [
+      204,
+      386
+     ],
+     "expected": [
+      30,
+      110,
+      210
+     ],
+     "actual": [
+      30,
+      110,
+      210
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-resize-hidden",
+     "point": [
+      534,
+      266
+     ],
+     "expected": [
+      240,
+      180,
+      30
+     ],
+     "actual": [
+      240,
+      180,
+      30
+     ],
+     "passed": true
+    }
+   ],
+   "desktop_background": [
+    161,
+    220,
+    142
+   ],
+   "expected_background": [
+    161,
+    220,
+    142
+   ],
+   "passed": true
+  },
+  {
+   "capture": "klog/alpha3-base-01-gpu-window32-capture-04.png",
+   "number": 4,
+   "pixels": [
+    {
+     "phase": "gpu-restored",
+     "point": [
+      1801,
+      102
+     ],
+     "expected": [
+      255,
+      255,
+      255
+     ],
+     "actual": [
+      255,
+      255,
+      255
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-restored",
+     "point": [
+      204,
+      386
+     ],
+     "expected": [
+      30,
+      180,
+      70
+     ],
+     "actual": [
+      30,
+      180,
+      70
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-restored",
+     "point": [
+      534,
+      266
+     ],
+     "expected": [
+      240,
+      180,
+      30
+     ],
+     "actual": [
+      240,
+      180,
+      30
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-restored",
+     "point": [
+      654,
+      356
+     ],
+     "expected": [
+      30,
+      110,
+      210
+     ],
+     "actual": [
+      30,
+      110,
+      210
+     ],
+     "passed": true
+    }
+   ],
+   "desktop_background": [
+    161,
+    220,
+    142
+   ],
+   "expected_background": [
+    161,
+    220,
+    142
+   ],
+   "passed": true
+  },
+  {
+   "capture": "klog/alpha3-base-01-gpu-window32-capture-05.png",
+   "number": 5,
+   "pixels": [
+    {
+     "phase": "gpu-child-exited",
+     "point": [
+      1801,
+      102
+     ],
+     "expected": [
+      255,
+      255,
+      255
+     ],
+     "actual": [
+      255,
+      255,
+      255
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-child-exited",
+     "point": [
+      204,
+      386
+     ],
+     "expected": [
+      220,
+      50,
+      60
+     ],
+     "actual": [
+      220,
+      50,
+      60
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-child-exited",
+     "point": [
+      534,
+      266
+     ],
+     "expected": [
+      240,
+      180,
+      30
+     ],
+     "actual": [
+      240,
+      180,
+      30
+     ],
+     "passed": true
+    }
+   ],
+   "desktop_background": [
+    161,
+    220,
+    142
+   ],
+   "expected_background": [
+    161,
+    220,
+    142
+   ],
+   "passed": true
+  },
+  {
+   "capture": "klog/alpha3-base-01-gpu-window32-capture-06.png",
+   "number": 6,
+   "pixels": [
+    {
+     "phase": "gpu-into-owner",
+     "point": [
+      1801,
+      102
+     ],
+     "expected": [
+      255,
+      255,
+      255
+     ],
+     "actual": [
+      255,
+      255,
+      255
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-into-owner",
+     "point": [
+      314,
+      546
+     ],
+     "expected": [
+      30,
+      180,
+      70
+     ],
+     "actual": [
+      30,
+      180,
+      70
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-into-owner",
+     "point": [
+      534,
+      266
+     ],
+     "expected": [
+      240,
+      180,
+      30
+     ],
+     "actual": [
+      240,
+      180,
+      30
+     ],
+     "passed": true
+    }
+   ],
+   "desktop_background": [
+    161,
+    220,
+    142
+   ],
+   "expected_background": [
+    161,
+    220,
+    142
+   ],
+   "passed": true
+  }
+ ]
+}

@@ -8,7 +8,10 @@
  * named on the command line after --run (e.g. --run 7-Zip\7z.exe), run with "i" and expected to exit 0. With
  * --no-services (the title layout, which starts no services) the service manager is reported but not required. With
  * --trace CHANNELS, msiexec runs with those Wine debug channels added (Wine hands a child its own WINEDEBUG). A
- * program that has not ended in time is ended, so a stalled step fails the probe instead of holding the title. */
+ * program that has not ended in time is ended, so a stalled step fails the probe instead of holding the title.
+ * The user's folders are Mihawk's (patch 1240); with --moved NAME the probe checks an older prefix's moved profile
+ * instead of the rest: NAME, saved in C:\users\steamuser\Documents before the move, is read through the profile and
+ * through the old path, and C:\users lists no steamuser (src/pw_wine_profile.h). */
 #include <windows.h>
 
 static int failures;
@@ -70,6 +73,50 @@ void mainCRTStartup(void)
     RegCloseKey(key);
     size = GetEnvironmentVariableA("APPDATA", folder, sizeof(folder));
     check(size && size < sizeof(folder) && exists(folder), "the user's application data folder exists");
+    /* The user is Mihawk (patch 1240) and its profile holds the user's folders (src/pw_wine_profile.h). */
+    {
+        char user[64], profile[MAX_PATH], head[MAX_PATH];
+        DWORD length = sizeof(user);
+        check(GetUserNameA(user, &length) && !lstrcmpA(user, "Mihawk"), "the Windows user is Mihawk");
+        length = GetEnvironmentVariableA("USERPROFILE", profile, sizeof(profile));
+        check(length && length < sizeof(profile) && !lstrcmpiA(profile, "C:\\users\\Mihawk"),
+              "USERPROFILE is the Mihawk folder in C: users");
+        lstrcpynA(head, folder, lstrlenA(profile) + 1);
+        check(!lstrcmpiA(head, profile) && folder[lstrlenA(profile)] == '\\', "the application data folder is in the profile");
+        check(exists("C:\\users\\Mihawk\\Documents"), "the profile has Documents");
+        /* --moved NAME: an older prefix's profile moved; NAME was saved in steamuser's Documents before. */
+        const char *moved = NULL;
+        for (const char *p = command; *p; ++p) if (!memcmp(p, "--moved ", 8)) { moved = p + 8; break; }
+        if (moved) {
+            char path[MAX_PATH], before[256] = "", after[256] = "";
+            DWORD got = 0;
+            wsprintfA(path, "%s\\Documents\\%s", profile, moved);
+            HANDLE file = CreateFileA(path, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+            if (file != INVALID_HANDLE_VALUE) { ReadFile(file, after, sizeof(after) - 1, &got, NULL); CloseHandle(file); }
+            after[got] = 0;
+            wsprintfA(line, "prefix-probe: the saved file holds \"%s\"\n", after);
+            say(line);
+            check(got > 0, "the file saved before the move is in the profile's Documents");
+            wsprintfA(path, "C:\\users\\steamuser\\Documents\\%s", moved);
+            got = 0;
+            file = CreateFileA(path, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+            if (file != INVALID_HANDLE_VALUE) { ReadFile(file, before, sizeof(before) - 1, &got, NULL); CloseHandle(file); }
+            before[got] = 0;
+            check(got > 0 && !lstrcmpA(before, after), "the old steamuser path finds the same file");
+            WIN32_FIND_DATAA found;
+            HANDLE search = FindFirstFileA("C:\\users\\*", &found);
+            int listed = 0;
+            if (search != INVALID_HANDLE_VALUE) {
+                do listed |= !lstrcmpiA(found.cFileName, "steamuser"); while (FindNextFileA(search, &found));
+                FindClose(search);
+            }
+            check(!listed, "C: users lists no steamuser folder");
+            say(failures ? "PS5_PROTON_PREFIX_PROBE FAIL\n"
+                         : "PS5_PROTON_PREFIX_PROBE PASS: the profile moved to Mihawk, the old path still leads to it\n");
+            ExitProcess(failures ? 1 : 0);
+        }
+        check(!exists("C:\\users\\steamuser"), "a new prefix has no steamuser folder");
+    }
 
     /* The service control manager. */
     {

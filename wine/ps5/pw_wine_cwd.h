@@ -22,7 +22,9 @@
  * PPRBUG-22859). Wine needs two, dosdevices/c: -> ../drive_c and z: -> /, so
  * links are virtual: kept here, followed by every wrapped call, and saved in
  * a PW_CWD_LINK_TABLE file in the link's directory, which is read the first
- * time a lookup below that directory fails.
+ * time a lookup below that directory fails, the directory as named or as
+ * reached through other links (C:\users\steamuser: dosdevices/c:, then
+ * drive_c/users' table; src/pw_wine_profile.h).
  */
 #include <stddef.h>
 #include <sys/types.h>

@@ -493,3 +493,10 @@ Patch 1189 names what keeps a Mihawk OS session from ending, in the title's hang
 user process does; in `gate-2026-10-18-defaults-01` game-mode-dxvk64's session did not end after its game's process
 ended (once in 12 runs with every speed switch on). The snapshot now prints the counts the server's shutdown is decided
 on and every process with its system mark, running threads, end and image name. Diagnostic only.
+
+Patch 1240 makes the Windows user Mihawk. Proton's advapi32 answers GetUserNameA/W with a fixed `steamuser`, and every
+profile path follows from it (shell32's `%USERPROFILE%`, wineboot's ProfileImagePath and Volatile Environment,
+LookupAccountSid's first user), so a new prefix's profile is `C:\users\Mihawk`. A prefix made before v3.0.0-alpha-3 is
+moved once by the title before Wine starts on it: the folder, its registry's paths and a link from the old name
+(`src/pw_wine_profile.h`, `tests/test_pw_wine_profile.c`). The Unix `USER` the title gives Wine, and so
+`WINEUSERNAME`, is Mihawk too. A new and a moved prefix passed on the base PS5 (`docs/PLAN.md`).

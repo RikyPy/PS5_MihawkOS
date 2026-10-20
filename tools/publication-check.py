@@ -59,7 +59,7 @@ SERIAL = re.compile(rb'(?i)\b(?:serial(?:[ _-]?(?:number|no))?|psid|openpsid|idp
                     rb'["\']?[A-Za-z0-9-]{8,}')
 HOME = re.compile(rb'/home/([a-z_][a-z0-9_-]{0,31})/')
 WINUSER = re.compile(rb'(?i)C:\\{1,2}Users\\{1,2}([A-Za-z0-9._-]+)')
-WINUSERS_OK = {b'steamuser', b'public', b'default', b'all users', b'mihawk'}  # Wine's and the prototype's demo user
+WINUSERS_OK = {b'steamuser', b'public', b'default', b'all users', b'mihawk'}  # Proton's, Wine's, Mihawk OS's (patch 1240)
 LAN = [ipaddress.ip_network(n) for n in ('10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16', '100.64.0.0/10')]
 
 # Binary formats that are never this project's: a game, firmware, a key or a disc image could hide in them.

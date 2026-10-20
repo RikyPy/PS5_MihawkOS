@@ -5,6 +5,11 @@ order, and what is already proven) and [`docs/ARCHITECTURE.md`](docs/ARCHITECTUR
 (who owns what). The human README is [`README.md`](README.md); provenance and licences
 are [`NOTICE.md`](NOTICE.md) and [`LICENSING.md`](LICENSING.md).
 
+> **Contributing from a fork?** These instructions were written for the maintainer's own agents. Rules 1 to 7 and 9
+> apply to everyone as written. Rule 8's "work on `main`, locally" and rule 10 are the maintainer's. In a fork you work
+> on a branch, push it to your fork and open a pull request against `main`, as [`CONTRIBUTING.md`](CONTRIBUTING.md)
+> and [`skills/contribute/SKILL.md`](skills/contribute/SKILL.md) describe. Run their checks before you open it.
+
 ## What this repository is
 
 A PS5 homebrew title that **launches 64-bit and 32-bit Windows games** and a **Wine runtime** they
@@ -90,6 +95,7 @@ on the DualSense, `/data` mounting, and running one game per process.
 | Plain-language accomplishments and proof limits | [`docs/FEATURES.md`](docs/FEATURES.md) |
 | How code, probes, tools and documents are designed for the agent's loop | `../PS5_VulkanTemplate/skills/ps5-agent-native/SKILL.md` (the method), [`skills/proton-agent-native/SKILL.md`](skills/proton-agent-native/SKILL.md) (here) |
 | How 32-bit programs run, and what was learned from prospero-win | [`docs/IA32_DESIGN.md`](docs/IA32_DESIGN.md), [`docs/IA32_REFERENCE_REVIEW.md`](docs/IA32_REFERENCE_REVIEW.md) |
+| How to contribute from a fork, and the checks before a pull request | [`CONTRIBUTING.md`](CONTRIBUTING.md), [`skills/contribute/SKILL.md`](skills/contribute/SKILL.md) |
 | Dated investigations and obsolete defaults | [`docs/history/2026-10-07/README.md`](docs/history/2026-10-07/README.md); historical instructions do not override the current plan |
 
 ## How this repository is designed: for the agent's loop

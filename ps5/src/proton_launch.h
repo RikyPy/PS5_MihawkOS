@@ -106,6 +106,8 @@ std::string proton_title_path(const char *path);
 std::string proton_controls_path();
 /* The Game Mode setting (src/pw_game_mode.h), beside controls.txt. */
 std::string proton_game_mode_path();
+/* The Logging setting (src/pw_detailed_logs.h), beside game-mode.txt. */
+std::string proton_logging_path();
 /* Every place the catalog is read from, in order, existing or not. */
 std::vector<std::string> proton_game_roots();
 

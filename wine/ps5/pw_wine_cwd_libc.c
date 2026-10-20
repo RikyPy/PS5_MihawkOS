@@ -115,12 +115,16 @@ static int load_tables(const char *path)
 }
 
 /* After a lookup failed for want of a directory, read the tables on the way
- * and resolve again. 1 when the call is worth repeating; 0 keeps errno. */
+ * and resolve again. 1 when the call is worth repeating; 0 keeps errno.
+ * Both ways are read: as named, and as followed, since a table below a link
+ * is in the link's target (C:\users\steamuser is dosdevices/c: -> drive_c,
+ * then drive_c/users' table; src/pw_wine_profile.h). The callers repeat
+ * while a reload finds more, so a chain of links is read link by link. */
 static int reload(struct resolved *r)
 {
     int saved = errno;
 
-    if ((saved != ENOENT && saved != ENOTDIR) || !load_tables(r->logical) ||
+    if ((saved != ENOENT && saved != ENOTDIR) || !(load_tables(r->logical) + load_tables(r->full)) ||
         pw_cwd_follow(r->logical, r->follow_last, r->full, sizeof(r->full))) {
         errno = saved;
         return 0;

@@ -313,6 +313,10 @@ def main():
     if not (DEPS / 'prefix-probe/system.reg').is_file():
         raise SystemExit('.deps/prefix-probe, the check prefix template, is missing: run tools/fetch-all.sh')
     copy_prefix(DEPS / 'prefix-probe', prefix)
+    # The template's host wineboot named the profile steamuser (Proton's GetUserNameW); the console's Wine names it
+    # Mihawk (patch 1240), so the staged prefix is Mihawk's, as the title moves an older one (src/pw_wine_profile.h).
+    if (prefix / 'drive_c/users/steamuser').is_dir():
+        (prefix / 'drive_c/users/steamuser').rename(prefix / 'drive_c/users/Mihawk')
     # A WoW64 prefix: the i386 modules in C:\windows\syswow64, as wineboot installs them (every module but import
     # libraries). The 32-bit loader takes a system DLL only from the prefix, and the template predates the i386
     # build: kernel32.dll was not found (m3-pe32-2026-10-07-09). The code still loads from lib/wine/i386-windows;
@@ -414,9 +418,13 @@ def main():
         # the host's system fonts (Z:\\usr\\share\\fonts\\...) are registered too, and the console has none of those files
         text = re.sub(r'^"[^"\n]*"="Z:\\\\usr\\\\share\\\\fonts\\\\[^\n]*\n', '', text, flags=re.M)
         text = text.replace('"LOGONSERVER"="\\\\\\\\CACHYOS-X8664"', '"LOGONSERVER"="\\\\\\\\PS5"')
+        # The profile's paths and name, by pw_wine_profile_rewrite's rules: after users and a separator, before a
+        # separator, a quote, ';', ',' or ']'; or a whole quoted "steamuser" (the saved USERNAME).
+        text = re.sub(r'(?i)([\\/]users(?:\\\\|/))steamuser(?=[\\/";,\]])', r'\1Mihawk', text)
+        text = re.sub(r'(?i)"steamuser"', '"Mihawk"', text)
         path.write_text(text)
     # Keep user folders local instead of host-home symlinks.
-    for path in ('windows/temp', 'users/prospero/Temp', 'users/prospero/AppData/Local/Temp'):
+    for path in ('windows/temp', 'users/Mihawk/AppData/Local/Temp'):
         (prefix / 'drive_c' / path).mkdir(parents=True, exist_ok=True)
     for name in ('wine-probe.exe', 'xinput-probe.exe', 'hid-probe.exe', 'sync-probe.exe', 'shell-open-probe.exe', 'exit-probe.exe', 'priority-probe.exe',
                  'hang-probe.exe', 'window-probe.exe', 'fs-probe.exe', 'stack-probe.exe', 'gl-exit-probe.exe', 'gl-present-probe.exe', 'gl-sprite-probe.exe', 'vm-protect-probe.exe', 'vm-protect32-probe.exe', 'remote-memory-probe.exe', 'mem-probe.exe', 'gl-vertex-probe.exe', 'stdout-probe.exe', 'nt-file-probe.exe', 'thread-leak-probe.exe', 'd3d11-probe.exe', 'gpu-host-memory-probe.exe', 'section-memory-probe.exe',

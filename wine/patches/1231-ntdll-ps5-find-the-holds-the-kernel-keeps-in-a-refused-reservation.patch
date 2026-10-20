@@ -1,0 +1,264 @@
+From: PS5_Proton
+Subject: [PATCH] ntdll: find the holds the kernel keeps in a refused reservation (PS5)
+
+late-library (alpha-3 item 1b). The kernel's JIT objects hold address space in an arena of their own (at 32 GiB and every 2 GiB
+above, up to some 230 MiB each, on the Pro and on the standard PS5): a reservation over a hold is refused with ENOMEM, no list the
+kernel shows has an entry for it (entries 0 in 0x7ef000000-0x1000000000), and with the user-space module loader (native/pw_prx_elf_ps5.c,
+one object per text run of its modules) Wine had no view over them, where the kernel's module loader leaves views in those slots.
+VirtualQuery then called free a 34.7 GB interval at 0x7ef000000 of which no reservation could be made: late-library reserved 6 spans,
+31 GiB, on the Pro with the loader forced on and on the standard PS5 (a3-pro-02-loader), where the same Pro with the kernel's loader
+reserved 16 spans, 917 GiB (a3-pro-02-kernel; the helper's RLIMIT_DATA is 32 GiB on both and is not the cause, nor is the size of one
+mapping: the first 16 GiB piece of a split reservation was refused as well).
+
+A fixed reservation of 1 GiB or more that the kernel refuses is now looked through (ps5_claim_holds), 256 MiB windows at a time and
+the refused windows 64 KiB at a time, skipping Wine's own views and reserved areas: each hold found (it ends where 4 MiB of 64 KiB steps
+in a row are free) becomes a native view, as ps5_claim_native_holes makes them, and the request is asked once more. Nothing about the
+arena's place or size is assumed. The first such request costs about 40 ms for 34 GB, later ones microseconds; a helper that never asks
+pays nothing. A refused fixed area of 1 GiB or more says which step and which kernel answer refused it.
+
+anon_mmap_tryfixed keeps answering EEXIST to every refusal, as upstream's PS5 port always did: try_map_free_area goes on to the next
+window on EEXIST and stops with "mmap() error" on anything else. A first version of this patch passed the kernel's ENOMEM on (so late-library
+would see ERROR_NOT_ENOUGH_MEMORY): every search for room that met a hold then failed, libcef's 1 TiB sandbox reservation among them
+(MihawkBrowser on the Pro and on the standard PS5: a3-pro-browser-01, a3-base-browser-01).
+---
+diff --git a/dlls/ntdll/unix/virtual.c b/dlls/ntdll/unix/virtual.c
+--- a/dlls/ntdll/unix/virtual.c
++++ b/dlls/ntdll/unix/virtual.c
+@@ -1008,6 +1008,12 @@
+ #define PS5_HIGH_RESERVE     ((size_t)16 << 30)
+ #endif
+ 
++#ifdef __PROSPERO__
++/* The last fixed reservation of 1 GiB or more the kernel refused, for ps5_claim_holds (below) to look through. */
++static char *ps5_refused_start;
++static size_t ps5_refused_size;
++#endif
++
+ static void *anon_mmap_tryfixed( void *start, size_t size, int prot, int flags )
+ {
+     void *ptr;
+@@ -1020,10 +1026,27 @@
+     /* The kernel ignores MAP_EXCL, so claim the range with a reservation
+      * that refuses to overwrite, then map over it if needed. */
+     ptr = start;
+-    if (sceKernelReserveVirtualRange( &ptr, size, PS5_MAP_FIXED | PS5_MAP_NO_OVERWRITE, host_page_size ))
+     {
+-        errno = EEXIST;
+-        return MAP_FAILED;
++        const int reserved = sceKernelReserveVirtualRange( &ptr, size, PS5_MAP_FIXED | PS5_MAP_NO_OVERWRITE, host_page_size );
++
++        if (reserved)
++        {
++            /* A range of 1 GiB or more says what the kernel said, and is remembered for ps5_claim_holds (late-library, alpha-3). */
++            if (size >= ((size_t)1 << 30))
++            {
++                fprintf( stderr, "wine-ps5: the kernel refused a fixed reservation of %#lx bytes at %p: %#x\n", (unsigned long)size, start,
++                         reserved );
++                ps5_refused_start = start;
++                ps5_refused_size = size;
++            }
++            /* EEXIST whatever the kernel said: try_map_free_area (alloc_free_area's search for room) goes on to the next window on
++             * EEXIST and stops with an error on anything else, and the kernel answers ENOMEM for a hold of its own in the range
++             * (a JIT object's, late-library, alpha-3) as well as for a mapping in the way. Passing the ENOMEM on (a first version of
++             * this patch did, so that late-library would see "not enough memory") made every search that met a hold fail: libcef's
++             * sandbox reservation, MihawkBrowser on both consoles. */
++            errno = EEXIST;
++            return MAP_FAILED;
++        }
+     }
+     /* Fixed allocations such as CLR's near-code heaps can lie outside the
+      * startup reservations. A bare kernel reservation cannot be committed
+@@ -2996,9 +3019,24 @@
+     struct reserved_area *area;
+     NTSTATUS status;
+     char *start = base, *end = (char *)base + ROUND_SIZE( 0, size, host_page_mask );
++#ifdef __PROSPERO__
++    int step = 0;  /* which of the mappings below refused, for the line at failed: */
++#endif
+ 
+     if ((UINT_PTR)base & host_page_mask) return STATUS_CONFLICTING_ADDRESSES;
++#ifdef __PROSPERO__
++    {
++        struct file_view *overlap = find_view_range( base, size );
++
++        /* A refusal that Windows scanners cannot tell from a free range: which view it was (late-library, base PS5 13.40). */
++        if (overlap && size >= ((size_t)1 << 30))
++            fprintf( stderr, "wine-ps5: a fixed area %p-%p overlaps view %p-%p (protect %#x)\n", base, (char *)base + size,
++                     overlap->base, (char *)overlap->base + overlap->size, overlap->protect );
++        if (overlap) return STATUS_CONFLICTING_ADDRESSES;
++    }
++#else
+     if (find_view_range( base, size )) return STATUS_CONFLICTING_ADDRESSES;
++#endif
+ 
+     LIST_FOR_EACH_ENTRY( area, &reserved_areas, struct reserved_area, entry )
+     {
+@@ -3009,25 +3047,44 @@
+         if (area_end <= start) continue;
+         if (area_start > start)
+         {
++#ifdef __PROSPERO__
++            step = 1;
++#endif
+             if (anon_mmap_tryfixed( start, area_start - start, unix_prot, 0 ) == MAP_FAILED) goto failed;
+             start = area_start;
+         }
+         if (area_end >= end)
+         {
++#ifdef __PROSPERO__
++            step = 2;
++#endif
+             if (reserved_area_mmap( start, end - start, unix_prot ) == MAP_FAILED) goto failed;
+             return STATUS_SUCCESS;
+         }
++#ifdef __PROSPERO__
++        step = 3;
++#endif
+         if (reserved_area_mmap( start, area_end - start, unix_prot ) == MAP_FAILED) goto failed;
+         start = area_end;
+     }
+ 
++#ifdef __PROSPERO__
++    step = 4;
++#endif
+     if (anon_mmap_tryfixed( start, end - start, unix_prot, 0 ) == MAP_FAILED) goto failed;
+     return STATUS_SUCCESS;
+ 
+ failed:
++#ifdef __PROSPERO__
++    if (size >= ((size_t)1 << 30))
++        fprintf( stderr, "wine-ps5: a fixed area %p-%p refused at step %d from %p: errno %d\n", base, (char *)base + size, step,
++                 start, errno );
++#endif
+     if (errno == ENOMEM)
+     {
++#ifndef __PROSPERO__
+         ERR( "out of memory for %p-%p\n", base, (char *)base + size );
++#endif
+         status = STATUS_NO_MEMORY;
+     }
+     else if (errno == EEXIST) status = STATUS_CONFLICTING_ADDRESSES;
+@@ -3215,6 +3272,96 @@
+             ERR( "no view for the foreign mapping at %p-%p\n", base, (char *)base + size );
+ }
+ 
++/* Holds the kernel keeps that no list shows. The kernel's JIT objects (a payload's executable memory is only that:
++ * __wine_ps5_exec_convert and native/pw_prx_elf_ps5.c's modules) hold address space in an arena of its own, at 32 GiB and every 2 GiB
++ * above on the Pro and the standard PS5 (late-library, alpha-3), up to some 230 MiB each: the kernel refuses a reservation over a
++ * hold with ENOMEM, shows no entry for it (entries 0 in 0x7ef000000-0x1000000000), and Wine had no view there when the user-space
++ * module loader made them, so VirtualQuery called free a 34.7 GB interval of which no reservation could be made (the same Pro with
++ * the kernel's loader reserved 16 spans, 917 GiB; the user-space one forced, 6 spans, 31 GiB). A reservation of 1 GiB or more that
++ * the kernel has just refused is now looked through, 256 MiB at a time and the refused windows 64 KiB at a time, for what it
++ * refuses: each hold found (it ends where 4 MiB of 64 KiB steps in a row are free) becomes a view of its own, the same native
++ * view ps5_claim_native_holes makes, and the request is asked once more. Where the holds are is not assumed: only the range just
++ * refused is looked at, so the cost (about 10 ms for a 34 GB range, once; holds already claimed are views) falls on the one
++ * request that would have failed. Wine's own views and reserved areas are skipped: a refusal inside them is theirs.
++ * virtual_mutex must be held by caller. Returns how many holds it claimed. */
++static char *ps5_known_end( char *at )
++{
++    struct file_view *view;
++    struct reserved_area *area;
++
++    if ((view = find_view_range( at, 0x10000 ))) return (char *)view->base + view->size;
++    LIST_FOR_EACH_ENTRY( area, &reserved_areas, struct reserved_area, entry )
++        if ((char *)area->base <= at && at < (char *)area->base + area->size) return (char *)area->base + area->size;
++    return NULL;
++}
++static int ps5_free_64k( char *at )
++{
++    void *where = at;
++
++    if (sceKernelReserveVirtualRange( &where, 0x10000, PS5_MAP_FIXED | PS5_MAP_NO_OVERWRITE, host_page_size )) return 0;
++    munmap( at, 0x10000 );
++    return 1;
++}
++static unsigned ps5_claim_holds( char *base, size_t size )
++{
++    static unsigned scans;
++    struct timespec now;
++    ULONGLONG begin_us, took_us;
++    char *cur = base, *end = base + size;
++    unsigned claimed = 0;
++    size_t claimed_bytes = 0;
++
++    clock_gettime( CLOCK_MONOTONIC, &now );
++    begin_us = (ULONGLONG)now.tv_sec * 1000000 + now.tv_nsec / 1000;
++    while (cur < end)
++    {
++        const size_t window = min( (size_t)256 << 20, (size_t)(end - cur) );
++        void *where = cur;
++        char *known, *p, *next = cur + window;
++
++        if ((known = ps5_known_end( cur )))
++        {
++            cur = known;
++            continue;
++        }
++        if (!sceKernelReserveVirtualRange( &where, window, PS5_MAP_FIXED | PS5_MAP_NO_OVERWRITE, host_page_size ))
++        {
++            munmap( cur, window );   /* free: the bare window just made */
++            cur = next;
++            continue;
++        }
++        for (p = cur; p < cur + window; )
++        {
++            char *hold_end, *q;
++            unsigned free_run = 0;
++            struct file_view *view;
++
++            if ((known = ps5_known_end( p ))) { p = known; continue; }
++            if (ps5_free_64k( p )) { p += 0x10000; continue; }
++            hold_end = p + 0x10000;
++            for (q = p + 0x10000; q < end && free_run < 64 && (size_t)(q - p) < ((size_t)1 << 30); q += 0x10000)
++            {
++                if (ps5_known_end( q )) break;
++                if (ps5_free_64k( q )) ++free_run;
++                else { free_run = 0; hold_end = q + 0x10000; }
++            }
++            if (!create_view( &view, p, hold_end - p, VPROT_SYSTEM ))
++            {
++                ++claimed;
++                claimed_bytes += hold_end - p;
++            }
++            p = hold_end;
++        }
++        cur = max( next, p );
++    }
++    clock_gettime( CLOCK_MONOTONIC, &now );
++    took_us = (ULONGLONG)now.tv_sec * 1000000 + now.tv_nsec / 1000 - begin_us;
++    if (scans++ < 16 || claimed)
++        fprintf( stderr, "wine-ps5: holds in %p-%p (scan %u): %u claimed as native views (%#lx bytes), %llu us\n", base, end, scans,
++                 claimed, (unsigned long)claimed_bytes, (unsigned long long)took_us );
++    return claimed;
++}
++
+ /* A commit into a free placeholder that set_vprot could not make (errno EEXIST: the engine refused it over a mapping
+  * that is not Wine's) fails, instead of a success over pages never committed, and the placeholder is free again for a
+  * retry. Protection 0 tears down only the engine's runs an earlier piece backed. virtual_mutex must be held by caller. */
+@@ -3293,7 +3440,17 @@
+         if (limit_low && base < (void *)limit_low) return STATUS_CONFLICTING_ADDRESSES;
+         if (limit_high && is_beyond_limit( base, size, (void *)limit_high )) return STATUS_CONFLICTING_ADDRESSES;
+         if (is_beyond_limit( base, size, host_addr_space_limit )) return STATUS_CONFLICTING_ADDRESSES;
+-        if ((status = map_fixed_area( base, size, unix_prot ))) return status;
++        status = map_fixed_area( base, size, unix_prot );
++#ifdef __PROSPERO__
++        /* Refused with nothing of Wine's in the way: a hold of the kernel's may be (ps5_claim_holds). The holds found are
++         * views now, so a request over one is the conflict it is, and any other is asked once more. */
++        if (status && size >= ((size_t)1 << 30) && ps5_claim_holds( base, size ))
++        {
++            if (find_view_range( base, size )) return STATUS_CONFLICTING_ADDRESSES;
++            status = map_fixed_area( base, size, unix_prot );
++        }
++#endif
++        if (status) return status;
+         if (is_beyond_limit( base, size, working_set_limit )) working_set_limit = address_space_limit;
+         ptr = base;
+     }
+@@ -3338,6 +3495,7 @@
+              * the measured host aperture or change its page granularity. A
+              * foreign mapping the first search ran into is a view now. */
+             ps5_claim_native_holes();
++            if (ps5_refused_size && ps5_claim_holds( ps5_refused_start, ps5_refused_size )) ps5_refused_size = 0;
+             ptr = alloc_free_area( start, end, host_size, top_down, unix_prot, align_mask );
+ #else
+             ptr = alloc_free_area( (void *)limit_low, (void *)limit_high, size, top_down, unix_prot, align_mask );

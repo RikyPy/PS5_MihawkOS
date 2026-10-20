@@ -101,7 +101,7 @@ struct passwd *pw_compat_getpwuid(uid_t uid)
     static struct passwd record;static char empty[]="";
     const char *home=getenv("HOME"),*user=getenv("USER");
     record=(struct passwd){0};
-    record.pw_name=(char *)(user && *user?user:"prospero");
+    record.pw_name=(char *)(user && *user?user:"Mihawk");   /* Wine's WINEUSERNAME: the Windows user (patch 1240) */
     record.pw_dir=(char *)(home && *home=='/'?home:"/download0/prospero-win");
     record.pw_uid=uid;record.pw_gid=getgid();record.pw_shell=empty;record.pw_passwd=empty;
     return &record;

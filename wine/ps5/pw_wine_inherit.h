@@ -22,13 +22,13 @@
  * 1230). */
 static inline int pw_wine_inherited(const char *entry)
 {
-    static const char *const names[]={"WINE_PS5_DESKTOP=","WINE_PS5_VIEW=","WINE_PS5_WINDOW_SURFACES=","WINE_PS5_REFRESH=","WINE_PS5_HID=","WINE_PS5_LOCALE=",
+    static const char *const names[]={"WINE_PS5_DESKTOP=","WINE_PS5_VIEW=","WINE_PS5_FIRMWARE=","WINE_PS5_WINDOW_SURFACES=","WINE_PS5_REFRESH=","WINE_PS5_HID=","WINE_PS5_LOCALE=",
         "WINE_PS5_HELPER_SCHED=","WINE_PS5_HELPER_PRIORITY=","WINE_PS5_HELPER_CPUS=",
         "WINE_PS5_HELPER_CPUS_WIDEN=",   /* the loader places the helper on the title's CPUs (src/pw_cpu_placement.c) */
         "WINE_PS5_ASYNC_PRESENT=",   /* the broker WSI presents from its own thread (graphics patch 0024) */
         "WINE_PS5_PRESENT_LINK=",    /* presents over a connection of their own (graphics patch 0026) */
         "WINE_PS5_SCHED_CENSUS=",
-        "WINE_PS5_PAYLOAD_DMEM=","WINE_PS5_NATIVE_SIGNALS=","WINEARCH=",   /* wow64: a 32-bit program runs in its helper (docs/IA32_DESIGN.md, M3) */
+        "WINE_PS5_PAYLOAD_DMEM=","WINE_PS5_PRX_LOADER=","WINE_PS5_NATIVE_SIGNALS=","WINEARCH=",   /* wow64: a 32-bit program runs in its helper (docs/IA32_DESIGN.md, M3) */
         "WINETEST_",  /* watchdog, slice and threading controls must reach payload conformance tests */
         "WINE_PS5_OPENGL=","WINE_D3D_CONFIG=","WINE_CPU_TOPOLOGY=","WINEESYNC=","WINEFSYNC=","DXVK_","VKD3D_",
         "DOTNET_","SDL_","WINE_ADDITIONAL_CERTS_DIR=","WINE_PS5_DNS=","WINE_PS5_SERVICES=","RADV_DEBUG=","RADV_PERFTEST=",

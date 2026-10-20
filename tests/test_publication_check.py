@@ -82,7 +82,7 @@ class PublicationCheck(unittest.TestCase):
         self.assertIn('named game or launcher: 2 in 1 places: notes2.md', output)
 
     def test_names_that_are_not_games_and_the_trademark_notice_pass(self):
-        (self.repo / 'prefix.txt').write_text('C:\\users\\steamuser\\Documents, a steaming bowl, PPSA99170\n')
+        (self.repo / 'prefix.txt').write_text('C:\\users\\Mihawk\\Documents, C:\\users\\steamuser\\Documents, a steaming bowl, PPSA99170\n')
         (self.repo / 'LEGAL.md').write_text('| St' + 'eam, Proton | Valve Corporation |\n')
         code, output = self.run_tool('tree')
         self.assertEqual(code, 0, output)

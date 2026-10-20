@@ -69,7 +69,7 @@ int pw_wine_launch_host_dir(const char *prefix, const char *windows_path, char *
  * mihawk and retired those folders (2026-10-10). Returns 0, or -1 for an invalid ID or insufficient storage. */
 int pw_wine_launch_prefix_id(const char *requested, const char *game_id, char *out, size_t size);
 
-/* The user folders wineboot makes in a prefix on Linux (C:\users\steamuser\AppData\Roaming, Documents,
+/* The user folders wineboot makes in a prefix on Linux (C:\users\Mihawk\AppData\Roaming, Documents,
  * Saved Games, ... and C:\users\Public\...), which no process can make on the console: wineboot is a child
  * process. Without AppData\Roaming, .NET's GetFolderPath(ApplicationData) is empty, so a program builds a
  * relative save path; a .NET (MonoGame) game then saved beside the game and its load menu, combining that relative

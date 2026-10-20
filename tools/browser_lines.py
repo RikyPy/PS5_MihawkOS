@@ -4,7 +4,7 @@ host oracle (tools/run-browser-host.py) and the console (tools/run-browser.py). 
 or address (pw_browser_log_url); the record keeps them as they are."""
 import re
 
-LOAD = re.compile(r'^browser: load (scheme=\S+ host=\S+ path=\S+) status=(-?\d+) ms=(\d+) at=(\d+)', re.M)
+LOAD = re.compile(r'^browser: load (scheme=\S+(?: host=\S+ path=\S+)?) status=(-?\d+) ms=(\d+) at=(\d+)', re.M)
 LOAD_ERROR = re.compile(r'^browser: load-error code=(-?\d+) (scheme=\S+ host=\S+)', re.M)
 DONE = re.compile(r'^browser: download done (scheme=\S+ host=\S+) path=\S+ bytes=(\d+) ms=(\d+) sha256=(\w+)', re.M)
 HANDOFF = re.compile(r'^browser: handoff child=\d+ window_ms=(\d+) (\w+)', re.M)
@@ -17,7 +17,7 @@ def first(pattern, text):
 
 
 def summary(lines, script, expect_sha256):
-    """The record of one run from its browser lines, and whether it passed: every load 200, no load error or step
+    """The record of one run from its browser lines, and whether it passed: a window, a clean exit, every load 200 (an about: page, 0), no load error or step
     timeout, the download done with the expected SHA-256 when the script downloads, and the hand-off when it opens."""
     text = '\n'.join(lines)
     loads = [{'where': w, 'status': int(s), 'ms': int(ms), 'at_ms': int(at)} for w, s, ms, at in LOAD.findall(text)]
@@ -38,7 +38,11 @@ def summary(lines, script, expect_sha256):
     }
     downloads = re.search(r'(^|;)\s*download\b', script) is not None
     opens = re.search(r'(^|;)\s*open\b', script) is not None
-    record['passed'] = (timeouts == 0 and not errors and bool(loads) and all(row['status'] == 200 for row in loads)
+    # about:blank is a load that needs no network: CEF reports it with status 0 (the runtime's own start-up page proof).
+    record['passed'] = (timeouts == 0 and not errors and bool(loads) and record['startup']['window_ms'] is not None
+                        and record['exited']
+                        and all(row['status'] == 200 or (row['where'] == 'scheme=about' and row['status'] in (0, 200))
+                                for row in loads)
                         and (not downloads or (done is not None and done.group(4) == expect_sha256))
                         and (not opens or (handoff is not None and handoff.group(2) == 'exiting')))
     return record

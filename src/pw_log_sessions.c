@@ -8,8 +8,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-/* Empty the oldest session's folder and remove it, or touch nothing when it holds anything but regular files. */
-static int drop_oldest(const char *folder, unsigned *removed)
+int pw_log_sessions_drop(const char *folder, unsigned *removed)
 {
     struct stat status;
     if (lstat(folder, &status)) return errno == ENOENT ? 0 : errno;
@@ -41,7 +40,7 @@ int pw_log_sessions_rotate(const char *root, unsigned keep, unsigned *removed)
     if (mkdir(root, 0777) && errno != EEXIST) return errno;
     char from[PW_LOG_SESSIONS_PATH], to[PW_LOG_SESSIONS_PATH];
     snprintf(to, sizeof(to), "%s/%u", root, keep - 1);
-    int error = drop_oldest(to, removed);
+    int error = pw_log_sessions_drop(to, removed);
     for (unsigned i = keep - 1; !error && i-- > 0;) {
         snprintf(from, sizeof(from), "%s/%u", root, i);
         snprintf(to, sizeof(to), "%s/%u", root, i + 1);
