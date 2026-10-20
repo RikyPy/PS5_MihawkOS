@@ -1,0 +1,186 @@
+{
+ "telemetry_hold": null,
+ "launch_readiness": {
+  "ready": true,
+  "seconds": 0.146,
+  "settle_seconds": 0.0,
+  "census_seconds": 0.132,
+  "previous_cleanup_verified": true
+ },
+ "native_close_failures": [],
+ "run": "gate-2026-10-12-win11-01-desktop-session",
+ "what": "profile mihawk-os",
+ "env": [],
+ "result": "finished",
+ "seconds": 23.8,
+ "probe_verdict": "FAIL",
+ "clean_owner_restart": true,
+ "launcher_end_status": 0,
+ "initial_status": 0,
+ "closed_on_request": false,
+ "child_logs": [
+  "klog/gate-2026-10-12-win11-01-desktop-session-wine-child-6098.log",
+  "klog/gate-2026-10-12-win11-01-desktop-session-wine-child-6099.log",
+  "klog/gate-2026-10-12-win11-01-desktop-session-wine-child-6100.log",
+  "klog/gate-2026-10-12-win11-01-desktop-session-wine-child-6101.log",
+  "klog/gate-2026-10-12-win11-01-desktop-session-wine-child-6102.log",
+  "klog/gate-2026-10-12-win11-01-desktop-session-wine-child-6103.log",
+  "klog/gate-2026-10-12-win11-01-desktop-session-wine-child-6104.log",
+  "klog/gate-2026-10-12-win11-01-desktop-session-wine-child-6105.log",
+  "klog/gate-2026-10-12-win11-01-desktop-session-wine-child-6106.log",
+  "klog/gate-2026-10-12-win11-01-desktop-session-wine-child-6107.log",
+  "klog/gate-2026-10-12-win11-01-desktop-session-wine-child-6108.log",
+  "klog/gate-2026-10-12-win11-01-desktop-session-wine-child-6109.log",
+  "klog/gate-2026-10-12-win11-01-desktop-session-wine-child-6110.log",
+  "klog/gate-2026-10-12-win11-01-desktop-session-wine-child-6111.log",
+  "klog/gate-2026-10-12-win11-01-desktop-session-wine-child-6112.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": false,
+ "bench": {},
+ "steady": {
+  "server": {
+   "calls": 0.0,
+   "per_s": 0.0,
+   "avg_us": 0.0,
+   "selects": 0.0,
+   "blocked": 0.0,
+   "block_avg_us": 0.0,
+   "waits": 0.0,
+   "handles_avg": 0.0,
+   "wait_all": 0.0,
+   "polled": 0.0,
+   "delays": 0.0,
+   "yields": 0.0,
+   "intervals": 2
+  }
+ },
+ "intervals": {
+  "frames": [],
+  "server": [
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   }
+  ],
+  "top": []
+ },
+ "shown": {
+  "frames": 7,
+  "per_10s": [
+   1,
+   6
+  ],
+  "longest_gap_ms": 2198
+ },
+ "broker": {
+  "local_offer": null,
+  "host_limit": null,
+  "windows": {
+   "presents": 117,
+   "effect_bytes": 388800,
+   "mica_builds": 23,
+   "thumbnail_builds": 0,
+   "compositions": 114,
+   "compose_avg_us": 3069,
+   "compose_max_us": 8538
+  },
+  "refused": [],
+  "refused_count": 0,
+  "clients": [],
+  "wedged": false,
+  "failure_reasons": [],
+  "host_peak": null,
+  "local_peak": null
+ },
+ "pacing": null,
+ "captures": [
+  "klog/gate-2026-10-12-win11-01-desktop-session-capture-01.png",
+  "klog/gate-2026-10-12-win11-01-desktop-session-capture-02.png",
+  "klog/gate-2026-10-12-win11-01-desktop-session-capture-03.png"
+ ],
+ "pad_script": [
+  "# The probe requests each displayed capture after the actual child/browser is ready."
+ ],
+ "cleanup_verified": false,
+ "hooks_removed": true,
+ "session_passed": false,
+ "display_pixels": [
+  {
+   "capture": "klog/gate-2026-10-12-win11-01-desktop-session-capture-01.png",
+   "architecture": 64,
+   "actual": [
+    30,
+    110,
+    210
+   ],
+   "expected": [
+    30,
+    110,
+    210
+   ],
+   "passed": true
+  },
+  {
+   "capture": "klog/gate-2026-10-12-win11-01-desktop-session-capture-02.png",
+   "architecture": 32,
+   "actual": [
+    30,
+    180,
+    70
+   ],
+   "expected": [
+    30,
+    180,
+    70
+   ],
+   "passed": true
+  },
+  {
+   "capture": "klog/gate-2026-10-12-win11-01-desktop-session-capture-03.png",
+   "window": "File Explorer",
+   "light_pixels": 556242,
+   "passed": true
+  }
+ ]
+}

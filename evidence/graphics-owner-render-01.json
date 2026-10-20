@@ -1,0 +1,91 @@
+{
+ "run": "graphics-owner-render-01",
+ "what": "process-probe.exe",
+ "env": [
+  "WINE_PS5_CHILDREN=1",
+  "WINE_PS5_CHILD_METRICS=1",
+  "WINE_PS5_NTSYNC=0",
+  "WINE_PS5_SCHED=0",
+  "PROTON_LOADING_SCREEN=0",
+  "WINE_PS5_HID=0",
+  "WINE_PS5_OWNER_BOOTSTRAP=1",
+  "WINE_PS5_GRAPHICS_HOST=1",
+  "PS5_PROTON_PROBE_CAPTURE=Z:\\data\\ps5proton\\logs\\graphics-child-probe.ppm"
+ ],
+ "result": "finished",
+ "seconds": 9.7,
+ "probe_verdict": "PASS",
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": true,
+ "bench": {
+  "frames": 180.0,
+  "draws": 1.0,
+  "vsync": 1.0,
+  "total_ms": 3014.0,
+  "frame_us": 16748.0
+ },
+ "steady": {
+  "vulkan_first_frame_ms": 2595.0
+ },
+ "intervals": {
+  "frames": [
+   {
+    "api": "vulkan",
+    "first_frame_ms": 2595.0
+   },
+   {
+    "api": "vulkan",
+    "frames": 180.0,
+    "fps": 35.5,
+    "p50_ms": 16.75,
+    "p95_ms": 16.75,
+    "p99_ms": 17.0,
+    "max_ms": 38.5,
+    "present_avg_ms": 0.006,
+    "present_max_all_ms": 0.205
+   }
+  ],
+  "server": [
+   {
+    "calls": 2581.0,
+    "per_s": 510.0,
+    "avg_us": 30.7,
+    "selects": 63.0,
+    "blocked": 10.0,
+    "block_avg_us": 3316.7,
+    "waits": 23.0,
+    "handles_avg": 1.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   }
+  ],
+  "top": [
+   {
+    "create_file": {
+     "count": 52,
+     "avg_us": 524.6
+    },
+    "create_mapping": {
+     "count": 45,
+     "avg_us": 447.0
+    },
+    "get_key_value": {
+     "count": 433,
+     "avg_us": 15.3
+    },
+    "open_key": {
+     "count": 214,
+     "avg_us": 15.4
+    },
+    "set_key_value": {
+     "count": 166,
+     "avg_us": 14.1
+    }
+   }
+  ]
+ }
+}

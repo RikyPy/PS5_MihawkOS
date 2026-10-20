@@ -1,0 +1,67 @@
+{
+ "wine_revision": "1c78596625336a73dbfc035dbbcf0dbdd95b06eb",
+ "reference": "Pinned Linux Wine, actual headless initializer, actual owned-asset absence and restoration",
+ "cases": [
+  {
+   "bits": 32,
+   "asset_initially_present": true,
+   "returncode": 0,
+   "seconds": 1.27,
+   "verdicts": [
+    [
+     "PASS",
+     "13",
+     "0"
+    ]
+   ],
+   "probe_sha256": "64b300d1c6c0da8d68a6e5054dde9a1c8bf65a19261b339f078a5d36053d1c35",
+   "passed": true
+  },
+  {
+   "bits": 64,
+   "asset_initially_present": true,
+   "returncode": 0,
+   "seconds": 1.282,
+   "verdicts": [
+    [
+     "PASS",
+     "13",
+     "0"
+    ]
+   ],
+   "probe_sha256": "f8c95059bd3c520bd71e42f3d43720f0e19a461b80d99b1df9591d9ea8f299f7",
+   "passed": true
+  },
+  {
+   "bits": 32,
+   "asset_initially_present": false,
+   "returncode": 0,
+   "seconds": 1.234,
+   "verdicts": [
+    [
+     "PASS",
+     "13",
+     "0"
+    ]
+   ],
+   "probe_sha256": "64b300d1c6c0da8d68a6e5054dde9a1c8bf65a19261b339f078a5d36053d1c35",
+   "passed": true
+  },
+  {
+   "bits": 64,
+   "asset_initially_present": false,
+   "returncode": 0,
+   "seconds": 1.104,
+   "verdicts": [
+    [
+     "PASS",
+     "13",
+     "0"
+    ]
+   ],
+   "probe_sha256": "f8c95059bd3c520bd71e42f3d43720f0e19a461b80d99b1df9591d9ea8f299f7",
+   "passed": true
+  }
+ ],
+ "passed": true
+}

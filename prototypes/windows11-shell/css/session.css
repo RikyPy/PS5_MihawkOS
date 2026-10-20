@@ -1,0 +1,294 @@
+/* Session surfaces: lock screen, sign-in, sleep, restart and shut down screens (one dark root in
+   #overlays whose data-screen picks what shows), and the Alt+F4 "Shut Down Mihawk OS" dialog.
+   Owned by the session module (js/session.js). */
+
+.session {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  isolation: isolate;
+  color: var(--TextFillColorPrimary);
+  --session-image: var(--wallpaper);
+}
+.session:focus, .session:focus-visible { outline: none; box-shadow: none; }
+
+/* Sign-in backdrop: the lock-screen picture under Acrylic (heavy blur and a smoke layer). The
+   negative inset keeps the blur's soft edge off screen. */
+.session-bg {
+  position: absolute;
+  inset: -96px;
+  background: var(--session-image);
+  filter: blur(48px) saturate(120%);
+}
+.session-bg::after { content: ""; position: absolute; inset: 0; background: var(--SmokeFillColorDefault); }
+
+/* ---------- sign-in ---------- */
+.session-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 16px 8vh;
+  text-align: center;
+}
+.session-user { display: flex; flex-direction: column; align-items: center; min-width: 0; max-width: 100%; }
+.session-avatar {
+  width: 192px;
+  height: 192px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--ControlFillColorSecondary);
+}
+.session-name {
+  margin-top: 16px;
+  max-width: 100%;
+  font: var(--type-title);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.session-signin { margin-top: 28px; min-width: 120px; }
+.session-progress {
+  display: none;
+  align-items: center;
+  gap: 16px;
+  margin-top: 28px;
+  font: 400 20px/28px var(--font-display);
+}
+.session[data-screen="welcome"] .session-progress,
+.session[data-screen="busy"] .session-progress { display: flex; }
+.session[data-screen="busy"] .session-progress { margin-top: 0; }
+.session-progress .session-ring { --ring-size: 36px; --dot-size: 5px; }
+.session[data-screen="welcome"] .session-signin,
+.session[data-screen="busy"] .session-signin,
+.session[data-screen="busy"] .session-user,
+.session[data-screen="welcome"] .session-corner,
+.session[data-screen="busy"] .session-corner { display: none; }
+
+/* Bottom-right sign-in buttons (network, accessibility, power): subtle 40 px buttons. */
+.session-corner { position: absolute; right: 24px; bottom: 24px; display: flex; gap: 4px; }
+.session-corner-btn {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--SubtleFillColorTransparent);
+  color: var(--TextFillColorPrimary);
+  transition: background-color var(--dur-faster) linear, color var(--dur-faster) linear;
+}
+.session-corner-btn:hover { background: var(--SubtleFillColorSecondary); }
+.session-corner-btn:active { background: var(--SubtleFillColorTertiary); color: var(--TextFillColorSecondary); }
+.session-corner-btn:disabled { background: var(--SubtleFillColorDisabled); color: var(--TextFillColorDisabled); }
+
+/* ---------- lock screen ---------- */
+.session-lock {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: none;
+  background: var(--session-image);
+  will-change: transform;
+}
+.session[data-screen="lock"] .session-lock { display: block; }
+/* Windows 11: a large semibold time and the date under it, centred in the upper part. */
+.session-clock {
+  --lock-time: clamp(64px, min(11.1vh, 24vw), 168px);
+  position: absolute;
+  top: 10.5vh;
+  left: 16px;
+  right: 16px;
+  text-align: center;
+  text-shadow: 0 1px 12px var(--SmokeFillColorDefault);
+  pointer-events: none;
+}
+.session-time { font: 600 var(--lock-time)/1.15 var(--font-display); }
+.session-date { font: 600 max(16px, calc(var(--lock-time) * 0.19))/1.3 var(--font-display); }
+.session-status {
+  position: absolute;
+  right: 26px;
+  bottom: 26px;
+  display: flex;
+  gap: 16px;
+  filter: drop-shadow(0 1px 4px var(--SmokeFillColorDefault));
+}
+
+/* ---------- black: sleep, power off, boot ---------- */
+.session-black {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: var(--SolidBackgroundFillColorBaseAlt);
+  opacity: 0;
+  pointer-events: none;
+}
+.session[data-screen="sleep"] > :not(.session-black),
+.session[data-screen="off"] > :not(.session-black),
+.session[data-screen="boot"] > :not(.session-black) { visibility: hidden; }
+.session-boot, .session-off { display: none; position: absolute; inset: 0; }
+.session[data-screen="boot"] .session-boot { display: block; }
+.session[data-screen="off"] .session-off {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: var(--TextFillColorTertiary);
+}
+.session-off-text { font: var(--type-body); }
+.session-boot .session-logo {
+  --logo-size: clamp(72px, 11vh, 140px);
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  translate: -50% -50%;
+}
+.session-boot .session-ring {
+  --ring-size: 48px;
+  --dot-size: 6px;
+  position: absolute;
+  left: 50%;
+  top: 74%;
+  translate: -50% -50%;
+}
+
+/* The project's Mihawk mark (js/session.js LOGO, themes/windows11/start.svg). */
+.session-logo {
+  --logo-size: 30px;
+  width: var(--logo-size);
+  height: var(--logo-size);
+  flex: none;
+}
+
+/* Windows' spinning dots: five dots chase round the ring, slow over the top and rush through the
+   bottom, then vanish and start again, each 240 ms behind the last. */
+.session-ring {
+  --ring-size: 32px;
+  --dot-size: 4px;
+  position: relative;
+  display: block;
+  width: var(--ring-size);
+  height: var(--ring-size);
+  flex: none;
+}
+.session-ring i { position: absolute; inset: 0; opacity: 0; transform: rotate(180deg); animation: session-orbit 5.5s infinite; }
+.session-ring i::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: calc(50% - var(--dot-size) / 2);
+  width: var(--dot-size);
+  height: var(--dot-size);
+  border-radius: 50%;
+  background: currentColor;
+}
+.session-ring i:nth-child(2) { animation-delay: 240ms; }
+.session-ring i:nth-child(3) { animation-delay: 480ms; }
+.session-ring i:nth-child(4) { animation-delay: 720ms; }
+.session-ring i:nth-child(5) { animation-delay: 960ms; }
+@keyframes session-orbit {
+  0% { transform: rotate(180deg); opacity: 1; animation-timing-function: ease-out; }
+  7% { transform: rotate(300deg); animation-timing-function: linear; }
+  30% { transform: rotate(410deg); animation-timing-function: ease-in-out; }
+  39% { transform: rotate(645deg); animation-timing-function: linear; }
+  70% { transform: rotate(770deg); opacity: 1; animation-timing-function: ease-out; }
+  75% { transform: rotate(900deg); animation-timing-function: ease-out; }
+  76% { transform: rotate(900deg); opacity: 0; }
+  100% { transform: rotate(900deg); opacity: 0; }
+}
+/* A progress indicator is feedback, not decoration: Windows keeps it turning with animations off. */
+[data-animations="off"] .session-ring i { animation-duration: 5.5s !important; }
+@media (prefers-reduced-motion: reduce) { .session-ring i { animation-duration: 5.5s !important; } }
+
+@media (max-height: 520px) {
+  .session-avatar { width: 120px; height: 120px; }
+  .session-avatar > .icon { width: 120px !important; height: 120px !important; }
+}
+
+/* ---------- Alt+F4 "Shut Down Windows" ---------- */
+.sd {
+  position: absolute;
+  width: min(420px, calc(100vw - 16px));
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: var(--TextFillColorPrimary);
+  font: var(--type-body);
+  background: var(--SolidBackgroundFillColorBase);
+  border: 1px solid var(--SurfaceStrokeColorDefault);
+  border-radius: var(--radius-window);
+  box-shadow: var(--shadow-window);
+  transition: box-shadow var(--dur-fast) linear;
+}
+.sd:not(:focus-within) { box-shadow: var(--shadow-window-inactive); }
+.sd-titlebar {
+  display: flex;
+  align-items: center;
+  flex: none;
+  height: var(--titlebar-height);
+  padding-left: 12px;
+  background: var(--SolidBackgroundFillColorQuarternary);
+}
+.sd-title { flex: 1; min-width: 0; font: var(--type-caption); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: color var(--dur-faster) linear; }
+.sd:not(:focus-within) .sd-title { color: var(--TextFillColorTertiary); }
+.sd-close {
+  display: grid;
+  place-items: center;
+  width: var(--caption-button-width);
+  height: 100%;
+  padding: 0;
+  border: 0;
+  border-top-right-radius: calc(var(--radius-window) - 1px);
+  background: transparent;
+  color: var(--TextFillColorPrimary);
+  transition: background-color 150ms linear, color 100ms linear; /* hover to rest, as Windows' caption buttons */
+}
+.sd:not(:focus-within) .sd-close { color: var(--TextFillColorTertiary); }
+.sd-close:hover { background: var(--SystemFillColorCritical); color: var(--TextOnAccentFillColorPrimary); transition-duration: var(--dur-faster); }
+.sd-close:active {
+  background: color-mix(in srgb, var(--SystemFillColorCritical) 90%, transparent);
+  color: color-mix(in srgb, var(--TextOnAccentFillColorPrimary) 70%, transparent);
+}
+.sd-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex: none;
+  height: 72px;
+  background: var(--SolidBackgroundFillColorQuarternary);
+  border-bottom: 1px solid var(--DividerStrokeColorDefault);
+}
+.sd-wordmark { font: 350 28px/36px var(--font-display); }
+.sd-body { display: flex; gap: 16px; padding: 20px 24px 4px; }
+.sd-icon { flex: none; padding-top: 2px; }
+.sd-main { flex: 1; min-width: 0; }
+.sd-label { display: block; margin-bottom: 8px; }
+.sd-select-wrap { position: relative; }
+.sd-select-wrap > .icon { position: absolute; right: 12px; top: 50%; translate: 0 -50%; pointer-events: none; color: var(--TextFillColorSecondary); }
+/* WinUI ComboBox metrics: 32 px tall, padding 12,5,0,7, 4 px radius, elevation border. */
+.sd-select {
+  appearance: none;
+  -webkit-appearance: none;
+  display: block;
+  width: 100%;
+  height: var(--control-height);
+  margin: 0;
+  padding: 5px 36px 7px 12px;
+  border: 1px solid var(--ControlStrokeColorDefault);
+  border-bottom-color: var(--ControlStrokeColorSecondary);
+  border-radius: var(--radius-control);
+  background: var(--ControlFillColorDefault);
+  color: var(--TextFillColorPrimary);
+  transition: background-color var(--dur-faster) linear;
+}
+.sd-select:hover { background: var(--ControlFillColorSecondary); }
+.sd-select:active { background: var(--ControlFillColorTertiary); color: var(--TextFillColorSecondary); }
+.sd-select option { background: var(--SolidBackgroundFillColorQuarternary); color: var(--TextFillColorPrimary); }
+.sd-desc { margin: 12px 0 0; min-height: 60px; }
+.sd-buttons { display: flex; justify-content: flex-end; gap: 8px; padding: 12px 24px 24px; }
+.sd-buttons .btn { min-width: 88px; }

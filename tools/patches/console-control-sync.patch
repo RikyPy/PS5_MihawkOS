@@ -1,0 +1,37 @@
+--- a/payload/ps5vkctl/main.c
++++ b/payload/ps5vkctl/main.c
+@@ -15,6 +15,7 @@
+  *   status            which application the console is running, and its title
+  *   users             what the user service answers: init, foreground, logged-in
+  *   procs             the pids of that application's processes
++ *   sync              write the console's file buffers out (sync(2)) and say how long it took
+  *   launch <TITLEID>  start a title (sceLncUtilLaunchApp)
+  *   kill <TITLEID>    close a title: suspend, SIGKILL its processes, then
+  *                     sceLncUtilKillApp, which is the sequence
+@@ -50,6 +51,7 @@
+ #include <sys/sysctl.h>
+ #include <sys/types.h>
+ #include <sys/user.h>
++#include <time.h>
+ #include <unistd.h>
+ 
+ /* The agent's port, the longest command it answers, and its own log. */
+@@ -407,6 +409,18 @@
+               app_id == PS5VKCTL_NO_APP ? "" : running, count, list);
+         return 0;
+     }
++    if (strcmp(command, "sync") == 0)
++    {
++        /* The last step of every deploy (PS5_Proton tools/console_guard.py end_write). FreeBSD's sync starts the
++         * writes and does not wait for them, so the guard still waits 60 s before the next launch. */
++        struct timespec before, after;
++        clock_gettime(CLOCK_MONOTONIC, &before);
++        sync();
++        clock_gettime(CLOCK_MONOTONIC, &after);
++        reply(client, "ok sync ms=%lld", (long long)(after.tv_sec - before.tv_sec) * 1000 +
++              (after.tv_nsec - before.tv_nsec) / 1000000);
++        return 0;
++    }
+     if (strcmp(command, "quit") == 0)
+     {
+         reply(client, "ok bye");

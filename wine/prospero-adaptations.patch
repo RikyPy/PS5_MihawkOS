@@ -1,0 +1,1246 @@
+--- a/wine/ps5/pw_vulkan_radv.c
++++ b/wine/ps5/pw_vulkan_radv.c
+@@ -3,9 +3,7 @@
+  * vkGetInstanceProcAddr and vkGetDeviceProcAddr in libvulkan.so; Mesa's
+  * archive exports only the loader's ICD interface, whose instance lookup
+  * resolves every entry point and whose device lookup is the runtime's own.
+- * The title's own presenter shows GDI frames through RADV's VideoOut WSI
+- * while no swapchain presents (pw_videoout_idle, pw_videoout_show_tiled),
+- * and win32u shows the application's cursor over the swapchain's frames
++ * win32u shows the application's cursor over the swapchain's frames
+  * with VideoOut's hardware cursor (pw_videoout_cursor).
+  * Linked by tools/link_radv_prx.sh. */
+ #include <errno.h>
+@@ -22,10 +20,14 @@
+ 
+ PFN_vkVoidFunction VKAPI_CALL vk_icdGetInstanceProcAddr(VkInstance instance, const char *name);
+ PFN_vkVoidFunction VKAPI_CALL vk_common_GetDeviceProcAddr(VkDevice device, const char *name);
+-bool wsi_videoout_idle(void);
+-int wsi_videoout_show_tiled(const void *tiled, uint64_t bytes, uint32_t width, uint32_t height);
+-int pw_videoout_idle(void);
+-int pw_videoout_show_tiled(const void *tiled, uint64_t bytes, uint32_t width, uint32_t height);
++/* ACO's optional disassembler starts a host process from a temporary file.
++ * A game title cannot execute that diagnostic path. */
++int mkstemp(char *pattern)
++{
++    (void)pattern;
++    errno = ENOSYS;
++    return -1;
++}
+ int pw_videoout_cursor(const uint32_t *argb, uint32_t width, uint32_t height, int32_t x, int32_t y,
+                        uint32_t space_width, uint32_t space_height);
+ 
+@@ -37,13 +39,6 @@
+ VKAPI_ATTR PFN_vkVoidFunction VKAPI_CALL vkGetDeviceProcAddr(VkDevice device, const char *name)
+ {
+     return vk_common_GetDeviceProcAddr(device, name);
+-}
+-
+-/* 1 when a frame given to pw_videoout_show_tiled would show: the video
+- * output is RADV's and no swapchain is presenting. */
+-int pw_videoout_idle(void)
+-{
+-    return wsi_videoout_idle();
+ }
+ 
+ /* --- the hardware cursor -------------------------------------------------
+@@ -173,23 +168,6 @@
+     return rc == 0 ? 0 : -2;
+ }
+ 
+-/* Shows a B8G8R8A8 frame already in VideoOut's tiling while no swapchain
+- * presents: 0 shown, 1 a swapchain is presenting, <0 failed. A GDI frame
+- * has the cursor drawn in, so the hardware cursor is hidden while one shows;
+- * the next swapchain present brings it back. */
+-int pw_videoout_show_tiled(const void *tiled, uint64_t bytes, uint32_t width, uint32_t height)
+-{
+-    int result = wsi_videoout_show_tiled(tiled, bytes, width, height);
+-    int handle = __atomic_load_n(&videoout_handle, __ATOMIC_ACQUIRE);
+-
+-    if (result == 0 && handle >= 0) {
+-        cursor_lock();
+-        cursor_hide_locked(handle);
+-        cursor_unlock();
+-    }
+-    return result;
+-}
+-
+ /* Mesa's GPU description reads /proc/self/fd links, which a title does not
+  * have; the libc readlink is only in libkernel_sys, which a title does not
+  * get. Answer as a missing link would. */
+--- a/wine/ps5/pw_wine_dmem.c
++++ b/wine/ps5/pw_wine_dmem.c
+@@ -175,30 +175,33 @@
+ 
+ int pw_wine_dmem_add_region(PwWineDmem *d, uintptr_t address, size_t bytes, int reserved)
+ {
++    uintptr_t low = address, high = address + bytes;
++    unsigned first = 0, last;
+     int status = -1;
+ 
+     lock(d);
+-    if (d->regions < PW_WINE_DMEM_MAX_REGIONS && bytes && !(address % d->ops.page) &&
+-        !(bytes % d->ops.page) && address + bytes > address &&
+-        (reserved || !d->ops.reserve(d->ops.context, address, bytes))) {
+-        uintptr_t low = address, high = address + bytes;
+-        unsigned kept = 0;
+-
+-        /* Regions that touch or overlap the new one merge into it. */
+-        for (unsigned i = 0; i < d->regions; i++) {
+-            if (d->region_high[i] < low || d->region_low[i] > high) {
+-                d->region_low[kept] = d->region_low[i];
+-                d->region_high[kept++] = d->region_high[i];
+-                continue;
+-            }
+-            if (d->region_low[i] < low) low = d->region_low[i];
+-            if (d->region_high[i] > high) high = d->region_high[i];
+-        }
+-        d->region_low[kept] = low;
+-        d->region_high[kept] = high;
+-        d->regions = kept + 1;
+-        status = 0;
+-    }
++    if (!bytes || address % d->ops.page || bytes % d->ops.page || high <= low)
++        goto done;
++    /* Keep regions sorted so a bridging reservation merges every neighbour.
++     * A full table may still accept an extension of an existing region. */
++    while (first < d->regions && d->region_high[first] < low) first++;
++    last = first;
++    while (last < d->regions && d->region_low[last] <= high) {
++        if (d->region_low[last] < low) low = d->region_low[last];
++        if (d->region_high[last] > high) high = d->region_high[last];
++        last++;
++    }
++    if (first == last && d->regions == PW_WINE_DMEM_MAX_REGIONS) goto done;
++    if (!reserved && d->ops.reserve(d->ops.context, address, bytes)) goto done;
++    memmove(&d->region_low[first + 1], &d->region_low[last],
++            (d->regions - last) * sizeof(d->region_low[0]));
++    memmove(&d->region_high[first + 1], &d->region_high[last],
++            (d->regions - last) * sizeof(d->region_high[0]));
++    d->region_low[first] = low;
++    d->region_high[first] = high;
++    d->regions = d->regions - (last - first) + 1;
++    status = 0;
++done:
+     unlock(d);
+     return status;
+ }
+--- a/wine/ps5/pw_wine_dmem.h
++++ b/wine/ps5/pw_wine_dmem.h
+@@ -26,7 +26,7 @@
+     PW_WINE_DMEM_READ = 1,
+     PW_WINE_DMEM_WRITE = 2,
+     PW_WINE_DMEM_EXEC = 4,
+-    PW_WINE_DMEM_MAX_REGIONS = 64,
++    PW_WINE_DMEM_MAX_REGIONS = 4096,
+ };
+ 
+ /* What the module asks of the kernel. Addresses and sizes are multiples of
+--- a/wine/ps5/pw_wine_dmem_ps5.c
++++ b/wine/ps5/pw_wine_dmem_ps5.c
+@@ -158,15 +158,23 @@
+ 
+ /* ntdll's reserved area [base, +size), already reserved: backed by direct
+  * memory from now on. */
+-void __wine_ps5_dmem_region(void *base, size_t size)
++int __wine_ps5_dmem_region(void *base, size_t size)
+ {
+     if (!state && pw_wine_dmem_init(&dmem, &ops, runs, RUNS, 1)) state = -1;
+-    if (state < 0 || pw_wine_dmem_add_region(&dmem, (uintptr_t)base, size, 1)) return;
++    if (state < 0) return -1;
++    /* Kernel reservations cover whole 16 KiB pages, including PE sections
++     * whose Windows size is only a multiple of 4 KiB. */
++    if (pw_wine_dmem_add_region(&dmem, page_down(base), page_span(base, size), 1)) {
++        fprintf(stderr, "wine-ps5: cannot track reservation %p size=%zu regions=%u\n",
++                base, size, dmem.regions);
++        return -1;
++    }
+     if (!state) {
+         state = self_check((uintptr_t)base) ? 1 : -1;
+         fprintf(stderr, "wine-ps5: direct memory %s for anonymous memory (region %p, %zu MiB)\n",
+                 state > 0 ? "in use" : "refused", base, size >> 20);
+     }
++    return state > 0 ? 0 : -1;
+ }
+ 
+ void *__wine_ps5_mmap(void *address, size_t bytes, int protection, int flags, int fd, off_t offset)
+--- a/wine/ps5/pw_wine_sink.c
++++ b/wine/ps5/pw_wine_sink.c
+@@ -161,7 +161,7 @@
+ void pw_wine_set_pad(const PwWinePad *pad)
+ {
+     pthread_mutex_lock(&lock);
+-    if(!pad)pad_state.connected=0;
++    if(!pad || !pad->connected)pad_state.connected=0;
+     else if(!pad_state.connected || !same_pad(pad,&pad_state)) {
+         uint32_t packet=pad_state.packet+1;
+         pad_state=*pad;pad_state.connected=1;
+@@ -200,3 +200,22 @@
+     pthread_mutex_unlock(&lock);
+     return changed;
+ }
++
++static uint8_t dualsense_report[64];
++static int dualsense_connected;
++void pw_wine_set_dualsense(const uint8_t *report)
++{
++    pthread_mutex_lock(&lock);
++    dualsense_connected = report != NULL;
++    if (report) memcpy(dualsense_report, report, sizeof(dualsense_report));
++    pthread_mutex_unlock(&lock);
++}
++int pw_wine_dualsense(uint8_t *report)
++{
++    int connected;
++    pthread_mutex_lock(&lock);
++    connected = dualsense_connected;
++    if (report && connected) memcpy(report, dualsense_report, sizeof(dualsense_report));
++    pthread_mutex_unlock(&lock);
++    return connected;
++}
+--- a/wine/ps5/pw_wine_sink.h
++++ b/wine/ps5/pw_wine_sink.h
+@@ -74,6 +74,10 @@
+  * last call, else 0. */
+ int pw_wine_rumble(uint32_t *left,uint32_t *right);
+ 
++/* DualSense USB reports, shared with winebus. NULL disconnects. */
++void pw_wine_set_dualsense(const uint8_t *report);
++int pw_wine_dualsense(uint8_t *report);
++
+ /* Driver side. -1 when no sink is set or the arguments are invalid. */
+ int pw_wine_present(const void *bgra,uint32_t width,uint32_t height,uint32_t stride);
+ /* Asks the title to release the video output, once: 0 when it did (or has
+--- a/wine/ps5/pw_ws2_32_libc.c
++++ b/wine/ps5/pw_ws2_32_libc.c
+@@ -5,11 +5,42 @@
+  * gethostbyaddr answers through getnameinfo; h_errno is per thread, as the
+  * FreeBSD libc's is. */
+ #include <netdb.h>
++#include <errno.h>
+ #include <netinet/in.h>
+ #include <string.h>
+ #include <sys/socket.h>
+ 
+ static _Thread_local int pw_h_errno;
++
++/* This title has no libc resolver: those symbols belong to WebKit. Keep
++ * DNS failure explicit until a SceNet resolver adapter is implemented. */
++int getaddrinfo(const char *host, const char *service, const struct addrinfo *hints,
++                struct addrinfo **result)
++{
++    (void)host; (void)service; (void)hints;
++    *result = NULL;
++    errno = ENOSYS;
++    return EAI_SYSTEM;
++}
++
++void freeaddrinfo(struct addrinfo *info) { (void)info; }
++
++int getnameinfo(const struct sockaddr *address, socklen_t length, char *host,
++                size_t host_length, char *service, size_t service_length, int flags)
++{
++    (void)address; (void)length; (void)host; (void)host_length;
++    (void)service; (void)service_length; (void)flags;
++    errno = ENOSYS;
++    return EAI_SYSTEM;
++}
++
++struct hostent *gethostbyname(const char *name)
++{
++    (void)name;
++    pw_h_errno = NO_RECOVERY;
++    errno = ENOSYS;
++    return NULL;
++}
+ 
+ int *__h_errno(void)
+ {
+--- a/wine/wineps5/unix.c
++++ b/wine/wineps5/unix.c
+@@ -27,6 +27,7 @@
+ #include <string.h>
+ #include <dlfcn.h>
+ #include <pthread.h>
++#include <time.h>
+ 
+ #include "ntstatus.h"
+ #include "winternl.h"
+@@ -76,7 +77,6 @@
+ static pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
+ static pthread_cond_t started = PTHREAD_COND_INITIALIZER;
+ static struct ps5_stream *streams;
+-static HANDLE mixer_thread;
+ 
+ static int (*audio_available)(void);
+ static int (*audio_output)(const int16_t *frames);
+@@ -328,6 +328,10 @@
+         free_stream(stream);
+     else
+     {
++        TRACE("stream rate=%u channels=%u bits=%u period=%u buffer=%u flags=%#x\n",
++              stream->fmt->nSamplesPerSec, stream->fmt->nChannels,
++              stream->fmt->wBitsPerSample, stream->period_frames,
++              stream->bufsize_frames, stream->flags);
+         *params->channel_count = params->fmt->nChannels;
+         *params->stream = (stream_handle)(UINT_PTR)stream;
+     }
+@@ -357,14 +361,19 @@
+ 
+ /* The mixer: every started stream into one grain, then the grain to the
+  * title, which returns once the console's port took it. */
+-static void mixer_loop(void *args)
++static NTSTATUS mixer_loop(void *args)
+ {
+     static float accumulator[2 * PW_WINE_AUDIO_GRAIN];
+     static int16_t grain[2 * PW_WINE_AUDIO_GRAIN];
+     struct ps5_stream *stream;
+     BOOL playing;
+-
+-    pthread_mutex_lock(&lock);
++    unsigned grains = 0, short_grains = 0, missing = 0, errors = 0;
++    double output_ms = 0, max_gap_ms = 0, previous_end = 0;
++    struct timespec stamp;
++
++    struct main_loop_params *params = args;
++    pthread_mutex_lock(&lock);
++    NtSetEvent(params->event, NULL);
+     for (;;)
+     {
+         playing = FALSE;
+@@ -380,7 +389,11 @@
+         for (stream = streams; stream; stream = stream->next)
+         {
+             if (!stream->playing) continue;
+-            pw_audio_mix_add(&stream->mix, accumulator, PW_WINE_AUDIO_GRAIN);
++            unsigned mixed = pw_audio_mix_add(&stream->mix, accumulator, PW_WINE_AUDIO_GRAIN);
++            if (mixed < PW_WINE_AUDIO_GRAIN) {
++                ++short_grains;
++                missing += PW_WINE_AUDIO_GRAIN - mixed;
++            }
+             stream->since_event += PW_WINE_AUDIO_GRAIN;
+             if (stream->since_event >= stream->period_output_frames)
+             {
+@@ -391,13 +404,28 @@
+         pw_audio_mix_store(accumulator, grain, PW_WINE_AUDIO_GRAIN);
+         pthread_mutex_unlock(&lock);
+ 
+-        if (!audio_output || audio_output(grain))
++        clock_gettime(CLOCK_MONOTONIC, &stamp);
++        double begin = stamp.tv_sec * 1000.0 + stamp.tv_nsec / 1000000.0;
++        if (previous_end && begin - previous_end > max_gap_ms)
++            max_gap_ms = begin - previous_end;
++        int result = audio_output ? audio_output(grain) : -1;
++        clock_gettime(CLOCK_MONOTONIC, &stamp);
++        previous_end = stamp.tv_sec * 1000.0 + stamp.tv_nsec / 1000000.0;
++        output_ms += previous_end - begin;
++        if (result)
+         {
++            ++errors;
+             /* the port refused it: keep time without it */
+             LARGE_INTEGER delay;
+             delay.QuadPart = -(LONGLONG)PW_WINE_AUDIO_GRAIN * 10000000 / PW_WINE_AUDIO_RATE;
+             NtDelayExecution(FALSE, &delay);
+         }
++        if (++grains == 1875) {
++            TRACE("audio grains=%u short=%u missing=%u output_avg_ms=%.3f max_gap_ms=%.3f nonzero=%u last_result=%d\n",
++                  grains, short_grains, missing, output_ms / grains, max_gap_ms, errors, result);
++            grains = short_grains = missing = errors = 0;
++            output_ms = max_gap_ms = 0;
++        }
+         pthread_mutex_lock(&lock);
+     }
+ }
+@@ -406,7 +434,6 @@
+ {
+     struct start_params *params = args;
+     struct ps5_stream *stream = handle_get_stream(params->stream);
+-    static const WCHAR name[] = {'p','s','5','_','a','u','d','i','o','_','m','i','x','e','r',0};
+ 
+     pthread_mutex_lock(&lock);
+ 
+@@ -416,11 +443,6 @@
+     if (stream->playing)
+         return unlock_result(&params->result, AUDCLNT_E_NOT_STOPPED);
+ 
+-    if (!mixer_thread && create_unix_thread(&mixer_thread, name, mixer_loop, NULL))
+-    {
+-        mixer_thread = NULL;
+-        return unlock_result(&params->result, E_OUTOFMEMORY);
+-    }
+     stream->playing = TRUE;
+     stream->since_event = 0;
+     pthread_cond_signal(&started);
+@@ -852,519 +874,46 @@
+     return STATUS_SUCCESS;
+ }
+ 
+-const unixlib_entry_t __wine_unix_call_funcs[] =
+-{
+-    ps5_process_attach,
+-    ps5_not_implemented,
+-    ps5_not_implemented,
+-    ps5_not_implemented,
+-    ps5_get_endpoint_ids,
+-    ps5_create_stream,
+-    ps5_release_stream,
+-    ps5_start,
+-    ps5_stop,
+-    ps5_reset,
+-    ps5_get_render_buffer,
+-    ps5_release_render_buffer,
+-    ps5_not_implemented,
+-    ps5_not_implemented,
+-    ps5_is_format_supported,
+-    ps5_not_implemented,
+-    ps5_get_mix_format,
+-    ps5_get_device_period,
+-    ps5_get_buffer_size,
+-    ps5_get_latency,
+-    ps5_get_current_padding,
+-    ps5_get_next_packet_size,
+-    ps5_get_frequency,
+-    ps5_get_position,
+-    ps5_set_volumes,
+-    ps5_set_event_handle,
+-    ps5_set_sample_rate,
+-    ps5_test_connect,
+-    ps5_is_started,
+-    ps5_get_prop_value,
+-    ps5_not_implemented,
+-    ps5_midi_init,
+-    ps5_not_implemented,
+-    ps5_midi_out_message,
+-    ps5_midi_in_message,
+-    ps5_midi_notify_wait,
+-    ps5_aux_message,
++const unixlib_entry_t __wine_unix_call_funcs[funcs_count] =
++{
++    [process_attach] = ps5_process_attach,
++    [process_detach] = ps5_not_implemented,
++    [main_loop] = mixer_loop,
++    [get_endpoint_ids] = ps5_get_endpoint_ids,
++    [create_stream] = ps5_create_stream,
++    [release_stream] = ps5_release_stream,
++    [start] = ps5_start,
++    [stop] = ps5_stop,
++    [reset] = ps5_reset,
++    [timer_loop] = ps5_not_implemented,
++    [get_render_buffer] = ps5_get_render_buffer,
++    [release_render_buffer] = ps5_release_render_buffer,
++    [get_capture_buffer] = ps5_not_implemented,
++    [release_capture_buffer] = ps5_not_implemented,
++    [is_format_supported] = ps5_is_format_supported,
++    [get_loopback_capture_device] = ps5_not_implemented,
++    [get_mix_format] = ps5_get_mix_format,
++    [get_device_period] = ps5_get_device_period,
++    [get_buffer_size] = ps5_get_buffer_size,
++    [get_latency] = ps5_get_latency,
++    [get_current_padding] = ps5_get_current_padding,
++    [get_next_packet_size] = ps5_get_next_packet_size,
++    [get_frequency] = ps5_get_frequency,
++    [get_position] = ps5_get_position,
++    [set_volumes] = ps5_set_volumes,
++    [set_event_handle] = ps5_set_event_handle,
++    [set_sample_rate] = ps5_set_sample_rate,
++    [test_connect] = ps5_test_connect,
++    [is_started] = ps5_is_started,
++    [get_prop_value] = ps5_get_prop_value,
++    [midi_get_driver] = ps5_not_implemented,
++    [midi_init] = ps5_midi_init,
++    [midi_release] = ps5_not_implemented,
++    [midi_out_message] = ps5_midi_out_message,
++    [midi_in_message] = ps5_midi_in_message,
++    [midi_notify_wait] = ps5_midi_notify_wait,
++    [aux_message] = ps5_aux_message,
+ };
+ 
+ C_ASSERT(ARRAYSIZE(__wine_unix_call_funcs) == funcs_count);
+ 
+-#ifdef _WIN64
+-
+-typedef UINT PTR32;
+-
+-static NTSTATUS ps5_wow64_process_attach(void *args)
+-{
+-    SYSTEM_BASIC_INFORMATION info;
+-
+-    NtQuerySystemInformation(SystemEmulationBasicInformation, &info, sizeof(info), NULL);
+-    zero_bits = (ULONG_PTR)info.HighestUserAddress | 0x7fffffff;
+-    find_sink();
+-    return STATUS_SUCCESS;
+-}
+-
+-static NTSTATUS ps5_wow64_test_connect(void *args)
+-{
+-    struct
+-    {
+-        PTR32 name;
+-        enum driver_priority priority;
+-    } *params32 = args;
+-    struct test_connect_params params =
+-    {
+-        .name = ULongToPtr(params32->name),
+-    };
+-    ps5_test_connect(&params);
+-    params32->priority = params.priority;
+-    return STATUS_SUCCESS;
+-}
+-
+-static NTSTATUS ps5_wow64_get_endpoint_ids(void *args)
+-{
+-    struct
+-    {
+-        EDataFlow flow;
+-        PTR32 endpoints;
+-        unsigned int size;
+-        HRESULT result;
+-        unsigned int num;
+-        unsigned int default_idx;
+-    } *params32 = args;
+-    struct get_endpoint_ids_params params =
+-    {
+-        .flow = params32->flow,
+-        .endpoints = ULongToPtr(params32->endpoints),
+-        .size = params32->size
+-    };
+-    ps5_get_endpoint_ids(&params);
+-    params32->size = params.size;
+-    params32->result = params.result;
+-    params32->num = params.num;
+-    params32->default_idx = params.default_idx;
+-    return STATUS_SUCCESS;
+-}
+-
+-static NTSTATUS ps5_wow64_create_stream(void *args)
+-{
+-    struct
+-    {
+-        PTR32 name;
+-        PTR32 device;
+-        EDataFlow flow;
+-        AUDCLNT_SHAREMODE share;
+-        UINT flags;
+-        REFERENCE_TIME duration;
+-        REFERENCE_TIME period;
+-        PTR32 fmt;
+-        HRESULT result;
+-        PTR32 channel_count;
+-        PTR32 stream;
+-    } *params32 = args;
+-    struct create_stream_params params =
+-    {
+-        .name = ULongToPtr(params32->name),
+-        .device = ULongToPtr(params32->device),
+-        .flow = params32->flow,
+-        .share = params32->share,
+-        .flags = params32->flags,
+-        .duration = params32->duration,
+-        .period = params32->period,
+-        .fmt = ULongToPtr(params32->fmt),
+-        .channel_count = ULongToPtr(params32->channel_count),
+-        .stream = ULongToPtr(params32->stream)
+-    };
+-    ps5_create_stream(&params);
+-    params32->result = params.result;
+-    return STATUS_SUCCESS;
+-}
+-
+-static NTSTATUS ps5_wow64_release_stream(void *args)
+-{
+-    struct
+-    {
+-        stream_handle stream;
+-        HRESULT result;
+-    } *params32 = args;
+-    struct release_stream_params params =
+-    {
+-        .stream = params32->stream,
+-    };
+-    ps5_release_stream(&params);
+-    params32->result = params.result;
+-    return STATUS_SUCCESS;
+-}
+-
+-static NTSTATUS ps5_wow64_get_render_buffer(void *args)
+-{
+-    struct
+-    {
+-        stream_handle stream;
+-        UINT32 frames;
+-        HRESULT result;
+-        PTR32 data;
+-    } *params32 = args;
+-    BYTE *data = NULL;
+-    struct get_render_buffer_params params =
+-    {
+-        .stream = params32->stream,
+-        .frames = params32->frames,
+-        .data = &data
+-    };
+-    ps5_get_render_buffer(&params);
+-    params32->result = params.result;
+-    *(unsigned int *)ULongToPtr(params32->data) = PtrToUlong(data);
+-    return STATUS_SUCCESS;
+-}
+-
+-static NTSTATUS ps5_wow64_is_format_supported(void *args)
+-{
+-    struct
+-    {
+-        PTR32 device;
+-        EDataFlow flow;
+-        AUDCLNT_SHAREMODE share;
+-        PTR32 fmt_in;
+-        HRESULT result;
+-    } *params32 = args;
+-    struct is_format_supported_params params =
+-    {
+-        .device = ULongToPtr(params32->device),
+-        .flow = params32->flow,
+-        .share = params32->share,
+-        .fmt_in = ULongToPtr(params32->fmt_in),
+-    };
+-    ps5_is_format_supported(&params);
+-    params32->result = params.result;
+-    return STATUS_SUCCESS;
+-}
+-
+-static NTSTATUS ps5_wow64_get_mix_format(void *args)
+-{
+-    struct
+-    {
+-        PTR32 device;
+-        EDataFlow flow;
+-        PTR32 fmt;
+-        HRESULT result;
+-    } *params32 = args;
+-    struct get_mix_format_params params =
+-    {
+-        .device = ULongToPtr(params32->device),
+-        .flow = params32->flow,
+-        .fmt = ULongToPtr(params32->fmt)
+-    };
+-    ps5_get_mix_format(&params);
+-    params32->result = params.result;
+-    return STATUS_SUCCESS;
+-}
+-
+-static NTSTATUS ps5_wow64_get_device_period(void *args)
+-{
+-    struct
+-    {
+-        PTR32 device;
+-        EDataFlow flow;
+-        HRESULT result;
+-        PTR32 def_period;
+-        PTR32 min_period;
+-    } *params32 = args;
+-    struct get_device_period_params params =
+-    {
+-        .device = ULongToPtr(params32->device),
+-        .flow = params32->flow,
+-        .def_period = ULongToPtr(params32->def_period),
+-        .min_period = ULongToPtr(params32->min_period),
+-    };
+-    ps5_get_device_period(&params);
+-    params32->result = params.result;
+-    return STATUS_SUCCESS;
+-}
+-
+-static NTSTATUS ps5_wow64_get_buffer_size(void *args)
+-{
+-    struct
+-    {
+-        stream_handle stream;
+-        HRESULT result;
+-        PTR32 frames;
+-    } *params32 = args;
+-    struct get_buffer_size_params params =
+-    {
+-        .stream = params32->stream,
+-        .frames = ULongToPtr(params32->frames)
+-    };
+-    ps5_get_buffer_size(&params);
+-    params32->result = params.result;
+-    return STATUS_SUCCESS;
+-}
+-
+-static NTSTATUS ps5_wow64_get_latency(void *args)
+-{
+-    struct
+-    {
+-        stream_handle stream;
+-        HRESULT result;
+-        PTR32 latency;
+-    } *params32 = args;
+-    struct get_latency_params params =
+-    {
+-        .stream = params32->stream,
+-        .latency = ULongToPtr(params32->latency)
+-    };
+-    ps5_get_latency(&params);
+-    params32->result = params.result;
+-    return STATUS_SUCCESS;
+-}
+-
+-static NTSTATUS ps5_wow64_get_current_padding(void *args)
+-{
+-    struct
+-    {
+-        stream_handle stream;
+-        HRESULT result;
+-        PTR32 padding;
+-    } *params32 = args;
+-    struct get_current_padding_params params =
+-    {
+-        .stream = params32->stream,
+-        .padding = ULongToPtr(params32->padding)
+-    };
+-    ps5_get_current_padding(&params);
+-    params32->result = params.result;
+-    return STATUS_SUCCESS;
+-}
+-
+-static NTSTATUS ps5_wow64_get_next_packet_size(void *args)
+-{
+-    struct
+-    {
+-        stream_handle stream;
+-        HRESULT result;
+-        PTR32 frames;
+-    } *params32 = args;
+-    struct get_next_packet_size_params params =
+-    {
+-        .stream = params32->stream,
+-        .frames = ULongToPtr(params32->frames)
+-    };
+-    ps5_get_next_packet_size(&params);
+-    params32->result = params.result;
+-    return STATUS_SUCCESS;
+-}
+-
+-static NTSTATUS ps5_wow64_get_frequency(void *args)
+-{
+-    struct
+-    {
+-        stream_handle stream;
+-        HRESULT result;
+-        PTR32 freq;
+-    } *params32 = args;
+-    struct get_frequency_params params =
+-    {
+-        .stream = params32->stream,
+-        .freq = ULongToPtr(params32->freq)
+-    };
+-    ps5_get_frequency(&params);
+-    params32->result = params.result;
+-    return STATUS_SUCCESS;
+-}
+-
+-static NTSTATUS ps5_wow64_get_position(void *args)
+-{
+-    struct
+-    {
+-        stream_handle stream;
+-        BOOL device;
+-        HRESULT result;
+-        PTR32 pos;
+-        PTR32 qpctime;
+-    } *params32 = args;
+-    struct get_position_params params =
+-    {
+-        .stream = params32->stream,
+-        .device = params32->device,
+-        .pos = ULongToPtr(params32->pos),
+-        .qpctime = ULongToPtr(params32->qpctime)
+-    };
+-    ps5_get_position(&params);
+-    params32->result = params.result;
+-    return STATUS_SUCCESS;
+-}
+-
+-static NTSTATUS ps5_wow64_set_volumes(void *args)
+-{
+-    struct
+-    {
+-        stream_handle stream;
+-        float master_volume;
+-        PTR32 volumes;
+-        PTR32 session_volumes;
+-    } *params32 = args;
+-    struct set_volumes_params params =
+-    {
+-        .stream = params32->stream,
+-        .master_volume = params32->master_volume,
+-        .volumes = ULongToPtr(params32->volumes),
+-        .session_volumes = ULongToPtr(params32->session_volumes),
+-    };
+-    return ps5_set_volumes(&params);
+-}
+-
+-static NTSTATUS ps5_wow64_set_event_handle(void *args)
+-{
+-    struct
+-    {
+-        stream_handle stream;
+-        PTR32 event;
+-        HRESULT result;
+-    } *params32 = args;
+-    struct set_event_handle_params params =
+-    {
+-        .stream = params32->stream,
+-        .event = ULongToHandle(params32->event)
+-    };
+-
+-    ps5_set_event_handle(&params);
+-    params32->result = params.result;
+-    return STATUS_SUCCESS;
+-}
+-
+-static NTSTATUS ps5_wow64_get_prop_value(void *args)
+-{
+-    struct
+-    {
+-        PTR32 device;
+-        EDataFlow flow;
+-        PTR32 guid;
+-        PTR32 prop;
+-        HRESULT result;
+-        PTR32 value;
+-        PTR32 buffer;
+-        PTR32 buffer_size;
+-    } *params32 = args;
+-
+-    params32->result = E_NOTIMPL;
+-    return STATUS_SUCCESS;
+-}
+-
+-static NTSTATUS ps5_wow64_midi_init(void *args)
+-{
+-    struct
+-    {
+-        PTR32 err;
+-    } *params32 = args;
+-
+-    *(UINT *)ULongToPtr(params32->err) = DRV_SUCCESS;
+-    return STATUS_SUCCESS;
+-}
+-
+-/* The in and out messages share this layout; a notify context starts with
+- * send_notify in both widths. */
+-struct midi_message_params32
+-{
+-    UINT dev_id;
+-    UINT msg;
+-    UINT user;
+-    UINT param_1;
+-    UINT param_2;
+-    PTR32 err;
+-    PTR32 notify;
+-};
+-
+-static NTSTATUS ps5_wow64_midi_out_message(void *args)
+-{
+-    struct midi_message_params32 *params32 = args;
+-
+-    *(BOOL *)ULongToPtr(params32->notify) = FALSE;
+-    *(UINT *)ULongToPtr(params32->err) = no_device(params32->msg, MODM_GETNUMDEVS);
+-    return STATUS_SUCCESS;
+-}
+-
+-static NTSTATUS ps5_wow64_midi_in_message(void *args)
+-{
+-    struct midi_message_params32 *params32 = args;
+-
+-    *(BOOL *)ULongToPtr(params32->notify) = FALSE;
+-    *(UINT *)ULongToPtr(params32->err) = no_device(params32->msg, MIDM_GETNUMDEVS);
+-    return STATUS_SUCCESS;
+-}
+-
+-static NTSTATUS ps5_wow64_midi_notify_wait(void *args)
+-{
+-    struct
+-    {
+-        PTR32 quit;
+-        PTR32 notify;
+-    } *params32 = args;
+-
+-    *(BOOL *)ULongToPtr(params32->quit) = TRUE;
+-    return STATUS_SUCCESS;
+-}
+-
+-static NTSTATUS ps5_wow64_aux_message(void *args)
+-{
+-    struct
+-    {
+-        UINT dev_id;
+-        UINT msg;
+-        UINT user;
+-        UINT param_1;
+-        UINT param_2;
+-        PTR32 err;
+-    } *params32 = args;
+-
+-    *(UINT *)ULongToPtr(params32->err) = no_device(params32->msg, AUXDM_GETNUMDEVS);
+-    return STATUS_SUCCESS;
+-}
+-
+-const unixlib_entry_t __wine_unix_call_wow64_funcs[] =
+-{
+-    ps5_wow64_process_attach,
+-    ps5_not_implemented,
+-    ps5_not_implemented,
+-    ps5_not_implemented,
+-    ps5_wow64_get_endpoint_ids,
+-    ps5_wow64_create_stream,
+-    ps5_wow64_release_stream,
+-    ps5_start,
+-    ps5_stop,
+-    ps5_reset,
+-    ps5_wow64_get_render_buffer,
+-    ps5_release_render_buffer,
+-    ps5_not_implemented,
+-    ps5_not_implemented,
+-    ps5_wow64_is_format_supported,
+-    ps5_not_implemented,
+-    ps5_wow64_get_mix_format,
+-    ps5_wow64_get_device_period,
+-    ps5_wow64_get_buffer_size,
+-    ps5_wow64_get_latency,
+-    ps5_wow64_get_current_padding,
+-    ps5_wow64_get_next_packet_size,
+-    ps5_wow64_get_frequency,
+-    ps5_wow64_get_position,
+-    ps5_wow64_set_volumes,
+-    ps5_wow64_set_event_handle,
+-    ps5_set_sample_rate,
+-    ps5_wow64_test_connect,
+-    ps5_is_started,
+-    ps5_wow64_get_prop_value,
+-    ps5_not_implemented,
+-    ps5_wow64_midi_init,
+-    ps5_not_implemented,
+-    ps5_wow64_midi_out_message,
+-    ps5_wow64_midi_in_message,
+-    ps5_wow64_midi_notify_wait,
+-    ps5_wow64_aux_message,
+-};
+-
+-C_ASSERT(ARRAYSIZE(__wine_unix_call_wow64_funcs) == funcs_count);
+-
+-#endif /* _WIN64 */
+--- a/tools/link_radv_prx.sh
++++ b/tools/link_radv_prx.sh
+@@ -27,6 +27,9 @@
+ [[ -f $radv/tools/radv-link.sh ]] || { echo "$radv has no tools/radv-link.sh" >&2; exit 2; }
+ 
+ mkdir -p "$work/obj" "$work/stubs" "$work/build" "$prx/sce_module"
++mkdir -p "$work/title-stubs"
++cp "$sdk"/target/lib/*.so "$work/title-stubs/"
++rm -f "$work/title-stubs/libkernel_web.so" "$work/title-stubs/libkernel_sys.so" "$work/title-stubs/libScePosixForWebKit.so"
+ # shellcheck source=/dev/null
+ source "$radv/tools/radv-link.sh"
+ radv_link_recipe "$work" "$sdk" "$archive"
+@@ -49,7 +52,7 @@
+ "$sdk/bin/prospero-clang" -std=c11 -O2 -Wall -Wextra -Werror -fPIC -I"$install/include" \
+     -c "$root/wine/ps5/pw_vulkan_radv.c" -o "$work/obj/pw_vulkan_radv.o"
+ python3 "$root/tools/gen_prx_descriptor.py" "$work/obj/libvulkan_desc.c" \
+-    vkGetInstanceProcAddr vkGetDeviceProcAddr pw_videoout_idle pw_videoout_show_tiled pw_videoout_cursor
++    vkGetInstanceProcAddr vkGetDeviceProcAddr pw_videoout_cursor
+ "$sdk/bin/prospero-clang" -std=c11 -O2 -Wall -Wextra -Werror -fPIC -I"$root/wine/ps5" \
+     -c "$work/obj/libvulkan_desc.c" -o "$work/obj/libvulkan_desc.o"
+ 
+@@ -60,9 +63,9 @@
+     "$work/obj/pw_vulkan_radv.o" "$work/obj/libvulkan_desc.o" \
+     "$work/stubs/libSceAgc.so" "$work/stubs/libSceAgcDriver.so" \
+     "${radv_link_flags[@]}" "${radv_link_inputs[@]}" \
+-    --as-needed "$sdk"/target/lib/*.so > "$log" 2>&1
++    --as-needed "$work"/title-stubs/*.so > "$log" 2>&1
+ "$tool" link --module --in "$prx/libvulkan.shared.elf" --out "$work/libvulkan.elf" \
+-    --stub-dir "$sdk/target/lib" --stub "$work/stubs/libSceAgc.so" \
++    --stub-dir "$work/title-stubs" --stub "$work/stubs/libSceAgc.so" \
+     --stub "$work/stubs/libSceAgcDriver.so" --module-sdk 0x02000009 \
+     --companion-sdk 0x08050001 --file-name libvulkan.prx >> "$log" 2>&1
+ "$tool" self --sign --in "$work/libvulkan.elf" --out "$prx/sce_module/libvulkan.prx" >> "$log" 2>&1
+--- a/tools/build_wine_ps5.sh
++++ b/tools/build-wine-ps5.sh
+@@ -51,7 +51,7 @@
+ #       [--ps5-opengl-sdk DIR] [--jobs N]
+ set -eu
+ 
+-WINE_COMMIT=490f6d5dcbb2a5047345b8af88d114bbcaad69a8
++WINE_COMMIT=1c78596625336a73dbfc035dbbcf0dbdd95b06eb
+ MODULE_EXPORTS_COMMIT=30597512539e7edfde079cbcaf4a626bc0a948c5
+ # FreeType draws Wine's text. It is built from a pinned release with the
+ # payload SDK and linked into libfreetype.prx, which Wine's own
+@@ -75,18 +75,18 @@
+  FT_Outline_Transform FT_Outline_Translate FT_Property_Set FT_Render_Glyph FT_Set_Charmap
+  FT_Set_Pixel_Sizes FT_Vector_Length FT_Vector_Transform FT_Vector_Unit"
+ TARGETS="dlls/ntdll/ntdll.so dlls/win32u/win32u.so server/wineserver dlls/winevulkan/winevulkan.so
+- dlls/opengl32/opengl32.so dlls/ws2_32/ws2_32.so dlls/crypt32/crypt32.so"
++ dlls/opengl32/opengl32.so dlls/ws2_32/ws2_32.so dlls/crypt32/crypt32.so dlls/winebus.sys/winebus.so"
+ # The PE modules the patches change: every xinput built from xinput1_3's
+ # source reads the title's controller (patch 0470); xinput9_1_0 forwards to
+ # xinput1_4. quartz: its renderers wait for a state change without the filter
+ # lock (patch 0700). opengl32: it batches immediate-mode calls for its Unix
+ # side (patch 0720), so its PE and Unix halves must come from the same build.
+-PE_MODULES="xinput1_1 xinput1_2 xinput1_3 xinput1_4 xinputuap quartz opengl32"
++PE_MODULES="xinput1_1 xinput1_2 xinput1_3 xinput1_4 xinputuap quartz opengl32 wineps5.drv ntdll ntoskrnl.exe winebus.sys winehid.sys"
+ # Everything optional but FreeType (built below) is off: the console has none
+ # of these libraries, and a configure-time probe against the payload SDK must
+ # not pick up host headers.
+ CONFIGURE_ARGS="--host=x86_64-unknown-freebsd11 --build=x86_64-pc-linux-gnu
+- --enable-archs=i386,x86_64 --disable-tests --without-x
++ --enable-win64 --enable-archs=x86_64 --disable-tests --without-x
+  --without-fontconfig --without-gnutls --without-alsa --without-pulse
+  --without-dbus --without-gstreamer --without-sdl --without-udev --without-usb
+  --without-v4l2 --without-wayland --without-opengl --without-oss
+@@ -97,10 +97,10 @@
+ root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+ patches=$root/wine/patches
+ work=${PROSPERO_WINE_PS5_WORK:-$root/.deps/wine-ps5}
+-source_dir=${PROSPERO_WINE_SOURCE:-$root/.deps/wine/source}
+-host_tools=${PROSPERO_WINE_BUILD:-$root/.deps/wine/build}
+-foundation=${PS5_NATIVE_FOUNDATION:-$root/.deps/ps5-native-app-boilerplate}
+-sdk=${PS5_PAYLOAD_SDK:-}
++source_dir=${PROSPERO_WINE_SOURCE:-$root/.deps/wine-proton}
++host_tools=${PROSPERO_WINE_BUILD:-$root/.deps/wine-runtime/build}
++foundation=${PS5_NATIVE_FOUNDATION:-$root/.deps/prx-foundation}
++sdk=${PS5_PAYLOAD_SDK:-$root/.deps/native/ps5-payload-sdk}
+ prx_foundation=${PS5_PRX_FOUNDATION:-}
+ ps5vk_sdk=${PS5VK_SDK:-}
+ ps5opengl_sdk=${PS5_OPENGL_SDK:-}
+@@ -153,6 +153,7 @@
+     last=-1
+     for patch in $(cd "$patches" && ls | LC_ALL=C sort); do
+         case $patch in
++        README.md) continue ;;
+         [0-9][0-9][0-9][0-9]-*.patch) ;;
+         *) fail "unexpected file in the patch series: $patch" ;;
+         esac
+@@ -179,11 +180,18 @@
+ [ -x "$sdk/bin/prospero-clang" ] || fail "no PS5 payload SDK at $sdk"
+ [ -x "$host_tools/tools/winebuild/winebuild" ] ||
+     fail "no host Wine tools at $host_tools (run tools/build_wine_runtime.sh)"
+-[ "$(git -C "$source_dir" rev-parse HEAD 2>/dev/null)" = "$WINE_COMMIT" ] ||
++git -C "$source_dir" merge-base --is-ancestor "$WINE_COMMIT" HEAD ||
+     fail "$source_dir is not the pinned Wine revision $WINE_COMMIT"
+ 
+ # A private copy keeps the shared checkout pristine for the host build.
+ mkdir -p "$work"
++
++# Only libraries available to game titles. WebKit and system-only imports
++# can link successfully but resolve to NULL in the title process.
++title_stubs=$work/title-stubs
++mkdir -p "$title_stubs"
++cp "$sdk"/target/lib/*.so "$title_stubs/"
++rm -f "$title_stubs/libkernel_web.so" "$title_stubs/libkernel_sys.so" "$title_stubs/libScePosixForWebKit.so"
+ 
+ # FreeType, once per pinned release: a static archive for configure and the
+ # objects the PRX stage links. PROSPERO_FREETYPE_TARBALL names a local copy.
+@@ -225,6 +233,8 @@
+ if [ ! -d "$tree/.git" ]; then
+     git clone -q --shared --no-checkout "$source_dir" "$tree"
+ fi
++source_stamp=$( { printf '%s\n' "$WINE_COMMIT"; cat "$root/tools/generate-wine.sh"; for patch in $ordered; do cat "$patches/$patch"; done; } | sha256sum | cut -c1-64)
++if [ "$(cat "$work/source-stamp" 2>/dev/null)" != "$source_stamp" ]; then
+ git -C "$tree" checkout -q --force "$WINE_COMMIT"
+ git -C "$tree" clean -q -fdx
+ for patch in $ordered; do
+@@ -232,6 +242,11 @@
+     echo "applied $patch"
+ done
+ 
++bash "$root/tools/generate-wine.sh" "$tree" > "$work/generate.log" 2>&1
++
++    echo "$source_stamp" > "$work/source-stamp"
++fi
++
+ # The PS5 OpenGL SDK is optional. When supplied, Wine's generic EGL/WGL
+ # frontend binds directly to its static EGL symbols and the win32u PRX links
+ # the SDK into the runtime.
+@@ -240,7 +255,7 @@
+ 
+ # Reconfigure whenever the patches or the arguments change.
+ stamp=$(
+-    { printf '%s\n' "$WINE_COMMIT" "$CONFIGURE_ARGS" "$sdk" "$FREETYPE_SHA256" \
++    { printf '%s\n' "$WINE_COMMIT" "$source_stamp" "$CONFIGURE_ARGS" "$sdk" "$FREETYPE_SHA256" \
+         "$ps5opengl_sdk" "$opengl_cflags"
+       for patch in $ordered; do cat "$patches/$patch"; done; } | sha256sum | cut -c1-64)
+ build=$work/build
+@@ -290,17 +305,20 @@
+ (cd "$build" && rm -f $TARGETS)
+ for step in "dlls/ntdll/ntdll.so|$heap $dmem" "dlls/win32u/win32u.so|" "server/wineserver|$heap" \
+         "dlls/winevulkan/winevulkan.so|" "dlls/opengl32/opengl32.so|" "dlls/ws2_32/ws2_32.so|" \
+-        "dlls/crypt32/crypt32.so|"; do
++        "dlls/crypt32/crypt32.so|" "dlls/winebus.sys/winebus.so|"; do
+     target=${step%%|*}; objects=${step#*|}
+     make -C "$build" -k -j"$jobs" LDFLAGS="$objects $base" "$target" \
+         >> "$work/make.log" 2>&1 || status=$?
+ done
+ # The patched PE modules, built by the PE cross compilers into <work>/pe.
+ rm -rf "$work/pe"
+-for arch in i386 x86_64; do
++for arch in x86_64; do
+     mkdir -p "$work/pe/$arch-windows"
+     for module in $PE_MODULES; do
+-        target=dlls/$module/$arch-windows/$module.dll
++        case "$module" in
++            *.drv|*.exe|*.sys) target=dlls/$module/$arch-windows/$module ;;
++            *) target=dlls/$module/$arch-windows/$module.dll ;;
++        esac
+         make -C "$build" -k -j"$jobs" "$target" >> "$work/make.log" 2>&1 || status=$?
+         [ ! -f "$build/$target" ] || cp "$build/$target" "$work/pe/$arch-windows/"
+     done
+@@ -350,7 +368,7 @@
+         # those resolve to NULL in the title (pthread_getspecific in
+         # win32u's first call). Leave them out so everything binds to the
+         # title's own libraries, and a symbol only they have stays unresolved.
+-        rm -f "$opengl_stubs/libkernel_web.so" "$opengl_stubs/libScePosixForWebKit.so"
++        rm -f "$opengl_stubs/libkernel_web.so" "$opengl_stubs/libkernel_sys.so" "$opengl_stubs/libScePosixForWebKit.so"
+         for import in "$ps5opengl_sdk"/lib/*.so; do
+             [ -e "$import" ] || continue
+             [ -e "$opengl_stubs/$(basename "$import")" ] || cp "$import" "$opengl_stubs/"
+@@ -362,7 +380,7 @@
+         # shellcheck disable=SC2086
+         # Match the upstream Core33 link options: force its weak AGC Gate2
+         # entry point into the archive so the draw submit path is available.
+-        (cd "$build" && "$sdk/bin/prospero-clang++" -shared -nodefaultlibs \
++        (cd "$build" && "$sdk/bin/prospero-clang++" -shared -nodefaultlibs -Wl,--build-id=none \
+             -Wl,-Bsymbolic -Wl,-T,"$pie" -Wl,-T,"$root/wine/ps5/prx_eh_frame.ld" \
+             -Wl,--eh-frame-hdr -Wl,-soname,"$name.prx" -Wl,-z,defs \
+             -Wl,--warn-unresolved-symbols -L"$work/ps5lib" -L"$ps5opengl_sdk/lib" \
+@@ -378,8 +396,8 @@
+         (cd "$build" && "$sdk/bin/prospero-lld" --shared -Bsymbolic -T "$pie" \
+             -T "$root/wine/ps5/prx_eh_frame.ld" --eh-frame-hdr -soname "$name.prx" -z defs \
+             --warn-unresolved-symbols -L"$work/ps5lib" -o "$prx/$name.shared.elf" $objects $3 ${4:-} \
+-            "$sdk/target/lib/libunwind.a" --as-needed "${5:-$sdk/target/lib}"/*.so) > "$log" 2>&1
+-        stubs_dir=${5:-$sdk/target/lib}
++            "$sdk/target/lib/libunwind.a" --as-needed "${5:-$title_stubs}"/*.so) > "$log" 2>&1
++        stubs_dir=${5:-$title_stubs}
+     fi &&
+     "$tool" link --module --in "$prx/$name.shared.elf" --out "$prx/$name.elf" \
+         --stub-dir "$stubs_dir" $stubs --module-sdk 0x02000009 \
+@@ -412,16 +430,15 @@
+         pw_wine_heap_stats pw_wine_heap_malloc pw_wine_heap_free \
+         pw_wine_set_present_sink pw_wine_post_input pw_wine_sink_stats \
+         pw_wine_present pw_wine_next_input pw_wine_input_fd \
+-        pw_wine_set_pad pw_wine_rumble pw_wine_pad pw_wine_set_rumble \
++        pw_wine_set_dualsense pw_wine_dualsense pw_wine_set_pad pw_wine_rumble pw_wine_pad pw_wine_set_rumble \
+         pw_wine_set_audio_sink pw_wine_audio_available pw_wine_audio_output \
+         __wine_virtual_stats __wine_virtual_fault_top __wine_ps5_set_output_sink __wine_ps5_memory_stats pw_cwd_set \
+-        __wine_ps5_set_segv_hook __wine_ps5_set_segv_unresolved_hook pw_wine_set_display_release pw_wine_release_display
+-    python3 "$root/tools/gen_prx_descriptor.py" "$prx/obj/win32u_desc.c" __wine_unix_lib_init
++        pw_wine_set_display_release pw_wine_release_display
++    python3 "$root/tools/gen_prx_descriptor.py" "$prx/obj/win32u_desc.c" __wine_unix_call_funcs
+     python3 "$root/tools/gen_prx_descriptor.py" "$prx/obj/wineserver_desc.c" \
+         pw_wineserver_connect pw_wine_thread_register
+-    python3 "$root/tools/gen_prx_descriptor.py" "$prx/obj/wowprospero_desc.c" __wine_unix_call_funcs
+     python3 "$root/tools/gen_prx_descriptor.py" "$prx/obj/wineps5_desc.c" \
+-        __wine_unix_call_funcs __wine_unix_call_wow64_funcs
++        __wine_unix_call_funcs
+     python3 "$root/tools/gen_prx_descriptor.py" "$prx/obj/xinput_desc.c" \
+         __wine_unix_call_funcs __wine_unix_call_wow64_funcs
+     python3 "$root/tools/gen_prx_descriptor.py" "$prx/obj/winevulkan_desc.c" \
+@@ -430,14 +447,15 @@
+         __wine_unix_call_funcs __wine_unix_call_wow64_funcs
+     python3 "$root/tools/gen_prx_descriptor.py" "$prx/obj/ws2_32_desc.c" \
+         __wine_unix_call_funcs __wine_unix_call_wow64_funcs
++    python3 "$root/tools/gen_prx_descriptor.py" "$prx/obj/winebus_desc.c" __wine_unix_call_funcs
+     python3 "$root/tools/gen_prx_descriptor.py" "$prx/obj/crypt32_desc.c" \
+         __wine_unix_call_funcs __wine_unix_call_wow64_funcs
+     python3 "$root/tools/gen_prx_descriptor.py" "$prx/obj/libvulkan_desc.c" \
+         vkGetInstanceProcAddr vkGetDeviceProcAddr
+     # shellcheck disable=SC2086
+     python3 "$root/tools/gen_prx_descriptor.py" "$prx/obj/libfreetype_desc.c" $FREETYPE_EXPORTS
+-    for unit in ntdll_desc win32u_desc wineserver_desc wowprospero_desc wineps5_desc \
+-            libfreetype_desc xinput_desc winevulkan_desc opengl32_desc ws2_32_desc crypt32_desc \
++    for unit in ntdll_desc win32u_desc wineserver_desc wineps5_desc \
++            libfreetype_desc xinput_desc winevulkan_desc opengl32_desc ws2_32_desc crypt32_desc winebus_desc \
+             libvulkan_desc; do
+         "$sdk/bin/prospero-clang" -std=c11 -O2 -Wall -Wextra -Werror -fPIC -I"$root/wine/ps5" \
+             -c "$prx/obj/$unit.c" -o "$prx/obj/$unit.o" || fail "cannot compile $unit.c"
+@@ -464,23 +482,9 @@
+         $prx/obj/pw_wine_compat_libc.o $prx/obj/pw_wine_threads.o \
+         $prx/obj/pw_wine_threads_libc.o $prx/obj/wineserver_desc.o \
+         $prx/obj/pw_wine_cwd.o $prx/obj/pw_wine_cwd_libc.o $cwd_wraps"
+-    # The WoW64 CPU backend (wine/wowprospero): its Unix library runs i386
+-    # code through the IA-32 DBT and imports ntdll's functions like win32u.
+-    wow=""
+-    for unit in wine/wowprospero/unix.c src/pw_x86_engine.c src/pw_x86_block.c \
+-            src/pw_x86_cache.c src/pw_x86_hostexec.c src/pw_x86_reencode.c src/pw_x87.c \
+-            src/pw_guest_fp.c src/pw_vm.c src/pw_vm_posix.c; do
+-        object=$prx/obj/wow_$(basename "$unit" .c).o
+-        "$sdk/bin/prospero-clang" -std=gnu11 -O2 -fPIC -D__WINESRC__ -DWINE_UNIX_LIB -D_REENTRANT \
+-            -I"$root/wine/wowprospero" -I"$build/include" -I"$tree/include" \
+-            -I"$root/src" -I"$root/include" -c "$root/$unit" -o "$object" || fail "cannot compile $unit"
+-        wow="$wow $object"
+-    done
+-    # unix.c keeps one __thread pointer, which the PS5 compiler emulates;
+-    # the payload SDK's own emutls object provides __emutls_get_address.
++    # ws2_32 uses emulated TLS; no i386 CPU backend is built.
+     (cd "$prx/obj" && "$sdk/bin/llvm-ar" x "$sdk/target/lib/libc.a" emutls.o) ||
+-        fail "no emutls.o in the payload SDK's libc.a"
+-    link_prx wowprospero - "$wow $prx/obj/emutls.o $prx/obj/wowprospero_desc.o" "$prx/ntdll.shared.elf"
++        fail "no emutls.o in the payload SDK libc.a"
+     link_prx libfreetype - "$ft/obj/*.o $prx/obj/libfreetype_desc.o"
+     # The audio driver (wine/wineps5): mmdevapi loads it by name, and it
+     # mixes into the title's audio sink, which ntdll exports.
+@@ -515,6 +519,8 @@
+     # initialise, and it does so with no driver.
+     link_prx opengl32 dlls/opengl32/opengl32.so "$prx/obj/opengl32_desc.o" \
+         "$prx/ntdll.shared.elf $prx/win32u.shared.elf"
++    link_prx winebus dlls/winebus.sys/winebus.so "$prx/obj/winebus_desc.o" "$prx/ntdll.shared.elf"
++
+     # Winsock's Unix side: games import ws2_32 even when they never go online
+     # (Warcraft III's does), and it does not initialise without it.
+     "$sdk/bin/prospero-clang" -std=c11 -O2 -Wall -Wextra -Werror -fPIC \
+@@ -569,7 +575,7 @@
+ owners = {"dlls/ntdll/": "dlls/ntdll/ntdll.so", "dlls/win32u/": "dlls/win32u/win32u.so",
+           "server/": "server/wineserver", "dlls/winevulkan/": "dlls/winevulkan/winevulkan.so",
+           "dlls/opengl32/": "dlls/opengl32/opengl32.so", "dlls/ws2_32/": "dlls/ws2_32/ws2_32.so",
+-          "dlls/crypt32/": "dlls/crypt32/crypt32.so"}
++          "dlls/crypt32/": "dlls/crypt32/crypt32.so", "dlls/winebus.sys/": "dlls/winebus.sys/winebus.so"}
+ unresolved = {target: set() for target in owners.values()}
+ # lld prints each unresolved symbol, then ">>> referenced by" lines whose
+ # continuation names the object ("dir/file.o:(function)"); the object's
+@@ -614,8 +620,8 @@
+ objdump = shutil.which("llvm-objdump-18") or shutil.which("llvm-objdump") or f"{sdk}/bin/llvm-objdump"
+ SYSCALL_ALLOWED = {"__wine_syscall_dispatcher", "__wine_unix_call_dispatcher"}
+ ntdll_exports = exports("ntdll.shared.elf", prx) if (Path(prx) / "ntdll.shared.elf").is_file() else set()
+-for name in ("ntdll", "win32u", "wineserver", "wowprospero", "wineps5", "libfreetype", "xinput1_3",
+-             "winevulkan", "opengl32", "ws2_32", "crypt32", "libvulkan") if not prx_status.startswith("skipped") else ():
++for name in ("ntdll", "win32u", "wineserver", "wineps5", "libfreetype", "xinput1_3",
++             "winevulkan", "opengl32", "ws2_32", "crypt32", "winebus", "libvulkan") if not prx_status.startswith("skipped") else ():
+     module = Path(prx) / "sce_module" / f"{name}.prx"
+     link_log = Path(prx) / f"{name}.link.log"
+     if name == "libvulkan" and not link_log.is_file():
+@@ -638,7 +644,7 @@
+                    if len(fields) >= 8 and fields[6] == "UND"}
+         provided = title_exports | (ntdll_exports if name in ("win32u", "wowprospero", "wineps5",
+                                                               "xinput1_3", "winevulkan", "opengl32", "ws2_32",
+-                                                              "crypt32") else set())
++                                                              "crypt32", "winebus") else set())
+         entry["title_unbound"] = sorted((imports & exports("libkernel_sys.so")) - provided)
+         # The kernel kills a title that executes a syscall instruction outside
+         # libkernel (measured: SYSTEM_ILLEGAL_FUNCTION_CALL). Wine's dispatchers
+@@ -659,7 +665,7 @@
+     result["prx"]["modules"][name] = entry
+ # The patched PE modules, beside the PRXs.
+ result["pe"] = {str(path.relative_to(Path(prx).parent / "pe")): hashlib.sha256(path.read_bytes()).hexdigest()
+-                for path in sorted((Path(prx).parent / "pe").glob("*-windows/*.dll"))}
++                for path in sorted((Path(prx).parent / "pe").glob("*-windows/*"))}
+ Path(report).write_text(json.dumps(result, indent=2) + "\n")
+ for target, entry in result["targets"].items():
+     print(f"{target}: built={entry['built']} malloc={entry.get('malloc', '-')} "
+@@ -684,8 +690,6 @@
+ then title_status=0; else title_status=$?; fi
+ [ "$status" -eq 0 ] || fail "build failed; see $work/make.log"
+ [ "$title_status" -ne 3 ] || fail "PRX imports only libkernel_sys exports, which a title does not get"
+-# A warning until the working-directory shim stops issuing raw syscalls.
+-[ "$title_status" -ne 4 ] ||
+-    echo "build_wine_ps5: WARNING: PRX executes raw syscalls, which kill a title" >&2
++[ "$title_status" -ne 4 ] || fail "PRX contains raw syscalls; see report.json"
+ [ "$prx_status" != 1 ] || fail "PRX link failed; see $prx/*.link.log"
+ echo "report: $work/report.json"

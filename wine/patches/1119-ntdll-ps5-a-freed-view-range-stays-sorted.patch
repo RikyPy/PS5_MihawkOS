@@ -1,0 +1,28 @@
+From: PS5_Proton <local>
+Subject: [PATCH] ntdll: PS5: a freed view's range goes in sorted order when its neighbours share a granule
+
+free_ranges_remove_view finds the range at the view's granule-rounded base, then moves the base past a granule the
+previous view shares. With a view at 0x594000 after one ending there (an emulator splits placeholders on 16 KiB pages),
+the range it had found ended at 0x590000, before the moved base, and the new range [0x5a0000, 0x64940000) was put in
+front of [0, 0x590000). The list stopped being sorted; the binary search later returned a live guest view's address
+to a thread stack and create_view asserted (view->protect & VPROT_SYSTEM): a Unity game's AssetGarbageCollector
+thread was not created (2026-10-14, record removed from the tree; in git history). Find the range again from the moved base.
+---
+diff --git a/dlls/ntdll/unix/virtual.c b/dlls/ntdll/unix/virtual.c
+--- a/dlls/ntdll/unix/virtual.c
++++ b/dlls/ntdll/unix/virtual.c
+@@ -1486,6 +1486,14 @@
+         view_base = prev_view_end;
+     if (next_view_base && next_view_base < view_end && next_view_end > view_base)
+         view_end = next_view_base;
++#ifdef __PROSPERO__
++    /* The neighbours can move view_base past a granule the previous view shares (a view at 0x594000 after one
++     * ending there: an emulator's placeholders are split on 16 KiB pages). The range found for the old view_base then
++     * ends before it, and the new free range went in front of it: the list stopped being sorted, the search later
++     * gave a thread stack the address of a live view and create_view asserted (2026-10-14). */
++    range = free_ranges_lower_bound( view_base );
++    next = range + 1;
++#endif
+ 
+     TRACE_(virtual_ranges)( "%p - %p, aligned %p - %p.\n",
+                             view->base, (char *)view->base + view->size, view_base, view_end );

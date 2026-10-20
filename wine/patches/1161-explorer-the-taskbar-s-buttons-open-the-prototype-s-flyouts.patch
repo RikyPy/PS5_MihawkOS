@@ -1,0 +1,150 @@
+From: PS5_Proton <local>
+Subject: [PATCH] explorer: the taskbar's search pill, status button, clock and chevron open the prototype's flyouts
+
+The approved prototype's taskbar opens a surface from each of these; patch 1140 drew them and left them unwired.
+Now, with PS5_Proton's native surfaces (wine/ps5/pw_shell_start.c and pw_shell_flyouts.c):
+
+- the search pill opens Start on its Search view (pw_shell_search);
+- the status button opens Quick Settings: the network tile from the adapters' real state and the Settings button
+  (pw_shell_quick_settings; iphlpapi is delay-loaded for it);
+- the clock (now SS_NOTIFY) opens the notification centre and the calendar (pw_shell_notifications);
+- the chevron opens the hidden icons: in the prototype's layout the notification area's icons wait off the bar, as
+  Windows 11 hides new icons, and move into a .tb-trayflyout-shaped popup on the prototype's acrylic while it is
+  open, so a click reaches the program through the icon's own window. With no icons it opens nothing.
+
+Task View has no native surface yet and stays drawn, not wired.
+---
+--- a/programs/explorer/Makefile.in
++++ b/programs/explorer/Makefile.in
+@@ -1,6 +1,6 @@
+ MODULE    = explorer.exe
+ IMPORTS   = rpcrt4 user32 gdi32 advapi32 win32u uxtheme
+-DELAYIMPORTS = comctl32 shell32 oleaut32 ole32 shlwapi dwmapi
++DELAYIMPORTS = comctl32 shell32 oleaut32 ole32 shlwapi dwmapi iphlpapi
+ 
+ EXTRADLLFLAGS = -mwindows -municode
+ 
+@@ -11,4 +11,5 @@
+ 	explorer.rc \
+ 	startmenu.c \
+ 	pw_shell_start.c \
++	pw_shell_flyouts.c \
+ 	systray.c
+--- a/programs/explorer/systray.c
++++ b/programs/explorer/systray.c
+@@ -414,7 +414,13 @@
+ {
+     POINT pos;
+ 
+-    if (enable_taskbar)
++    if (enable_taskbar && mihawk_taskbar && taskbar_prototype)
++    {
++        /* Windows 11's default: an icon waits behind the chevron (taskbar_hidden_icons), off the bar */
++        pos.x = -icon_cx;
++        pos.y = (tray_height - icon_cy) / 2;
++    }
++    else if (enable_taskbar)
+     {
+         pos.x = tray_width - icon_cx * (icon->display + 1) - (mihawk_taskbar ? taskbar_clock_width : 0);
+         pos.y = (tray_height - icon_cy) / 2;
+@@ -1667,15 +1673,88 @@
+         DrawCaptionTempW( 0, dis->hDC, &rect, 0, 0, start_label, flags | DC_INBUTTON | DC_ICON );
+ }
+ 
++/* The hidden icons (the chevron), as the prototype's .tb-trayflyout: on its acrylic (PS5_DWMSBT_FLYOUT), centred over
++ * the chevron 12 px above the bar, 40 x 40 slots 44 px apart, three a row. The notification area's own icon windows
++ * move into it while it is open, so a click reaches the program as it would on the bar. */
++static HWND taskbar_hidden;
++static LRESULT CALLBACK taskbar_hidden_proc( HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam )
++{
++    switch (msg)
++    {
++    case WM_ACTIVATE: if (LOWORD(wparam) == WA_INACTIVE) ShowWindow( hwnd, SW_HIDE ); return 0;
++    case WM_CLOSE: ShowWindow( hwnd, SW_HIDE ); return 0;
++    case WM_ERASEBKGND:
++    {
++        RECT box; HDC dc = (HDC)wparam;
++        if (GetClipBox( dc, &box ) != ERROR) PatBlt( dc, box.left, box.top, box.right - box.left, box.bottom - box.top, BLACKNESS );
++        return 1;
++    }
++    }
++    return DefWindowProcW( hwnd, msg, wparam, lparam );
++}
++static void taskbar_hidden_icons(void)
++{
++    struct icon *icon; unsigned count = 0, i = 0, columns, rows; RECT chevron, area; MSG msg; int result = 1;
++    DWORD corner = DWMWCP_ROUND, dark = taskbar_dark, backdrop = 7 /* PS5_DWMSBT_FLYOUT */, colour = DWMWA_COLOR_DEFAULT;
++    MARGINS sheet = {-1, -1, -1, -1}; WNDCLASSW wc = {0};
++    if (taskbar_hidden) { ShowWindow( taskbar_hidden, SW_HIDE ); return; }
++    LIST_FOR_EACH_ENTRY( icon, &icon_list, struct icon, entry ) if (icon->display >= 0) ++count;
++    if (!count) return;  /* as on Windows: nothing hidden, nothing to show */
++    columns = min( count, 3 ); rows = (count + columns - 1) / columns;
++    GetWindowRect( taskbar_chevron, &chevron );
++    if (!SystemParametersInfoW( SPI_GETWORKAREA, 0, &area, 0 )) return;
++    wc.lpfnWndProc = taskbar_hidden_proc; wc.hInstance = GetModuleHandleW( NULL ); wc.hCursor = LoadCursorW( NULL, (LPCWSTR)IDC_ARROW );
++    wc.lpszClassName = L"MihawkHiddenIcons"; RegisterClassW( &wc );
++    int width = 10 + 44 * columns, height = 10 + 44 * rows;
++    taskbar_hidden = CreateWindowExW( WS_EX_TOOLWINDOW | WS_EX_TOPMOST, wc.lpszClassName, L"Hidden icons", WS_POPUP | WS_CLIPCHILDREN,
++                                      (chevron.left + chevron.right - width) / 2, area.bottom - 12 - height, width, height,
++                                      tray_window, NULL, wc.hInstance, NULL );
++    if (!taskbar_hidden) return;
++    DwmSetWindowAttribute( taskbar_hidden, DWMWA_WINDOW_CORNER_PREFERENCE, &corner, sizeof(corner) );
++    DwmSetWindowAttribute( taskbar_hidden, DWMWA_USE_IMMERSIVE_DARK_MODE, &dark, sizeof(dark) );
++    DwmSetWindowAttribute( taskbar_hidden, DWMWA_BORDER_COLOR, &colour, sizeof(colour) );
++    DwmExtendFrameIntoClientArea( taskbar_hidden, &sheet );
++    DwmSetWindowAttribute( taskbar_hidden, DWMWA_SYSTEMBACKDROP_TYPE, &backdrop, sizeof(backdrop) );
++    LIST_FOR_EACH_ENTRY( icon, &icon_list, struct icon, entry )
++    {
++        if (icon->display < 0) continue;
++        SetParent( icon->window, taskbar_hidden );
++        SetWindowSubclass( icon->window, pw_shell_glass_child, 2, 0 );
++        SetWindowPos( icon->window, 0, 7 + 44 * (i % columns), 7 + 44 * (i / columns), 40, 40, SWP_NOACTIVATE | SWP_NOZORDER | SWP_SHOWWINDOW );
++        ++i;
++    }
++    ShowWindow( taskbar_hidden, SW_SHOW ); SetForegroundWindow( taskbar_hidden );
++    while (IsWindowVisible( taskbar_hidden ) && (result = GetMessageW( &msg, NULL, 0, 0 )) > 0)
++    {
++        if (msg.message == WM_KEYDOWN && msg.wParam == VK_ESCAPE) { ShowWindow( taskbar_hidden, SW_HIDE ); continue; }
++        TranslateMessage( &msg ); DispatchMessageW( &msg );
++    }
++    if (!result) PostQuitMessage( (int)msg.wParam );
++    /* the icons go back behind the chevron */
++    LIST_FOR_EACH_ENTRY( icon, &icon_list, struct icon, entry )
++    {
++        POINT pos;
++        if (icon->display < 0 || GetParent( icon->window ) != taskbar_hidden) continue;
++        RemoveWindowSubclass( icon->window, pw_shell_glass_child, 2 );
++        SetParent( icon->window, tray_window ); pos = get_icon_pos( icon );
++        SetWindowPos( icon->window, 0, pos.x, pos.y, icon_cx, icon_cy, SWP_NOACTIVATE | SWP_NOZORDER );
++    }
++    DestroyWindow( taskbar_hidden ); taskbar_hidden = NULL;
++}
++
+ static void click_taskbar_button( HWND button )
+ {
+     LONG_PTR id = GetWindowLongPtrW( button, GWLP_ID );
+     HWND hwnd = (HWND)id;
+ 
+     if (mihawk_taskbar && button == taskbar_overflow) { taskbar_overflow_menu(); return; }
+-    if (mihawk_taskbar && button == taskbar_search) { do_startmenu( tray_window ); return; }
+-    /* Task View, the hidden icons and Quick Settings have no native surface yet: the buttons are drawn, not wired. */
+-    if (mihawk_taskbar && (button == taskbar_taskview || button == taskbar_chevron || button == taskbar_status)) return;
++    /* the search pill opens Start's Search view (wine/ps5/pw_shell_start.c), as the prototype's does */
++    if (mihawk_taskbar && button == taskbar_search) { pw_shell_search( tray_window ); return; }
++    /* the prototype's flyouts (wine/ps5/pw_shell_flyouts.c); Task View has no native surface yet: drawn, not wired */
++    if (mihawk_taskbar && button == taskbar_status) { pw_shell_quick_settings( tray_window ); return; }
++    if (mihawk_taskbar && button == taskbar_clock) { pw_shell_notifications( tray_window ); return; }
++    if (mihawk_taskbar && button == taskbar_chevron) { taskbar_hidden_icons(); return; }
++    if (mihawk_taskbar && button == taskbar_taskview) return;
+     for (int i = 0; mihawk_taskbar && i < PW_TASKBAR_PINS; ++i)
+         if (button == taskbar_pins[i])
+         {
+@@ -2189,7 +2268,7 @@
+         taskbar_fallback = LoadImageW(taskbar_icons, MAKEINTRESOURCEW(PW_ICON_ORIGINAL_DOCUMENT), IMAGE_ICON, PW_APPEARANCE_TASKBAR_ICON_SIZE, PW_APPEARANCE_TASKBAR_ICON_SIZE, 0);
+         taskbar_more[0] = LoadImageW(taskbar_icons, MAKEINTRESOURCEW(PW_ICON_LIGHT_ARROW_DOWN_WIDE_NARROW), IMAGE_ICON, PW_APPEARANCE_TASKBAR_ICON_SIZE, PW_APPEARANCE_TASKBAR_ICON_SIZE, 0);
+         taskbar_more[1] = LoadImageW(taskbar_icons, MAKEINTRESOURCEW(PW_ICON_DARK_ARROW_DOWN_WIDE_NARROW), IMAGE_ICON, PW_APPEARANCE_TASKBAR_ICON_SIZE, PW_APPEARANCE_TASKBAR_ICON_SIZE, 0);
+-        taskbar_clock = CreateWindowW(L"STATIC", L"", WS_CHILD | WS_VISIBLE | SS_OWNERDRAW,
++        taskbar_clock = CreateWindowW(L"STATIC", L"", WS_CHILD | WS_VISIBLE | SS_OWNERDRAW | SS_NOTIFY,
+                                      0, 0, 0, 0, tray_window, (HMENU)0xfff1, NULL, NULL);
+         taskbar_overflow = CreateWindowW(WC_BUTTONW, L"More applications", WS_CHILD | WS_TABSTOP | BS_OWNERDRAW,
+                                         0, 0, 0, 0, tray_window, (HMENU)0xfff0, NULL, NULL);

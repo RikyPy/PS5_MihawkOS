@@ -1,0 +1,67 @@
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Subject: [PATCH] ntdll: PS5: include native mappings in Windows address queries
+
+VirtualQuery called the payload carrier at 0x400000 MEM_FREE, so an emulator
+failed its placeholder reservation with STATUS_CONFLICTING_ADDRESSES.
+Keep Windows views authoritative, exclude Wine-owned reservations from the
+host census, and report remaining native mappings as unavailable. Query the
+current map rather than retaining synthetic views after native unload.
+---
+--- a/dlls/ntdll/unix/virtual.c
++++ b/dlls/ntdll/unix/virtual.c
+@@ -201,6 +201,8 @@
+ extern int __wine_ps5_munmap( void *addr, size_t len );
+ extern int __wine_ps5_mprotect( void *addr, size_t len, int prot );
+ extern int __wine_ps5_dmem_region( void *base, size_t size );
++typedef int (*pw_wine_vm_owned_query)( const void *, void **, void ** );
++extern int pw_wine_vm_gap( const void *, const void *, pw_wine_vm_owned_query, void **, void ** );
+ #define host_mmap __wine_ps5_mmap
+ #define host_munmap __wine_ps5_munmap
+ #define host_mprotect __wine_ps5_mprotect
+@@ -6486,6 +6488,24 @@
+ }
+ 
+ 
++#ifdef __PROSPERO__
++/* Wine owns and locks this list; the PS5 helper subtracts its reservations
++ * from the live native map. Windows views remain authoritative. */
++static int query_wine_reserved_area( const void *address, void **start, void **end )
++{
++    struct reserved_area *area;
++
++    LIST_FOR_EACH_ENTRY( area, &reserved_areas, struct reserved_area, entry )
++    {
++        *start = area->base;
++        *end = (char *)area->base + area->size;
++        if (*end > address) return 0;
++    }
++    return 1;
++}
++#endif
++
++
+ static struct file_view *get_memory_region_size( char *base, char **region_start, char **region_end,
+                                                  BOOL *fake_reserved )
+ {
+@@ -6517,6 +6537,21 @@
+             return view;
+         }
+     }
++#ifdef __PROSPERO__
++    {
++        void *start, *end;
++        int status = pw_wine_vm_gap( base, *region_end, query_wine_reserved_area, &start, &end );
++
++        if (status < 0) WARN( "cannot query native mapping at %p\n", base );
++        else
++        {
++            *region_start = max( *region_start, (char *)start );
++            *region_end = end;
++        }
++        /* A failed native query must not advertise unverified space as free. */
++        *fake_reserved = status != 0;
++    }
++#endif
+ #ifdef __i386__
+     {
+         struct reserved_area *area;

@@ -1,0 +1,137 @@
+From: PS5_Proton
+Subject: [PATCH] Wine: bind real GPU HWNDs and publish canonical client clips
+
+Publish only independently rendered GPU children in addition to top-level
+windows. Reuse Wine visible-region calculations for controls and nested HWNDs.
+Bind the native Vulkan surface to its full HWND and server lifetime; never
+infer a window from the foreground process.
+
+--- a/server/window.c
++++ b/server/window.c
+@@ -165,6 +165,11 @@
+ static pthread_mutex_t ps5_snapshot_mutex = PTHREAD_MUTEX_INITIALIZER;
+ static PwWindowSnapshot ps5_snapshot;
+ struct desktop *ps5_hardware_desktop(void);
++static int is_visible(const struct window *win);
++static inline int is_desktop_window(const struct window *win);
++static struct region *get_visible_region(struct window *win,unsigned int flags);
++static inline void client_to_screen_rect(struct window *win,struct rectangle *rect);
++static inline void map_win_region_to_screen(struct window *win,struct region *region);
+ 
+ DECLSPEC_EXPORT int pw_wineserver_windows(void *output, unsigned int bytes)
+ {
+@@ -202,9 +207,52 @@
+     row->top = win->visible_rect.top;
+     row->right = win->visible_rect.right;
+     row->bottom = win->visible_rect.bottom;
+-    if ((win->style & WS_VISIBLE) && !(win->style & WS_MINIMIZE))row->flags |= PW_WINDOW_VISIBLE;
++    {
++        struct rectangle visible=win->visible_rect,client=win->client_rect;
++        client_to_screen_rect(win->parent,&visible);
++        client_to_screen_rect(win->parent,&client);
++        row->left=visible.left;row->top=visible.top;row->right=visible.right;row->bottom=visible.bottom;
++        row->client_left=client.left;row->client_top=client.top;
++        row->client_right=client.right;row->client_bottom=client.bottom;
++    }
++    if(win->parent && !is_desktop_window(win->parent))row->flags|=PW_WINDOW_CHILD;
++    if(win->paint_flags & PAINT_HAS_PIXEL_FORMAT)
++    {
++        struct region *region=get_visible_region((struct window *)win,DCX_CLIPCHILDREN|DCX_CLIPSIBLINGS);
++        struct rectangle *rects;
++        data_size_t bytes=0;
++        row->flags|=PW_WINDOW_CLIENT;
++        if(!region) {snapshot->overflow=1;return;}
++        map_win_region_to_screen((struct window *)win,region);
++        rects=get_region_data_and_free(region,sizeof(snapshot->clips),&bytes);
++        if(!rects || bytes/sizeof(*rects)>PW_WINDOW_CLIP_LIMIT-snapshot->clip_count)
++        {free(rects);snapshot->overflow=1;return;}
++        row->clip_start=snapshot->clip_count;
++        row->clip_count=bytes/sizeof(*rects);
++        for(unsigned int i=0;i<row->clip_count;++i)
++        {
++            struct rectangle *rect=&rects[i];
++            snapshot->clips[snapshot->clip_count++]=(PwWindowClip){rect->left,rect->top,rect->right,rect->bottom};
++        }
++        free(rects);
++    }
++    if (is_visible(win) && !(win->style & WS_MINIMIZE))row->flags |= PW_WINDOW_VISIBLE;
+     if (desktop)row->flags |= PW_WINDOW_DESKTOP;
+     if (win->win_region || (win->ex_style & WS_EX_LAYERED))row->flags |= PW_WINDOW_UNSUPPORTED;
++}
++
++/* GDI children draw into their parent's surface. Publish only child HWNDs
++ * carrying independent pixel formats, with Wine's existing visible regions.
++ * Children precede their parent in this topmost-first record. */
++static void ps5_snapshot_children(PwWindowSnapshot *snapshot,const struct window *parent,unsigned int depth)
++{
++    struct window *win;
++    if(depth>64) {snapshot->overflow=1;return;}
++    LIST_FOR_EACH_ENTRY(win,&parent->children,struct window,entry)
++    {
++        ps5_snapshot_children(snapshot,win,depth+1);
++        if(win->paint_flags & PAINT_HAS_PIXEL_FORMAT)ps5_snapshot_add(snapshot,win,0);
++    }
+ }
+ 
+ void ps5_windows_publish(void)
+@@ -224,7 +272,10 @@
+         if (desktop->top_window)
+         {
+             LIST_FOR_EACH_ENTRY(win, &desktop->top_window->children, struct window, entry)
++            {
++                ps5_snapshot_children(&snapshot,win,0);
+                 ps5_snapshot_add(&snapshot,win,0);
++            }
+             ps5_snapshot_add(&snapshot,desktop->top_window,1);
+         }
+         release_object(desktop);
+--- a/dlls/win32u/ps5drv.c
++++ b/dlls/win32u/ps5drv.c
+@@ -856,6 +856,7 @@
+ #ifdef SONAME_LIBVULKAN
+ 
+ static int (*release_display)(void);
++static int (*bind_gpu_window)(VkSurfaceKHR,UINT,UINT64);
+ 
+ static VkResult ps5_vulkan_surface_create( HWND hwnd, BOOL raw, const struct vulkan_instance *instance,
+                                            VkSurfaceKHR *handle, struct client_surface **client )
+@@ -867,6 +868,7 @@
+     uint32_t count = 1, chosen = 0, i;
+     VkResult res;
+ 
++    if(window_surfaces)hwnd=get_full_window_handle(hwnd);
+     *client = NULL;
+     *handle = VK_NULL_HANDLE;
+ 
+@@ -910,6 +912,22 @@
+     info.imageExtent = modes[chosen].parameters.visibleRegion;
+     if (!(*client = nulldrv_client_surface_create( hwnd ))) return VK_ERROR_OUT_OF_HOST_MEMORY;
+     res = instance->p_vkCreateDisplayPlaneSurfaceKHR( instance->host.instance, &info, NULL, handle );
++    if (res == VK_SUCCESS && window_surfaces)
++    {
++        UINT64 generation=0;
++        SERVER_START_REQ(get_window_info)
++        {
++            req->handle=wine_server_user_handle(hwnd);
++            if(!wine_server_call(req) && reply->native_pid==getpid())generation=reply->generation;
++        }
++        SERVER_END_REQ;
++        if(!generation || !bind_gpu_window || bind_gpu_window(*handle,(UINT)(UINT_PTR)hwnd,generation))
++        {
++            instance->p_vkDestroySurfaceKHR(instance->host.instance,*handle,NULL);
++            *handle=VK_NULL_HANDLE;
++            res=VK_ERROR_SURFACE_LOST_KHR;
++        }
++    }
+     if (res != VK_SUCCESS)
+     {
+         client_surface_release( *client );
+@@ -955,6 +973,8 @@
+         ERR( "version mismatch, win32u wants %u but driver has %u\n", version, WINE_VULKAN_DRIVER_VERSION );
+         return STATUS_INVALID_PARAMETER;
+     }
++    bind_gpu_window=dlsym(vulkan_handle,"pw_gpu_vulkan_bind_window");
++    if(window_surfaces && !bind_gpu_window)return STATUS_NOT_SUPPORTED;
+     *driver_funcs = &ps5_vulkan_driver_funcs;
+     return STATUS_SUCCESS;
+ }

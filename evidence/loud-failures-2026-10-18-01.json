@@ -1,0 +1,30 @@
+{
+  "battery": "loud-failures-2026-10-18-01",
+  "expected_cases": [
+    "launcher-ended",
+    "games-autodetect",
+    "notice-fixed-base32"
+  ],
+  "revision": "f11e3ad27c9b3c72a331ddacb14dd3795f0df79d",
+  "dirty": false,
+  "cases": [
+    {
+      "case": "launcher-ended",
+      "run": "loud-failures-2026-10-18-01-launcher-ended",
+      "runner_status": 1,
+      "seconds": 54.9,
+      "result": "title still running",
+      "probe_verdict": null,
+      "returned_to_launcher": false,
+      "exit_stall": null,
+      "passed": false,
+      "run_seconds": null,
+      "launch_readiness": null,
+      "stages": null
+    }
+  ],
+  "stopped_after": "launcher-ended",
+  "complete": false,
+  "seconds": 55.0,
+  "passed": false
+}

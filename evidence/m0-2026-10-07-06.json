@@ -1,0 +1,16 @@
+{
+ "run": "m0-2026-10-07-06",
+ "elf_sha256": "45c3103d163d563e2f188b7324593b0ef330da9ad44f1120a849e3f1f5682afa",
+ "process": "payload through websrv/elfldr, no title running",
+ "modes": {
+  "signal32fsraw": {
+   "lines": [
+    "M0 start mode=signal32fsraw",
+    "M0 low_page at=10000000",
+    "M0 registration through _sigaction=resolved",
+    "M0 signal32fs armed"
+   ],
+   "ended": false
+  }
+ }
+}

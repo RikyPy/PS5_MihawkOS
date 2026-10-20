@@ -1,0 +1,101 @@
+# Where LLVM's disassembler and the console's CPU (AMD Zen 2) disagree about a long-mode encoding, or
+# where LLVM's MC description of an instruction is not what it does (docs/MMU4K.md, section 4.1).
+# One line per disagreement that tools/ia32-decode-oracle.sh --64 reports and we keep on purpose:
+#
+#   <KIND> <MAP>:<opcode hex>[-<opcode hex>][/<ModRM.reg>] [p=<prefix set>,...] <reason>
+#
+# The format is tests/ia32-llvm-differences.txt's; p= also names a VEX payload class
+# (vex.<pp>.L<l>.W<w>[.v], pp one of np 66 f3 f2, .v for a vvvv in use). KIND adds the long-mode
+# checks: STORE_MISSED, STORE_EXTRA, FLOW and STACK compare the table's attributes with LLVM's MC
+# description. Lines marked "as 32-bit" repeat a reason tests/ia32-llvm-differences.txt gives, which
+# the CPU sweep there confirmed; the rest are not yet confirmed on the console's CPU.
+
+# Encodings the CPU executes and LLVM does not decode (as 32-bit).
+OURS_ONLY PRI:F1 F1 is INT1 (ICEBP) on the CPU, a one-byte debug trap (as 32-bit).
+OURS_ONLY PRI:C0-C1/6 /6 of group 2 is SAL, the same operation as SHL /4 (AMD documents it; as 32-bit).
+OURS_ONLY PRI:D0-D3/6 /6 of group 2 is SAL, the same operation as SHL /4 (AMD documents it; as 32-bit).
+OURS_ONLY PRI:F6-F7/1 /1 of group 3 is TEST again on the CPU, with its immediate (as 32-bit).
+OURS_ONLY PRI:90 p=66f3 66 F3 90 is PAUSE on the CPU (66 changes nothing in it; as 32-bit).
+OURS_ONLY 0F:0D The 0F 0D group is a prefetch or a reserved NOP for every ModRM on the CPU (as 32-bit).
+OURS_ONLY 0F:18-1F 0F 18-1F are the reserved hint NOPs: the CPU runs every encoding of them (as 32-bit).
+OURS_ONLY PRI:D9/3 FSTP1 (D9 D8+i), an alias of FSTP ST(i) (as 32-bit).
+OURS_ONLY PRI:DB/4 FENI, FDISI, FSETPM (DB E0/E1/E4) run as FNOP on the CPU (as 32-bit).
+OURS_ONLY PRI:DC/2 FCOM2 (DC D0+i), an alias of FCOM ST(i) (as 32-bit).
+OURS_ONLY PRI:DC/3 FCOMP3 (DC D8+i), an alias of FCOMP ST(i) (as 32-bit).
+OURS_ONLY PRI:DD/1 FXCH4 (DD C8+i), an alias of FXCH ST(i) (as 32-bit).
+OURS_ONLY PRI:DE/2 FCOMP5 (DE D0+i), an alias of FCOMP ST(i) (as 32-bit).
+OURS_ONLY PRI:DF/1 FXCH7 (DF C8+i), an alias of FXCH ST(i) (as 32-bit).
+OURS_ONLY PRI:DF/2 FSTP8 (DF D0+i), an alias of FSTP ST(i) (as 32-bit).
+OURS_ONLY PRI:DF/3 FSTP9 (DF D8+i), an alias of FSTP ST(i) (as 32-bit).
+LLVM_ONLY PRI:8E/1 MOV CS, r/m is #UD on the CPU; LLVM decodes it (as 32-bit).
+
+# Encodings that are #UD on Zen 2 and LLVM decodes.
+LLVM_ONLY PRI:C4-C5 p=66,f3,f2,f0,40,41,42,44,48,4f,6648,4866,f348,f24c,f048,6641,6667,66f3,f266,6748 A legacy prefix (66, F2, F3, LOCK) or REX before VEX is #UD; LLVM ignores it.
+LLVM_ONLY PRI:D5 D5 is #UD in long mode (AAD is gone); LLVM decodes APX's REX2, which Zen 2 does not have.
+
+# AMD's SSE4a, which the console's Zen 2 has and LLVM decodes as Intel's VMREAD (as 32-bit).
+LENGTH 0F:78 p=66,6667,f266,f2,4866,6641,6648,f24c With 66 or F2, 0F 78 is EXTRQ/INSERTQ on AMD, and two imm8 follow.
+
+# Operand size: where LLVM and the CPU (AMD) disagree on 66.
+LENGTH PRI:E8 p=66,6667,66f3,f266,4866,6641 AMD makes 66 CALL rel16 (the console's CPU: we decode rel16 and give no form); LLVM follows Intel, which ignores the 66.
+LENGTH 0F:80-8F p=6648 REX.W after 66 makes the operand size 64, so Jcc keeps rel32 (we give no form, as for any 66 near branch); LLVM keeps the 66 and reads rel16.
+
+# LLVM lets F2/F3 cancel a 66 before them; on the CPU F2/F3 select nothing in these forms and 66
+# still sets the operand size (as 32-bit, where the CPU sweep confirmed our lengths).
+LENGTH 0F:80-8F p=66f3,f266 Jcc rel: 66 makes the displacement 16-bit (as 32-bit).
+LENGTH PRI:C7 p=66f3 MOV Ev, Iz (and XBEGIN): 66 makes the immediate 16-bit (as 32-bit).
+TEXT PRI:86-89 p=66f3 XRELEASE XCHG/MOV: 66 makes it a 16-bit operation (as 32-bit).
+TEXT PRI:91-97 p=66f3 XRELEASE XCHG: 66 makes it a 16-bit operation (as 32-bit).
+TEXT 0F:1F p=66f3,f266 In the 0F map LLVM prints a 16-bit register beside a 32-bit memory operand; 66 makes both 16-bit (as 32-bit).
+TEXT 0F:40-4F p=66f3,f266 As 0F:1F.
+TEXT 0F:A3-A5 p=66f3,f266 As 0F:1F.
+TEXT 0F:AB-AD p=66f3,f266 As 0F:1F.
+TEXT 0F:AF p=66f3,f266 As 0F:1F.
+TEXT 0F:B1 p=66f3,f266 As 0F:1F.
+TEXT 0F:B3 p=66f3,f266 As 0F:1F.
+TEXT 0F:BA-BD p=66f3,f266 As 0F:1F.
+TEXT 0F:C1 p=66f3,f266 As 0F:1F.
+
+# The hint NOPs LLVM names after extensions (as 32-bit): prefetchwt1, prefetchrst2, cldemote, and the
+# CET and BHI encodings (rdsspd, ibhf), all NOPs where the extension is off or absent, as on Zen 2.
+TEXT 0F:0D The 0F 0D/0F 18 hints LLVM names as prefetches it knows; we print NOP (as 32-bit).
+TEXT 0F:18-1F As 0F:0D.
+
+# Long-mode spellings where LLVM reads prefixes otherwise than the CPU.
+TEXT PRI:86-89 p=f348,f24c F2/F3 then REX: the REX sits where it must, between the legacy prefixes and the opcode, and the CPU still reads XACQUIRE/XRELEASE; LLVM wants F2/F3 right before the opcode and prints rep.
+TEXT PRI:91-97 p=f348,f24c As PRI:86-89.
+TEXT PRI:C6-C7 p=f348 As PRI:86-89.
+TEXT PRI:90 p=f348,f24c F3 (F2) with REX.W before 90 is PAUSE (NOP) on the CPU, REX.W changing nothing in it; LLVM names it XCHG RAX, RAX.
+TEXT PRI:A0 p=6667,6748 MOV AL, moffs32 (67): LLVM names the byte forms MOVABS with addr32 when another prefix comes too.
+TEXT PRI:A2 p=6667,6748 As PRI:A0.
+TEXT PRI:E3 p=6748 The address size picks JECXZ (67) or JRCXZ, as the SDM says; LLVM picks by REX.W.
+TEXT 0F:7E p=f348 F3 0F 7E is MOVQ xmm, xmm/m64 whatever REX.W; LLVM drops the F3 and reads MOVQ r/m64, mm.
+TEXT 0F:AE/6 p=6748 NP 0F AE F0-F7 is MFENCE; after 67 REX.W LLVM reads a 66 that is not there and names it TPAUSE (66 0F AE /6, absent on Zen 2).
+TEXT 0F:AE/7 p=6748 NP 0F AE /7 is CLFLUSH; after 67 REX.W LLVM reads a 66 that is not there and names it CLFLUSHOPT (67 41 or 48 alone: CLFLUSH, as we say).
+TEXT PRI:E5 p=48,4f,6648,6748,f048,f24c,f348 IN/OUT ignore REX.W (port I/O is at most 32-bit, and #GP in user mode); the row prints the 64-bit register name.
+TEXT PRI:E7 p=48,4f,6648,6748,f048,f24c,f348 As PRI:E5.
+TEXT PRI:ED p=48,4f,6648,6748,f048,f24c,f348 As PRI:E5.
+TEXT PRI:EF p=48,4f,6648,6748,f048,f24c,f348 As PRI:E5.
+TEXT 0F:C7/7 p=f3,f348,66f3 RDPID's destination is 64-bit in long mode; the shared row's Ed prints the 32-bit name (a register-only form).
+
+# LLVM's MC description: what it records for an instruction against what the CPU does. A row's STACK
+# is right where LLVM lists no RSP; a fence, hint or trap is not a store of memory a run could place.
+STACK PRI:C2-C3 RET pops RIP from [RSP]; LLVM's description lists no RSP.
+STACK PRI:C8 ENTER pushes RBP and moves RSP; LLVM's description lists no RSP.
+STACK PRI:CA-CB RETF pops RIP and CS from [RSP]; LLVM's description lists no RSP.
+STACK PRI:CF IRET pops from [RSP]; LLVM's description lists no RSP.
+STACK 0F:A0-A1 PUSH FS / POP FS use [RSP]; LLVM's description lists no RSP.
+STACK 0F:A8-A9 PUSH GS / POP GS use [RSP]; LLVM's description lists no RSP.
+STORE_MISSED PRI:90 p=f3 PAUSE stores nothing; LLVM marks it as touching memory.
+STORE_MISSED PRI:CC-CD INT3 and INT n trap; LLVM marks them as touching memory.
+STORE_MISSED 0F:0D/0 PREFETCH loads a cache line and stores nothing; LLVM marks it as storing.
+STORE_MISSED 0F:18/0 PREFETCHNTA/T0/T1/T2 store nothing; LLVM marks them as storing.
+STORE_MISSED 0F:18/1 As 0F:18/0.
+STORE_MISSED 0F:18/2 As 0F:18/0.
+STORE_MISSED 0F:18/3 As 0F:18/0.
+STORE_MISSED 0F:0D/1 PREFETCHW stores nothing; LLVM marks it as storing.
+STORE_MISSED 0F:77 EMMS stores nothing; LLVM marks it as touching memory.
+STORE_MISSED 0F:AE/2 LDMXCSR loads MXCSR from memory and stores nothing; LLVM marks it as storing.
+STORE_MISSED 0F:AE/5 LFENCE stores nothing; LLVM marks fences as touching memory.
+STORE_MISSED 0F:AE/6 MFENCE stores nothing; LLVM marks fences as touching memory.
+STORE_MISSED 0F:AE/7 SFENCE stores nothing; LLVM marks fences as touching memory.

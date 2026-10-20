@@ -1,0 +1,152 @@
+{
+ "telemetry_hold": null,
+ "launch_readiness": {
+  "ready": true,
+  "seconds": 0.208,
+  "settle_seconds": 0.0,
+  "census_seconds": 0.185,
+  "previous_cleanup_verified": true
+ },
+ "native_close_failures": [],
+ "run": "mihawk-alpha-gate-2026-10-09-09-gl-upload32",
+ "what": "gl-upload32-probe.exe",
+ "env": [
+  "PROTON_LAYOUT=launcher"
+ ],
+ "result": "finished",
+ "seconds": 16.8,
+ "probe_verdict": "PASS",
+ "clean_owner_restart": true,
+ "launcher_end_status": 0,
+ "initial_status": 0,
+ "closed_on_request": false,
+ "child_logs": [
+  "klog/mihawk-alpha-gate-2026-10-09-09-gl-upload32-wine-child-1421.log",
+  "klog/mihawk-alpha-gate-2026-10-09-09-gl-upload32-wine-child-1422.log",
+  "klog/mihawk-alpha-gate-2026-10-09-09-gl-upload32-wine-child-1423.log",
+  "klog/mihawk-alpha-gate-2026-10-09-09-gl-upload32-wine-child-1424.log",
+  "klog/mihawk-alpha-gate-2026-10-09-09-gl-upload32-wine-child-1425.log",
+  "klog/mihawk-alpha-gate-2026-10-09-09-gl-upload32-wine-child-1426.log",
+  "klog/mihawk-alpha-gate-2026-10-09-09-gl-upload32-wine-child-1427.log",
+  "klog/mihawk-alpha-gate-2026-10-09-09-gl-upload32-wine-child-1428.log",
+  "klog/mihawk-alpha-gate-2026-10-09-09-gl-upload32-wine-child-1429.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": true,
+ "bench": {},
+ "steady": {
+  "server": {
+   "calls": 0.0,
+   "per_s": 0.0,
+   "avg_us": 0.0,
+   "selects": 0.0,
+   "blocked": 0.0,
+   "block_avg_us": 0.0,
+   "waits": 0.0,
+   "handles_avg": 0.0,
+   "wait_all": 0.0,
+   "polled": 0.0,
+   "delays": 0.0,
+   "yields": 0.0,
+   "intervals": 1
+  }
+ },
+ "intervals": {
+  "frames": [],
+  "server": [
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   }
+  ],
+  "top": []
+ },
+ "shown": {
+  "frames": 107,
+  "per_10s": [
+   107
+  ],
+  "longest_gap_ms": 1141
+ },
+ "broker": {
+  "local_offer": 8589934592,
+  "host_limit": 1073741824,
+  "refused": [],
+  "refused_count": 0,
+  "clients": [
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": 1422,
+    "frames": 120,
+    "submissions": 374
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   }
+  ],
+  "wedged": false,
+  "failure_reasons": [],
+  "host_peak": 415924224,
+  "local_peak": 499515392
+ },
+ "captures": [],
+ "cleanup_verified": true,
+ "hooks_removed": true
+}

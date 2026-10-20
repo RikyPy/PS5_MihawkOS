@@ -1,0 +1,204 @@
+{
+ "cpp": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 0.0,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 41,
+   "todo": 0
+  },
+  "todo_lines": 0
+ },
+ "environ": {
+  "exit_code": 2,
+  "failure_count": 2,
+  "failures": [
+   {
+    "file": "environ.c",
+    "line": 314,
+    "text": "Couldn't create child process Z:\\<workspace>\\PS5_Proton\\.deps\\wine-tests\\exe\\ucrtbase_test.exe environ, create"
+   },
+   {
+    "file": "environ.c",
+    "line": 314,
+    "text": "No child process handle (CreateProcess failed?)"
+   }
+  ],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 0.0,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 2,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 124,
+   "todo": 0
+  },
+  "todo_lines": 0
+ },
+ "file": {
+  "exit_code": 2,
+  "failure_count": 2,
+  "failures": [
+   {
+    "file": "file.c",
+    "line": 449,
+    "text": "_spawnl returned -1, errno 22"
+   },
+   {
+    "file": "file.c",
+    "line": 453,
+    "text": "Timed out waiting for the child process"
+   }
+  ],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 30.1,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 2,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 505,
+   "todo": 4
+  },
+  "todo_lines": 4
+ },
+ "misc": {
+  "exit_code": 7,
+  "failure_count": 7,
+  "failures": [
+   {
+    "file": "misc.c",
+    "line": 498,
+    "text": "No child process handle (CreateProcess failed?)"
+   },
+   {
+    "file": "misc.c",
+    "line": 1251,
+    "text": "child process wait failed"
+   },
+   {
+    "file": "misc.c",
+    "line": 1253,
+    "text": "child process exited with code -1"
+   },
+   {
+    "file": "misc.c",
+    "line": 1261,
+    "text": "exit_event was not set (102)"
+   },
+   {
+    "file": "misc.c",
+    "line": 1352,
+    "text": "child process wait failed"
+   },
+   {
+    "file": "misc.c",
+    "line": 1354,
+    "text": "child process exited with code -1"
+   },
+   {
+    "file": "misc.c",
+    "line": 1361,
+    "text": "quick_exit_event was not set (102)"
+   }
+  ],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 0.1,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 7,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 199026,
+   "todo": 1
+  },
+  "todo_lines": 1
+ },
+ "printf": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 0.0,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 1950,
+   "todo": 0
+  },
+  "todo_lines": 0
+ },
+ "scanf": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 0.0,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 369,
+   "todo": 9
+  },
+  "todo_lines": 9
+ },
+ "string": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 0.1,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 787359,
+   "todo": 0
+  },
+  "todo_lines": 0
+ },
+ "thread": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 0.0,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 60,
+   "todo": 0
+  },
+  "todo_lines": 0
+ }
+}

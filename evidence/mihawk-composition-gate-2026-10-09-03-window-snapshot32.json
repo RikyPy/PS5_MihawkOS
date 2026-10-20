@@ -1,0 +1,144 @@
+{
+ "launch_readiness": {
+  "ready": true,
+  "seconds": 0.196,
+  "settle_seconds": 0.0,
+  "census_seconds": 0.165,
+  "previous_cleanup_verified": true
+ },
+ "run": "mihawk-composition-gate-2026-10-09-03-window-snapshot32",
+ "what": "C:\\windows\\system32\\mihawk.exe",
+ "env": [
+  "PROTON_WINDOW_SNAPSHOT_PROBE=1",
+  "PROTON_LAYOUT=launcher"
+ ],
+ "result": "finished",
+ "seconds": 26.4,
+ "probe_verdict": "PASS",
+ "clean_owner_restart": true,
+ "launcher_end_status": 0,
+ "initial_status": 0,
+ "closed_on_request": false,
+ "child_logs": [
+  "klog/mihawk-composition-gate-2026-10-09-03-window-snapshot32-wine-child-5308.log",
+  "klog/mihawk-composition-gate-2026-10-09-03-window-snapshot32-wine-child-5309.log",
+  "klog/mihawk-composition-gate-2026-10-09-03-window-snapshot32-wine-child-5310.log",
+  "klog/mihawk-composition-gate-2026-10-09-03-window-snapshot32-wine-child-5311.log",
+  "klog/mihawk-composition-gate-2026-10-09-03-window-snapshot32-wine-child-5312.log",
+  "klog/mihawk-composition-gate-2026-10-09-03-window-snapshot32-wine-child-5313.log",
+  "klog/mihawk-composition-gate-2026-10-09-03-window-snapshot32-wine-child-5314.log",
+  "klog/mihawk-composition-gate-2026-10-09-03-window-snapshot32-wine-child-5315.log",
+  "klog/mihawk-composition-gate-2026-10-09-03-window-snapshot32-wine-child-5316.log",
+  "klog/mihawk-composition-gate-2026-10-09-03-window-snapshot32-wine-child-5317.log",
+  "klog/mihawk-composition-gate-2026-10-09-03-window-snapshot32-wine-child-5318.log",
+  "klog/mihawk-composition-gate-2026-10-09-03-window-snapshot32-wine-child-5319.log",
+  "klog/mihawk-composition-gate-2026-10-09-03-window-snapshot32-wine-child-5320.log",
+  "klog/mihawk-composition-gate-2026-10-09-03-window-snapshot32-wine-child-5321.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": true,
+ "bench": {},
+ "steady": {
+  "server": {
+   "calls": 0.0,
+   "per_s": 0.0,
+   "avg_us": 0.0,
+   "selects": 0.0,
+   "blocked": 0.0,
+   "block_avg_us": 0.0,
+   "waits": 0.0,
+   "handles_avg": 0.0,
+   "wait_all": 0.0,
+   "polled": 0.0,
+   "delays": 0.0,
+   "yields": 0.0,
+   "intervals": 3
+  }
+ },
+ "intervals": {
+  "frames": [],
+  "server": [
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   }
+  ],
+  "top": []
+ },
+ "shown": {
+  "frames": 85,
+  "per_10s": [
+   49,
+   36
+  ],
+  "longest_gap_ms": 1313
+ },
+ "broker": {
+  "local_offer": null,
+  "host_limit": null,
+  "refused": [],
+  "refused_count": 0,
+  "clients": [],
+  "wedged": false,
+  "failure_reasons": [],
+  "host_peak": null,
+  "local_peak": null
+ },
+ "captures": [],
+ "cleanup_verified": true,
+ "hooks_removed": true
+}

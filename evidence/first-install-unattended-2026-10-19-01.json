@@ -1,0 +1,72 @@
+{
+  "name": "first-install-unattended-2026-10-19-01",
+  "launch_readiness": {
+    "ready": true,
+    "seconds": 0.536,
+    "settle_seconds": 0.0,
+    "census_seconds": 0.526,
+    "previous_cleanup_verified": true
+  },
+  "milestones": [
+    "[MihawkOS] elevation: ok (filesystem access)",
+    "[MihawkOS] ends: status 0",
+    "[MihawkOS] elevation: ok (filesystem access)",
+    "[MihawkOS] setup: unattended (scripted presses, real engine)",
+    "[MihawkOS] setup: step 0",
+    "[MihawkOS] setup: starts at step 0 (record done=0 runtime=0 prefix=0 returning=0), 9 languages, language en-US",
+    "[MihawkOS] setup: step 1",
+    "[MihawkOS] setup: language en-US",
+    "[MihawkOS] setup: step 2",
+    "[MihawkOS] setup: step 3",
+    "[MihawkOS] setup: drive check: phase 1 problem 0, 1552643644 bytes",
+    "[MihawkOS] install: from /mnt/usb0/mihawkos, 143 pieces, 1552643644 bytes",
+    "[MihawkOS] setup: install starts",
+    "[MihawkOS] setup: step 4",
+    "[MihawkOS] setup: install 3 problem 0, 0 of 1552643644 bytes in 0.0 s",
+    "[MihawkOS] install: failed into /data/ps5proton status=0 errno=0 path= written=48161767 of 1552643644 files=8 chunks=1 of 143 in 59.4 s: Could not read /mnt/usb0/mihawkos/ef8b50a3905dcea5cdba51067d44c48aac13aa7647d802cd918ce22b6fcbab27.zst: Device not configured. Check the storage, then press CROSS to try again.",
+    "[MihawkOS] setup: install 5 problem 6, 48161767 of 1552643644 bytes in 59.4 s"
+  ],
+  "stop_lines": [],
+  "launches": [
+    "prime",
+    "install"
+  ],
+  "primed": {
+    "folder_made": true,
+    "logs_made": true,
+    "early_lines": [
+      "elevation: granted=1 status=ok uid=0 note=",
+      "first run: dev.conf written (1), /data/ps5proton made, /data/ps5proton/logs made",
+      "elevation: ok (filesystem access)"
+    ]
+  },
+  "install_done": false,
+  "storage_errors": 48,
+  "hooks_removed": true,
+  "passed": false,
+  "capture": "klog/first-install-unattended-2026-10-19-01",
+  "diagnosis": {
+    "verdict": "failed: the USB stick disconnected during the install (hardware or link); the install engine reported it cleanly",
+    "klog": [
+      "umass0: USB_ERR_TIMEOUT",
+      "(da1:umass-sim1:1:0:0): READ(10). CDB: 28 00 00 16 09 80 00 01 00 00",
+      "umass0: at uhub1, port 3, addr 1 (disconnected)",
+      "da1: < USB DISK 3.0 PMAP> s/n <masked> detached",
+      "g_vfs_done():da1s1[READ(offset=738394112, length=131072)]error = 6",
+      "[PS][fserr] 0x80020006,0x00000001,****/da1s1,****/usb0,eboot.bin,"
+    ],
+    "install": "install: failed into /data/ps5proton ... written=48161767 of 1552643644 files=8 chunks=1 of 143 in 59.4 s: Could not read /mnt/usb0/mihawkos/ef8b50a3...zst (the tour: problem read_failed)",
+    "storage_errors_scope": "all 48 on da1s1 (/mnt/usb0, the stick); none on the internal SSD (no [IOD] or nsid1 lines)",
+    "console_guard": "recorded the PlayGoCore ReportCorruptPackageError lines as storage damage: no launch or write until a person clears it (tools/console_guard.py clear-storage)",
+    "proved_on_the_way": [
+      "Check drive no longer crashes (statfs removed): drive check phase 1 problem 0, 1552643644 bytes",
+      "priming: first run wrote dev.conf, made /data/ps5proton and logs/ before root; granted",
+      "the scripted tour walked Welcome, Language en-US, How to install, Prepare a USB drive, Install"
+    ],
+    "not_covered": [
+      "presses from the script, not the DualSense",
+      "no PS5 restart before it: a resident Lapy daemon answered"
+    ],
+    "next": "the owner moved the stick to another port; run -02 retries in place after the guard is cleared"
+  }
+}

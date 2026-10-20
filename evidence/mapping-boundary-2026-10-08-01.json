@@ -1,0 +1,28 @@
+{
+ "run": "mapping-boundary-2026-10-08-01",
+ "read_only": false,
+ "temporary_direct_backing_bytes": 0,
+ "kernel_reads": false,
+ "kernel_writes": false,
+ "no_overwrite": true,
+ "payload": true,
+ "elf_sha256": "c4e783abd65bc1095aad90b7e4ad5a75cdad5287c490ef0e1f73af1c88a4c586",
+ "source_sha256": "bd70ac7159a8fc4ace4972d26b7225bd333f1218cbfb3e75dac27737a91881b8",
+ "completed": true,
+ "passed": false,
+ "purpose": "measure the ordinary reservation boundary, not claim extended mapping support",
+ "lines": [
+  "mapping-class identity role=payload abi=0x1 status=0 guard=1 app=0 header4=0 header8=0 header12=0",
+  "mapping-class memconf status=0 size=8 version=1 flags=0x1",
+  "mapping-boundary address=0xfc00000000 status=0x80020016 exact=0",
+  "mapping-boundary address=0xfffff00000 status=0x80020016 exact=0",
+  "mapping-boundary address=0x10000000000 status=0x80020016 exact=0",
+  "mapping-boundary address=0x20000000000 status=0x80020016 exact=0",
+  "mapping-boundary address=0x40000000000 status=0x80020016 exact=0",
+  "mapping-boundary address=0x80000000000 status=0x80020016 exact=0",
+  "mapping-boundary address=0x100000000000 status=0x80020016 exact=0",
+  "mapping-boundary address=0x400000000000 status=0x80020016 exact=0",
+  "mapping-boundary address=0x7ffffff00000 status=0x80020016 exact=0",
+  "mapping-boundary completed=9 expected=9"
+ ]
+}

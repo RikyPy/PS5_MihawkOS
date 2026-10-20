@@ -1,0 +1,95 @@
+From e52e10a344eb0193933c8db432bf00f59a14fe73 Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Tue, 6 Oct 2026 23:10:00 -0400
+Subject: [PATCH] server: PS5: read and write a helper process's memory through
+ the helper
+
+On the PS5 every Windows program but the title's own runs in a helper
+process, and the server lives in the title. read_process_memory refused
+every process but the title, and write_process_memory wrote into the
+title's own pages at the address it was given, whatever the target
+process was. remote-memory-probe-2026-10-06-01, on the console, in a
+helper: VirtualAllocEx and VirtualProtectEx into a suspended child
+worked; every ReadProcessMemory and WriteProcessMemory failed, the
+child's included and the process's own (Wine sends both to the server).
+Chromium's sandbox writes its target's memory before the target runs, so
+a launcher's browser could not start its GPU process ("GPU process isn't
+usable. Goodbye."). Crash reporters, launchers and hooking libraries do
+the same.
+
+The title gives the server a copier (pw_wineserver_set_remote_memory),
+which asks the helper to copy through a service socket the helper opened
+to the title. A write to another process never touches the title's
+memory now. Without a copier the server refuses, as before.
+---
+ server/ptrace.c | 37 ++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 36 insertions(+), 1 deletion(-)
+
+diff --git a/server/ptrace.c b/server/ptrace.c
+index c06dd17..200762e 100644
+--- a/server/ptrace.c
++++ b/server/ptrace.c
+@@ -530,17 +530,50 @@ static data_size_t ps5_copy_memory( int writing, char *local, const char *target
+     }
+     return done;
+ }
++
++/* Another process's memory: a helper process runs each Windows program but the title's own, and its memory is
++ * not this process's. The title copies it through the helper (pw_ps5_child_memory in PS5_Proton's
++ * wine/ps5/pw_wine_process.c), which it gives here at start. Chromium's sandbox, crash reporters, launchers and
++ * hooking libraries read and write other processes, and a process its own through WriteProcessMemory: every one
++ * of those calls was refused (remote-memory-probe-2026-10-06-01), and a launcher's browser could not start its GPU
++ * process. The copier returns 0 with *done bytes copied, or -1 when the helper cannot be reached. */
++static int (*ps5_remote_memory)( int pid, int writing, unsigned long long address, void *buffer, unsigned int size,
++                                 unsigned int *done );
++void pw_wineserver_set_remote_memory( int (*copy)( int pid, int writing, unsigned long long address, void *buffer,
++                                                   unsigned int size, unsigned int *done ) )
++{
++    ps5_remote_memory = copy;
++}
++static int ps5_remote_copy( struct process *process, int writing, client_ptr_t ptr, data_size_t size, char *local,
++                            data_size_t *written )
++{
++    unsigned int done = 0;
++
++    if (!ps5_remote_memory || ps5_remote_memory( process->unix_pid, writing, ptr, local, size, &done ))
++    {
++        set_error( STATUS_ACCESS_DENIED );
++        return 0;
++    }
++    if (written) *written = done;
++    if (done != size)
++    {
++        set_error( STATUS_PARTIAL_COPY );
++        return 0;
++    }
++    return 1;
++}
+ #endif
+ 
+ /* read data from a process memory space */
+ int read_process_memory( struct process *process, client_ptr_t ptr, data_size_t size, char *dest )
+ {
+ #ifdef __PROSPERO__
+-    if (process->unix_pid != getpid() || (unsigned long)ptr != ptr)
++    if ((unsigned long)ptr != ptr)
+     {
+         set_error( STATUS_ACCESS_DENIED );
+         return 0;
+     }
++    if (process->unix_pid != getpid()) return ps5_remote_copy( process, 0, ptr, size, dest, NULL );
+     if (ps5_copy_memory( 0, dest, (const char *)(unsigned long)ptr, size ) != size)
+     {
+         set_error( STATUS_PARTIAL_COPY );
+@@ -672,6 +705,8 @@ int write_process_memory( struct process *process, client_ptr_t ptr, data_size_t
+         set_error( STATUS_ACCESS_DENIED );
+         return 0;
+     }
++    /* Not this process's memory: written here, it went to the title's own pages at that address. */
++    if (process->unix_pid != getpid()) return ps5_remote_copy( process, 1, ptr, size, (char *)src, written );
+     done = ps5_copy_memory( 1, (char *)src, (const char *)(unsigned long)ptr, size );
+     if (written) *written = done;
+     if (done != size)
+-- 
+2.56.0
+

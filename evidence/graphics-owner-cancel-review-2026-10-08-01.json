@@ -1,0 +1,13 @@
+{
+  "run": "evidence/graphics-owner-cancel-2026-10-08-01.json",
+  "status": "inconclusive for owner-wide cancellation; normal close passed",
+  "renderer_frames": 167,
+  "renderer_submissions": 502,
+  "capture": "klog/graphics-owner-cancel-2026-10-08-01-capture-01.png",
+  "capture_review": "colored triangle presented",
+  "server_termination_requested": false,
+  "reason": "The native owner probe overrides do not belong to the initial helper environment whitelist. Child used default 180 frames and completed before server cancellation deadline; actual swapchain default 1280x720, not requested 640x360. No force close or pressure change.",
+  "broker_wedged": false,
+  "native_helpers_remaining": 0,
+  "next": "Explicit owner-cancel mode in the probe itself uses its existing 640x360 four-frame lifecycle, then waits with both processes alive."
+}

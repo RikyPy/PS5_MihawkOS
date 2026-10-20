@@ -1,0 +1,62 @@
+From: PS5_Proton <local>
+Subject: [PATCH] win32u: a PS5 window surface flush takes no user lock
+
+win32u flushes a window surface with the surface's lock held, and any thread that pumps messages flushes every
+surface of its process (flush_window_surfaces). update_surface_region takes the user lock (get_win_ptr) and then the
+surface's lock. The PS5 driver's flush asked win32u for the window's WS_EX_LAYERED (get_window_long, the user lock)
+before publishing a changed input shape (patch 0990), the other way round: two threads deadlocked.
+
+Seen in MihawkBrowser in the desktop session (PS5_Proton, 2026-10-18, record removed from the tree; in git history; and the owner's own session the
+same day: a search loaded with status 200, then a blank or frozen page and a window that would not close). The hang
+snapshot showed the browser's UI thread, last request get_window_region (apply_window_pos's update_surface_region),
+and Chromium's occlusion-tracker thread ("ThreadPoolSingleThreadCOMSTASharedForegroundBlocking", which pumps
+messages), last request get_message, both 96,746 ms old, neither in a server nor a sync-device wait; the WM_CLOSE
+posted to the window stayed in the UI thread's queue. The tracker reacts to every window change in the session, so
+Explorer's windows made the race likely; any program with a second thread that pumps messages can meet it.
+
+The driver now keeps WS_EX_LAYERED in its own window record, from WindowPosChanged and SetWindowStyle (both called
+without the user lock), and the flush reads it under the screen lock.
+
+--- a/dlls/win32u/ps5drv.c
++++ b/dlls/win32u/ps5drv.c
+@@ -88,6 +88,7 @@
+     BOOL input_shape_valid;
+     UINT input_shape_mode;
+     RECT input_shape_rect;
++    BOOL layered;           /* WS_EX_LAYERED as the style callbacks last said: a flush must not ask win32u */
+ };
+ 
+ static int (*present_frame)( const void *bgra, UINT width, UINT height, UINT stride );
+@@ -329,7 +330,7 @@
+                                      UINT width, UINT height, UINT opacity,
+                                      const void *shape, UINT stride, size_t bytes, BOOL changed)
+ {
+-    BOOL layered=get_window_long(window->hwnd,GWL_EXSTYLE)&WS_EX_LAYERED;
++    BOOL layered=window->layered;
+     UINT mode=!layered ? 0 : !opacity ? 2 : shape ? 1 : 0;
+     BOOL okay;
+     NTSTATUS status;
+@@ -491,6 +492,7 @@
+ {
+     struct ps5_window *window;
+     UINT style = NtUserGetWindowLongW( hwnd, GWL_STYLE );
++    UINT ex_style = NtUserGetWindowLongW( hwnd, GWL_EXSTYLE );
+     BOOL shown = (style & WS_VISIBLE) && !(style & WS_MINIMIZE) &&
+                  (NtUserGetAncestor( hwnd, GA_PARENT ) == get_desktop_window() ||
+                   (window_surfaces && hwnd == get_desktop_window()));
+@@ -532,6 +534,7 @@
+         repaint = shown && !window->shown;
+         window->visible = new_rects->visible;
+         window->shown = shown;
++        window->layered = !!(ex_style & WS_EX_LAYERED);
+         if (changed) compose_screen();
+     }
+     pthread_mutex_unlock( &screen_lock );
+@@ -1140,6 +1143,7 @@
+     {
+         window->opacity = 255;
+         window->input_shape_valid = FALSE;
++        window->layered = !!(style->styleNew & WS_EX_LAYERED);
+     }
+     pthread_mutex_unlock( &screen_lock );
+ }

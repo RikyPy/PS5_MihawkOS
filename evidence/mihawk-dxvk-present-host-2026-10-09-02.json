@@ -1,0 +1,23 @@
+{
+ "oracle": "Linux Wine 11.18 with pinned DXVK v3.1-19-g601930949",
+ "runs": [
+  {
+   "bits": 64,
+   "exit_code": 1,
+   "stdout": "MIHAWK_DXVK_PRESENT FAIL bits=64 actual=0,0,0 step=display status=0x80004005\n",
+   "probe_sha256": "ff198edfdc5ed40a61a02f8d8ba7ec834e320dc1e13aa60a85124d967a017c3c"
+  },
+  {
+   "bits": 32,
+   "exit_code": 1,
+   "stdout": "MIHAWK_DXVK_PRESENT FAIL bits=32 actual=0,0,0 step=display status=0x80004005\n",
+   "probe_sha256": "9ff136b65d07371ca6594cfdf5aadb8b9468e640e1409c4dc5214b8f07cbe488"
+  }
+ ],
+ "scope": "Owned window GDI drawable observation after ordinary ClearRenderTargetView and Present; no D3D readback",
+ "source_sha256": "93d656c46ffb17ea7bed7c11dbac048e2926f42fa19dc6c5f3b8810faf119e4b",
+ "passed": false,
+ "observed_failure": "Both owned window drawable samples are RGB 0,0,0 after repeated unbound ClearRenderTargetView and Present, matching console black content.",
+ "console_qualified": false,
+ "windows_equivalence_verified": false
+}

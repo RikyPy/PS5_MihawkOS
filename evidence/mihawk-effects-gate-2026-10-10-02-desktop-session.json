@@ -1,0 +1,259 @@
+{
+ "telemetry_hold": null,
+ "launch_readiness": {
+  "ready": true,
+  "seconds": 0.18,
+  "settle_seconds": 0.0,
+  "census_seconds": 0.166,
+  "previous_cleanup_verified": true
+ },
+ "native_close_failures": [],
+ "run": "mihawk-effects-gate-2026-10-10-02-desktop-session",
+ "what": "profile mihawk-os",
+ "env": [],
+ "result": "finished",
+ "seconds": 25.1,
+ "probe_verdict": "PASS",
+ "clean_owner_restart": true,
+ "launcher_end_status": 0,
+ "initial_status": 0,
+ "closed_on_request": false,
+ "child_logs": [
+  "klog/mihawk-effects-gate-2026-10-10-02-desktop-session-wine-child-3160.log",
+  "klog/mihawk-effects-gate-2026-10-10-02-desktop-session-wine-child-3161.log",
+  "klog/mihawk-effects-gate-2026-10-10-02-desktop-session-wine-child-3162.log",
+  "klog/mihawk-effects-gate-2026-10-10-02-desktop-session-wine-child-3163.log",
+  "klog/mihawk-effects-gate-2026-10-10-02-desktop-session-wine-child-3164.log",
+  "klog/mihawk-effects-gate-2026-10-10-02-desktop-session-wine-child-3165.log",
+  "klog/mihawk-effects-gate-2026-10-10-02-desktop-session-wine-child-3166.log",
+  "klog/mihawk-effects-gate-2026-10-10-02-desktop-session-wine-child-3167.log",
+  "klog/mihawk-effects-gate-2026-10-10-02-desktop-session-wine-child-3168.log",
+  "klog/mihawk-effects-gate-2026-10-10-02-desktop-session-wine-child-3169.log",
+  "klog/mihawk-effects-gate-2026-10-10-02-desktop-session-wine-child-3170.log",
+  "klog/mihawk-effects-gate-2026-10-10-02-desktop-session-wine-child-3171.log",
+  "klog/mihawk-effects-gate-2026-10-10-02-desktop-session-wine-child-3172.log",
+  "klog/mihawk-effects-gate-2026-10-10-02-desktop-session-wine-child-3173.log",
+  "klog/mihawk-effects-gate-2026-10-10-02-desktop-session-wine-child-3174.log",
+  "klog/mihawk-effects-gate-2026-10-10-02-desktop-session-wine-child-3175.log",
+  "klog/mihawk-effects-gate-2026-10-10-02-desktop-session-wine-child-3176.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": true,
+ "bench": {},
+ "steady": {
+  "server": {
+   "calls": 0.0,
+   "per_s": 0.0,
+   "avg_us": 0.0,
+   "selects": 0.0,
+   "blocked": 0.0,
+   "block_avg_us": 0.0,
+   "waits": 0.0,
+   "handles_avg": 0.0,
+   "wait_all": 0.0,
+   "polled": 0.0,
+   "delays": 0.0,
+   "yields": 0.0,
+   "intervals": 2
+  }
+ },
+ "intervals": {
+  "frames": [],
+  "server": [
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   }
+  ],
+  "top": []
+ },
+ "shown": {
+  "frames": 7,
+  "per_10s": [
+   1,
+   6
+  ],
+  "longest_gap_ms": 2125
+ },
+ "broker": {
+  "local_offer": 8589934592,
+  "host_limit": 1073741824,
+  "refused": [],
+  "refused_count": 0,
+  "clients": [
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": 3174,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": 3175,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": 3176,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": 3171,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": 3170,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": 3173,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   }
+  ],
+  "wedged": false,
+  "failure_reasons": [],
+  "host_peak": 8454144,
+  "local_peak": 0
+ },
+ "captures": [
+  "klog/mihawk-effects-gate-2026-10-10-02-desktop-session-capture-01.png",
+  "klog/mihawk-effects-gate-2026-10-10-02-desktop-session-capture-02.png",
+  "klog/mihawk-effects-gate-2026-10-10-02-desktop-session-capture-03.png"
+ ],
+ "pad_script": [
+  "# The probe requests each displayed capture after the actual child/browser is ready."
+ ],
+ "cleanup_verified": true,
+ "hooks_removed": true,
+ "session_passed": true,
+ "display_pixels": [
+  {
+   "capture": "klog/mihawk-effects-gate-2026-10-10-02-desktop-session-capture-01.png",
+   "architecture": 64,
+   "actual": [
+    30,
+    110,
+    210
+   ],
+   "expected": [
+    30,
+    110,
+    210
+   ],
+   "passed": true
+  },
+  {
+   "capture": "klog/mihawk-effects-gate-2026-10-10-02-desktop-session-capture-02.png",
+   "architecture": 32,
+   "actual": [
+    30,
+    180,
+    70
+   ],
+   "expected": [
+    30,
+    180,
+    70
+   ],
+   "passed": true
+  },
+  {
+   "capture": "klog/mihawk-effects-gate-2026-10-10-02-desktop-session-capture-03.png",
+   "window": "File Explorer",
+   "light_pixels": 557530,
+   "passed": true
+  }
+ ]
+}

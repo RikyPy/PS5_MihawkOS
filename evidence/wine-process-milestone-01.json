@@ -1,0 +1,145 @@
+{
+  "scope": "Experimental headless PE64 children sharing the original Wine server; production defaults unchanged",
+  "passed": true,
+  "console_cases": {
+    "basic": {
+      "run": "wine-process-basic-05",
+      "passed": true,
+      "native_children": 2,
+      "native_children_deleted": 2,
+      "native_fatal_records": 0,
+      "runtime_sha256": {
+        "ntdll": "384f1854fec6acc851f5d3a27f3cc7b7b87d40ca9aadd2589dbeb903f9b65090",
+        "wineserver": "9dc0637c4ba021ecacd43fc1f299c9842846f41d661bb6386e7b1dfbb7b3471d"
+      },
+      "probe_sha256": "16fc72852a17469d5c3eac7f6eed5ed16e52312ec56f660f74b077fde333669c"
+    },
+    "suspended": {
+      "run": "wine-process-suspended-03",
+      "passed": true,
+      "native_children": 2,
+      "native_children_deleted": 2,
+      "native_fatal_records": 0,
+      "runtime_sha256": {
+        "ntdll": "384f1854fec6acc851f5d3a27f3cc7b7b87d40ca9aadd2589dbeb903f9b65090",
+        "wineserver": "9dc0637c4ba021ecacd43fc1f299c9842846f41d661bb6386e7b1dfbb7b3471d"
+      },
+      "probe_sha256": "16fc72852a17469d5c3eac7f6eed5ed16e52312ec56f660f74b077fde333669c"
+    },
+    "terminate": {
+      "run": "wine-process-terminate-03",
+      "passed": true,
+      "native_children": 2,
+      "native_children_deleted": 2,
+      "native_fatal_records": 0,
+      "runtime_sha256": {
+        "ntdll": "384f1854fec6acc851f5d3a27f3cc7b7b87d40ca9aadd2589dbeb903f9b65090",
+        "wineserver": "9dc0637c4ba021ecacd43fc1f299c9842846f41d661bb6386e7b1dfbb7b3471d"
+      },
+      "probe_sha256": "16fc72852a17469d5c3eac7f6eed5ed16e52312ec56f660f74b077fde333669c"
+    },
+    "repeat": {
+      "run": "wine-process-repeat-05",
+      "passed": true,
+      "native_children": 5,
+      "native_children_deleted": 5,
+      "native_fatal_records": 0,
+      "runtime_sha256": {
+        "ntdll": "3cb65e3f43d7214a5beaa3194210630ea7c70092f438e0942414ff935ef764b5",
+        "wineserver": "9dc0637c4ba021ecacd43fc1f299c9842846f41d661bb6386e7b1dfbb7b3471d"
+      },
+      "probe_sha256": "ce96a7b2931fa4395d91eb6e35ed4571043c7ab1dff6d4180ac749c884d68bfe"
+    },
+    "parent_exit": {
+      "run": "wine-process-parent-exit-02",
+      "passed": true,
+      "native_children": 2,
+      "native_children_deleted": 2,
+      "native_fatal_records": 0,
+      "runtime_sha256": {
+        "ntdll": "384f1854fec6acc851f5d3a27f3cc7b7b87d40ca9aadd2589dbeb903f9b65090",
+        "wineserver": "9dc0637c4ba021ecacd43fc1f299c9842846f41d661bb6386e7b1dfbb7b3471d"
+      },
+      "probe_sha256": "16fc72852a17469d5c3eac7f6eed5ed16e52312ec56f660f74b077fde333669c"
+    },
+    "default_disabled": {
+      "run": "wine-process-disabled-01",
+      "passed": true,
+      "native_children": 0,
+      "native_children_deleted": 0,
+      "native_fatal_records": 0,
+      "runtime_sha256": {
+        "ntdll": "3cb65e3f43d7214a5beaa3194210630ea7c70092f438e0942414ff935ef764b5",
+        "wineserver": "9dc0637c4ba021ecacd43fc1f299c9842846f41d661bb6386e7b1dfbb7b3471d"
+      },
+      "probe_sha256": "ce96a7b2931fa4395d91eb6e35ed4571043c7ab1dff6d4180ac749c884d68bfe"
+    }
+  },
+  "native_lifecycle_runs": [
+    "service-native-reuse-01",
+    "service-native-parent-close-01"
+  ],
+  "host_baseline": "process-probe-host-verified.json",
+  "host_baseline_revision": "a518d643873ff733bafb31595dfd01ab8bbdf790",
+  "ps5_wine_base": "1c78596625336a73dbfc035dbbcf0dbdd95b06eb",
+  "final_prx_audit": {
+    "ntdll": {
+      "sha256": "3cb65e3f43d7214a5beaa3194210630ea7c70092f438e0942414ff935ef764b5",
+      "needed": [
+        "libSceLibcInternal.sprx",
+        "libSceSystemService.sprx",
+        "libkernel.sprx"
+      ],
+      "unresolved": [],
+      "errors": [],
+      "raw_syscalls": [],
+      "title_unbound": []
+    },
+    "wineserver": {
+      "sha256": "9dc0637c4ba021ecacd43fc1f299c9842846f41d661bb6386e7b1dfbb7b3471d",
+      "needed": [
+        "libSceLibcInternal.sprx",
+        "libkernel.sprx"
+      ],
+      "unresolved": [],
+      "errors": [],
+      "raw_syscalls": [],
+      "title_unbound": []
+    }
+  },
+  "portable_tests": {
+    "passed": true,
+    "tests": [
+      "test_pw_fd_census",
+      "test_pw_wine_prx",
+      "test_pw_wine_start",
+      "test_pw_wine_threads"
+    ],
+    "sanitizers": [
+      "address",
+      "undefined"
+    ],
+    "leak_sanitizer": "disabled after sandbox/ptrace runtime failure"
+  },
+  "production_restore": {
+    "smoke_run": "wine-process-production-restore-01",
+    "launcher_run": "wine-process-restored-launcher-01",
+    "signed_self_sha256": "8f63bbc57bd9203520653d9e3eb765798a434b737ac6c1f79b106437542761c3",
+    "signed_runtime_sha256": {
+      "ntdll": "f4913c21e631b3d2e3caa36ca7e50bd7cd0853760c5ee4ae30b1b655a988a353",
+      "wineserver": "622be687a65dc27de9e53e60d542f0bb2ed3725bf9ea36d1973f8ea8c87a351f"
+    },
+    "frames": 120,
+    "fps_after_first_half": 59.9,
+    "fault_records": 0,
+    "driver_errors": 0,
+    "shell_idle": true
+  },
+  "remaining": [
+    "Descendant spawning through the owning title",
+    "Child graphics/display lifetime",
+    "Remote native debugging/memory/scheduling",
+    "Extended startup flags and attributes",
+    "Representative applications and targeted process conformance"
+  ]
+}

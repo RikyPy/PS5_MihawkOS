@@ -1,0 +1,68 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+Subject: [PATCH] ntdll: zero partial host pages on Windows decommit
+
+When host pages are larger than Windows pages, decommit cannot replace a
+partial host page without discarding neighboring data. Clear the committed
+Windows pages in those boundaries and restore their host protection union.
+Recommit then returns zeroed bytes as required, preserving neighbors.
+
+The synthetic probe passes with 4 KiB host pages and fails on its second
+commit under isolated 16 KiB host bookkeeping before this patch. Console
+qualification remains separate. SPDX-License-Identifier: LGPL-2.1-or-later
+
+--- a/dlls/ntdll/unix/virtual.c
++++ b/dlls/ntdll/unix/virtual.c
+@@ -3019,21 +3019,44 @@
+  */
+ static NTSTATUS decommit_pages( struct file_view *view, char *base, size_t size )
+ {
+-    char *host_end, *host_start = (char *)ROUND_SIZE( 0, base, host_page_mask );
+-
+-    if (!size)
+-    {
+-        size = view->size;
+-        host_end = host_start + view->size;
+-    }
+-    else host_end = ROUND_ADDR( base + size, host_page_mask );
++    char *page, *end, *host_end, *host_start = (char *)ROUND_SIZE( 0, base, host_page_mask );
++    unsigned int phase;
++
++    if (!size) size = view->size;
++    end = base + size;
++    host_end = ROUND_ADDR( end, host_page_mask );
++
++    /* Complete host pages are replaced below. A partial host page cannot
++     * be discarded without losing its neighbors, so clear only the Windows
++     * pages being decommitted. Recommitting them must return zeroed memory.
++     * Prepare both boundaries before clearing either, so a protection failure
++     * can restore the original union without destroying existing contents. */
++    for (phase = 0; phase < 2; ++phase)
++        for (page = base; page < end; page += page_size)
++        {
++            if (page >= host_start && page < host_end)
++            {
++                page = host_end;
++                if (page == end) break;
++            }
++            if (!(get_page_vprot( page ) & VPROT_COMMITTED)) continue;
++            if (phase) memset( page, 0, page_size );
++            else if (mprotect_range( page, page_size, VPROT_READ | VPROT_WRITE,
++                                     VPROT_GUARD | VPROT_WRITEWATCH ))
++            {
++                mprotect_range( base, size, 0, 0 );
++                return STATUS_ACCESS_DENIED;
++            }
++        }
+ 
+     if (host_start < host_end) anon_mmap_fixed( host_start, host_end - host_start, PROT_NONE, 0 );
+     set_page_vprot_bits( base, size, 0, VPROT_COMMITTED );
+     if (host_start < host_end) kernel_writewatch_register_range( view, host_start, host_end - host_start );
++    /* Restore the union after the temporary writes, including a boundary
++     * host page whose last committed Windows page was just decommitted. */
++    if (mprotect_range( base, size, 0, 0 )) return STATUS_ACCESS_DENIED;
+     return STATUS_SUCCESS;
+ }
+-
+ 
+ /***********************************************************************
+  *           remove_pages_from_view

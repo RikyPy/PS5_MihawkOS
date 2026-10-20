@@ -1,0 +1,21 @@
+{
+ "run": "dmem-share-2026-10-12-01",
+ "mib": 64,
+ "elf_sha256": "e8e3eaa80020ed5e6f35b671a8dbad862cb9bcebf3c0168312024d32a85420fb",
+ "passed": false,
+ "lines": [
+  "--- hold",
+  "dmem-share hold-before pid=3000 status=0 resident_kib=3504 mapped_kib=16864",
+  "dmem-share hold allocation=0 map=0 offset=429719552 bytes=67108864",
+  "dmem-share hold-written pid=3000 status=0 resident_kib=3504 mapped_kib=16864",
+  "dmem-share hold: other side finished, its mark NOT seen here",
+  "dmem-share hold-after pid=3000 status=0 resident_kib=3552 mapped_kib=16992",
+  "PS5_PROTON_DMEM_SHARE FAIL side=hold mark=0 unmap=0 release=0",
+  "",
+  "--- map",
+  "dmem-share map-before pid=3001 status=0 resident_kib=3552 mapped_kib=16992",
+  "dmem-share map status=0x8002000d offset=429719552 bytes=67108864",
+  "PS5_PROTON_DMEM_SHARE FAIL side=map status=0x8002000d contents=0 unmap=0xffffffff",
+  ""
+ ]
+}

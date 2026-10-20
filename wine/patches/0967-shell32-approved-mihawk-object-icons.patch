@@ -1,0 +1,172 @@
+From: Mihawk <local@invalid>
+Subject: [PATCH] shell32: use approved Mihawk object icons at existing resource IDs
+
+Keep shell identity, filesystem behavior and application-provided icons intact.
+Build the resources from pinned editable SVGs before compiling shell32.
+
+--- a/dlls/shell32/shell32.rc
++++ b/dlls/shell32/shell32.rc
+@@ -421,28 +421,28 @@
+ END
+ 
+ /* FIXME: Following resource is not yet added */
+-/* @makedep: resources/document.ico */
+-IDI_SHELL_FILE ICON resources/document.ico
+-
+-/* @makedep: resources/document.ico */
+-IDI_SHELL_DOCUMENT ICON resources/document.ico
++/* @makedep: resources/mihawk/document.ico */
++IDI_SHELL_FILE ICON resources/mihawk/document.ico
++
++/* @makedep: resources/mihawk/document.ico */
++IDI_SHELL_DOCUMENT ICON resources/mihawk/document.ico
+ 
+ /* @makedep: resources/window.ico */
+ IDI_SHELL_WINDOW ICON resources/window.ico
+ 
+-/* @makedep: resources/folder.ico */
+-IDI_SHELL_FOLDER ICON resources/folder.ico
+-
+-/* @makedep: resources/folder_open.ico */
+-IDI_SHELL_FOLDER_OPEN ICON resources/folder_open.ico
++/* @makedep: resources/mihawk/folder.ico */
++IDI_SHELL_FOLDER ICON resources/mihawk/folder.ico
++
++/* @makedep: resources/mihawk/folder-open.ico */
++IDI_SHELL_FOLDER_OPEN ICON resources/mihawk/folder-open.ico
+ 
+ /* FIXME: Following three resources are not yet added */
+-/* @makedep: resources/folder_open.ico */
+-IDI_SHELL_FOLDER_OPEN_SMALL ICON resources/folder_open.ico
+-/* @makedep: resources/folder_open.ico */
+-IDI_SHELL_FOLDER_OPEN_LARGE ICON resources/folder_open.ico
+-/* @makedep: resources/folder_open.ico */
+-IDI_SHELL_FOLDER_SMALL_XP ICON resources/folder_open.ico
++/* @makedep: resources/mihawk/folder-open.ico */
++IDI_SHELL_FOLDER_OPEN_SMALL ICON resources/mihawk/folder-open.ico
++/* @makedep: resources/mihawk/folder-open.ico */
++IDI_SHELL_FOLDER_OPEN_LARGE ICON resources/mihawk/folder-open.ico
++/* @makedep: resources/mihawk/folder-open.ico */
++IDI_SHELL_FOLDER_SMALL_XP ICON resources/mihawk/folder-open.ico
+ 
+ /* FIXME: Following resource is not yet added */
+ /* @makedep: resources/disk_drive.ico */
+@@ -455,8 +455,8 @@
+ /* @makedep: resources/disk_drive.ico */
+ IDI_SHELL_FLOPPY ICON resources/disk_drive.ico
+ 
+-/* @makedep: resources/drive.ico */
+-IDI_SHELL_DRIVE ICON resources/drive.ico
++/* @makedep: resources/mihawk/drive.ico */
++IDI_SHELL_DRIVE ICON resources/mihawk/drive.ico
+ 
+ /* @makedep: resources/netdrive.ico */
+ IDI_SHELL_NETDRIVE ICON resources/netdrive.ico
+@@ -476,8 +476,8 @@
+ /* @makedep: resources/network.ico */
+ IDI_SHELL_NETWORK ICON resources/network.ico
+ 
+-/* @makedep: resources/mycomputer.ico */
+-IDI_SHELL_MY_COMPUTER ICON resources/mycomputer.ico
++/* @makedep: resources/mihawk/this-pc.ico */
++IDI_SHELL_MY_COMPUTER ICON resources/mihawk/this-pc.ico
+ 
+ /* @makedep: resources/printer.ico */
+ IDI_SHELL_PRINTER ICON resources/printer.ico
+@@ -515,15 +515,18 @@
+ /* @makedep: resources/shortcut.ico */
+ IDI_SHELL_SHORTCUT ICON resources/shortcut.ico
+ 
+-/* @makedep: resources/trash_full.ico */
+-IDI_SHELL_FULL_RECYCLE_BIN ICON resources/trash_full.ico
++/* @makedep: resources/mihawk/recycle-empty.ico */
++IDI_SHELL_EMPTY_RECYCLE_BIN ICON resources/mihawk/recycle-empty.ico
++
++/* @makedep: resources/mihawk/recycle-full.ico */
++IDI_SHELL_FULL_RECYCLE_BIN ICON resources/mihawk/recycle-full.ico
+ 
+ /* FIXME: Following resource is not yet added */
+ /* @makedep: resources/folder.ico */
+ IDI_SHELL_MODEM_FOLDER ICON resources/folder.ico
+ 
+-/* @makedep: resources/desktop.ico */
+-IDI_SHELL_DESKTOP ICON resources/desktop.ico
++/* @makedep: resources/mihawk/desktop.ico */
++IDI_SHELL_DESKTOP ICON resources/mihawk/desktop.ico
+ 
+ /* @makedep: resources/control.ico */
+ IDI_SHELL_CONTROL_PANEL ICON resources/control.ico
+@@ -759,11 +762,11 @@
+ /* @makedep: resources/folder_open.ico */
+ IDI_SHELL_TWO_CLICK_OPEN ICON resources/folder_open.ico
+ 
+-/* @makedep: resources/trash_file.ico */
+-IDI_SHELL_EMPTY_RECYCLE_BIN_95 ICON resources/trash_file.ico
+-
+-/* @makedep: resources/trash_full.ico */
+-IDI_SHELL_FULL_RECYCLE_BIN_95 ICON resources/trash_full.ico
++/* @makedep: resources/mihawk/recycle-empty.ico */
++IDI_SHELL_EMPTY_RECYCLE_BIN_95 ICON resources/mihawk/recycle-empty.ico
++
++/* @makedep: resources/mihawk/recycle-full.ico */
++IDI_SHELL_FULL_RECYCLE_BIN_95 ICON resources/mihawk/recycle-full.ico
+ 
+ /* @makedep: resources/internet.ico */
+ IDI_SHELL_WEB_FOLDERS ICON resources/internet.ico
+@@ -834,8 +837,8 @@
+ IDI_SHELL_ZIP_DRIVE ICON resources/disk_drive.ico
+ 
+ /* FIXME: Following resource is not yet added */
+-/* @makedep: resources/blank.ico */
+-IDI_SHELL_DOWNLOAD ICON resources/blank.ico
++/* @makedep: resources/mihawk/downloads.ico */
++IDI_SHELL_DOWNLOAD ICON resources/mihawk/downloads.ico
+ 
+ /* FIXME: Following resource is not yet added */
+ /* @makedep: resources/blank.ico */
+@@ -848,20 +851,20 @@
+ /* @makedep: resources/disk_drive.ico */
+ IDI_SHELL_BAD_REMOVABLE_DISK ICON resources/disk_drive.ico
+ 
+-/* @makedep: resources/mydocs.ico */
+-IDI_SHELL_MY_DOCUMENTS ICON resources/mydocs.ico
+-
+-/* FIXME: Following resource is not yet added */
+-/* @makedep: resources/mydocs.ico */
+-IDI_SHELL_MY_PICTURES ICON resources/mydocs.ico
+-
+-/* FIXME: Following resource is not yet added */
+-/* @makedep: resources/mydocs.ico */
+-IDI_SHELL_MY_MUSIC ICON resources/mydocs.ico
+-
+-/* FIXME: Following resource is not yet added */
+-/* @makedep: resources/mydocs.ico */
+-IDI_SHELL_MY_VIDEOS ICON resources/mydocs.ico
++/* @makedep: resources/mihawk/documents.ico */
++IDI_SHELL_MY_DOCUMENTS ICON resources/mihawk/documents.ico
++
++/* FIXME: Following resource is not yet added */
++/* @makedep: resources/mihawk/pictures.ico */
++IDI_SHELL_MY_PICTURES ICON resources/mihawk/pictures.ico
++
++/* FIXME: Following resource is not yet added */
++/* @makedep: resources/mihawk/music.ico */
++IDI_SHELL_MY_MUSIC ICON resources/mihawk/music.ico
++
++/* FIXME: Following resource is not yet added */
++/* @makedep: resources/mihawk/videos.ico */
++IDI_SHELL_MY_VIDEOS ICON resources/mihawk/videos.ico
+ 
+ /* FIXME: Following resource is not yet added */
+ /* @makedep: resources/internet.ico */
+@@ -901,8 +904,8 @@
+ /* @makedep: resources/printer.ico */
+ IDI_SHELL_PRINT_PHOTO ICON resources/printer.ico
+ 
+-/* @makedep: resources/trash_file.ico */
+-IDI_SHELL_EMPTY_RECYCLE_BIN2 ICON resources/trash_file.ico
++/* @makedep: resources/mihawk/recycle-empty.ico */
++IDI_SHELL_EMPTY_RECYCLE_BIN2 ICON resources/mihawk/recycle-empty.ico
+ 
+ /* FIXME: Following resource is not yet added */
+ /* @makedep: resources/folder.ico */

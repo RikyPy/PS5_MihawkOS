@@ -1,0 +1,31 @@
+{
+ "run": "zink-present-2026-10-06-03",
+ "what": "gl-present-probe.exe",
+ "env": [
+  "WINEDLLOVERRIDES=opengl32=n;d3d11,dxgi,d3d10core=n,b;bcrypt=b",
+  "GALLIUM_DRIVER=zink",
+  "WINE_PS5_HID=0",
+  "PROTON_LOADING_SCREEN=0",
+  "PROTON_GPU_CAPTURE=1",
+  "WINEDEBUG=-all,+seh,+debugstr,+loaddll"
+ ],
+ "result": "finished",
+ "seconds": 6.2,
+ "probe_verdict": "FAIL",
+ "clean_owner_restart": false,
+ "child_logs": [
+  "klog/zink-present-2026-10-06-03-wine-child-145.log",
+  "klog/zink-present-2026-10-06-03-wine-child-146.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": false,
+ "bench": {},
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [],
+  "top": []
+ }
+}

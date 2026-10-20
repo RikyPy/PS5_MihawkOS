@@ -1,0 +1,32 @@
+# Assets
+
+Asset attribution is retained as a provenance record. Paths below are relative to
+the title's `assets/` folder. Before elevation it can be visible through `/app0`;
+after elevation, use the platform's resolved install folder rather than assuming
+`/app0` remains accessible. No game files or saves belong in this asset manifest.
+
+The assets the title ships, written from `ps5/assets.json` by
+`ps5/tools/build-assets.py --notices`. Only assets with a clear licence are
+shipped: in PS5_VulkanTemplate, the asset pack's other files (the `assets`
+submodule) stay out, and the samples that use them get the replacements here.
+
+| Path under the title's `assets/` | Asset | Author | Licence | Consumers |
+| --- | --- | --- | --- | --- |
+| `Roboto-Medium.ttf` | [Roboto Medium](https://fonts.google.com/specimen/Roboto) | Christian Robertson (Google Fonts) | Apache-2.0 | all |
+| `hui/fonts/inter-regular.huifont` | [Inter Regular](https://github.com/rsms/inter) (a signed-distance-field atlas with accented Latin and Cyrillic, made by ps5-homebrew-ui's tools/font-baker with its european set (ps5/ui/setup-kit.sh)) | The Inter Project Authors | OFL-1.1 | the UI module |
+| `hui/fonts/inter-semibold.huifont` | [Inter SemiBold](https://github.com/rsms/inter) (a signed-distance-field atlas with accented Latin and Cyrillic, made by ps5-homebrew-ui's tools/font-baker with its european set (ps5/ui/setup-kit.sh)) | The Inter Project Authors | OFL-1.1 | the UI module |
+| `hui/fonts/montserrat-medium.huifont` | [Montserrat Medium](https://github.com/JulietaUla/Montserrat) (a signed-distance-field atlas with accented Latin and Cyrillic, made by ps5-homebrew-ui's tools/font-baker with its european set (ps5/ui/setup-kit.sh)) | The Montserrat Project Authors | OFL-1.1 | the UI module |
+| `hui/fonts/dejavu-sans-mono.huifont` | [DejaVu Sans Mono](https://dejavu-fonts.github.io/) (a signed-distance-field atlas, made by ps5-homebrew-ui's tools/bake-fonts.sh) | Bitstream, Inc.; the DejaVu changes are in the public domain | Bitstream-Vera | the UI module |
+| `hui/fonts/press-start-2p.huifont` | [Press Start 2P](https://fonts.google.com/specimen/Press+Start+2P) (a signed-distance-field atlas, made by ps5-homebrew-ui's tools/bake-fonts.sh) | The Press Start 2P Project Authors | OFL-1.1 | the UI module |
+| `hui/fonts/patrick-hand.huifont` | [Patrick Hand](https://fonts.google.com/specimen/Patrick+Hand) (a signed-distance-field atlas, made by ps5-homebrew-ui's tools/bake-fonts.sh) | Patrick Wagesreiter | OFL-1.1 | the UI module |
+| `hui/audio/sfx/glass` | [The glass sound set (ProsperoEden's sound effects)](https://github.com/blackbearreloaded/ps5-homebrew-ui) (generated with ElevenLabs Sound Effects v2 for ProsperoEden, trimmed, faded and levelled by ps5-homebrew-ui's tools/process-sfx.py (its THIRD_PARTY_NOTICES.md)) | BlackBearReloaded | GPL-3.0-or-later | the UI module |
+| `hui/audio/sfx/paper` | [The paper sound set (ProsperoPuzzles' sound effects)](https://github.com/blackbearreloaded/ps5-homebrew-ui) (generated with ElevenLabs Sound Effects v2 for ProsperoPuzzles, trimmed, faded and levelled by ps5-homebrew-ui's tools/process-sfx.py (its THIRD_PARTY_NOTICES.md)) | BlackBearReloaded | GPL-3.0-or-later | the UI module |
+| `music` | [Bubble Garden, Glass Meadow and Sky Lounge: MihawkOS's own music](https://github.com/mihawk-99/PS5_MihawkOS) (original pieces synthesized by tools/make-mihawk-music.py (seeded: the same samples on every run, no recording or sample as input), OGG Vorbis from pinned libogg 1.3.5 and libvorbis 1.3.7; tests/test_mihawk_music.py renders them again and compares every byte) | Mihawk (made by tools/make-mihawk-music.py) | LGPL-2.1-or-later | ps5proton |
+| `setup/flags` | [Country flags (4x3) for the guided setup's language tiles](https://github.com/lipis/flag-icons) (the SVGs kept in ps5/assets/flags at revision 086f7e97d657358203916dbe84f61c2bccaa81eb (SOURCE.json), rasterized to 240x180 PNG by rsvg-convert) | Panayiotis Lipiridis and the flag-icons contributors | MIT | ps5proton |
+| `setup/qr.txt` | [The guided setup's QR code: the USB install page (docs/INSTALL_USB.md)](https://github.com/mihawk-99/PS5_MihawkOS) (made by ps5/tools/generate_assets.py with qrencode, one line of modules a row) | Mihawk | MIT | ps5proton |
+| `setup/fonts` | [Noto Sans SC Medium and Noto Sans JP Medium, for the guided setup's Chinese and Japanese](https://github.com/google/fonts/tree/main/ofl/notosanssc) (Google Fonts' variable TrueType files at revision 47d54ca1ebb14fd864695f1d39dc734f39017c33, cut to the characters the setup's text uses and set at the Medium weight with fontTools, then baked into signed-distance-field atlases by tools/bake-huifont.cpp) | Adobe and Google (Noto Sans CJK) | OFL-1.1 | ps5proton |
+| `hui/fonts/Inter-Regular.ttf` | [Inter Regular](https://github.com/rsms/inter) (the TrueType file, for the samples' settings windows in the title's theme) | The Inter Project Authors | OFL-1.1 | the UI module |
+| `hui/fonts/Inter-SemiBold.ttf` | [Inter SemiBold](https://github.com/rsms/inter) (the TrueType file, for the samples' settings windows in the title's theme) | The Inter Project Authors | OFL-1.1 | the UI module |
+| `hui/fonts/DejaVuSansMono.ttf` | [DejaVu Sans Mono](https://dejavu-fonts.github.io/) (the TrueType file, for the samples' settings windows in the title's theme) | Bitstream, Inc.; the DejaVu changes are in the public domain | Bitstream-Vera | the UI module |
+| `hui/fonts/PressStart2P-Regular.ttf` | [Press Start 2P](https://fonts.google.com/specimen/Press+Start+2P) (the TrueType file, for the samples' settings windows in the title's theme) | The Press Start 2P Project Authors | OFL-1.1 | the UI module |
+| `hui/fonts/PatrickHand-Regular.ttf` | [Patrick Hand](https://fonts.google.com/specimen/Patrick+Hand) (the TrueType file, for the samples' settings windows in the title's theme) | Patrick Wagesreiter | OFL-1.1 | the UI module |

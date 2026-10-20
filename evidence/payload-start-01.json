@@ -1,0 +1,23 @@
+{
+  "run": "payload-start-01",
+  "title_runner_status": 0,
+  "payload_file_removed": true,
+  "title_lines": [
+    "payload-start image bytes=134800",
+    "payload-start net_init=0 socket=12 connect <address>:8080 -> 0 errno=0",
+    "payload-start sent 135255 of 135255 bytes; launcher answered \"HTTP/1.1 200 OK\" after 190 ms",
+    "channel connect path=/system_tmp/ps5proton-helper.sock fd=12 errno=0 attempts=1",
+    "channel made pair=0 memory=15 mapped=1",
+    "channel sent descriptors=2 errno=0",
+    "channel answer through the sent socket: yes \"payload: through the socket you sent\"",
+    "channel received from the payload descriptors=1 note=\"payload: a socket end of mine\"",
+    "channel answer through the received socket: sent",
+    "channel payload verdict: \"payload verdict answer=1 page=1 reply=1\"",
+    "channel summary connect=1 answer=1 received=1 reply=1 verdict=1",
+    "payload-start the channel held 1, 616 ms after the request"
+  ],
+  "title_passed": true,
+  "production_restored": true,
+  "payload_lines": [],
+  "passed": true
+}

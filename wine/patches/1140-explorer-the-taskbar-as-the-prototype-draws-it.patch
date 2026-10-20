@@ -1,0 +1,377 @@
+From: PS5_Proton <local>
+Subject: [PATCH] explorer: the taskbar as the prototype draws it
+
+The approved Windows 11 prototype (PS5_Proton prototypes/windows11-shell) draws Windows 11's 23H2 taskbar: centred,
+Start, the 220 x 32 search pill, Task View and the pinned apps (File Explorer, Settings, Notepad, Terminal), each a 40 x 40
+slot 44 px apart; at the right the hidden-icons chevron, the network, volume and battery status button, the two-line
+clock and an 8 px show-desktop sliver. Explorer's taskbar showed Start and the open windows only. At 96 DPI it now:
+
+- places every slot where the prototype does (PS5_Proton src/pw_taskbar_layout.h, equal to the prototype's boxes);
+- draws the prototype's own pixels in them (pw_shell_taskbar.h: sprites PS5_Proton measured from the prototype and
+  premultiplied, GdiAlphaBlend over the cleared glass buffer, so the compositor puts them over the acrylic as Chromium
+  put them over the bar), at rest, hovered, pressed and focused, with the 6 x 3 running and 16 x 3 accent pills;
+- shows a pinned app's windows on its pin (by process image; Terminal's console window is conhost's) and launches
+  the app from it, the other windows after the pins with their own icon on the same plates;
+- draws the clock in the prototype's own glyphs where Chromium places them (PS5_Proton src/pw_text_glyphs.h: each
+  character measured at Skia's four quarter-pixel pen phases, linear advances, right-aligned by Blink's 1/64 px box;
+  GDI's whole-pixel advances made "10/16/2026" 58 px wide instead of 61.1), when every character was measured;
+- draws the bar's top line as the prototype's inset divider (black at 5.9%, white at 8.2% in dark), over the
+  prototype's taskbar acrylic (the private backdrop of server patch 1141) instead of Mica.
+
+Search opens Start. Task View, the hidden icons and Quick Settings have no native surface yet, so those buttons are
+drawn and not wired. At other DPIs the previous drawing stays.
+---
+diff --git a/programs/explorer/systray.c b/programs/explorer/systray.c
+index 15bf7f9..ec1edb1 100644
+--- a/programs/explorer/systray.c
++++ b/programs/explorer/systray.c
+@@ -28,6 +28,7 @@
+ #include "appearance.h"
+ #include "icons.h"
+ #include "pw_shell_style.h"
++#include "pw_shell_taskbar.h"
+ 
+ #include <wine/debug.h>
+ #include <wine/list.h>
+@@ -111,6 +112,7 @@ struct taskbar_button
+     BOOL        icon_loaded;
+     RECT        placed;        /* where the button was last shown, if placed_shown */
+     BOOL        placed_shown;
++    int         pin;           /* the pinned app its process is, -1 none, -2 not looked up yet */
+ };
+ 
+ static struct list taskbar_buttons = LIST_INIT( taskbar_buttons );
+@@ -121,6 +123,14 @@ static HWND tray_window;
+  * The full integration batch must pass before committing this patch. */
+ static BOOL mihawk_taskbar;
+ static HWND taskbar_clock, taskbar_overflow;
++/* The prototype's search pill, Task View, chevron, status button and pinned apps (patch 1140), where they were last put,
++ * and each pin's state: the window it stands for (the focused one, else the first), running, focused. */
++static HWND taskbar_search, taskbar_taskview, taskbar_chevron, taskbar_status, taskbar_pins[PW_TASKBAR_PINS];
++static RECT taskbar_fixed_placed[4 + PW_TASKBAR_PINS];
++static HWND taskbar_pin_window[PW_TASKBAR_PINS];
++static BOOL taskbar_pin_running[PW_TASKBAR_PINS], taskbar_pin_active[PW_TASKBAR_PINS];
++static int taskbar_text_right, taskbar_time_top, taskbar_date_top;
++static BOOL taskbar_prototype;  /* the prototype's layout and pixels are in use (96 DPI) */
+ static HMODULE taskbar_icons;
+ static HICON taskbar_fallback, taskbar_more[2];
+ static COLORREF taskbar_palette[5];
+@@ -898,7 +908,9 @@ static void taskbar_dwm(HWND hwnd, DWORD corner, DWORD backdrop, DWORD border)
+ /* After the palette refreshes: Mica taskbar, acrylic previews, theme text. */
+ static void taskbar_surfaces(void)
+ {
+-    if (tray_window) taskbar_dwm(tray_window, DWMWCP_DONOTROUND, DWMSBT_MAINWINDOW, DWMWA_COLOR_NONE);
++    /* At 96 DPI the prototype's taskbar acrylic (server patch 1141's private backdrop 5), Mica otherwise. */
++    if (tray_window) taskbar_dwm(tray_window, DWMWCP_DONOTROUND,
++                                 pw_taskbar_sprites_apply(GetDpiForWindow(tray_window)) ? 5 : DWMSBT_MAINWINDOW, DWMWA_COLOR_NONE);
+     if (taskbar_preview) taskbar_dwm(taskbar_preview, DWMWCP_ROUND, DWMSBT_TRANSIENTWINDOW, taskbar_colour(3));
+     if (taskbar_theme) CloseThemeData(taskbar_theme);
+     taskbar_theme = tray_window ? OpenThemeData(tray_window, L"WINDOW") : NULL;
+@@ -973,6 +985,20 @@ static void taskbar_paint_clock(const DRAWITEMSTRUCT *dis)
+     int line = MulDiv(PW_APPEARANCE_TASKBAR_CLOCK_LINE_HEIGHT, GetDpiForWindow(tray_window), 96);
+     upper.right -= taskbar_padding; upper.top = (tray_height - 2 * line) / 2; upper.bottom = upper.top + line;
+     lower.right -= taskbar_padding; lower.top = upper.bottom; lower.bottom = lower.top + line;
++    if (taskbar_prototype)
++    {
++        upper.right = lower.right = dis->rcItem.left + taskbar_text_right;
++        upper.top = dis->rcItem.top + taskbar_time_top; upper.bottom = upper.top + 17;
++        lower.top = dis->rcItem.top + taskbar_date_top; lower.bottom = lower.top + 17;
++        /* The prototype's own glyphs where Chromium puts them, when it measured every character of both lines. */
++        if (glass && pw_taskbar_text_width(taskbar_dark, taskbar_time) >= 0 && pw_taskbar_text_width(taskbar_dark, taskbar_date) >= 0)
++        {
++            pw_taskbar_text(dc, taskbar_dark, taskbar_time, &dis->rcItem, taskbar_text_right, taskbar_time_top);
++            pw_taskbar_text(dc, taskbar_dark, taskbar_date, &dis->rcItem, taskbar_text_right, taskbar_date_top);
++            SelectObject(dc, prior); EndBufferedPaint(glass, TRUE);
++            return;
++        }
++    }
+     pw_shell_glass_text(taskbar_theme, glass, dc, taskbar_time, &upper, taskbar_colour(1), DT_RIGHT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);
+     pw_shell_glass_text(taskbar_theme, glass, dc, taskbar_date, &lower, taskbar_colour(1), DT_RIGHT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);
+     SelectObject(dc, prior);
+@@ -1070,9 +1096,11 @@ static void taskbar_paint_icon(const DRAWITEMSTRUCT *dis, struct taskbar_button
+     if (glass) { pw_shell_glass_fix(glass); EndBufferedPaint(glass, TRUE); }
+ }
+ 
++static void taskbar_layout_prototype(void);
+ static void taskbar_layout(void)
+ {
+     struct taskbar_button *win; int count = 1, slots, available, width, pos, shown = 0;
++    if ((taskbar_prototype = pw_taskbar_sprites_apply(GetDpiForWindow(tray_window)))) { taskbar_layout_prototype(); return; }
+     int right = tray_width - taskbar_clock_width - taskbar_padding - nb_displayed * icon_cx;
+     HWND foreground = GetAncestor(GetForegroundWindow(), GA_ROOTOWNER);
+     LIST_FOR_EACH_ENTRY(win, &taskbar_buttons, struct taskbar_button, entry)
+@@ -1140,12 +1168,124 @@ static void taskbar_layout(void)
+     }
+ }
+ 
++/* The pinned app a window's process is (looked up once per window). */
++static int taskbar_window_pin(struct taskbar_button *win)
++{
++    if (win->pin == -2)
++    {
++        WCHAR path[MAX_PATH]; DWORD length = ARRAY_SIZE(path), pid = 0; HANDLE process;
++        win->pin = -1;
++        GetWindowThreadProcessId(win->hwnd, &pid);
++        if ((process = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, pid)))
++        {
++            if (QueryFullProcessImageNameW(process, 0, path, &length)) win->pin = pw_taskbar_pin_of(path);
++            CloseHandle(process);
++        }
++    }
++    return win->pin;
++}
++
++/* A window moved or shown only when its place changed, and repainted then. */
++static void taskbar_put(HWND hwnd, const PwTaskbarRect *r, RECT *placed)
++{
++    RECT place = {r->left, r->top, r->right, r->bottom};
++    if (EqualRect(&place, placed) && IsWindowVisible(hwnd)) return;
++    SetWindowPos(hwnd, NULL, place.left, place.top, place.right - place.left, place.bottom - place.top,
++                 SWP_NOACTIVATE | SWP_NOZORDER | SWP_SHOWWINDOW);
++    InvalidateRect(hwnd, NULL, FALSE);
++    *placed = place;
++}
++
++static int taskbar_clock_text_width(void)
++{
++    int time_width = pw_taskbar_text_width(taskbar_dark, taskbar_time), date_width = pw_taskbar_text_width(taskbar_dark, taskbar_date);
++    /* As the prototype lays the lines out: Blink's box, the advances rounded up to 1/64 px, to the nearest pixel. */
++    if (taskbar_prototype && time_width >= 0 && date_width >= 0) return (((max(time_width, date_width) + 1023) & ~1023) + 32768) >> 16;
++    HDC dc = GetDC(tray_window); SIZE time = {0}, date = {0};
++    HGDIOBJ prior = SelectObject(dc, taskbar_font ? taskbar_font : GetStockObject(DEFAULT_GUI_FONT));
++    GetTextExtentPoint32W(dc, taskbar_time, lstrlenW(taskbar_time), &time);
++    GetTextExtentPoint32W(dc, taskbar_date, lstrlenW(taskbar_date), &date);
++    SelectObject(dc, prior); ReleaseDC(tray_window, dc);
++    return max(time.cx, date.cx);
++}
++
++/* The prototype's taskbar (src/pw_taskbar_layout.h): Start, search, Task View and the pins centred, a pinned app's
++ * windows shown on its pin, the other windows after the pins, the tray at the right. */
++static void taskbar_layout_prototype(void)
++{
++    struct taskbar_button *win; PwTaskbarPlace place; unsigned slots = PW_TASKBAR_PINS, at = PW_TASKBAR_PINS, i;
++    HWND foreground = GetAncestor(GetForegroundWindow(), GA_ROOTOWNER);
++    HWND pin_window[PW_TASKBAR_PINS] = {0}; BOOL running[PW_TASKBAR_PINS] = {0}, active[PW_TASKBAR_PINS] = {0};
++    LIST_FOR_EACH_ENTRY(win, &taskbar_buttons, struct taskbar_button, entry)
++    {
++        WCHAR title[256], previous[256];
++        if (!win->hwnd) continue;
++        win->active = win->hwnd == foreground;
++        win->visible = taskbar_eligible(win->hwnd);
++        GetWindowTextW(win->hwnd, title, ARRAY_SIZE(title)); GetWindowTextW(win->button, previous, ARRAY_SIZE(previous));
++        if (lstrcmpW(title, previous))
++        {
++            win->placed_shown = FALSE;
++            lstrcpyW(win->title, title); SetWindowTextW(win->button, title);
++            if (win->tooltip)
++            {
++                TTTOOLINFOW tip = {sizeof(tip)}; tip.hwnd = tray_window; tip.uId = (UINT_PTR)win->button;
++                tip.uFlags = TTF_SUBCLASS | TTF_IDISHWND; tip.lpszText = win->title;
++                SendMessageW(win->tooltip, TTM_UPDATETIPTEXTW, 0, (LPARAM)&tip);
++            }
++        }
++        if (!win->visible) continue;
++        int pin = taskbar_window_pin(win);
++        if (pin < 0) { ++slots; continue; }
++        running[pin] = TRUE;
++        if (win->active) { active[pin] = TRUE; pin_window[pin] = win->hwnd; }
++        else if (!pin_window[pin]) pin_window[pin] = win->hwnd;
++    }
++    pw_taskbar_place(&place, tray_width, slots, taskbar_clock_text_width(), 0);
++    /* notification icons stay left of the chevron (they are placed from the right past this width) */
++    taskbar_clock_width = tray_width - place.chevron.left + 4;
++    taskbar_text_right = place.text_right - place.clock.left;
++    taskbar_time_top = place.time_top - place.clock.top; taskbar_date_top = place.date_top - place.clock.top;
++    BOOL overflow = place.apps_shown < slots;
++    unsigned room = overflow && place.apps_shown ? place.apps_shown - 1 : place.apps_shown;
++    LIST_FOR_EACH_ENTRY(win, &taskbar_buttons, struct taskbar_button, entry)
++    {
++        if (!win->hwnd) { taskbar_put(win->button, &place.start, &win->placed); win->placed_shown = TRUE; continue; }
++        if (win->visible && win->pin < 0 && at < room)
++        {
++            RECT before = win->placed;
++            taskbar_put(win->button, &place.apps[at++], &win->placed);
++            if (!win->placed_shown || !EqualRect(&before, &win->placed)) InvalidateRect(win->button, NULL, FALSE);
++            win->placed_shown = TRUE;
++        }
++        else if (win->placed_shown || IsWindowVisible(win->button))
++        { ShowWindow(win->button, SW_HIDE); win->placed_shown = FALSE; SetRectEmpty(&win->placed); }
++    }
++    taskbar_put(taskbar_search, &place.search, &taskbar_fixed_placed[0]);
++    taskbar_put(taskbar_taskview, &place.taskview, &taskbar_fixed_placed[1]);
++    taskbar_put(taskbar_chevron, &place.chevron, &taskbar_fixed_placed[2]);
++    taskbar_put(taskbar_status, &place.status, &taskbar_fixed_placed[3]);
++    for (i = 0; i < PW_TASKBAR_PINS; ++i)
++    {
++        if (running[i] != taskbar_pin_running[i] || active[i] != taskbar_pin_active[i]) InvalidateRect(taskbar_pins[i], NULL, FALSE);
++        taskbar_pin_window[i] = pin_window[i]; taskbar_pin_running[i] = running[i]; taskbar_pin_active[i] = active[i];
++        if (i < room) taskbar_put(taskbar_pins[i], &place.apps[i], &taskbar_fixed_placed[4 + i]);
++        else if (IsWindowVisible(taskbar_pins[i])) { ShowWindow(taskbar_pins[i], SW_HIDE); SetRectEmpty(&taskbar_fixed_placed[4 + i]); }
++    }
++    if (overflow) taskbar_put(taskbar_overflow, &place.apps[place.apps_shown - 1], &taskbar_overflow_placed);
++    else if (IsWindowVisible(taskbar_overflow)) { ShowWindow(taskbar_overflow, SW_HIDE); SetRectEmpty(&taskbar_overflow_placed); }
++    taskbar_overflow_shown = overflow;
++    taskbar_put(taskbar_clock, &place.clock, &taskbar_clock_placed);
++}
++
+ /* Theme, font, DPI or display changes: every button, the overflow and the clock are placed and painted again. */
+ static void taskbar_forget_placement(void)
+ {
+     struct taskbar_button *win;
+     LIST_FOR_EACH_ENTRY(win, &taskbar_buttons, struct taskbar_button, entry) win->placed_shown = FALSE;
+     SetRectEmpty(&taskbar_overflow_placed); SetRectEmpty(&taskbar_clock_placed);
++    for (unsigned int i = 0; i < ARRAY_SIZE(taskbar_fixed_placed); ++i) SetRectEmpty(&taskbar_fixed_placed[i]);
++    LIST_FOR_EACH_ENTRY(win, &taskbar_buttons, struct taskbar_button, entry) SetRectEmpty(&win->placed);
+     taskbar_overflow_shown = -1;
+ }
+ 
+@@ -1401,6 +1541,7 @@ static void add_taskbar_button( HWND hwnd )
+ 
+     if (!(win = calloc( 1, sizeof(*win) ))) return;
+     win->hwnd = hwnd;
++    win->pin = -2;
+     win->button = CreateWindowW( WC_BUTTONW, NULL, WS_CHILD | BS_OWNERDRAW,
+                                  0, 0, 0, 0, tray_window, (HMENU)hwnd, 0, 0 );
+     if (!win->button) { free(win); return; }
+@@ -1447,6 +1588,70 @@ static void remove_taskbar_button( HWND hwnd )
+     free( win );
+ }
+ 
++/* A 40 px plate sprite at another width: its two halves at the ends, its middle column between (a plate is the same
++ * in every column between its 4 px corners). */
++static void taskbar_plate(HDC dc, unsigned sprite, int width)
++{
++    const struct pw_shell_sprite *s = &pw_shell_sprites[!!taskbar_dark][sprite];
++    if (width == s->width) { pw_taskbar_sprite(dc, taskbar_dark, sprite, 0, 0); return; }
++    int half = min(width, s->width) / 2;
++    BITMAPINFO info = {{sizeof(BITMAPINFOHEADER), s->width, -s->height, 1, 32, BI_RGB}};
++    void *bits = NULL; HBITMAP bitmap = CreateDIBSection(NULL, &info, DIB_RGB_COLORS, &bits, NULL, 0); HDC source;
++    if (!bitmap || !bits || !(source = CreateCompatibleDC(dc))) { if (bitmap) DeleteObject(bitmap); return; }
++    memcpy(bits, s->bgra, (size_t)s->width * s->height * 4);
++    HGDIOBJ prior = SelectObject(source, bitmap); BLENDFUNCTION blend = {AC_SRC_OVER, 0, 255, AC_SRC_ALPHA};
++    GdiAlphaBlend(dc, 0, 0, half, s->height, source, 0, 0, half, s->height, blend);
++    GdiAlphaBlend(dc, width - half, 0, half, s->height, source, s->width - half, 0, half, s->height, blend);
++    if (width > 2 * half) GdiAlphaBlend(dc, half, 0, width - 2 * half, s->height, source, s->width / 2, 0, 1, s->height, blend);
++    SelectObject(source, prior); DeleteDC(source); DeleteObject(bitmap);
++}
++
++/* The prototype's own pixels for Start, the search pill, Task View, the tray buttons, the pins and the other windows'
++ * buttons (their plates and pills; a window's own icon in between). FALSE: not one of them. */
++static BOOL taskbar_paint_prototype(const DRAWITEMSTRUCT *dis, struct taskbar_button *win)
++{
++    HWND item = dis->hwndItem; HDC dc = NULL; HPAINTBUFFER glass; RECT rect = dis->rcItem; int pin = -1, width;
++    BOOL hot = !!GetPropW(item, L"MihawkTaskbarHot"), pressed = !!(dis->itemState & ODS_SELECTED), dark = taskbar_dark;
++    for (int i = 0; i < PW_TASKBAR_PINS; ++i) if (item == taskbar_pins[i]) pin = i;
++    if (!taskbar_prototype || !(win || pin >= 0 || item == taskbar_search || item == taskbar_taskview ||
++                                item == taskbar_chevron || item == taskbar_status)) return FALSE;
++    if (!(glass = pw_shell_glass_begin(dis->hDC, &rect, &dc))) return FALSE;
++    width = rect.right - rect.left;
++    if (item == taskbar_search) pw_taskbar_sprite(dc, dark, hot || pressed ? PW_SPRITE_SEARCH_HOVER : PW_SPRITE_SEARCH, 0, 0);
++    else if (win && !win->hwnd)
++    {
++        if (pressed) { taskbar_plate(dc, PW_SPRITE_PLATE_PRESS, width); pw_taskbar_sprite(dc, dark, PW_SPRITE_START, 0, 0); }
++        else pw_taskbar_sprite(dc, dark, hot ? PW_SPRITE_START_HOVER : PW_SPRITE_START, 0, 0);
++    }
++    else
++    {
++        BOOL active = pin >= 0 ? taskbar_pin_active[pin] : win && win->active;
++        if (pressed) taskbar_plate(dc, PW_SPRITE_PLATE_PRESS, width);
++        else if (active) taskbar_plate(dc, PW_SPRITE_PLATE_ACTIVE, width);
++        else if (hot) taskbar_plate(dc, PW_SPRITE_PLATE_HOVER, width);
++        if (item == taskbar_taskview) pw_taskbar_sprite(dc, dark, PW_SPRITE_TASKVIEW, 0, 0);
++        else if (item == taskbar_chevron) pw_taskbar_sprite(dc, dark, PW_SPRITE_CHEVRON, 0, 0);
++        else if (item == taskbar_status) pw_taskbar_sprite(dc, dark, PW_SPRITE_STATUS, 0, 0);
++        else if (pin >= 0)
++        {
++            pw_taskbar_sprite(dc, dark, pw_taskbar_pin_apps[pin].sprite, 0, 0);
++            if (taskbar_pin_running[pin]) pw_taskbar_pill(dc, dark, active, width);
++        }
++        else
++        {
++            HICON icon = taskbar_window_icon(win);
++            if (!icon) icon = LoadIconW(NULL, (LPCWSTR)IDI_APPLICATION);
++            if (icon) DrawIconEx(dc, (width - 24) / 2, (rect.bottom - rect.top - 24) / 2, icon, 24, 24, 0, NULL, DI_NORMAL);
++            pw_shell_glass_fix(glass);  /* a masked icon becomes opaque; the sprites are premultiplied and stay */
++            pw_taskbar_pill(dc, dark, active, width);
++        }
++    }
++    if ((dis->itemState & ODS_FOCUS) && !(dis->itemState & ODS_NOFOCUSRECT))
++    { InflateRect(&rect, -2, -2); DrawFocusRect(dc, &rect); pw_shell_glass_fix(glass); }
++    EndBufferedPaint(glass, TRUE);
++    return TRUE;
++}
++
+ static void paint_taskbar_button( const DRAWITEMSTRUCT *dis )
+ {
+     RECT rect;
+@@ -1455,6 +1660,7 @@ static void paint_taskbar_button( const DRAWITEMSTRUCT *dis )
+ 
+     if (mihawk_taskbar)
+     {
++        if (dis->hwndItem != taskbar_clock && taskbar_paint_prototype(dis, win)) return;
+         if (dis->hwndItem == taskbar_clock) taskbar_paint_clock(dis);
+         else if (win || dis->hwndItem == taskbar_overflow) taskbar_paint_icon(dis, win);
+         return;
+@@ -1478,6 +1684,17 @@ static void click_taskbar_button( HWND button )
+     HWND hwnd = (HWND)id;
+ 
+     if (mihawk_taskbar && button == taskbar_overflow) { taskbar_overflow_menu(); return; }
++    if (mihawk_taskbar && button == taskbar_search) { do_startmenu( tray_window ); return; }
++    /* Task View, the hidden icons and Quick Settings have no native surface yet: the buttons are drawn, not wired. */
++    if (mihawk_taskbar && (button == taskbar_taskview || button == taskbar_chevron || button == taskbar_status)) return;
++    for (int i = 0; mihawk_taskbar && i < PW_TASKBAR_PINS; ++i)
++        if (button == taskbar_pins[i])
++        {
++            struct taskbar_button *shown = taskbar_pin_window[i] ? find_taskbar_button( taskbar_pin_window[i] ) : NULL;
++            if (shown) click_taskbar_button( shown->button );
++            else if (!pw_taskbar_launch_pin( tray_window, i )) WARN( "pinned app %u did not start: %lu\n", i, GetLastError() );
++            return;
++        }
+     if (!hwnd)  /* start button */
+     {
+         do_startmenu( tray_window );
+@@ -1643,7 +1860,7 @@ static void show_taskbar_contextmenu( HWND button, LPARAM lparam )
+ {
+     ULONG_PTR id = GetWindowLongPtrW( button, GWLP_ID );
+ 
+-    if (id) SendNotifyMessageW( (HWND)id, WM_POPUPSYSTEMMENU, 0, lparam );
++    if (id && !(mihawk_taskbar && id >= 0xffe0 && id <= 0xffff)) SendNotifyMessageW( (HWND)id, WM_POPUPSYSTEMMENU, 0, lparam );
+ }
+ 
+ static void do_hide_systray(void)
+@@ -1724,7 +1941,11 @@ static LRESULT WINAPI shell_traywnd_proc( HWND hwnd, UINT msg, WPARAM wparam, LP
+             GetClientRect(hwnd, &client);
+             if ((glass = pw_shell_glass_begin(dc, &client, &buffer)))
+             {
+-                edge = client; edge.bottom = 1; pw_shell_glass_fill(glass, buffer, &edge, taskbar_colour(3), 255);
++                edge = client; edge.bottom = 1;
++                /* the prototype's inset divider: black at 5.9% (white at 8.2% in dark) over the acrylic */
++                if (taskbar_prototype) pw_shell_glass_fill(glass, buffer, &edge, taskbar_dark ? RGB(255, 255, 255) : RGB(0, 0, 0),
++                                                           taskbar_dark ? 21 : 15);
++                else pw_shell_glass_fill(glass, buffer, &edge, taskbar_colour(3), 255);
+                 EndBufferedPaint(glass, TRUE);
+             }
+             else
+@@ -1984,6 +2205,22 @@ void initialize_systray( BOOL arg_using_root, BOOL arg_enable_shell, BOOL arg_sh
+         taskbar_overflow = CreateWindowW(WC_BUTTONW, L"More applications", WS_CHILD | WS_TABSTOP | BS_OWNERDRAW,
+                                         0, 0, 0, 0, tray_window, (HMENU)0xfff0, NULL, NULL);
+         SetWindowSubclass(taskbar_overflow, taskbar_button_proc, 1, 0);
++        {
++            static const WCHAR *names[] = {L"Search", L"Task View", L"Show hidden icons", L"Quick Settings"};
++            HWND *fixed[] = {&taskbar_search, &taskbar_taskview, &taskbar_chevron, &taskbar_status};
++            for (unsigned int i = 0; i < ARRAY_SIZE(fixed); ++i)
++            {
++                *fixed[i] = CreateWindowW(WC_BUTTONW, names[i], WS_CHILD | WS_TABSTOP | BS_OWNERDRAW,
++                                         0, 0, 0, 0, tray_window, (HMENU)(UINT_PTR)(0xffe0 + i), NULL, NULL);
++                if (*fixed[i]) SetWindowSubclass(*fixed[i], taskbar_button_proc, 1, 0);
++            }
++            for (unsigned int i = 0; i < PW_TASKBAR_PINS; ++i)
++            {
++                taskbar_pins[i] = CreateWindowW(WC_BUTTONW, pw_taskbar_pin_apps[i].name, WS_CHILD | WS_TABSTOP | BS_OWNERDRAW,
++                                                0, 0, 0, 0, tray_window, (HMENU)(UINT_PTR)(0xffe8 + i), NULL, NULL);
++                if (taskbar_pins[i]) SetWindowSubclass(taskbar_pins[i], taskbar_button_proc, 1, 0);
++            }
++        }
+         taskbar_arm_clock();
+         taskbar_watch(TRUE);
+         taskbar_surfaces();

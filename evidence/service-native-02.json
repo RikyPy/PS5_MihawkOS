@@ -1,0 +1,45 @@
+{
+  "title": "PPSA99170",
+  "identity": "f8f103ede5284024877803be47175e59",
+  "kind": "service-native",
+  "build": {
+    "revision": "f7f3b2d21944dc004ef6ec20468a6e71cfecf921",
+    "kind": "service-native",
+    "sdk_revision": "611893fc25ef3e138f5bc2c90d829d8b58174cd2",
+    "source_sha256": {
+      "ps5/src/main.cpp": "2fec5b3dd6f79eb3c8ea5b1204624a57fc5811baf50240571a7cf79135a17ba9",
+      "ps5/CMakeLists.txt": "0e1769164ed4c5b42a0b0ebbcb07e6cce79c77d57c71c69730a2fe3b73a2df04",
+      "native/proton_service_preflight.h": "7cffc4c18698e9bdf5a27839fea015d1ebf3c3551cbdf688710a7b9150ceb616",
+      "native/proton_service_preflight.cpp": "ae298b49624a96fe8f84c03c3519870b94d5810fa16d1632d8da09b859919417"
+    },
+    "radv_recipe_sha256": "bcb92ff14ae32fbee7991399a7b79c065c78bda3162c76d41c49d170a46b4022",
+    "identity": "2676b275c7d14758b9cb18b830a5297fae94d7c9e9b789abeb00501b6cbb2d87",
+    "eboot_sha256": "1bab47d5edea8b58981c7f8a42c6c5f1ec2e93825caa9a52ca00468672f60b82"
+  },
+  "capture": "klog/service-native-02",
+  "passed": false,
+  "status": "complete",
+  "production_sha256": "8f63bbc57bd9203520653d9e3eb765798a434b737ac6c1f79b106437542761c3",
+  "production_restored": true,
+  "root_reference_balance_verified": false,
+  "forced_title_close": false,
+  "installed_readback_sha256": "d3d7cb497833ebb57876fe4465257217608ac9765f9a360a3ca0e658b845f325",
+  "production_executable_sha256": "bc5c7a75f249a59e7bce80218c6e749b9ea2f426e9bec4c96939ce7f75ceb17d",
+  "probe_readback_sha256": "8e6f6fa8cc54ab96bf6914eb8b053df078d1007e650db596ce2f1ae8258bc5f2",
+  "probe_executable_sha256": "96b4e09a825c01d318cd3923c68305af1c8c878e13804b0ffd13536d6b12ddf5",
+  "helper_uploaded": true,
+  "helper_executable_verified": true,
+  "shell_idle_after_run": true,
+  "post_launch_fault_records": 0,
+  "parent_shell_exit_seen": true,
+  "observations": [
+    "service-native identity=f8f103ede5284024877803be47175e59 revision=1 parent=126 elevated=1",
+    "bindings spawn=1 kill=1",
+    "app id=49176 list_count=1 parent_listed=0",
+    "descriptors before=12 after=12",
+    "result=FAIL"
+  ],
+  "fresh_identity_seen": true,
+  "restored_readback_sha256": "d3d7cb497833ebb57876fe4465257217608ac9765f9a360a3ca0e658b845f325",
+  "helper_removed": true
+}

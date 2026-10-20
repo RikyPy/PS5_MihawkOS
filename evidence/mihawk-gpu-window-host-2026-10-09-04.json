@@ -1,0 +1,20 @@
+{
+ "name": "mihawk-gpu-window-host-2026-10-09-04",
+ "passed": true,
+ "build_fingerprint": "ba82a693607fd2ad8f6845c852bbb2c587c6103cae2ca43a38ac2ed28ef21cf4",
+ "sanitized_host_suites": 50,
+ "composition_capture_verdict_tests": 1,
+ "battery_runner_tests": 5,
+ "wine_patch_replay": {
+  "clean": 147,
+  "conflicts": 0,
+  "untested": 0
+ },
+ "commands": [
+  "bash tools/host-tests.sh",
+  "python3 tests/test_window_compose_runner.py",
+  "python3 tests/test_battery_runner.py",
+  "bash tools/check-patches.sh --write"
+ ],
+ "proof_limit": "Host resource/composition contracts and pinned patch replay; actual paired OpenGL/DXVK window rendering and full exact-source console gate are pending."
+}

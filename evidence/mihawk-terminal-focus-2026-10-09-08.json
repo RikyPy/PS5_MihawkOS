@@ -1,0 +1,87 @@
+{
+  "battery": "mihawk-terminal-focus-2026-10-09-08",
+  "expected_cases": [
+    "shell32",
+    "shell64",
+    "telemetry-teardown"
+  ],
+  "revision": "38d89d37be50fedee0ea61d0de768ac0f0c28a87",
+  "dirty": true,
+  "cases": [
+    {
+      "case": "shell32",
+      "run": "mihawk-terminal-focus-2026-10-09-08-shell32",
+      "runner_status": 1,
+      "seconds": 52.6,
+      "result": "finished",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": false,
+      "run_seconds": 45.9,
+      "launch_readiness": {
+        "ready": true,
+        "seconds": 0.172,
+        "settle_seconds": 0.0,
+        "census_seconds": 0.158,
+        "previous_cleanup_verified": true
+      },
+      "runner_overhead_seconds": 6.7,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 15,
+      "protocol_errors": 0
+    },
+    {
+      "case": "shell64",
+      "run": "mihawk-terminal-focus-2026-10-09-08-shell64",
+      "runner_status": 1,
+      "seconds": 53.5,
+      "result": "exited",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": false,
+      "run_seconds": 39.8,
+      "launch_readiness": {
+        "ready": true,
+        "seconds": 7.711,
+        "settle_seconds": 7.531,
+        "census_seconds": 0.157,
+        "previous_cleanup_verified": false
+      },
+      "runner_overhead_seconds": 13.7,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 15,
+      "protocol_errors": 0
+    },
+    {
+      "case": "telemetry-teardown",
+      "run": "mihawk-terminal-focus-2026-10-09-08-telemetry-teardown",
+      "runner_status": 0,
+      "seconds": 21.1,
+      "result": "exited",
+      "probe_verdict": null,
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "run_seconds": 12.6,
+      "launch_readiness": {
+        "ready": true,
+        "seconds": 7.78,
+        "settle_seconds": 7.597,
+        "census_seconds": 0.157,
+        "previous_cleanup_verified": false
+      },
+      "runner_overhead_seconds": 8.5,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 8,
+      "protocol_errors": 0
+    }
+  ],
+  "complete": true,
+  "seconds": 127.2,
+  "passed": false
+}

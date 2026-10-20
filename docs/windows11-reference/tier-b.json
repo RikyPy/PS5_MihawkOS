@@ -1,0 +1,24 @@
+{
+  "about": "Windows 11 numbers from documented Win32 behaviour and widely published defaults, each with how it was derived. Tier B: good, to be cross-checked.",
+  "desktop_icon_grid": {
+    "horizontal_spacing_px": 75,
+    "vertical_spacing_px": 75,
+    "derivation": "HKCU\\Control Panel\\Desktop\\WindowMetrics IconSpacing and IconVerticalSpacing both default to -1125; the registry stores twips (15 per pixel at 96 DPI), so 1125 / 15 = 75 px. Several user guides give -1125 as the default; the pixel value is derived, not stated by Microsoft.",
+    "sources": [
+      "https://stardock.atlassian.net/wiki/spaces/SHC/pages/1423736838/Spacing+on+Icons+has+changed",
+      "https://www.majorgeeks.com/content/page/desktop_icon_spacing.html"
+    ],
+    "caveat": "one user report gives -1710 horizontal on Windows 10 before 1607; Windows 11 is reported as -1125 for both"
+  },
+  "approved_shell_reference": {
+    "source": "the user's approved visual reference for the shell, built into the shell already (docs/MIHAWK_OS.md)",
+    "taskbar_height_px": 48,
+    "start_panel_px": [600, 566],
+    "explorer_sidebar_px": 165,
+    "at": "1920x1080, 96 DPI"
+  },
+  "to_verify": {
+    "desktop_icon_sizes_px": "Large 96, Medium 48, Small 32 are the commonly cited sizes of the desktop's View menu; not yet confirmed by an official source",
+    "caption_button_px": "46 x 32 is widely quoted (Tier C until measured)"
+  }
+}

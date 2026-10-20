@@ -1,0 +1,103 @@
+{
+ "telemetry_hold": null,
+ "launch_readiness": {
+  "ready": true,
+  "seconds": 0.166,
+  "settle_seconds": 0.0,
+  "census_seconds": 0.153,
+  "previous_cleanup_verified": true
+ },
+ "native_close_failures": [],
+ "run": "mihawk-effects-gate-2026-10-10-02-virtual-query64",
+ "what": "virtual-query64-probe.exe",
+ "env": [],
+ "result": "finished",
+ "seconds": 10.5,
+ "probe_verdict": "PASS",
+ "clean_owner_restart": true,
+ "launcher_end_status": 0,
+ "initial_status": 0,
+ "closed_on_request": false,
+ "child_logs": [
+  "klog/mihawk-effects-gate-2026-10-10-02-virtual-query64-wine-child-2677.log",
+  "klog/mihawk-effects-gate-2026-10-10-02-virtual-query64-wine-child-2678.log",
+  "klog/mihawk-effects-gate-2026-10-10-02-virtual-query64-wine-child-2679.log",
+  "klog/mihawk-effects-gate-2026-10-10-02-virtual-query64-wine-child-2680.log",
+  "klog/mihawk-effects-gate-2026-10-10-02-virtual-query64-wine-child-2681.log",
+  "klog/mihawk-effects-gate-2026-10-10-02-virtual-query64-wine-child-2682.log",
+  "klog/mihawk-effects-gate-2026-10-10-02-virtual-query64-wine-child-2683.log",
+  "klog/mihawk-effects-gate-2026-10-10-02-virtual-query64-wine-child-2684.log",
+  "klog/mihawk-effects-gate-2026-10-10-02-virtual-query64-wine-child-2685.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": true,
+ "bench": {},
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [],
+  "top": []
+ },
+ "shown": {
+  "frames": 0,
+  "per_10s": [],
+  "longest_gap_ms": 0
+ },
+ "broker": {
+  "local_offer": 8589934592,
+  "host_limit": 1073741824,
+  "refused": [],
+  "refused_count": 0,
+  "clients": [
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   }
+  ],
+  "wedged": false,
+  "failure_reasons": [],
+  "host_peak": 0,
+  "local_peak": 0
+ },
+ "captures": [],
+ "cleanup_verified": true,
+ "hooks_removed": true
+}

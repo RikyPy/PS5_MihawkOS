@@ -1,0 +1,137 @@
+{
+ "run": "graphics-owner-cancel-2026-10-08-01",
+ "what": "C:\\process-probe.exe",
+ "env": [
+  "PROTON_LAYOUT=launcher",
+  "PS5_PROTON_PROBE_FRAMES=100000",
+  "PS5_PROTON_PROBE_WIDTH=640",
+  "PS5_PROTON_PROBE_HEIGHT=360"
+ ],
+ "result": "finished",
+ "seconds": 14.9,
+ "probe_verdict": null,
+ "clean_owner_restart": true,
+ "launcher_end_status": 0,
+ "initial_status": 0,
+ "closed_on_request": true,
+ "child_logs": [
+  "klog/graphics-owner-cancel-2026-10-08-01-wine-child-148.log",
+  "klog/graphics-owner-cancel-2026-10-08-01-wine-child-149.log",
+  "klog/graphics-owner-cancel-2026-10-08-01-wine-child-150.log",
+  "klog/graphics-owner-cancel-2026-10-08-01-wine-child-151.log",
+  "klog/graphics-owner-cancel-2026-10-08-01-wine-child-152.log",
+  "klog/graphics-owner-cancel-2026-10-08-01-wine-child-153.log",
+  "klog/graphics-owner-cancel-2026-10-08-01-wine-child-154.log",
+  "klog/graphics-owner-cancel-2026-10-08-01-wine-child-155.log",
+  "klog/graphics-owner-cancel-2026-10-08-01-wine-child-156.log",
+  "klog/graphics-owner-cancel-2026-10-08-01-wine-child-157.log",
+  "klog/graphics-owner-cancel-2026-10-08-01-wine-child-158.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": true,
+ "bench": {
+  "frames": 180.0,
+  "draws": 1.0,
+  "vsync": 1.0,
+  "total_ms": 3476.0,
+  "frame_us": 19315.0
+ },
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   }
+  ],
+  "top": []
+ },
+ "shown": {
+  "frames": 0,
+  "per_10s": [],
+  "longest_gap_ms": 0
+ },
+ "broker": {
+  "local_offer": 8589934592,
+  "host_limit": 1073741824,
+  "refused": [],
+  "refused_count": 0,
+  "clients": [
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": 157,
+    "frames": 167,
+    "submissions": 502
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   }
+  ],
+  "wedged": false,
+  "failure_reasons": [],
+  "host_peak": 30490624,
+  "local_peak": 28573696
+ },
+ "pad_script": [
+  "anchor frame",
+  "1 capture",
+  "3 stop"
+ ],
+ "captures": [
+  "klog/graphics-owner-cancel-2026-10-08-01-capture-01.png"
+ ]
+}

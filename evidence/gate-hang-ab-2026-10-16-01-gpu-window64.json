@@ -1,0 +1,1374 @@
+{
+ "telemetry_hold": null,
+ "launch_readiness": {
+  "ready": true,
+  "seconds": 0.133,
+  "settle_seconds": 0.0,
+  "census_seconds": 0.122,
+  "previous_cleanup_verified": true
+ },
+ "native_close_failures": [],
+ "run": "gate-hang-ab-2026-10-16-01-gpu-window64",
+ "what": "C:\\windows\\system32\\mihawk.exe",
+ "env": [
+  "PROTON_LAYOUT=launcher",
+  "WINE_PS5_WINDOW_SURFACES=1",
+  "PROTON_STOP_TERMINATE=0"
+ ],
+ "result": "finished",
+ "seconds": 28.0,
+ "probe_verdict": "PASS",
+ "clean_owner_restart": true,
+ "launcher_end_status": 0,
+ "initial_status": 0,
+ "closed_on_request": false,
+ "child_logs": [
+  "klog/gate-hang-ab-2026-10-16-01-gpu-window64-wine-child-3174.log",
+  "klog/gate-hang-ab-2026-10-16-01-gpu-window64-wine-child-3175.log",
+  "klog/gate-hang-ab-2026-10-16-01-gpu-window64-wine-child-3176.log",
+  "klog/gate-hang-ab-2026-10-16-01-gpu-window64-wine-child-3177.log",
+  "klog/gate-hang-ab-2026-10-16-01-gpu-window64-wine-child-3178.log",
+  "klog/gate-hang-ab-2026-10-16-01-gpu-window64-wine-child-3179.log",
+  "klog/gate-hang-ab-2026-10-16-01-gpu-window64-wine-child-3180.log",
+  "klog/gate-hang-ab-2026-10-16-01-gpu-window64-wine-child-3181.log",
+  "klog/gate-hang-ab-2026-10-16-01-gpu-window64-wine-child-3182.log",
+  "klog/gate-hang-ab-2026-10-16-01-gpu-window64-wine-child-3183.log",
+  "klog/gate-hang-ab-2026-10-16-01-gpu-window64-wine-child-3184.log",
+  "klog/gate-hang-ab-2026-10-16-01-gpu-window64-wine-child-3185.log",
+  "klog/gate-hang-ab-2026-10-16-01-gpu-window64-wine-child-3186.log"
+ ],
+ "child_logs_missing": [],
+ "session_logs_status": 0,
+ "storage_errors": 0,
+ "stop_terminate": "0",
+ "injected_fault": null,
+ "exec_protection": {
+  "refused": 0,
+  "conversions": 532,
+  "converted_kib": 84256,
+  "convert_failed": 0,
+  "exec_refused": 0,
+  "grant_retries": 0,
+  "modules": 44,
+  "sdk_refused": 0
+ },
+ "foreign_mappings": {
+  "found": 0,
+  "skipped_unmaps": 0,
+  "refused_maps": 0,
+  "query_failed": 0,
+  "holes": 0,
+  "hole_list": []
+ },
+ "helper_sched": {
+  "helpers": [
+   {
+    "kind": "memory",
+    "mode": "rr",
+    "main_tid": "101911",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xea00",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xea00",
+    "service": "0",
+    "program": "700",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "1/700",
+    "now_kernel": "10/700"
+   },
+   {
+    "kind": "program",
+    "mode": "rr",
+    "main_tid": "101674",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xea00",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xea00",
+    "service": "0",
+    "program": "700",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "1/700",
+    "now_kernel": "10/700"
+   },
+   {
+    "kind": "program",
+    "mode": "rr",
+    "main_tid": "102469",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xea00",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xea00",
+    "service": "0",
+    "program": "700",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "1/700",
+    "now_kernel": "10/700"
+   },
+   {
+    "kind": "program",
+    "mode": "rr",
+    "main_tid": "101588",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xea00",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xea00",
+    "service": "0",
+    "program": "700",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "1/700",
+    "now_kernel": "10/700"
+   },
+   {
+    "kind": "program",
+    "mode": "rr",
+    "main_tid": "101957",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xea00",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xea00",
+    "service": "0",
+    "program": "700",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "1/700",
+    "now_kernel": "10/700"
+   },
+   {
+    "kind": "program",
+    "mode": "rr",
+    "main_tid": "101680",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xea00",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xea00",
+    "service": "0",
+    "program": "700",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "1/700",
+    "now_kernel": "10/700"
+   },
+   {
+    "kind": "program",
+    "mode": "rr",
+    "main_tid": "102442",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xea00",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xea00",
+    "service": "0",
+    "program": "700",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "1/700",
+    "now_kernel": "10/700"
+   },
+   {
+    "kind": "program",
+    "mode": "rr",
+    "main_tid": "101648",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xea00",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xea00",
+    "service": "0",
+    "program": "700",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "1/700",
+    "now_kernel": "10/700"
+   },
+   {
+    "kind": "program",
+    "mode": "rr",
+    "main_tid": "102297",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xea00",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xea00",
+    "service": "0",
+    "program": "700",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "1/700",
+    "now_kernel": "10/700"
+   },
+   {
+    "kind": "program",
+    "mode": "rr",
+    "main_tid": "102469",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xea00",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xea00",
+    "service": "0",
+    "program": "700",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "1/700",
+    "now_kernel": "10/700"
+   },
+   {
+    "kind": "program",
+    "mode": "rr",
+    "main_tid": "102302",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xea00",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xea00",
+    "service": "0",
+    "program": "700",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "1/700",
+    "now_kernel": "10/700"
+   },
+   {
+    "kind": "program",
+    "mode": "rr",
+    "main_tid": "101955",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xea00",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xea00",
+    "service": "0",
+    "program": "700",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "1/700",
+    "now_kernel": "10/700"
+   },
+   {
+    "kind": "program",
+    "mode": "rr",
+    "main_tid": "102385",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xea00",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xea00",
+    "service": "0",
+    "program": "700",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "1/700",
+    "now_kernel": "10/700"
+   }
+  ],
+  "workers": [
+   {
+    "worker": "3/700",
+    "worker_kernel": "2/700",
+    "worker_cpus": "0xea00",
+    "status": "0",
+    "inherit": "3/700",
+    "inherit_kernel": "2/700",
+    "inherit_cpus": "0xea00"
+   },
+   {
+    "worker": "3/700",
+    "worker_kernel": "2/700",
+    "worker_cpus": "0xea00",
+    "status": "0",
+    "inherit": "3/700",
+    "inherit_kernel": "2/700",
+    "inherit_cpus": "0xea00"
+   },
+   {
+    "worker": "3/700",
+    "worker_kernel": "2/700",
+    "worker_cpus": "0xea00",
+    "status": "0",
+    "inherit": "3/700",
+    "inherit_kernel": "2/700",
+    "inherit_cpus": "0xea00"
+   },
+   {
+    "worker": "3/700",
+    "worker_kernel": "2/700",
+    "worker_cpus": "0xea00",
+    "status": "0",
+    "inherit": "3/700",
+    "inherit_kernel": "2/700",
+    "inherit_cpus": "0xea00"
+   },
+   {
+    "worker": "3/700",
+    "worker_kernel": "2/700",
+    "worker_cpus": "0xea00",
+    "status": "0",
+    "inherit": "3/700",
+    "inherit_kernel": "2/700",
+    "inherit_cpus": "0xea00"
+   },
+   {
+    "worker": "3/700",
+    "worker_kernel": "2/700",
+    "worker_cpus": "0xea00",
+    "status": "0",
+    "inherit": "3/700",
+    "inherit_kernel": "2/700",
+    "inherit_cpus": "0xea00"
+   },
+   {
+    "worker": "3/700",
+    "worker_kernel": "2/700",
+    "worker_cpus": "0xea00",
+    "status": "0",
+    "inherit": "3/700",
+    "inherit_kernel": "2/700",
+    "inherit_cpus": "0xea00"
+   },
+   {
+    "worker": "3/700",
+    "worker_kernel": "2/700",
+    "worker_cpus": "0xea00",
+    "status": "0",
+    "inherit": "3/700",
+    "inherit_kernel": "2/700",
+    "inherit_cpus": "0xea00"
+   },
+   {
+    "worker": "3/700",
+    "worker_kernel": "2/700",
+    "worker_cpus": "0xea00",
+    "status": "0",
+    "inherit": "3/700",
+    "inherit_kernel": "2/700",
+    "inherit_cpus": "0xea00"
+   },
+   {
+    "worker": "3/700",
+    "worker_kernel": "2/700",
+    "worker_cpus": "0xea00",
+    "status": "0",
+    "inherit": "3/700",
+    "inherit_kernel": "2/700",
+    "inherit_cpus": "0xea00"
+   },
+   {
+    "worker": "3/700",
+    "worker_kernel": "2/700",
+    "worker_cpus": "0xea00",
+    "status": "0",
+    "inherit": "3/700",
+    "inherit_kernel": "2/700",
+    "inherit_cpus": "0xea00"
+   },
+   {
+    "worker": "3/700",
+    "worker_kernel": "2/700",
+    "worker_cpus": "0xea00",
+    "status": "0",
+    "inherit": "3/700",
+    "inherit_kernel": "2/700",
+    "inherit_cpus": "0xea00"
+   }
+  ],
+  "program_threads": {
+   "set": 19,
+   "failed": 0
+  },
+  "census": null,
+  "census_processes": 0,
+  "row": null,
+  "scheduled": {
+   "ok": true,
+   "reasons": []
+  }
+ },
+ "helpers_ended": {
+  "why": null,
+  "count": 0,
+  "signals": {},
+  "gone_ms": {},
+  "still_there": [],
+  "after_kill": null,
+  "stalled": null,
+  "wedge_s": null,
+  "recorder_rows": "process rows from kern.proc (the title's own: state=3 pri=10/0 cpu=15 threads=18)"
+ },
+ "helper_doom": [
+  {
+   "seen": [
+    "exit"
+   ],
+   "doomed": null,
+   "stamped_ms_ago": null,
+   "ended": true
+  },
+  {
+   "seen": [
+    "exit"
+   ],
+   "doomed": null,
+   "stamped_ms_ago": null,
+   "ended": true
+  },
+  {
+   "seen": [
+    "exit"
+   ],
+   "doomed": null,
+   "stamped_ms_ago": null,
+   "ended": true
+  },
+  {
+   "seen": [
+    "exit"
+   ],
+   "doomed": null,
+   "stamped_ms_ago": null,
+   "ended": true
+  },
+  {
+   "seen": [
+    "exit"
+   ],
+   "doomed": null,
+   "stamped_ms_ago": null,
+   "ended": true
+  },
+  {
+   "seen": [
+    "exit"
+   ],
+   "doomed": null,
+   "stamped_ms_ago": null,
+   "ended": true
+  },
+  {
+   "seen": [
+    "exit"
+   ],
+   "doomed": null,
+   "stamped_ms_ago": null,
+   "ended": true
+  },
+  {
+   "seen": [
+    "exit"
+   ],
+   "doomed": null,
+   "stamped_ms_ago": null,
+   "ended": true
+  }
+ ],
+ "broker_phases": null,
+ "memory_helper_slowest": {
+  "census": 52,
+  "alloc": 0,
+  "shared": 0,
+  "touch": 1,
+  "dmem": 3,
+  "grant": 0,
+  "free": 1,
+  "stall": 0
+ },
+ "memory_helper": {
+  "dead": [],
+  "stall_tests": 0,
+  "sections_mib": [],
+  "given_back": 0,
+  "lost": 0,
+  "gave_back_lines": 0
+ },
+ "assertion": false,
+ "chunk_maps": null,
+ "mapped_mib": null,
+ "ask_failures_max": null,
+ "misplaced_max": null,
+ "rep_step_us": null,
+ "exec_rewrites_us": null,
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": true,
+ "bench": {},
+ "steady": {
+  "server": {
+   "calls": 0.0,
+   "per_s": 0.0,
+   "avg_us": 0.0,
+   "selects": 0.0,
+   "blocked": 0.0,
+   "block_avg_us": 0.0,
+   "waits": 0.0,
+   "handles_avg": 0.0,
+   "wait_all": 0.0,
+   "polled": 0.0,
+   "delays": 0.0,
+   "yields": 0.0,
+   "intervals": 3
+  }
+ },
+ "intervals": {
+  "frames": [],
+  "server": [
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   }
+  ],
+  "top": []
+ },
+ "shown": {
+  "frames": 553,
+  "per_10s": [
+   1,
+   139,
+   413
+  ],
+  "longest_gap_ms": 2598
+ },
+ "broker": {
+  "local_offer": 8589934592,
+  "host_limit": 1073741824,
+  "windows": {
+   "presents": 581,
+   "effect_bytes": 0,
+   "mica_builds": 0,
+   "thumbnail_builds": 0,
+   "compositions": 575,
+   "compose_avg_us": 2641,
+   "compose_max_us": 3336
+  },
+  "refused": [],
+  "refused_count": 0,
+  "clients": [
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": 3185,
+    "frames": 112,
+    "submissions": 229
+   },
+   {
+    "pid": 3186,
+    "frames": 39,
+    "submissions": 86
+   },
+   {
+    "pid": 3175,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": 3183,
+    "frames": 355,
+    "submissions": 727
+   }
+  ],
+  "wedged": false,
+  "failure_reasons": [],
+  "host_peak": 26001408,
+  "local_peak": 199065600
+ },
+ "pacing": {
+  "windows": [
+   {
+    "cookie": 11,
+    "pid": 3185,
+    "route": "composed",
+    "final": true,
+    "refused": "not-fullscreen",
+    "direct": 0.0,
+    "composed": 112.0,
+    "seconds": 7.9,
+    "frames": 112.0,
+    "hidden": 0.0,
+    "fps": 14.2,
+    "mean": 67.79,
+    "p50": 33.5,
+    "p95": 50.5,
+    "p99": 1982.68,
+    "max": 1982.68,
+    "over20": 92.0,
+    "over34": 9.0,
+    "present_avg": 46.78,
+    "present_max": 714.05
+   },
+   {
+    "cookie": 9,
+    "pid": 3183,
+    "route": "composed",
+    "final": false,
+    "refused": "not-fullscreen",
+    "direct": 0.0,
+    "composed": 268.0,
+    "seconds": 10.0,
+    "frames": 268.0,
+    "hidden": 0.0,
+    "fps": 26.8,
+    "mean": 37.51,
+    "p50": 19.25,
+    "p95": 50.5,
+    "p99": 705.28,
+    "max": 705.28,
+    "over20": 133.0,
+    "over34": 17.0,
+    "present_avg": 29.91,
+    "present_max": 704.81
+   },
+   {
+    "cookie": 12,
+    "pid": 3186,
+    "route": "composed",
+    "final": true,
+    "refused": "no-window",
+    "direct": 0.0,
+    "composed": 39.0,
+    "seconds": 2.1,
+    "frames": 39.0,
+    "hidden": 0.0,
+    "fps": 18.7,
+    "mean": 48.73,
+    "p50": 33.5,
+    "p95": 33.75,
+    "p99": 690.12,
+    "max": 690.12,
+    "over20": 34.0,
+    "over34": 1.0,
+    "present_avg": 47.12,
+    "present_max": 689.51
+   },
+   {
+    "cookie": 9,
+    "pid": 3183,
+    "route": "composed",
+    "final": true,
+    "refused": "not-fullscreen",
+    "direct": 0.0,
+    "composed": 87.0,
+    "seconds": 4.5,
+    "frames": 87.0,
+    "hidden": 0.0,
+    "fps": 19.4,
+    "mean": 46.74,
+    "p50": 24.25,
+    "p95": 33.75,
+    "p99": 680.81,
+    "max": 680.81,
+    "over20": 55.0,
+    "over34": 4.0,
+    "present_avg": 34.7,
+    "present_max": 680.28
+   }
+  ],
+  "clients": {
+   "11": {
+    "pid": 3185,
+    "route": "composed",
+    "routes": {
+     "composed": 112
+    },
+    "windows": 1,
+    "seconds": 7.9,
+    "frames": 112,
+    "hidden": 0,
+    "direct": 0,
+    "composed": 112,
+    "refused": [
+     "not-fullscreen"
+    ],
+    "fps": 14.2,
+    "p50_median_ms": 33.5,
+    "p95_worst_ms": 50.5,
+    "p99_worst_ms": 1982.68,
+    "max_ms": 1982.68,
+    "over20": 92,
+    "over34": 9,
+    "present_avg_ms": 46.78,
+    "present_max_ms": 714.05
+   },
+   "9": {
+    "pid": 3183,
+    "route": "composed",
+    "routes": {
+     "composed": 355
+    },
+    "windows": 2,
+    "seconds": 14.5,
+    "frames": 355,
+    "hidden": 0,
+    "direct": 0,
+    "composed": 355,
+    "refused": [
+     "not-fullscreen"
+    ],
+    "fps": 24.5,
+    "p50_median_ms": 21.75,
+    "p95_worst_ms": 50.5,
+    "p99_worst_ms": 705.28,
+    "max_ms": 705.28,
+    "over20": 188,
+    "over34": 21,
+    "present_avg_ms": 31.08,
+    "present_max_ms": 704.81
+   },
+   "12": {
+    "pid": 3186,
+    "route": "composed",
+    "routes": {
+     "composed": 39
+    },
+    "windows": 1,
+    "seconds": 2.1,
+    "frames": 39,
+    "hidden": 0,
+    "direct": 0,
+    "composed": 39,
+    "refused": [
+     "no-window"
+    ],
+    "fps": 18.6,
+    "p50_median_ms": 33.5,
+    "p95_worst_ms": 33.75,
+    "p99_worst_ms": 690.12,
+    "max_ms": 690.12,
+    "over20": 34,
+    "over34": 1,
+    "present_avg_ms": 47.12,
+    "present_max_ms": 689.51
+   }
+  }
+ },
+ "captures": [
+  "klog/gate-hang-ab-2026-10-16-01-gpu-window64-capture-01.png",
+  "klog/gate-hang-ab-2026-10-16-01-gpu-window64-capture-02.png",
+  "klog/gate-hang-ab-2026-10-16-01-gpu-window64-capture-03.png",
+  "klog/gate-hang-ab-2026-10-16-01-gpu-window64-capture-04.png",
+  "klog/gate-hang-ab-2026-10-16-01-gpu-window64-capture-05.png",
+  "klog/gate-hang-ab-2026-10-16-01-gpu-window64-capture-06.png"
+ ],
+ "cleanup_verified": true,
+ "hooks_removed": true,
+ "semantics_passed": true,
+ "window_pixels": [
+  {
+   "capture": "klog/gate-hang-ab-2026-10-16-01-gpu-window64-capture-01.png",
+   "number": 1,
+   "pixels": [
+    {
+     "phase": "gpu-controls",
+     "point": [
+      1801,
+      102
+     ],
+     "expected": [
+      255,
+      255,
+      255
+     ],
+     "actual": [
+      255,
+      255,
+      255
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-controls",
+     "point": [
+      304,
+      439
+     ],
+     "expected": [
+      30,
+      180,
+      70
+     ],
+     "actual": [
+      30,
+      180,
+      70
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-controls",
+     "point": [
+      634,
+      319
+     ],
+     "expected": [
+      240,
+      180,
+      30
+     ],
+     "actual": [
+      240,
+      180,
+      30
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-controls",
+     "point": [
+      754,
+      409
+     ],
+     "expected": [
+      220,
+      50,
+      60
+     ],
+     "actual": [
+      220,
+      50,
+      60
+     ],
+     "passed": true
+    }
+   ],
+   "desktop_background": [
+    11,
+    52,
+    142
+   ],
+   "expected_background": [
+    11,
+    52,
+    142
+   ],
+   "passed": true
+  },
+  {
+   "capture": "klog/gate-hang-ab-2026-10-16-01-gpu-window64-capture-02.png",
+   "number": 2,
+   "pixels": [
+    {
+     "phase": "gpu-modal",
+     "point": [
+      1801,
+      102
+     ],
+     "expected": [
+      255,
+      255,
+      255
+     ],
+     "actual": [
+      255,
+      255,
+      255
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-modal",
+     "point": [
+      304,
+      439
+     ],
+     "expected": [
+      30,
+      110,
+      210
+     ],
+     "actual": [
+      30,
+      110,
+      210
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-modal",
+     "point": [
+      634,
+      319
+     ],
+     "expected": [
+      240,
+      180,
+      30
+     ],
+     "actual": [
+      240,
+      180,
+      30
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-modal",
+     "point": [
+      754,
+      409
+     ],
+     "expected": [
+      220,
+      50,
+      60
+     ],
+     "actual": [
+      220,
+      50,
+      60
+     ],
+     "passed": true
+    }
+   ],
+   "desktop_background": [
+    11,
+    52,
+    142
+   ],
+   "expected_background": [
+    11,
+    52,
+    142
+   ],
+   "passed": true
+  },
+  {
+   "capture": "klog/gate-hang-ab-2026-10-16-01-gpu-window64-capture-03.png",
+   "number": 3,
+   "pixels": [
+    {
+     "phase": "gpu-resize-hidden",
+     "point": [
+      1801,
+      102
+     ],
+     "expected": [
+      255,
+      255,
+      255
+     ],
+     "actual": [
+      255,
+      255,
+      255
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-resize-hidden",
+     "point": [
+      204,
+      389
+     ],
+     "expected": [
+      30,
+      110,
+      210
+     ],
+     "actual": [
+      30,
+      110,
+      210
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-resize-hidden",
+     "point": [
+      534,
+      269
+     ],
+     "expected": [
+      240,
+      180,
+      30
+     ],
+     "actual": [
+      240,
+      180,
+      30
+     ],
+     "passed": true
+    }
+   ],
+   "desktop_background": [
+    11,
+    52,
+    142
+   ],
+   "expected_background": [
+    11,
+    52,
+    142
+   ],
+   "passed": true
+  },
+  {
+   "capture": "klog/gate-hang-ab-2026-10-16-01-gpu-window64-capture-04.png",
+   "number": 4,
+   "pixels": [
+    {
+     "phase": "gpu-restored",
+     "point": [
+      1801,
+      102
+     ],
+     "expected": [
+      255,
+      255,
+      255
+     ],
+     "actual": [
+      255,
+      255,
+      255
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-restored",
+     "point": [
+      204,
+      389
+     ],
+     "expected": [
+      30,
+      180,
+      70
+     ],
+     "actual": [
+      30,
+      180,
+      70
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-restored",
+     "point": [
+      534,
+      269
+     ],
+     "expected": [
+      240,
+      180,
+      30
+     ],
+     "actual": [
+      240,
+      180,
+      30
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-restored",
+     "point": [
+      654,
+      359
+     ],
+     "expected": [
+      30,
+      110,
+      210
+     ],
+     "actual": [
+      30,
+      110,
+      210
+     ],
+     "passed": true
+    }
+   ],
+   "desktop_background": [
+    11,
+    52,
+    142
+   ],
+   "expected_background": [
+    11,
+    52,
+    142
+   ],
+   "passed": true
+  },
+  {
+   "capture": "klog/gate-hang-ab-2026-10-16-01-gpu-window64-capture-05.png",
+   "number": 5,
+   "pixels": [
+    {
+     "phase": "gpu-child-exited",
+     "point": [
+      1801,
+      102
+     ],
+     "expected": [
+      255,
+      255,
+      255
+     ],
+     "actual": [
+      255,
+      255,
+      255
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-child-exited",
+     "point": [
+      204,
+      389
+     ],
+     "expected": [
+      220,
+      50,
+      60
+     ],
+     "actual": [
+      220,
+      50,
+      60
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-child-exited",
+     "point": [
+      534,
+      269
+     ],
+     "expected": [
+      240,
+      180,
+      30
+     ],
+     "actual": [
+      240,
+      180,
+      30
+     ],
+     "passed": true
+    }
+   ],
+   "desktop_background": [
+    11,
+    52,
+    142
+   ],
+   "expected_background": [
+    11,
+    52,
+    142
+   ],
+   "passed": true
+  },
+  {
+   "capture": "klog/gate-hang-ab-2026-10-16-01-gpu-window64-capture-06.png",
+   "number": 6,
+   "pixels": [
+    {
+     "phase": "gpu-into-owner",
+     "point": [
+      1801,
+      102
+     ],
+     "expected": [
+      255,
+      255,
+      255
+     ],
+     "actual": [
+      255,
+      255,
+      255
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-into-owner",
+     "point": [
+      314,
+      549
+     ],
+     "expected": [
+      30,
+      180,
+      70
+     ],
+     "actual": [
+      30,
+      180,
+      70
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-into-owner",
+     "point": [
+      534,
+      269
+     ],
+     "expected": [
+      240,
+      180,
+      30
+     ],
+     "actual": [
+      240,
+      180,
+      30
+     ],
+     "passed": true
+    }
+   ],
+   "desktop_background": [
+    11,
+    52,
+    142
+   ],
+   "expected_background": [
+    11,
+    52,
+    142
+   ],
+   "passed": true
+  }
+ ]
+}

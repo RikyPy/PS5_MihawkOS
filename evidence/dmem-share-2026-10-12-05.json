@@ -1,0 +1,24 @@
+{
+ "run": "dmem-share-2026-10-12-05",
+ "mib": 64,
+ "elf_sha256": "ab6f95a60fd23124afa24bb6d4a45adf1d2546060e4c44938396976db7d16ee3",
+ "passed": true,
+ "lines": [
+  "--- hold",
+  "dmem-share hold-before pid=125 status=0 resident_kib=3504 mapped_kib=16864",
+  "dmem-share hold allocation=0 map=0 offset=426934272 bytes=67108864",
+  "dmem-share hold-written pid=125 status=0 resident_kib=3552 mapped_kib=16992",
+  "dmem-share hold: grant pid 126 on offset 426934272 for 67108864 bytes with prot 0x33: 0",
+  "dmem-share hold: other side finished, its mark seen here (the memory is shared)",
+  "dmem-share hold-after pid=125 status=0 resident_kib=3552 mapped_kib=16992",
+  "PS5_PROTON_DMEM_SHARE PASS side=hold mark=1 unmap=0 release=0",
+  "",
+  "--- map",
+  "dmem-share map-before pid=126 status=0 resident_kib=3552 mapped_kib=16992",
+  "dmem-share map status=0 offset=426934272 bytes=67108864",
+  "dmem-share map: pattern matches (0 wrong bytes of 67108864)",
+  "dmem-share map-written pid=126 status=0 resident_kib=3552 mapped_kib=16992",
+  "PS5_PROTON_DMEM_SHARE PASS side=map status=0 contents=1 unmap=0",
+  ""
+ ]
+}

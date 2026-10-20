@@ -1,0 +1,58 @@
+From 4222ca7fa61e6e88c84ce1b66e48ab7420467323 Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Tue, 6 Oct 2026 18:45:18 -0400
+Subject: [PATCH] winebus: keep only the newest unread input reports
+
+process_hid_report appends every report to a list that hidclass empties
+one read at a time, the oldest first, and the list has no bound. A device
+that reports faster than hidclass reads makes every later report older:
+the PS5 DualSense reports 122 times a second, and in a helper process each
+read goes through a server round trip in the title. In
+a 2026-10-06 run (record removed from the tree; in git history) the bus queued all 199 reports
+that carried a press, and a .NET (MonoGame) game showed none of them. A +hid trace
+slowed the bus to 76 reports a second, and with it the presses arrived.
+
+A gamepad's newest state is the one that matters: a device keeps at most
+four unread reports, dropping the oldest, and the drops are counted in the
+log (err, every 1000th).
+---
+ dlls/winebus.sys/main.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+diff --git a/dlls/winebus.sys/main.c b/dlls/winebus.sys/main.c
+index 06d67b0..5dc27dc 100644
+--- a/dlls/winebus.sys/main.c
++++ b/dlls/winebus.sys/main.c
+@@ -46,6 +46,9 @@ DEFINE_GUID(GUID_NULL,0,0,0,0,0,0,0,0,0,0,0);
+ 
+ WINE_DEFAULT_DEBUG_CHANNEL(hid);
+ 
++/* The unread input reports a device keeps for hidclass (process_hid_report). */
++#define MAX_UNREAD_REPORTS 4
++
+ static DRIVER_OBJECT *driver_obj;
+ 
+ static DEVICE_OBJECT *mouse_obj;
+@@ -790,6 +793,19 @@ static void process_hid_report(DEVICE_OBJECT *device, BYTE *report_buf, DWORD re
+     }
+ 
+     list_add_tail(&ext->reports, &report->entry);
++    /* Keep only the newest unread reports. The list is a FIFO that hidclass empties one read at a time, and a
++     * device that reports faster than hidclass reads (the PS5 DualSense, at 122 reports a second, read through a
++     * server round trip each in a helper process) left every press further behind, until none arrived while the
++     * program ran (2026-10-06). A gamepad's newest state is the one that matters. */
++    if (list_count(&ext->reports) > MAX_UNREAD_REPORTS)
++    {
++        static LONG dropped;
++        struct hid_report *oldest = LIST_ENTRY(list_head(&ext->reports), struct hid_report, entry);
++        list_remove(&oldest->entry);
++        RtlFreeHeap(GetProcessHeap(), 0, oldest);
++        if (InterlockedIncrement(&dropped) % 1000 == 1)
++            ERR("device %p: %ld unread input reports dropped so far, the oldest first\n", device, dropped);
++    }
+ 
+     memcpy(last_report->buffer, report_buf, report_len);
+ 
+-- 
+2.56.0
+

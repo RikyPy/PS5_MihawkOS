@@ -1,0 +1,35 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Sun, 4 Oct 2026 10:55:00 -0400
+Subject: [PATCH] ntdll: reading a directory is an invalid device request
+
+NtReadFile left a directory handle to the generic read path, which relies on read() failing with
+EISDIR, as Linux's does, to return STATUS_INVALID_DEVICE_REQUEST. FreeBSD's read() on a directory
+can succeed with the directory's raw entries, and on the PS5 ntdll's file test saw NtReadFile on a
+directory return STATUS_SUCCESS (file.c:197). The server already tells a directory apart
+(FD_TYPE_DIR), so the status is now returned before any read, on every system.
+---
+  dlls/ntdll/unix/file.c | 8 ++++++++
+  1 file changed, 8 insertions(+)
+
+diff --git a/dlls/ntdll/unix/file.c b/dlls/ntdll/unix/file.c
+index 74f270d..768c6bb 100644
+--- a/dlls/ntdll/unix/file.c
++++ b/dlls/ntdll/unix/file.c
+@@ -6593,6 +6593,14 @@ NTSTATUS WINAPI NtReadFile( HANDLE handle, HANDLE event, PIO_APC_ROUTINE apc, vo
+ 
+     async_read = !(options & (FILE_SYNCHRONOUS_IO_ALERT | FILE_SYNCHRONOUS_IO_NONALERT));
+ 
++    /* Reading a directory is not a request a directory takes. Linux's read() says so
++     * (EISDIR); FreeBSD's, the PS5's, can return the directory's raw entries instead. */
++    if (type == FD_TYPE_DIR)
++    {
++        status = STATUS_INVALID_DEVICE_REQUEST;
++        goto done;
++    }
++
+     if (type == FD_TYPE_FILE)
+     {
+         if (async_read && (!offset || offset->QuadPart < 0))
+-- 
+2.55.0

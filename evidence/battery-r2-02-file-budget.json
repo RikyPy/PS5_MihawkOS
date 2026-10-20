@@ -1,0 +1,57 @@
+{
+ "run": "battery-r2-02-file-budget",
+ "what": "process-probe.exe",
+ "env": [],
+ "result": "finished",
+ "seconds": 12.9,
+ "probe_verdict": "PASS",
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": true,
+ "bench": {},
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [
+   {
+    "calls": 6799.0,
+    "per_s": 1335.0,
+    "avg_us": 593.9,
+    "selects": 972.0,
+    "blocked": 322.0,
+    "block_avg_us": 11660.3,
+    "waits": 969.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 644.0,
+    "delays": 0.0,
+    "yields": 0.0
+   }
+  ],
+  "top": [
+   {
+    "create_file": {
+     "count": 648,
+     "avg_us": 4321.4
+    },
+    "event_op": {
+     "count": 320,
+     "avg_us": 2424.7
+    },
+    "create_key": {
+     "count": 101,
+     "avg_us": 938.2
+    },
+    "close_handle": {
+     "count": 1770,
+     "avg_us": 37.0
+    },
+    "set_key_value": {
+     "count": 82,
+     "avg_us": 413.6
+    }
+   }
+  ]
+ }
+}

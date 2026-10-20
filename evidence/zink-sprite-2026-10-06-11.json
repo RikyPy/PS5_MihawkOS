@@ -1,0 +1,47 @@
+{
+ "run": "zink-sprite-2026-10-06-11",
+ "what": "gl-sprite-probe.exe",
+ "env": [
+  "WINEDLLOVERRIDES=opengl32=n;d3d11,dxgi,d3d10core=n,b;bcrypt=b",
+  "GALLIUM_DRIVER=zink",
+  "WINE_PS5_HID=0",
+  "PROTON_LOADING_SCREEN=0",
+  "PROTON_GPU_CAPTURE=1",
+  "WINEDEBUG=-all,+seh,+debugstr,+loaddll",
+  "ZINK_DESCRIPTORS=lazy"
+ ],
+ "result": "finished",
+ "seconds": 11.1,
+ "probe_verdict": "PASS",
+ "clean_owner_restart": true,
+ "child_logs": [
+  "klog/zink-sprite-2026-10-06-11-wine-child-143.log",
+  "klog/zink-sprite-2026-10-06-11-wine-child-144.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": true,
+ "bench": {},
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   }
+  ],
+  "top": []
+ }
+}

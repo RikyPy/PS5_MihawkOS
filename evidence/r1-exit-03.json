@@ -1,0 +1,100 @@
+{
+ "run": "r1-exit-03",
+ "what": "exit-probe.exe",
+ "env": [],
+ "result": "finished",
+ "seconds": 19.4,
+ "probe_verdict": "PASS",
+ "exit_stall": true,
+ "stop_requested": "probe exit stalled",
+ "returned_to_launcher": true,
+ "passed": false,
+ "steady": {
+  "server": {
+   "calls": 0.0,
+   "per_s": 0.0,
+   "avg_us": 0.0,
+   "selects": 0.0,
+   "blocked": 0.0,
+   "block_avg_us": 0.0,
+   "waits": 0.0,
+   "handles_avg": 0.0,
+   "wait_all": 0.0,
+   "polled": 0.0,
+   "delays": 0.0,
+   "yields": 0.0,
+   "intervals": 2
+  }
+ },
+ "intervals": {
+  "frames": [],
+  "server": [
+   {
+    "calls": 1571.0,
+    "per_s": 310.0,
+    "avg_us": 21.9,
+    "selects": 7.0,
+    "blocked": 2.0,
+    "block_avg_us": 3215.6,
+    "waits": 4.0,
+    "handles_avg": 1.25,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   }
+  ],
+  "top": [
+   {
+    "create_mapping": {
+     "count": 54,
+     "avg_us": 143.9
+    },
+    "get_key_value": {
+     "count": 370,
+     "avg_us": 15.2
+    },
+    "create_file": {
+     "count": 56,
+     "avg_us": 82.2
+    },
+    "close_handle": {
+     "count": 285,
+     "avg_us": 13.9
+    },
+    "open_key": {
+     "count": 163,
+     "avg_us": 15.0
+    }
+   }
+  ]
+ }
+}

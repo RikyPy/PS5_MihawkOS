@@ -1,0 +1,905 @@
+{
+ "telemetry_hold": null,
+ "launch_readiness": {
+  "ready": true,
+  "seconds": 0.363,
+  "settle_seconds": 0.0,
+  "census_seconds": 0.341,
+  "previous_cleanup_verified": true
+ },
+ "native_close_failures": [],
+ "run": "dmem-gpu-dxvk64-2026-10-12-05",
+ "what": "C:\\windows\\system32\\mihawk.exe",
+ "env": [
+  "PROTON_LAYOUT=launcher",
+  "WINE_PS5_WINDOW_SURFACES=1",
+  "PROTON_GPU_HOST_DMEM=1"
+ ],
+ "result": "finished",
+ "seconds": 43.0,
+ "probe_verdict": "PASS",
+ "clean_owner_restart": true,
+ "launcher_end_status": 0,
+ "initial_status": 0,
+ "closed_on_request": false,
+ "child_logs": [
+  "klog/dmem-gpu-dxvk64-2026-10-12-05-wine-child-234.log",
+  "klog/dmem-gpu-dxvk64-2026-10-12-05-wine-child-235.log",
+  "klog/dmem-gpu-dxvk64-2026-10-12-05-wine-child-236.log",
+  "klog/dmem-gpu-dxvk64-2026-10-12-05-wine-child-237.log",
+  "klog/dmem-gpu-dxvk64-2026-10-12-05-wine-child-238.log",
+  "klog/dmem-gpu-dxvk64-2026-10-12-05-wine-child-239.log",
+  "klog/dmem-gpu-dxvk64-2026-10-12-05-wine-child-240.log",
+  "klog/dmem-gpu-dxvk64-2026-10-12-05-wine-child-241.log",
+  "klog/dmem-gpu-dxvk64-2026-10-12-05-wine-child-242.log",
+  "klog/dmem-gpu-dxvk64-2026-10-12-05-wine-child-243.log",
+  "klog/dmem-gpu-dxvk64-2026-10-12-05-wine-child-244.log",
+  "klog/dmem-gpu-dxvk64-2026-10-12-05-wine-child-245.log",
+  "klog/dmem-gpu-dxvk64-2026-10-12-05-wine-child-246.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": true,
+ "bench": {},
+ "steady": {
+  "server": {
+   "calls": 0.0,
+   "per_s": 0.0,
+   "avg_us": 0.0,
+   "selects": 0.0,
+   "blocked": 0.0,
+   "block_avg_us": 0.0,
+   "waits": 0.0,
+   "handles_avg": 0.0,
+   "wait_all": 0.0,
+   "polled": 0.0,
+   "delays": 0.0,
+   "yields": 0.0,
+   "intervals": 2
+  }
+ },
+ "intervals": {
+  "frames": [],
+  "server": [
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   }
+  ],
+  "top": []
+ },
+ "shown": {
+  "frames": 7,
+  "per_10s": [
+   1,
+   6
+  ],
+  "longest_gap_ms": 4866
+ },
+ "broker": {
+  "local_offer": 8589934592,
+  "host_limit": 1073741824,
+  "windows": {
+   "presents": 1244,
+   "effect_bytes": 0,
+   "mica_builds": 0,
+   "thumbnail_builds": 0,
+   "compositions": 1235,
+   "compose_avg_us": 2704,
+   "compose_max_us": 3293
+  },
+  "refused": [],
+  "refused_count": 0,
+  "clients": [
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": 245,
+    "frames": 310,
+    "submissions": 621
+   },
+   {
+    "pid": 246,
+    "frames": 105,
+    "submissions": 211
+   },
+   {
+    "pid": 235,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": 243,
+    "frames": 754,
+    "submissions": 1510
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   }
+  ],
+  "wedged": false,
+  "failure_reasons": [],
+  "host_peak": 37961728,
+  "local_peak": 21823488
+ },
+ "pacing": {
+  "windows": [
+   {
+    "cookie": 9,
+    "pid": 243,
+    "route": "composed",
+    "final": false,
+    "refused": "off",
+    "direct": 0.0,
+    "composed": 276.0,
+    "seconds": 10.0,
+    "frames": 276.0,
+    "hidden": 0.0,
+    "fps": 27.6,
+    "mean": 36.37,
+    "p50": 33.5,
+    "p95": 33.75,
+    "p99": 691.96,
+    "max": 691.96,
+    "over20": 194.0,
+    "over34": 10.0,
+    "present_avg": 31.95,
+    "present_max": 691.5
+   },
+   {
+    "cookie": 11,
+    "pid": 245,
+    "route": "composed",
+    "final": false,
+    "refused": "off",
+    "direct": 0.0,
+    "composed": 202.0,
+    "seconds": 10.4,
+    "frames": 202.0,
+    "hidden": 0.0,
+    "fps": 19.4,
+    "mean": 51.88,
+    "p50": 33.5,
+    "p95": 33.75,
+    "p99": 2552.7,
+    "max": 2552.7,
+    "over20": 185.0,
+    "over34": 7.0,
+    "present_avg": 37.7,
+    "present_max": 681.65
+   },
+   {
+    "cookie": 11,
+    "pid": 245,
+    "route": "composed",
+    "final": true,
+    "refused": "off",
+    "direct": 0.0,
+    "composed": 108.0,
+    "seconds": 4.5,
+    "frames": 108.0,
+    "hidden": 0.0,
+    "fps": 23.9,
+    "mean": 38.62,
+    "p50": 33.5,
+    "p95": 33.75,
+    "p99": 33.75,
+    "max": 679.72,
+    "over20": 104.0,
+    "over34": 1.0,
+    "present_avg": 38.08,
+    "present_max": 679.2
+   },
+   {
+    "cookie": 9,
+    "pid": 243,
+    "route": "composed",
+    "final": false,
+    "refused": "off",
+    "direct": 0.0,
+    "composed": 332.0,
+    "seconds": 10.0,
+    "frames": 332.0,
+    "hidden": 0.0,
+    "fps": 33.1,
+    "mean": 30.23,
+    "p50": 16.75,
+    "p95": 33.75,
+    "p99": 689.25,
+    "max": 689.25,
+    "over20": 114.0,
+    "over34": 8.0,
+    "present_avg": 26.93,
+    "present_max": 688.8
+   },
+   {
+    "cookie": 12,
+    "pid": 246,
+    "route": "composed",
+    "final": true,
+    "refused": "off",
+    "direct": 0.0,
+    "composed": 105.0,
+    "seconds": 4.2,
+    "frames": 105.0,
+    "hidden": 0.0,
+    "fps": 24.7,
+    "mean": 38.66,
+    "p50": 33.5,
+    "p95": 33.75,
+    "p99": 34.0,
+    "max": 686.98,
+    "over20": 98.0,
+    "over34": 1.0,
+    "present_avg": 37.98,
+    "present_max": 686.36
+   },
+   {
+    "cookie": 9,
+    "pid": 243,
+    "route": "composed",
+    "final": true,
+    "refused": "off",
+    "direct": 0.0,
+    "composed": 146.0,
+    "seconds": 5.2,
+    "frames": 146.0,
+    "hidden": 0.0,
+    "fps": 27.9,
+    "mean": 32.94,
+    "p50": 33.5,
+    "p95": 33.75,
+    "p99": 92.0,
+    "max": 677.78,
+    "over20": 101.0,
+    "over34": 3.0,
+    "present_avg": 31.59,
+    "present_max": 677.27
+   }
+  ],
+  "clients": {
+   "9": {
+    "pid": 243,
+    "route": "composed",
+    "routes": {
+     "composed": 754
+    },
+    "windows": 3,
+    "seconds": 25.2,
+    "frames": 754,
+    "hidden": 0,
+    "direct": 0,
+    "composed": 754,
+    "refused": [
+     "off"
+    ],
+    "fps": 29.9,
+    "p50_median_ms": 33.5,
+    "p95_worst_ms": 33.75,
+    "p99_worst_ms": 691.96,
+    "max_ms": 691.96,
+    "over20": 409,
+    "over34": 21,
+    "present_avg_ms": 29.67,
+    "present_max_ms": 691.5
+   },
+   "11": {
+    "pid": 245,
+    "route": "composed",
+    "routes": {
+     "composed": 310
+    },
+    "windows": 2,
+    "seconds": 14.9,
+    "frames": 310,
+    "hidden": 0,
+    "direct": 0,
+    "composed": 310,
+    "refused": [
+     "off"
+    ],
+    "fps": 20.8,
+    "p50_median_ms": 33.5,
+    "p95_worst_ms": 33.75,
+    "p99_worst_ms": 2552.7,
+    "max_ms": 2552.7,
+    "over20": 289,
+    "over34": 8,
+    "present_avg_ms": 37.83,
+    "present_max_ms": 681.65
+   },
+   "12": {
+    "pid": 246,
+    "route": "composed",
+    "routes": {
+     "composed": 105
+    },
+    "windows": 1,
+    "seconds": 4.2,
+    "frames": 105,
+    "hidden": 0,
+    "direct": 0,
+    "composed": 105,
+    "refused": [
+     "off"
+    ],
+    "fps": 25.0,
+    "p50_median_ms": 33.5,
+    "p95_worst_ms": 33.75,
+    "p99_worst_ms": 34.0,
+    "max_ms": 686.98,
+    "over20": 98,
+    "over34": 1,
+    "present_avg_ms": 37.98,
+    "present_max_ms": 686.36
+   }
+  }
+ },
+ "captures": [
+  "klog/dmem-gpu-dxvk64-2026-10-12-05-capture-01.png",
+  "klog/dmem-gpu-dxvk64-2026-10-12-05-capture-02.png",
+  "klog/dmem-gpu-dxvk64-2026-10-12-05-capture-03.png",
+  "klog/dmem-gpu-dxvk64-2026-10-12-05-capture-04.png",
+  "klog/dmem-gpu-dxvk64-2026-10-12-05-capture-05.png",
+  "klog/dmem-gpu-dxvk64-2026-10-12-05-capture-06.png"
+ ],
+ "cleanup_verified": true,
+ "hooks_removed": true,
+ "semantics_passed": true,
+ "window_pixels": [
+  {
+   "capture": "klog/dmem-gpu-dxvk64-2026-10-12-05-capture-01.png",
+   "number": 1,
+   "pixels": [
+    {
+     "phase": "gpu-controls",
+     "point": [
+      1801,
+      102
+     ],
+     "expected": [
+      255,
+      255,
+      255
+     ],
+     "actual": [
+      255,
+      255,
+      255
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-controls",
+     "point": [
+      304,
+      439
+     ],
+     "expected": [
+      30,
+      180,
+      70
+     ],
+     "actual": [
+      30,
+      180,
+      70
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-controls",
+     "point": [
+      634,
+      319
+     ],
+     "expected": [
+      240,
+      180,
+      30
+     ],
+     "actual": [
+      240,
+      180,
+      30
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-controls",
+     "point": [
+      754,
+      409
+     ],
+     "expected": [
+      220,
+      50,
+      60
+     ],
+     "actual": [
+      220,
+      50,
+      60
+     ],
+     "passed": true
+    }
+   ],
+   "desktop_background": [
+    11,
+    52,
+    142
+   ],
+   "expected_background": [
+    11,
+    52,
+    142
+   ],
+   "passed": true
+  },
+  {
+   "capture": "klog/dmem-gpu-dxvk64-2026-10-12-05-capture-02.png",
+   "number": 2,
+   "pixels": [
+    {
+     "phase": "gpu-modal",
+     "point": [
+      1801,
+      102
+     ],
+     "expected": [
+      255,
+      255,
+      255
+     ],
+     "actual": [
+      255,
+      255,
+      255
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-modal",
+     "point": [
+      304,
+      439
+     ],
+     "expected": [
+      30,
+      110,
+      210
+     ],
+     "actual": [
+      30,
+      110,
+      210
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-modal",
+     "point": [
+      634,
+      319
+     ],
+     "expected": [
+      240,
+      180,
+      30
+     ],
+     "actual": [
+      240,
+      180,
+      30
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-modal",
+     "point": [
+      754,
+      409
+     ],
+     "expected": [
+      220,
+      50,
+      60
+     ],
+     "actual": [
+      220,
+      50,
+      60
+     ],
+     "passed": true
+    }
+   ],
+   "desktop_background": [
+    11,
+    52,
+    142
+   ],
+   "expected_background": [
+    11,
+    52,
+    142
+   ],
+   "passed": true
+  },
+  {
+   "capture": "klog/dmem-gpu-dxvk64-2026-10-12-05-capture-03.png",
+   "number": 3,
+   "pixels": [
+    {
+     "phase": "gpu-resize-hidden",
+     "point": [
+      1801,
+      102
+     ],
+     "expected": [
+      255,
+      255,
+      255
+     ],
+     "actual": [
+      255,
+      255,
+      255
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-resize-hidden",
+     "point": [
+      204,
+      389
+     ],
+     "expected": [
+      30,
+      110,
+      210
+     ],
+     "actual": [
+      30,
+      110,
+      210
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-resize-hidden",
+     "point": [
+      534,
+      269
+     ],
+     "expected": [
+      240,
+      180,
+      30
+     ],
+     "actual": [
+      240,
+      180,
+      30
+     ],
+     "passed": true
+    }
+   ],
+   "desktop_background": [
+    11,
+    52,
+    142
+   ],
+   "expected_background": [
+    11,
+    52,
+    142
+   ],
+   "passed": true
+  },
+  {
+   "capture": "klog/dmem-gpu-dxvk64-2026-10-12-05-capture-04.png",
+   "number": 4,
+   "pixels": [
+    {
+     "phase": "gpu-restored",
+     "point": [
+      1801,
+      102
+     ],
+     "expected": [
+      255,
+      255,
+      255
+     ],
+     "actual": [
+      255,
+      255,
+      255
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-restored",
+     "point": [
+      204,
+      389
+     ],
+     "expected": [
+      30,
+      180,
+      70
+     ],
+     "actual": [
+      30,
+      180,
+      70
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-restored",
+     "point": [
+      534,
+      269
+     ],
+     "expected": [
+      240,
+      180,
+      30
+     ],
+     "actual": [
+      240,
+      180,
+      30
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-restored",
+     "point": [
+      654,
+      359
+     ],
+     "expected": [
+      30,
+      110,
+      210
+     ],
+     "actual": [
+      30,
+      110,
+      210
+     ],
+     "passed": true
+    }
+   ],
+   "desktop_background": [
+    11,
+    52,
+    142
+   ],
+   "expected_background": [
+    11,
+    52,
+    142
+   ],
+   "passed": true
+  },
+  {
+   "capture": "klog/dmem-gpu-dxvk64-2026-10-12-05-capture-05.png",
+   "number": 5,
+   "pixels": [
+    {
+     "phase": "gpu-child-exited",
+     "point": [
+      1801,
+      102
+     ],
+     "expected": [
+      255,
+      255,
+      255
+     ],
+     "actual": [
+      255,
+      255,
+      255
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-child-exited",
+     "point": [
+      204,
+      389
+     ],
+     "expected": [
+      220,
+      50,
+      60
+     ],
+     "actual": [
+      220,
+      50,
+      60
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-child-exited",
+     "point": [
+      534,
+      269
+     ],
+     "expected": [
+      240,
+      180,
+      30
+     ],
+     "actual": [
+      240,
+      180,
+      30
+     ],
+     "passed": true
+    }
+   ],
+   "desktop_background": [
+    11,
+    52,
+    142
+   ],
+   "expected_background": [
+    11,
+    52,
+    142
+   ],
+   "passed": true
+  },
+  {
+   "capture": "klog/dmem-gpu-dxvk64-2026-10-12-05-capture-06.png",
+   "number": 6,
+   "pixels": [
+    {
+     "phase": "gpu-into-owner",
+     "point": [
+      1801,
+      102
+     ],
+     "expected": [
+      255,
+      255,
+      255
+     ],
+     "actual": [
+      255,
+      255,
+      255
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-into-owner",
+     "point": [
+      314,
+      549
+     ],
+     "expected": [
+      30,
+      180,
+      70
+     ],
+     "actual": [
+      30,
+      180,
+      70
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-into-owner",
+     "point": [
+      534,
+      269
+     ],
+     "expected": [
+      240,
+      180,
+      30
+     ],
+     "actual": [
+      240,
+      180,
+      30
+     ],
+     "passed": true
+    }
+   ],
+   "desktop_background": [
+    11,
+    52,
+    142
+   ],
+   "expected_background": [
+    11,
+    52,
+    142
+   ],
+   "passed": true
+  }
+ ]
+}

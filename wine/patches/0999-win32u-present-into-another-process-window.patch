@@ -1,0 +1,43 @@
+From: PS5_Proton
+Subject: [PATCH] win32u: present into a window another process owns
+
+On Windows any process may create a swapchain on another process's window,
+and Chromium relies on it: without DirectComposition (a stub in Wine), its
+GPU process presents into the browser process's compositor window. The PS5
+window surface was bound only when the presenter owned the window, so
+a launcher's sign-in window could not be shown (2026-10-10, record removed from the tree; in git history:
+VK_ERROR_SURFACE_LOST_KHR, then CreateSwapChainForHwnd failed).
+
+The surface is now bound to any window that has an owning process; the
+broker files the frames under that owner, and drops them when the
+presenter exits (src/pw_window_scene.h). A refusal is logged with the
+window, its owner, the presenter and the generation.
+
+diff --git a/dlls/win32u/ps5drv.c b/dlls/win32u/ps5drv.c
+index c6ee725..1eac766 100644
+--- a/dlls/win32u/ps5drv.c
++++ b/dlls/win32u/ps5drv.c
+@@ -971,14 +971,21 @@ static VkResult ps5_vulkan_surface_create( HWND hwnd, BOOL raw, const struct vul
+     if (res == VK_SUCCESS && window_surfaces)
+     {
+         UINT64 generation=0;
++        int owner=0,bound=-1;
++        /* Any process may present into a window another owns, as on Windows: Chromium's GPU process presents
++         * into the browser process's compositor window when DirectComposition is unavailable. The broker files the
++         * frames under the window's owner (src/pw_window_scene.h); only a window with no owning process is refused. */
+         SERVER_START_REQ(get_window_info)
+         {
+             req->handle=wine_server_user_handle(hwnd);
+-            if(!wine_server_call(req) && reply->native_pid==getpid())generation=reply->generation;
++            if(!wine_server_call(req) && reply->native_pid>0) {owner=reply->native_pid;generation=reply->generation;}
+         }
+         SERVER_END_REQ;
+-        if(!generation || !bind_gpu_window || bind_gpu_window(*handle,(UINT)(UINT_PTR)hwnd,generation))
++        if(generation && bind_gpu_window)bound=bind_gpu_window(*handle,(UINT)(UINT_PTR)hwnd,generation);
++        if(bound)
+         {
++            ERR("window surface refused: hwnd %p owner %d presenter %d generation %s bind %d\n",hwnd,owner,
++                (int)getpid(),wine_dbgstr_longlong(generation),bound);
+             instance->p_vkDestroySurfaceKHR(instance->host.instance,*handle,NULL);
+             *handle=VK_NULL_HANDLE;
+             res=VK_ERROR_SURFACE_LOST_KHR;

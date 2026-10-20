@@ -1,0 +1,79 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Sun, 4 Oct 2026 22:30:00 -0400
+Subject: [PATCH] ntdll: on PS5, defer a signal that lands inside the sync device
+
+Patches 0921 and 0922 traced a .NET game's freezes with the in-process synchronization device on
+(2026-10-04; record removed from the tree; in git history): thread 0050 held the device's lock inside a wait when a SIGUSR1 landed on it; the
+suspend handler's server call (a select, run on the calling thread since patch 0918) waited for the
+server lock, held by thread 0034 in create_event, which waited for the device's lock. Linux's ntsync
+is a kernel driver, and no signal handler runs while its lock is held; the PS5 device is code in this
+process.
+
+Wine's asynchronous handlers (SIGINT, SIGQUIT, SIGUSR1) now ask the device first: when the signal
+landed on a thread inside it, from before the thread asks for the device's lock until it has let it
+go, the device notes the signal, the handler returns at once, and the device raises the signal again
+as soon as its thread is out, so the handler runs a moment later holding nothing. The device's waits
+sleep on a semaphore of their own without the lock (PS5_Proton src/pw_ntsync.c), so a blocked thread
+is never inside it and is suspended at once.
+---
+  dlls/ntdll/unix/signal_x86_64.c | 25 +++++++++++++++++++------
+  1 file changed, 19 insertions(+), 6 deletions(-)
+
+diff --git a/dlls/ntdll/unix/signal_x86_64.c b/dlls/ntdll/unix/signal_x86_64.c
+index f6dc433..6f63e25 100644
+--- a/dlls/ntdll/unix/signal_x86_64.c
++++ b/dlls/ntdll/unix/signal_x86_64.c
+@@ -2946,9 +2946,10 @@ static void fpe_handler( int signal, siginfo_t *siginfo, void *sigcontext )
+ /* The in-process synchronization device (patch 0890) is code in this process,
+  * not a kernel driver: a signal can land while its thread holds the device's
+  * lock, and a handler that then needs the device, or the server lock held by
+- * a thread that waits for the device, never returns. The device counts such
+- * signals for its dump (PS5_Proton src/pw_ntsync.h). */
+-extern void pw_ntsync_signal_arrived( int signal );
++ * a thread that waits for the device, never returns. Such a signal is left to
++ * the device, which raises it again as soon as its thread is out
++ * (PS5_Proton src/pw_ntsync.h). */
++extern int pw_ntsync_signal_deferred( int signal );
+ #endif
+ 
+ /**********************************************************************
+@@ -2962,7 +2963,11 @@ static void int_handler( int signal, siginfo_t *siginfo, void *sigcontext )
+     HANDLE handle;
+ 
+ #ifdef __PROSPERO__
+-    pw_ntsync_signal_arrived( signal );
++    if (pw_ntsync_signal_deferred( signal ))
++    {
++        leave_handler( ucontext );
++        return;
++    }
+ #endif
+ 
+     if (p__wine_ctrl_routine)
+@@ -2999,7 +3004,11 @@ static void quit_handler( int signal, siginfo_t *siginfo, void *sigcontext )
+     ucontext_t *ucontext = init_handler( sigcontext );
+ 
+ #ifdef __PROSPERO__
+-    pw_ntsync_signal_arrived( signal );
++    if (pw_ntsync_signal_deferred( signal ))
++    {
++        leave_handler( ucontext );
++        return;
++    }
+ #endif
+ 
+ #ifdef __PROSPERO__
+@@ -3045,7 +3054,11 @@ static void usr1_handler( int signal, siginfo_t *siginfo, void *sigcontext )
+     ucontext_t *ucontext = init_handler( sigcontext );
+ 
+ #ifdef __PROSPERO__
+-    pw_ntsync_signal_arrived( signal );
++    if (pw_ntsync_signal_deferred( signal ))
++    {
++        leave_handler( ucontext );
++        return;
++    }
+ #endif
+ 
+     if (is_inside_syscall( RSP_sig(ucontext) ))

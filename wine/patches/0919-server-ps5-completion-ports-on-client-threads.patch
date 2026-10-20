@@ -1,0 +1,36 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Sun, 4 Oct 2026 14:30:00 -0400
+Subject: [PATCH] server: on PS5, run the completion port requests on the client threads too
+
+Patch 0918 runs the requests that touch only sync objects, handles and file opens on the calling
+thread. In a .NET (MonoGame) game the most frequent request left on the pipes was remove_completion, about 900 a
+second at 15 us: .NET's thread pool takes its I/O completions from a port. NtRemoveIoCompletion asks
+remove_completion, waits with select (already direct) when the port is empty, and then asks
+get_thread_completion; NtSetIoCompletion asks add_completion. The four completion requests (with
+query_completion) only move messages between a port's queue and its waiters, wake waiters as
+event_op does, never sleep in the server, and carry handles and values, no application buffer,
+so they join the list.
+---
+  server/request.c | 6 ++++++
+  1 file changed, 6 insertions(+)
+
+diff --git a/server/request.c b/server/request.c
+index ab127f1..aea3463 100644
+--- a/server/request.c
++++ b/server/request.c
+@@ -366,6 +366,12 @@ static int is_direct_request( enum request req )
+     case REQ_dup_handle:
+     case REQ_create_file:
+     case REQ_get_handle_fd:
++    /* completion ports: queue, take and count messages, and fetch the one a
++     * wait was given; like event_op, they wake waiters and never sleep */
++    case REQ_add_completion:
++    case REQ_remove_completion:
++    case REQ_get_thread_completion:
++    case REQ_query_completion:
+         return 1;
+     default:
+         return 0;
+-- 
+2.55.0

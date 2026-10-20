@@ -1,0 +1,419 @@
+From: PS5_Proton
+Subject: [PATCH] explorer: Mica taskbar and live window previews
+
+The Mihawk taskbar declares a Mica backdrop through the public DWM API and
+paints with alpha: buffered paint clears to glass, GDI marks become opaque and
+the clock uses composited theme text. Hovering an application button shows a
+rounded acrylic pop-up with the window title and its live DWM thumbnail,
+scaled to fit, or its icon while minimized; clicking it activates the window.
+Wine owns the windows and the compositor draws the retained pixels; nothing
+is copied. Tooltips, keyboard navigation and button semantics are unchanged.
+
+diff --git a/programs/explorer/Makefile.in b/programs/explorer/Makefile.in
+index bd0d1465..ca82eba8 100644
+--- a/programs/explorer/Makefile.in
++++ b/programs/explorer/Makefile.in
+@@ -1,6 +1,6 @@
+ MODULE    = explorer.exe
+ IMPORTS   = rpcrt4 user32 gdi32 advapi32 win32u uxtheme
+-DELAYIMPORTS = comctl32 shell32 oleaut32 ole32 shlwapi
++DELAYIMPORTS = comctl32 shell32 oleaut32 ole32 shlwapi dwmapi
+ 
+ EXTRADLLFLAGS = -mwindows -municode
+ 
+diff --git a/programs/explorer/systray.c b/programs/explorer/systray.c
+index c1d569ff..1d914b91 100644
+--- a/programs/explorer/systray.c
++++ b/programs/explorer/systray.c
+@@ -27,6 +27,7 @@
+ #include <uxtheme.h>
+ #include "appearance.h"
+ #include "icons.h"
++#include "pw_shell_style.h"
+ 
+ #include <wine/debug.h>
+ #include <wine/list.h>
+@@ -127,6 +128,13 @@ static RECT taskbar_original_area;
+ static BOOL taskbar_area_saved;
+ static WCHAR taskbar_time[64], taskbar_date[64];
+ static int taskbar_gap, taskbar_clock_width, taskbar_padding;
++/* DWM surfaces: the taskbar is Mica, previews are rounded acrylic pop-ups with
++ * the hovered window's live DWM thumbnail. Wine owns every window; the
++ * compositor draws materials and retained pixels; nothing is copied here. */
++static HTHEME taskbar_theme;
++static HWND taskbar_preview, taskbar_preview_button, taskbar_hover;
++static HTHUMBNAIL taskbar_preview_thumbnail;
++enum { TASKBAR_PREVIEW_SHOW = 4, TASKBAR_PREVIEW_HIDE = 5 };
+ 
+ /* Palette and font are GUI-thread-owned. Wine's real theme/settings
+  * notifications refresh them; painting performs no registry/theme queries. */
+@@ -150,6 +158,8 @@ static void taskbar_refresh_theme(void)
+ 
+ 
+ static void click_taskbar_button(HWND button);
++static void taskbar_preview_hover(HWND button);
++static void taskbar_preview_hide(void);
+ 
+ static unsigned int nb_displayed;
+ 
+@@ -864,6 +874,26 @@ static void taskbar_fill(HDC dc, const RECT *rect, COLORREF colour)
+     if (brush) { FillRect(dc, rect, brush); DeleteObject(brush); }
+ }
+ 
++static void taskbar_dwm(HWND hwnd, DWORD corner, DWORD backdrop, DWORD border)
++{
++    DWORD dark = taskbar_dark;
++    MARGINS sheet = {-1, -1, -1, -1};
++    DwmSetWindowAttribute(hwnd, DWMWA_WINDOW_CORNER_PREFERENCE, &corner, sizeof(corner));
++    DwmSetWindowAttribute(hwnd, DWMWA_USE_IMMERSIVE_DARK_MODE, &dark, sizeof(dark));
++    DwmSetWindowAttribute(hwnd, DWMWA_BORDER_COLOR, &border, sizeof(border));
++    DwmExtendFrameIntoClientArea(hwnd, &sheet);
++    DwmSetWindowAttribute(hwnd, DWMWA_SYSTEMBACKDROP_TYPE, &backdrop, sizeof(backdrop));
++}
++
++/* After the palette refreshes: Mica taskbar, acrylic previews, theme text. */
++static void taskbar_surfaces(void)
++{
++    if (tray_window) taskbar_dwm(tray_window, DWMWCP_DONOTROUND, DWMSBT_MAINWINDOW, DWMWA_COLOR_NONE);
++    if (taskbar_preview) taskbar_dwm(taskbar_preview, DWMWCP_ROUND, DWMSBT_TRANSIENTWINDOW, taskbar_colour(3));
++    if (taskbar_theme) CloseThemeData(taskbar_theme);
++    taskbar_theme = tray_window ? OpenThemeData(tray_window, L"WINDOW") : NULL;
++}
++
+ static BOOL taskbar_eligible(HWND hwnd)
+ {
+     LONG_PTR style = GetWindowLongPtrW(hwnd, GWL_EXSTYLE);
+@@ -897,9 +927,14 @@ static LRESULT CALLBACK taskbar_button_proc(HWND hwnd, UINT msg, WPARAM w, LPARA
+         TRACKMOUSEEVENT tracking = {sizeof(tracking), TME_LEAVE, hwnd, 0};
+         if (TrackMouseEvent(&tracking)) SetPropW(hwnd, L"MihawkTaskbarHot", (HANDLE)1);
+         InvalidateRect(hwnd, NULL, FALSE);
++        taskbar_preview_hover(hwnd);
+     }
+     else if (msg == WM_MOUSELEAVE)
+-    { RemovePropW(hwnd, L"MihawkTaskbarHot"); InvalidateRect(hwnd, NULL, FALSE); }
++    {
++        RemovePropW(hwnd, L"MihawkTaskbarHot"); InvalidateRect(hwnd, NULL, FALSE);
++        SetTimer(tray_window, TASKBAR_PREVIEW_HIDE, 300, NULL);
++    }
++    else if (msg == WM_LBUTTONDOWN || msg == WM_RBUTTONDOWN) taskbar_preview_hide();
+     else if (msg == WM_SETFOCUS || msg == WM_KILLFOCUS) InvalidateRect(hwnd, NULL, FALSE);
+     else if (msg == WM_NCDESTROY)
+     { RemovePropW(hwnd, L"MihawkTaskbarHot"); RemoveWindowSubclass(hwnd, taskbar_button_proc, id); }
+@@ -921,35 +956,22 @@ static void taskbar_update_clock(void)
+ 
+ static void taskbar_paint_clock(const DRAWITEMSTRUCT *dis)
+ {
+-    RECT upper = dis->rcItem, lower = dis->rcItem;
+-    HGDIOBJ prior = SelectObject(dis->hDC, taskbar_font ? taskbar_font : GetStockObject(DEFAULT_GUI_FONT));
+-    taskbar_fill(dis->hDC, &dis->rcItem, taskbar_colour(0));
+-    SetBkMode(dis->hDC, TRANSPARENT); SetTextColor(dis->hDC, taskbar_colour(1));
++    RECT upper = dis->rcItem, lower = dis->rcItem; HDC dc = NULL;
++    HPAINTBUFFER glass = pw_shell_glass_begin(dis->hDC, &dis->rcItem, &dc);
++    if (!glass) { dc = dis->hDC; taskbar_fill(dc, &dis->rcItem, taskbar_colour(0)); }
++    HGDIOBJ prior = SelectObject(dc, taskbar_font ? taskbar_font : GetStockObject(DEFAULT_GUI_FONT));
+     int line = MulDiv(PW_APPEARANCE_TASKBAR_CLOCK_LINE_HEIGHT, GetDpiForWindow(tray_window), 96);
+     upper.right -= taskbar_padding; upper.top = (tray_height - 2 * line) / 2; upper.bottom = upper.top + line;
+     lower.right -= taskbar_padding; lower.top = upper.bottom; lower.bottom = lower.top + line;
+-    DrawTextW(dis->hDC, taskbar_time, -1, &upper, DT_RIGHT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);
+-    DrawTextW(dis->hDC, taskbar_date, -1, &lower, DT_RIGHT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);
+-    SelectObject(dis->hDC, prior);
++    pw_shell_glass_text(taskbar_theme, glass, dc, taskbar_time, &upper, taskbar_colour(1), DT_RIGHT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);
++    pw_shell_glass_text(taskbar_theme, glass, dc, taskbar_date, &lower, taskbar_colour(1), DT_RIGHT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);
++    SelectObject(dc, prior);
++    if (glass) EndBufferedPaint(glass, TRUE);
+ }
+ 
+-static void taskbar_paint_icon(const DRAWITEMSTRUCT *dis, struct taskbar_button *win)
++static HICON taskbar_window_icon(struct taskbar_button *win)
+ {
+-    RECT rect = dis->rcItem, inside = rect; HICON icon = taskbar_fallback;
+-    BOOL overflow = dis->hwndItem == taskbar_overflow, start = !overflow && win && !win->hwnd;
+-    BOOL active = win && win->active, hot = !!GetPropW(dis->hwndItem, L"MihawkTaskbarHot");
+-    int dpi = GetDpiForWindow(tray_window), size = MulDiv(PW_APPEARANCE_TASKBAR_ICON_SIZE, dpi, 96);
+-    taskbar_fill(dis->hDC, &rect, taskbar_colour(0));
+-    if (active || hot || dis->itemState & ODS_SELECTED)
+-    {
+-        HBRUSH brush = CreateSolidBrush(taskbar_colour(4));
+-        HGDIOBJ prior_brush = SelectObject(dis->hDC, brush), prior_pen = SelectObject(dis->hDC, GetStockObject(NULL_PEN));
+-        InflateRect(&inside, -1, -2);
+-        RoundRect(dis->hDC, inside.left, inside.top, inside.right, inside.bottom, 8, 8);
+-        SelectObject(dis->hDC, prior_pen); SelectObject(dis->hDC, prior_brush); DeleteObject(brush);
+-    }
+-    if (overflow) icon = taskbar_more[taskbar_dark];
+-    else if (win && win->hwnd)
++    HICON icon = taskbar_fallback;
+     {
+         DWORD_PTR result = 0; DWORD pid;
+         GetWindowThreadProcessId(win->hwnd, &pid);
+@@ -979,6 +1001,28 @@ static void taskbar_paint_icon(const DRAWITEMSTRUCT *dis, struct taskbar_button
+             if (win->application_icon) icon = win->application_icon;
+         }
+     }
++    return icon;
++}
++
++static void taskbar_paint_icon(const DRAWITEMSTRUCT *dis, struct taskbar_button *win)
++{
++    RECT rect = dis->rcItem, inside = rect; HICON icon = taskbar_fallback; HDC dc = NULL;
++    BOOL overflow = dis->hwndItem == taskbar_overflow, start = !overflow && win && !win->hwnd;
++    BOOL active = win && win->active, hot = !!GetPropW(dis->hwndItem, L"MihawkTaskbarHot");
++    int dpi = GetDpiForWindow(tray_window), size = MulDiv(PW_APPEARANCE_TASKBAR_ICON_SIZE, dpi, 96);
++    /* Mica shows through; GDI marks are made opaque, the icon keeps its alpha. */
++    HPAINTBUFFER glass = pw_shell_glass_begin(dis->hDC, &dis->rcItem, &dc);
++    if (!glass) { dc = dis->hDC; taskbar_fill(dc, &rect, taskbar_colour(0)); }
++    if (active || hot || dis->itemState & ODS_SELECTED)
++    {
++        HBRUSH brush = CreateSolidBrush(taskbar_colour(4));
++        HGDIOBJ prior_brush = SelectObject(dc, brush), prior_pen = SelectObject(dc, GetStockObject(NULL_PEN));
++        InflateRect(&inside, -1, -2);
++        RoundRect(dc, inside.left, inside.top, inside.right, inside.bottom, 8, 8);
++        SelectObject(dc, prior_pen); SelectObject(dc, prior_brush); DeleteObject(brush);
++    }
++    if (overflow) icon = taskbar_more[taskbar_dark];
++    else if (win && win->hwnd) icon = taskbar_window_icon(win);
+     if (!icon) icon = LoadIconW(NULL, (LPCWSTR)IDI_APPLICATION); /* Borrowed system fallback. */
+     if (start)
+     {
+@@ -994,24 +1038,26 @@ static void taskbar_paint_icon(const DRAWITEMSTRUCT *dis, struct taskbar_button
+         };
+         static const INT mark_counts[] = {40, 11, 11};
+         int extent = MulDiv(PW_APPEARANCE_TASKBAR_START_SIZE, dpi, 96), x = (rect.right - extent) / 2, y = (rect.bottom - extent) / 2;
+-        HDC dc = dis->hDC; HBRUSH brush = CreateSolidBrush(PW_APPEARANCE_START_MARK); POINT points[ARRAY_SIZE(mark)];
++        HBRUSH brush = CreateSolidBrush(PW_APPEARANCE_START_MARK); POINT points[ARRAY_SIZE(mark)];
+         HGDIOBJ prior_brush = SelectObject(dc, brush), prior_pen = SelectObject(dc, GetStockObject(NULL_PEN));
+         int prior_mode = SetPolyFillMode(dc, ALTERNATE);
+         for (unsigned int i = 0; i < ARRAY_SIZE(mark); ++i)
+         { points[i].x = x + MulDiv(mark[i].x, extent, 312); points[i].y = y + MulDiv(mark[i].y, extent, 312); }
+         PolyPolygon(dc, points, mark_counts, ARRAY_SIZE(mark_counts));
+         SetPolyFillMode(dc, prior_mode); SelectObject(dc, prior_pen); SelectObject(dc, prior_brush); DeleteObject(brush);
+     }
+-    else if (icon) DrawIconEx(dis->hDC, (rect.right - size) / 2, (rect.bottom - size) / 2,
++    else if (icon) DrawIconEx(dc, (rect.right - size) / 2, (rect.bottom - size) / 2,
+                               icon, size, size, 0, NULL, DI_NORMAL);
+     if (win && win->hwnd)
+     {
+         int width = active ? MulDiv(16, dpi, 96) : MulDiv(6, dpi, 96);
+         RECT indicator = {(rect.right - width) / 2, rect.bottom - 4, (rect.right + width) / 2, rect.bottom - 1};
+-        taskbar_fill(dis->hDC, &indicator, taskbar_colour(active ? 2 : 1));
++        taskbar_fill(dc, &indicator, taskbar_colour(active ? 2 : 1));
+     }
+     if ((dis->itemState & ODS_FOCUS) && !(dis->itemState & ODS_NOFOCUSRECT))
+-    { InflateRect(&rect, -2, -2); DrawFocusRect(dis->hDC, &rect); }
++    { InflateRect(&rect, -2, -2); DrawFocusRect(dc, &rect); }
++    /* Alpha icons already carry alpha; masked icons and GDI marks become opaque. */
++    if (glass) { pw_shell_glass_fix(glass); EndBufferedPaint(glass, TRUE); }
+ }
+ 
+ static void taskbar_layout(void)
+@@ -1293,6 +1339,8 @@ static void remove_taskbar_button( HWND hwnd )
+     struct taskbar_button *win = find_taskbar_button( hwnd );
+ 
+     if (!win) return;
++    if (win->button == taskbar_preview_button) taskbar_preview_hide();
++    if (win->button == taskbar_hover) taskbar_hover = NULL;
+     list_remove( &win->entry );
+     if (win->tooltip) DestroyWindow(win->tooltip);
+     DestroyWindow( win->button );
+@@ -1367,6 +1415,131 @@ static void click_taskbar_button( HWND button )
+     SetForegroundWindow( hwnd );
+ }
+ 
++/* Live preview of a hovered application button: the window's title and its
++ * real DWM thumbnail, scaled to fit, or its icon while it is minimized. */
++static LRESULT CALLBACK taskbar_preview_proc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
++{
++    switch (msg)
++    {
++    case WM_ERASEBKGND: return 1;
++    case WM_MOUSEACTIVATE: return MA_NOACTIVATE;
++    case WM_PAINT:
++    {
++        PAINTSTRUCT paint; RECT client, title; HDC dc = BeginPaint(hwnd, &paint), buffer = NULL; HPAINTBUFFER glass;
++        int dpi = GetDpiForWindow(hwnd), header = MulDiv(32, dpi, 96), margin = MulDiv(12, dpi, 96);
++        WCHAR text[256];
++        GetClientRect(hwnd, &client);
++        if ((glass = pw_shell_glass_begin(dc, &client, &buffer)))
++        {
++            struct taskbar_button *win = taskbar_preview_button ?
++                find_taskbar_button((HWND)GetWindowLongPtrW(taskbar_preview_button, GWLP_ID)) : NULL;
++            HGDIOBJ prior = SelectObject(buffer, taskbar_font ? taskbar_font : GetStockObject(DEFAULT_GUI_FONT));
++            GetWindowTextW(hwnd, text, ARRAY_SIZE(text));
++            SetRect(&title, margin, 0, client.right - margin, header);
++            pw_shell_glass_text(taskbar_theme, glass, buffer, text, &title, taskbar_colour(1),
++                                DT_SINGLELINE | DT_VCENTER | DT_END_ELLIPSIS | DT_NOPREFIX);
++            SelectObject(buffer, prior);
++            if (!taskbar_preview_thumbnail && win)
++            {
++                int size = MulDiv(48, dpi, 96);
++                HICON icon = taskbar_window_icon(win);
++                DrawIconEx(buffer, (client.right - size) / 2, header + (client.bottom - header - size) / 2,
++                           icon ? icon : LoadIconW(NULL, (LPCWSTR)IDI_APPLICATION), size, size, 0, NULL, DI_NORMAL);
++                pw_shell_glass_fix(glass);
++            }
++            EndBufferedPaint(glass, TRUE);
++        }
++        EndPaint(hwnd, &paint); return 0;
++    }
++    case WM_MOUSEMOVE:
++    {
++        TRACKMOUSEEVENT tracking = {sizeof(tracking), TME_LEAVE, hwnd, 0};
++        TrackMouseEvent(&tracking); KillTimer(tray_window, TASKBAR_PREVIEW_HIDE); return 0;
++    }
++    case WM_MOUSELEAVE: SetTimer(tray_window, TASKBAR_PREVIEW_HIDE, 300, NULL); return 0;
++    case WM_LBUTTONUP:
++        if (taskbar_preview_button)
++        {
++            HWND button = taskbar_preview_button;
++            taskbar_preview_hide();
++            click_taskbar_button(button);
++        }
++        return 0;
++    }
++    return DefWindowProcW(hwnd, msg, wparam, lparam);
++}
++
++static void taskbar_preview_hide(void)
++{
++    if (!tray_window) return;
++    KillTimer(tray_window, TASKBAR_PREVIEW_SHOW); KillTimer(tray_window, TASKBAR_PREVIEW_HIDE);
++    if (taskbar_preview_thumbnail) DwmUnregisterThumbnail(taskbar_preview_thumbnail);
++    taskbar_preview_thumbnail = NULL; taskbar_preview_button = NULL;
++    if (taskbar_preview) ShowWindow(taskbar_preview, SW_HIDE);
++}
++
++static void taskbar_preview_show(HWND button)
++{
++    struct taskbar_button *win = find_taskbar_button((HWND)GetWindowLongPtrW(button, GWLP_ID));
++    int dpi = GetDpiForWindow(tray_window), margin = MulDiv(8, dpi, 96), header = MulDiv(32, dpi, 96);
++    int max_w = MulDiv(240, dpi, 96), max_h = MulDiv(150, dpi, 96), tw = max_w, th = max_h, width, height, x, y;
++    MONITORINFO monitor = {sizeof(monitor)};
++    SIZE source = {0};
++    RECT anchor;
++
++    if (!win || !win->hwnd || !IsWindow(win->hwnd)) { taskbar_preview_hide(); return; }
++    if (!taskbar_preview)
++    {
++        WNDCLASSW type = {0};
++        type.lpfnWndProc = taskbar_preview_proc; type.hInstance = GetModuleHandleW(NULL);
++        type.hCursor = LoadCursorW(NULL, (LPCWSTR)IDC_ARROW); type.lpszClassName = L"MihawkTaskbarPreview";
++        RegisterClassW(&type);
++        taskbar_preview = CreateWindowExW(WS_EX_TOOLWINDOW | WS_EX_TOPMOST | WS_EX_NOACTIVATE, type.lpszClassName,
++                                          NULL, WS_POPUP, 0, 0, 0, 0, tray_window, NULL, NULL, NULL);
++        if (!taskbar_preview) return;
++        taskbar_dwm(taskbar_preview, DWMWCP_ROUND, DWMSBT_TRANSIENTWINDOW, taskbar_colour(3));
++    }
++    if (taskbar_preview_thumbnail) DwmUnregisterThumbnail(taskbar_preview_thumbnail);
++    taskbar_preview_thumbnail = NULL;
++    if (!IsIconic(win->hwnd) && SUCCEEDED(DwmRegisterThumbnail(taskbar_preview, win->hwnd, &taskbar_preview_thumbnail)))
++    {
++        if (SUCCEEDED(DwmQueryThumbnailSourceSize(taskbar_preview_thumbnail, &source)) && source.cx > 0 && source.cy > 0)
++        {
++            if ((LONGLONG)source.cx * max_h > (LONGLONG)source.cy * max_w) th = max(1, MulDiv(source.cy, max_w, source.cx));
++            else tw = max(1, MulDiv(source.cx, max_h, source.cy));
++        }
++    }
++    width = max(tw, MulDiv(160, dpi, 96)) + 2 * margin;
++    height = header + th + margin;
++    GetWindowRect(button, &anchor);
++    GetMonitorInfoW(MonitorFromWindow(tray_window, MONITOR_DEFAULTTOPRIMARY), &monitor);
++    x = (anchor.left + anchor.right - width) / 2;
++    x = max(monitor.rcWork.left + margin, min(x, monitor.rcWork.right - margin - width));
++    y = monitor.rcWork.bottom - margin - height;
++    taskbar_preview_button = button;
++    SetWindowTextW(taskbar_preview, win->title);
++    if (taskbar_preview_thumbnail)
++    {
++        DWM_THUMBNAIL_PROPERTIES properties = {0};
++        properties.dwFlags = DWM_TNP_RECTDESTINATION | DWM_TNP_VISIBLE | DWM_TNP_OPACITY | DWM_TNP_SOURCECLIENTAREAONLY;
++        SetRect(&properties.rcDestination, (width - tw) / 2, header, (width - tw) / 2 + tw, header + th);
++        properties.opacity = 255; properties.fVisible = TRUE; properties.fSourceClientAreaOnly = FALSE;
++        DwmUpdateThumbnailProperties(taskbar_preview_thumbnail, &properties);
++    }
++    SetWindowPos(taskbar_preview, HWND_TOPMOST, x, y, width, height, SWP_NOACTIVATE | SWP_SHOWWINDOW);
++    InvalidateRect(taskbar_preview, NULL, FALSE);
++}
++
++/* Application buttons only; a visible preview follows the pointer at once. */
++static void taskbar_preview_hover(HWND button)
++{
++    if (!mihawk_taskbar || button == taskbar_overflow || !GetWindowLongPtrW(button, GWLP_ID)) return;
++    taskbar_hover = button;
++    KillTimer(tray_window, TASKBAR_PREVIEW_HIDE);
++    if (taskbar_preview_button && taskbar_preview && IsWindowVisible(taskbar_preview)) taskbar_preview_show(button);
++    else SetTimer(tray_window, TASKBAR_PREVIEW_SHOW, 400, NULL);
++}
++
+ static void show_taskbar_contextmenu( HWND button, LPARAM lparam )
+ {
+     ULONG_PTR id = GetWindowLongPtrW( button, GWLP_ID );
+@@ -1448,9 +1621,18 @@ static LRESULT WINAPI shell_traywnd_proc( HWND hwnd, UINT msg, WPARAM wparam, LP
+     case WM_PAINT:
+         if (mihawk_taskbar)
+         {
+-            PAINTSTRUCT paint; HDC dc = BeginPaint(hwnd, &paint); RECT edge;
+-            taskbar_fill(dc, &paint.rcPaint, taskbar_colour(0));
+-            GetClientRect(hwnd, &edge); edge.bottom = 1; taskbar_fill(dc, &edge, taskbar_colour(3));
++            PAINTSTRUCT paint; HDC dc = BeginPaint(hwnd, &paint), buffer = NULL; RECT client, edge; HPAINTBUFFER glass;
++            GetClientRect(hwnd, &client);
++            if ((glass = pw_shell_glass_begin(dc, &client, &buffer)))
++            {
++                edge = client; edge.bottom = 1; pw_shell_glass_fill(glass, buffer, &edge, taskbar_colour(3), 255);
++                EndBufferedPaint(glass, TRUE);
++            }
++            else
++            {
++                taskbar_fill(dc, &paint.rcPaint, taskbar_colour(0));
++                edge = client; edge.bottom = 1; taskbar_fill(dc, &edge, taskbar_colour(3));
++            }
+             EndPaint(hwnd, &paint); return 0;
+         }
+         return DefWindowProcW(hwnd, msg, wparam, lparam);
+@@ -1467,13 +1649,28 @@ static LRESULT WINAPI shell_traywnd_proc( HWND hwnd, UINT msg, WPARAM wparam, LP
+         break;
+     case WM_TIMER:
+         if (mihawk_taskbar && wparam == 3) { taskbar_update_clock(); sync_taskbar_buttons(); return 0; }
++        if (mihawk_taskbar && wparam == TASKBAR_PREVIEW_SHOW)
++        {
++            KillTimer(hwnd, wparam);
++            if (taskbar_hover && GetPropW(taskbar_hover, L"MihawkTaskbarHot")) taskbar_preview_show(taskbar_hover);
++            return 0;
++        }
++        if (mihawk_taskbar && wparam == TASKBAR_PREVIEW_HIDE)
++        {
++            POINT point; HWND under;
++            KillTimer(hwnd, wparam); GetCursorPos(&point); under = WindowFromPoint(point);
++            if (under != taskbar_preview && !(under == taskbar_preview_button && GetPropW(under, L"MihawkTaskbarHot")))
++                taskbar_preview_hide();
++            return 0;
++        }
+         break;
+     case WM_THEMECHANGED:
+     case WM_SETTINGCHANGE:
+         if (mihawk_taskbar && wparam != SPI_SETWORKAREA)
+         {
+-            taskbar_refresh_theme(); taskbar_refresh_font();
++            taskbar_refresh_theme(); taskbar_refresh_font(); taskbar_surfaces();
+             InvalidateRect(hwnd, NULL, FALSE); InvalidateRect(taskbar_clock, NULL, FALSE);
++            if (taskbar_preview) InvalidateRect(taskbar_preview, NULL, FALSE);
+             sync_taskbar_buttons();
+         }
+         break;
+@@ -1481,6 +1678,10 @@ static LRESULT WINAPI shell_traywnd_proc( HWND hwnd, UINT msg, WPARAM wparam, LP
+         if (mihawk_taskbar)
+         {
+             KillTimer(hwnd, 3); UnregisterHotKey(hwnd, 0x4d54);
++            taskbar_preview_hide();
++            if (taskbar_preview) DestroyWindow(taskbar_preview);
++            if (taskbar_theme) CloseThemeData(taskbar_theme);
++            taskbar_preview = NULL; taskbar_theme = NULL;
+             if (taskbar_area_saved) SystemParametersInfoW(SPI_SETWORKAREA, 0, &taskbar_original_area, SPIF_SENDCHANGE);
+             if (taskbar_fallback) DestroyIcon(taskbar_fallback);
+             for (unsigned i = 0; i < ARRAY_SIZE(taskbar_more); ++i)
+@@ -1678,6 +1879,7 @@ void initialize_systray( BOOL arg_using_root, BOOL arg_enable_shell, BOOL arg_sh
+                                         0, 0, 0, 0, tray_window, (HMENU)0xfff0, NULL, NULL);
+         SetWindowSubclass(taskbar_overflow, taskbar_button_proc, 1, 0);
+         SetTimer(tray_window, 3, 1000, NULL);
++        taskbar_surfaces();
+     }
+     add_taskbar_button( 0 );
+     if (mihawk_taskbar && !RegisterHotKey(tray_window, 0x4d54, MOD_WIN, 'T'))

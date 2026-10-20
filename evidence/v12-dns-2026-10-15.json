@@ -1,0 +1,28 @@
+{
+  "battery": "v12-dns-2026-10-15",
+  "expected_cases": [
+    "dnsapi32",
+    "dnsapi64"
+  ],
+  "revision": "f129706985bced268cf942fe319ba5db88242f66",
+  "dirty": true,
+  "cases": [
+    {
+      "case": "dnsapi32",
+      "run": "v12-dns-2026-10-15-dnsapi32",
+      "runner_status": 1,
+      "seconds": 60.4,
+      "result": "runner_error",
+      "probe_verdict": null,
+      "returned_to_launcher": null,
+      "exit_stall": null,
+      "passed": false,
+      "run_seconds": null,
+      "launch_readiness": null
+    }
+  ],
+  "stopped_after": "dnsapi32",
+  "complete": false,
+  "seconds": 60.4,
+  "passed": false
+}

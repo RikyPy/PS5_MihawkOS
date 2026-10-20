@@ -1,0 +1,23 @@
+From: PS5_Proton <local>
+Subject: [PATCH] server: a 4 px flyout has the tooltip's shadow
+
+The prototype's .tooltip is a flyout with 4 px corners whose shadow is --shadow-8 (0 0 2px and 0 4px 8px, black at
+12% and 14%, 24% and 28% in dark), not the menus' and flyouts' --shadow-28. A window on the flyout's acrylic
+(PS5_DWMSBT_FLYOUT_BASE or PS5_DWMSBT_FLYOUT) with 4 px corners (DWMWCP_ROUNDSMALL: comctl32's tooltips, patch 1210)
+now gets PW_SHADOW_TOOLTIP, which the compositor draws as those two layers (src/pw_window_effects.h). Menus (8 px) and
+the shell's flyouts keep --shadow-28.
+---
+diff --git a/server/window.c b/server/window.c
+--- a/server/window.c
++++ b/server/window.c
+@@ -267,8 +267,8 @@ static void ps5_snapshot_dwm(PwWindowRow *row, const struct window *win)
+         if (row->backdrop == PW_BACKDROP_FLYOUT_BASE || row->backdrop == PW_BACKDROP_FLYOUT)
+         {
+             /* .surface-flyout: --shadow-28 and SurfaceStrokeColorFlyout, black at 5.9% (20% in dark), unless the
+-             * window chose its own border colour. */
+-            if (plain) row->shadow = PW_SHADOW_FLYOUT;
++             * window chose its own border colour; with 4 px corners it is a .tooltip, whose shadow is --shadow-8. */
++            if (plain) row->shadow = row->radius == 4 ? PW_SHADOW_TOOLTIP : PW_SHADOW_FLYOUT;
+             if (!win->ps5_border_mode)
+             {
+                 row->flags |= PW_WINDOW_BORDER;

@@ -1,0 +1,106 @@
+{
+ "run": "exec-grant-measure-2026-10-14-01",
+ "mib": 64,
+ "elf_sha256": "c16d2a15e0e45c4de3cf67605f815ac43c344949459fff5d4523c83b07270f3c",
+ "passed": true,
+ "exec_grants": {
+  "direct": {
+   "allocation": "0",
+   "map": "0"
+  },
+  "direct-rx": {
+   "protection": "5",
+   "rc": "0",
+   "query": "0",
+   "prot": "0x1",
+   "used": "skipped"
+  },
+  "direct-rwx": {
+   "protection": "7",
+   "rc": "0",
+   "query": "0",
+   "prot": "0x3",
+   "used": "skipped"
+  },
+  "flexible": {
+   "map": "0",
+   "errno": "0"
+  },
+  "flexible-rx": {
+   "protection": "5",
+   "rc": "0",
+   "query": "0",
+   "prot": "0x1",
+   "used": "skipped"
+  },
+  "file": {
+   "statfs": "0",
+   "noexec": "0",
+   "fd": "12",
+   "map": "0",
+   "errno": "0"
+  },
+  "file-rx": {
+   "protection": "5",
+   "rc": "0",
+   "query": "0",
+   "prot": "0x1",
+   "used": "skipped"
+  },
+  "module-rx": {
+   "protection": "5",
+   "rc": "0",
+   "query": "0",
+   "prot": "0x4",
+   "used": "skipped"
+  },
+  "module": {
+   "load": "0x22",
+   "segments": "4"
+  },
+  "granted-rx": {
+   "protection": "5",
+   "rc": "0",
+   "query": "0",
+   "prot": "0x1",
+   "used": "skipped"
+  }
+ },
+ "lines": [
+  "--- exec",
+  "PS5_PROTON_EXEC_GRANT type=direct allocation=0 map=0",
+  "PS5_PROTON_EXEC_GRANT type=direct-rx protection=5 rc=0 query=0 prot=0x1",
+  "PS5_PROTON_EXEC_GRANT type=direct-rwx protection=7 rc=0 query=0 prot=0x3",
+  "PS5_PROTON_EXEC_GRANT type=flexible map=0 errno=0",
+  "PS5_PROTON_EXEC_GRANT type=flexible-rx protection=5 rc=0 query=0 prot=0x1",
+  "PS5_PROTON_EXEC_GRANT type=file statfs=0 noexec=0 fd=12 map=0 errno=0",
+  "PS5_PROTON_EXEC_GRANT type=file-rx protection=5 rc=0 query=0 prot=0x1",
+  "PS5_PROTON_EXEC_GRANT type=module-rx protection=5 rc=0 query=0 prot=0x4",
+  "PS5_PROTON_EXEC_GRANT type=module load=0x22 segments=4",
+  "PS5_PROTON_EXEC_GRANT type=direct-rx used=skipped",
+  "PS5_PROTON_EXEC_GRANT type=direct-rwx used=skipped",
+  "PS5_PROTON_EXEC_GRANT type=flexible-rx used=skipped",
+  "PS5_PROTON_EXEC_GRANT type=file-rx used=skipped",
+  "PS5_PROTON_EXEC_GRANT type=module-rx used=skipped",
+  "PS5_PROTON_EXEC_GRANT DONE types=5",
+  "",
+  "--- hold",
+  "dmem-share hold-before pid=127 status=0 resident_kib=3504 mapped_kib=16864",
+  "dmem-share hold allocation=0 map=0 offset=392626176 bytes=67108864",
+  "dmem-share hold-written pid=127 status=0 resident_kib=3552 mapped_kib=16992",
+  "dmem-share hold: grant pid 128 on offset 392626176 for 67108864 bytes with prot 0x33: 0",
+  "dmem-share hold: other side finished, its mark seen here (the memory is shared)",
+  "dmem-share hold-after pid=127 status=0 resident_kib=3552 mapped_kib=16992",
+  "PS5_PROTON_DMEM_SHARE PASS side=hold mark=1 unmap=0 release=0",
+  "",
+  "--- map",
+  "dmem-share map-before pid=128 status=0 resident_kib=3552 mapped_kib=16992",
+  "dmem-share map status=0 offset=392626176 bytes=67108864",
+  "dmem-share map: pattern matches (0 wrong bytes of 67108864)",
+  "dmem-share map-written pid=128 status=0 resident_kib=3552 mapped_kib=16992",
+  "PS5_PROTON_EXEC_GRANT type=granted-rx protection=5 rc=0 query=0 prot=0x1",
+  "PS5_PROTON_EXEC_GRANT type=granted-rx used=skipped",
+  "PS5_PROTON_DMEM_SHARE PASS side=map status=0 contents=1 unmap=0",
+  ""
+ ]
+}

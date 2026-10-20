@@ -1,0 +1,81 @@
+{
+ "run": "battery-r4-04-d3d11",
+ "what": "d3d11-probe.exe",
+ "env": [],
+ "result": "finished",
+ "seconds": 9.7,
+ "probe_verdict": "PASS",
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": true,
+ "bench": {
+  "frames": 180.0,
+  "draws": 1.0,
+  "vsync": 1.0,
+  "total_ms": 3027.0,
+  "frame_us": 16819.0
+ },
+ "steady": {
+  "vulkan_first_frame_ms": 2445.0
+ },
+ "intervals": {
+  "frames": [
+   {
+    "api": "vulkan",
+    "first_frame_ms": 2445.0
+   },
+   {
+    "api": "vulkan",
+    "frames": 161.0,
+    "fps": 31.5,
+    "p50_ms": 16.75,
+    "p95_ms": 16.75,
+    "p99_ms": 17.0,
+    "max_ms": 17.0,
+    "present_avg_ms": 0.006,
+    "present_max_all_ms": 0.159
+   }
+  ],
+  "server": [
+   {
+    "calls": 7598.0,
+    "per_s": 1488.0,
+    "avg_us": 26.1,
+    "selects": 1230.0,
+    "blocked": 403.0,
+    "block_avg_us": 9208.8,
+    "waits": 1208.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 798.0,
+    "delays": 0.0,
+    "yields": 0.0
+   }
+  ],
+  "top": [
+   {
+    "create_file": {
+     "count": 66,
+     "avg_us": 1066.4
+    },
+    "event_op": {
+     "count": 401,
+     "avg_us": 104.2
+    },
+    "create_mapping": {
+     "count": 56,
+     "avg_us": 431.9
+    },
+    "get_key_value": {
+     "count": 551,
+     "avg_us": 15.9
+    },
+    "create_key": {
+     "count": 235,
+     "avg_us": 35.3
+    }
+   }
+  ]
+ }
+}

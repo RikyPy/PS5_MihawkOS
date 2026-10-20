@@ -1,0 +1,33 @@
+{
+  "run": "section-view-host-2026-10-08-03",
+  "host_only": true,
+  "wine_revision": "7e893751d256bfe062fd1d159375f024dedfa696",
+  "source_sha256": "56bb48265822461bbf8789f658a1fb38871ffb5219bfe8ba4895684e3a5df24f",
+  "exe_sha256": "60511ab1a76acd963426a1054cb4a25498eb82c9b1f35c89fad62ae0b3d29a65",
+  "exit_code": 0,
+  "seconds": 1.26,
+  "lines": [
+    "0024:warn:debugstr:OutputDebugStringA \"PS5_PROTON_SECTION_CASE bytes=2097152 stage=complete error=0 passed=1\\n\"",
+    "0024:warn:debugstr:OutputDebugStringA \"PS5_PROTON_SECTION_CASE bytes=14495514624 stage=complete error=0 passed=1\\n\"",
+    "0024:warn:debugstr:OutputDebugStringA \"PS5_PROTON_LARGE_SECTION PASS cases=2\\n\""
+  ],
+  "passed": true,
+  "contract": [
+    "2 MiB and 13.5 GiB sections",
+    "full writable view, second full alias, and 64 KiB tail alias",
+    "MEM_COMMIT/MEM_MAPPED query covering the full view",
+    "eight Windows threads accessing disjoint pages through both aliases",
+    "read-only write fault and no-access read fault caught as access violations",
+    "protection restoration preserves alias contents",
+    "section handle closed before memory use",
+    "remaining tail alias survives both full-view removals",
+    "all worker handles and views close normally"
+  ],
+  "compiler_flags": [
+    "-fms-extensions",
+    "-fexceptions",
+    "-fasync-exceptions",
+    "-funwind-tables"
+  ],
+  "proof_limit": "Host Windows oracle only; no PS5 pass or Wine pager integration claim."
+}

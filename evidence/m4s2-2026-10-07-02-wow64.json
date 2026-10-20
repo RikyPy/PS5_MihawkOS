@@ -1,0 +1,32 @@
+{
+ "run": "m4s2-2026-10-07-02-wow64",
+ "what": "wow64-probe.exe",
+ "env": [
+  "PROTON_LAYOUT=launcher"
+ ],
+ "result": "finished",
+ "seconds": 7.3,
+ "probe_verdict": null,
+ "clean_owner_restart": false,
+ "launcher_end_status": 0,
+ "initial_status": 1,
+ "closed_on_request": false,
+ "child_logs": [
+  "klog/m4s2-2026-10-07-02-wow64-wine-child-2202.log",
+  "klog/m4s2-2026-10-07-02-wow64-wine-child-2203.log",
+  "klog/m4s2-2026-10-07-02-wow64-wine-child-2204.log",
+  "klog/m4s2-2026-10-07-02-wow64-wine-child-2205.log",
+  "klog/m4s2-2026-10-07-02-wow64-wine-child-2206.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": false,
+ "bench": {},
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [],
+  "top": []
+ }
+}

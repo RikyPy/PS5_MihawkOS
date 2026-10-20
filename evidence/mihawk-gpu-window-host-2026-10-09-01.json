@@ -1,0 +1,22 @@
+{
+ "head": "94185f8",
+ "host_suites": 50,
+ "host_passed": true,
+ "host_log": "klog/mihawk-gpu-window-host-2026-10-09-01.log",
+ "wine_patch_replay": {
+  "clean": 146,
+  "conflict": 0,
+  "untested": 0,
+  "log": "klog/mihawk-gpu-window-patches-2026-10-09-01.log"
+ },
+ "graphics_overlay_replay": {
+  "clean": 3,
+  "pin": "87a48676dda0977d5ba8ff1ddcf02816d41c443b"
+ },
+ "composition_image_verdict_tests": 1,
+ "battery_runner_tests": 5,
+ "console_qualified": false,
+ "scope": "Global opt-in GPU HWND planes and owner-bound helper identity; legacy production defaults remain",
+ "build_fingerprint": "c537703fe1b90e0ea27a24c46d1be047280cf8f00e344c71789a330f29a8bcb1",
+ "build_passed": true
+}

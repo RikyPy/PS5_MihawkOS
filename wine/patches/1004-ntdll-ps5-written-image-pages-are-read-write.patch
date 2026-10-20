@@ -1,0 +1,41 @@
+From: PS5_Proton
+Subject: [PATCH] ntdll: a written image page is PAGE_READWRITE for every process
+
+A launcher's CEF renderers (Chromium 108, 32-bit) ended about one second
+after they started, every 5 s, on a breakpoint (0x80000003) in libcef.dll:
+the first VirtualProtect(PAGE_READONLY) of a data page of the image that
+Chromium's protected-memory code checks returns PAGE_READWRITE. Wine
+returned PAGE_WRITECOPY, because a program's write to a copy-on-write image
+page is invisible to it (the host maps the page writable); Windows has made
+the page a private copy by then and reports PAGE_READWRITE. The browser
+reloaded the page 10 times and gave up, so the launcher stayed on its spinner
+(2026-10-11, record removed from the tree; in git history: 11 of 11 renderers).
+
+Proton's Wine already has the answer, simulate_writecopy (the first
+protection change of a copy-on-write page counts as copied), and enables it
+for two launchers' executables by the name in argv[1]. A helper on
+the PS5 has no such argv, and the environment variable is not inherited by
+helpers, so it never applied. It is on for every process here, unless
+WINE_SIMULATE_WRITECOPY=0, so every Chromium-based program and any other
+that seals a page it wrote gets what Windows gives it.
+---
+diff --git a/dlls/ntdll/unix/loader.c b/dlls/ntdll/unix/loader.c
+--- a/dlls/ntdll/unix/loader.c
++++ b/dlls/ntdll/unix/loader.c
+@@ -2496,6 +2496,16 @@
+                                        || !strcmp(sgi, "4327940") /* Portal Worlds */
+                                        || !strcmp(sgi, "2361360"); /* Hentai Maid Memories */
+ 
++#ifdef __PROSPERO__
++    /* Wine cannot see a program's write to a copy-on-write image page (the host maps it writable), so it
++     * reported PAGE_WRITECOPY where Windows reports PAGE_READWRITE once the page is written. Chromium
++     * seals a page it wrote with VirtualProtect(PAGE_READONLY) and requires PAGE_READWRITE back, so every
++     * CEF renderer (a launcher's, 11 of 11 on 2026-10-11) ended on a breakpoint. Proton switches this on per
++     * program (two launchers' executables by name, others by game id); on the PS5 a helper's
++     * argv names none of them, so it is on for every process unless WINE_SIMULATE_WRITECOPY=0. */
++    if (!env_str) simulate_writecopy = TRUE;
++#endif
++
+     if (sgi) wine_allocs_2g_limit = !strcmp(sgi, "359870");
+     if (wine_allocs_2g_limit) ERR("Allocation 2g limit enabled.\n");
+ 

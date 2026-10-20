@@ -1,0 +1,12 @@
+# Unified diffs intentionally prefix context (including blank lines) with a space.
+ps5/ui/template-adaptations.patch -whitespace
+platform/lapy/*.patch -whitespace
+tools/patches/radv-gpu-broker-features.patch -whitespace
+tools/patches/radv-gpu-broker-wsi.patch -whitespace
+wine/patches/0928-win32u-ps5-broker-variable-present-extent.patch -whitespace
+tools/patches/console-control-accept-retry.patch -whitespace
+
+# Owned patch series deliberately retain unified-diff context prefixes.
+wine/patches/*.patch -whitespace
+platform/graphics/patches/*.patch -whitespace
+platform/dxvk/patches/*.patch -whitespace

@@ -1,0 +1,34 @@
+{
+  "title": "PPSA99170",
+  "identity": "f499d39842b24b838a4ff5f05846a16f",
+  "frames_requested": 300,
+  "eboot_sha256": "791f5acd7e4200d50f1d0de6fa8dbff15b41e16bbfaeccd532d792b906b793be",
+  "fresh_identity_seen": true,
+  "shell_idle_after_run": true,
+  "title_finished_successfully": true,
+  "picture_and_log_check_passed": true,
+  "post_launch_fault_records": 0,
+  "elevation": [
+    "ok (filesystem access)",
+    "ok (filesystem access)"
+  ],
+  "sample": [
+    "starts",
+    "ok, 300 frames in 5.34 s, 59.9 fps after the first half"
+  ],
+  "probe": "d3d11-probe.exe",
+  "probe_passed": true,
+  "probe_records": [
+    "[PS5 Proton] Wine: 1991.225:0020:0024:warn:debugstr:OutputDebugStringA \"PS5_PROTON_D3D11_PROBE bench frames=180 draws=1 vsync=1 total_ms=3124 frame_us=17359\\n\"",
+    "[PS5 Proton] Wine: 1991.225:0020:0024:warn:seh:dispatch_exception \"PS5_PROTON_D3D11_PROBE bench frames=180 draws=1 vsync=1 total_ms=3124 frame_us=17359\\n\"",
+    "[PS5 Proton] Wine: 1991.243:0020:0024:warn:debugstr:OutputDebugStringA \"PS5_PROTON_D3D11_PROBE PASS: frames and readback\\n\"",
+    "[PS5 Proton] Wine: 1991.243:0020:0024:warn:seh:dispatch_exception \"PS5_PROTON_D3D11_PROBE PASS: frames and readback\\n\"",
+    "1991.225:0020:0024:warn:debugstr:OutputDebugStringA \"PS5_PROTON_D3D11_PROBE bench frames=180 draws=1 vsync=1 total_ms=3124 frame_us=17359\\n\"",
+    "1991.225:0020:0024:warn:seh:dispatch_exception \"PS5_PROTON_D3D11_PROBE bench frames=180 draws=1 vsync=1 total_ms=3124 frame_us=17359\\n\"",
+    "1991.243:0020:0024:warn:debugstr:OutputDebugStringA \"PS5_PROTON_D3D11_PROBE PASS: frames and readback\\n\"",
+    "1991.243:0020:0024:warn:seh:dispatch_exception \"PS5_PROTON_D3D11_PROBE PASS: frames and readback\\n\""
+  ],
+  "passed": true,
+  "capture": "klog/compatibility-d3d11-01-title",
+  "forced_close": false
+}

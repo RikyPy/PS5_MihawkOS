@@ -1,0 +1,171 @@
+From: PS5_Proton
+Subject: [PATCH] user32: route ordinary caption buttons through the theme hook
+
+Ordinary close/minimize/maximize buttons bypass the existing nonclient theme
+callback and always paint classic Marlett/3D controls. Reuse that callback for
+ordinary captions too; use Window parts when defined and retain the classic
+fallback for missing/disabled themes. The callback layout is unchanged, so the
+existing PE32/PE64 crossing carries the new enum values without another ABI.
+
+--- a/include/winuser.h
++++ b/include/winuser.h
+@@ -4859,6 +4859,11 @@
+     MENU_MAX_BUTTON,                 /* Menu max button */
+     MENU_RESTORE_BUTTON,             /* Menu restore button */
+     MENU_HELP_BUTTON,                /* Menu help button */
++    CAPTION_CLOSE_BUTTON,
++    CAPTION_MIN_BUTTON,
++    CAPTION_MAX_BUTTON,
++    CAPTION_RESTORE_BUTTON,
++    CAPTION_SMALL_CLOSE_BUTTON,
+ };
+ 
+ struct user_api_hook
+--- a/dlls/win32u/defwnd.c
++++ b/dlls/win32u/defwnd.c
+@@ -1492,7 +1492,6 @@
+     RECT rect;
+     DWORD style = get_window_long( hwnd, GWL_STYLE );
+     DWORD ex_style = get_window_long( hwnd, GWL_EXSTYLE );
+-    UINT flags = DFCS_CAPTIONCLOSE;
+ 
+     get_inside_rect( hwnd, COORDS_WINDOW, &rect, style, ex_style );
+ 
+@@ -1518,22 +1517,18 @@
+         rect.right -= 2;
+     }
+ 
+-    if (down) flags |= DFCS_PUSHED;
+-    if (grayed) flags |= DFCS_INACTIVE;
+-    draw_frame_caption( hdc, &rect, flags );
++    draw_menu_button( hwnd, hdc, &rect,
++                      (ex_style & WS_EX_TOOLWINDOW) ? CAPTION_SMALL_CLOSE_BUTTON : CAPTION_CLOSE_BUTTON, down, grayed );
+ }
+ 
+ static void draw_max_button( HWND hwnd, HDC hdc, BOOL down, BOOL grayed )
+ {
+     RECT rect;
+-    UINT flags;
+     DWORD style = get_window_long( hwnd, GWL_STYLE );
+     DWORD ex_style = get_window_long( hwnd, GWL_EXSTYLE );
+ 
+     /* never draw maximize box when window has WS_EX_TOOLWINDOW style */
+     if (ex_style & WS_EX_TOOLWINDOW) return;
+-
+-    flags = (style & WS_MAXIMIZE) ? DFCS_CAPTIONRESTORE : DFCS_CAPTIONMAX;
+ 
+     get_inside_rect( hwnd, COORDS_WINDOW, &rect, style, ex_style );
+     if (style & WS_SYSMENU) rect.right -= get_system_metrics( SM_CXSIZE );
+@@ -1541,22 +1536,18 @@
+     rect.bottom = rect.top + get_system_metrics( SM_CYSIZE ) - 2;
+     rect.top += 2;
+     rect.right -= 2;
+-    if (down) flags |= DFCS_PUSHED;
+-    if (grayed) flags |= DFCS_INACTIVE;
+-    draw_frame_caption( hdc, &rect, flags );
++    draw_menu_button( hwnd, hdc, &rect,
++                      (style & WS_MAXIMIZE) ? CAPTION_RESTORE_BUTTON : CAPTION_MAX_BUTTON, down, grayed );
+ }
+ 
+ static void draw_min_button( HWND hwnd, HDC hdc, BOOL down, BOOL grayed )
+ {
+     RECT rect;
+-    UINT flags;
+     DWORD style = get_window_long( hwnd, GWL_STYLE );
+     DWORD ex_style = get_window_long( hwnd, GWL_EXSTYLE );
+ 
+     /* never draw minimize box when window has WS_EX_TOOLWINDOW style */
+     if (ex_style & WS_EX_TOOLWINDOW) return;
+-
+-    flags = (style & WS_MINIMIZE) ? DFCS_CAPTIONRESTORE : DFCS_CAPTIONMIN;
+ 
+     get_inside_rect( hwnd, COORDS_WINDOW, &rect, style, ex_style );
+     if (style & WS_SYSMENU)
+@@ -1567,9 +1558,8 @@
+     rect.bottom = rect.top + get_system_metrics( SM_CYSIZE ) - 2;
+     rect.top += 2;
+     rect.right -= 2;
+-    if (down) flags |= DFCS_PUSHED;
+-    if (grayed) flags |= DFCS_INACTIVE;
+-    draw_frame_caption( hdc, &rect, flags );
++    draw_menu_button( hwnd, hdc, &rect,
++                      (style & WS_MINIMIZE) ? CAPTION_RESTORE_BUTTON : CAPTION_MIN_BUTTON, down, grayed );
+ }
+ 
+ static void draw_nc_caption( HDC hdc, RECT *rect, HWND hwnd, DWORD  style,
+--- a/dlls/user32/nonclient.c
++++ b/dlls/user32/nonclient.c
+@@ -136,6 +136,23 @@
+ void WINAPI USER_NonClientButtonDraw( HWND hwnd, HDC hdc, enum NONCLIENT_BUTTON_TYPE type,
+                                       RECT rect, BOOL down, BOOL grayed )
+ {
++    UINT flags;
++    switch (type)
++    {
++    case CAPTION_CLOSE_BUTTON:
++    case CAPTION_SMALL_CLOSE_BUTTON: flags = DFCS_CAPTIONCLOSE; break;
++    case CAPTION_MIN_BUTTON: flags = DFCS_CAPTIONMIN; break;
++    case CAPTION_MAX_BUTTON: flags = DFCS_CAPTIONMAX; break;
++    case CAPTION_RESTORE_BUTTON: flags = DFCS_CAPTIONRESTORE; break;
++    default: flags = 0; break;
++    }
++    if (type >= CAPTION_CLOSE_BUTTON && type <= CAPTION_SMALL_CLOSE_BUTTON)
++    {
++        if (down) flags |= DFCS_PUSHED;
++        if (grayed) flags |= DFCS_INACTIVE;
++        DrawFrameControl( hdc, &rect, DFC_CAPTION, flags );
++        return;
++    }
+     switch (type)
+     {
+     case MENU_CLOSE_BUTTON:
+--- a/dlls/uxtheme/window.c
++++ b/dlls/uxtheme/window.c
+@@ -64,6 +64,33 @@
+     DrawThemeBackground(theme, hdc, part, state, &rect, NULL);
+ }
+ 
++/* Ordinary caption buttons use the same theme parts as applications drawing
++ * Window chrome. The existing caption paint already provides the background
++ * beneath partially transparent sprites; painting the parent here would erase it. */
++static void uxtheme_draw_caption_button(HTHEME theme, HWND hwnd, HDC hdc,
++                                        enum NONCLIENT_BUTTON_TYPE type, RECT rect, BOOL down, BOOL grayed)
++{
++    int part, state;
++    HRESULT result;
++
++    switch (type)
++    {
++    case CAPTION_CLOSE_BUTTON: part = WP_CLOSEBUTTON; break;
++    case CAPTION_SMALL_CLOSE_BUTTON: part = WP_SMALLCLOSEBUTTON; break;
++    case CAPTION_MIN_BUTTON: part = WP_MINBUTTON; break;
++    case CAPTION_MAX_BUTTON: part = WP_MAXBUTTON; break;
++    case CAPTION_RESTORE_BUTTON: part = WP_RESTOREBUTTON; break;
++    default: return;
++    }
++    state = grayed ? CBS_DISABLED : down ? CBS_PUSHED : CBS_NORMAL;
++    if (GetActiveWindow() != hwnd) state += 4;
++    if (!IsThemePartDefined(theme, part, 0))
++        result = E_NOTIMPL;
++    else
++        result = DrawThemeBackground(theme, hdc, part, state, &rect, NULL);
++    if (FAILED(result)) user_api.pNonClientButtonDraw(hwnd, hdc, type, rect, down, grayed);
++}
++
+ void WINAPI UXTHEME_NonClientButtonDraw(HWND hwnd, HDC hdc, enum NONCLIENT_BUTTON_TYPE type,
+                                         RECT rect, BOOL down, BOOL grayed)
+ {
+@@ -78,6 +105,13 @@
+ 
+     switch (type)
+     {
++    case CAPTION_CLOSE_BUTTON:
++    case CAPTION_SMALL_CLOSE_BUTTON:
++    case CAPTION_MIN_BUTTON:
++    case CAPTION_MAX_BUTTON:
++    case CAPTION_RESTORE_BUTTON:
++        uxtheme_draw_caption_button(theme, hwnd, hdc, type, rect, down, grayed);
++        break;
+     case MENU_CLOSE_BUTTON:
+     case MENU_MIN_BUTTON:
+     case MENU_MAX_BUTTON:

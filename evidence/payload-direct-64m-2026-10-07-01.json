@@ -1,0 +1,16 @@
+{
+ "run": "payload-direct-64m-2026-10-07-01",
+ "owner": 510,
+ "mib": 64,
+ "wait_owner": false,
+ "elf_sha256": "b1fe7b3f76cdfa74af5427280c5eaf2b5ce117abb4dde19eefbc2dd97447882b",
+ "passed": true,
+ "lines": [
+  "direct start owner=510 budget=0 pool_mib=11712 bytes=67108864",
+  "direct before pid=517 fmem_status=0 resident_kib=3424 mapped_kib=16800 free_status=0x8002000c largest_mib=0",
+  "direct allocation=0 map=0 offset=138084876288",
+  "direct touched pid=517 fmem_status=0 resident_kib=3424 mapped_kib=16800 free_status=0x8002000c largest_mib=0",
+  "direct released pid=517 fmem_status=0 resident_kib=3424 mapped_kib=16800 free_status=0x8002000c largest_mib=0",
+  "PS5_PROTON_PAYLOAD_DMEM_PROBE PASS contents=1 unmap=0 release=0"
+ ]
+}

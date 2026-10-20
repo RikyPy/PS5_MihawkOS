@@ -1,0 +1,21 @@
+DXVK 601930949d111edbbcf9dd463948426d9f8f6ddd
+
+An unbound ClearRenderTargetView can remain deferred when Present uses
+the external blitter. endCurrentCommands suspends the pass and only
+prepares shared images. End the pass without suspension before external
+rendering to resolve pending clears and shader-readable layouts. This
+applies to every external-rendering caller, without application readback.
+
+--- a/src/dxvk/dxvk_context.cpp
++++ b/src/dxvk/dxvk_context.cpp
+@@ -202,7 +202,9 @@
+ 
+ 
+   Rc<DxvkCommandList> DxvkContext::beginExternalRendering() {
+-    // Flush and invalidate everything
++    // External rendering samples ordinary images outside our barrier tracker.
++    // Resolve deferred clears and restore shader-readable layouts first.
++    endCurrentPass(false);
+     endCurrentCommands();
+     beginCurrentCommands();
+ 

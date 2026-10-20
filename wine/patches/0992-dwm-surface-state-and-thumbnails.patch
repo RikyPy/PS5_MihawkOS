@@ -1,0 +1,895 @@
+From: PS5_Proton
+Subject: [PATCH] dwmapi/server: carry DWM surface state and live thumbnails
+
+The audit found DwmSetWindowAttribute and DwmExtendFrameIntoClientArea
+returning S_OK while storing nothing, and the thumbnail APIs returning
+E_NOTIMPL. dwmapi now validates corner preference, border colour, system
+backdrop, dark material and frame margins and sends them through one
+win32u call to owner-checked server window state. Thumbnails are bounded
+server objects owned by their destination HWND and released with it.
+Snapshot v4 exports the resolved radius, shadow, border, glass area and
+visible thumbnails. Visual only: regions, hit-testing and window state are
+unchanged. A server without these requests keeps the previous stub results.
+diff --git a/dlls/dwmapi/Makefile.in b/dlls/dwmapi/Makefile.in
+index 7df79cfc..0bf330d0 100644
+--- a/dlls/dwmapi/Makefile.in
++++ b/dlls/dwmapi/Makefile.in
+@@ -1,5 +1,5 @@
+ MODULE    = dwmapi.dll
+-IMPORTS   = user32
++IMPORTS   = user32 win32u
+ IMPORTLIB = dwmapi
+ 
+ SOURCES = \
+diff --git a/dlls/dwmapi/dwmapi.spec b/dlls/dwmapi/dwmapi.spec
+index d899a7ab..7c8b2ef1 100644
+--- a/dlls/dwmapi/dwmapi.spec
++++ b/dlls/dwmapi/dwmapi.spec
+@@ -76,7 +76,7 @@
+ @ stdcall DwmInvalidateIconicBitmaps(ptr)
+ @ stdcall DwmIsCompositionEnabled(ptr)
+ @ stub DwmModifyPreviousDxFrameDuration
+-@ stub DwmQueryThumbnailSourceSize
++@ stdcall DwmQueryThumbnailSourceSize(ptr ptr)
+ @ stdcall DwmRegisterThumbnail(long long ptr)
+ # @ stub DwmRenderGesture
+ @ stub DwmSetDxFrameDuration
+diff --git a/dlls/dwmapi/dwmapi_main.c b/dlls/dwmapi/dwmapi_main.c
+index af14f546..2518fce1 100644
+--- a/dlls/dwmapi/dwmapi_main.c
++++ b/dlls/dwmapi/dwmapi_main.c
+@@ -21,17 +21,36 @@
+ 
+ #include <stdarg.h>
+ 
++#include "ntstatus.h"
++#define WIN32_NO_STATUS
+ #include "winternl.h"
+ #define COBJMACROS
+ #include "windef.h"
+ #include "winbase.h"
+ #include "wingdi.h"
+ #include "winuser.h"
++#include "ntuser.h"
+ #include "dwmapi.h"
+ #include "wine/debug.h"
+ 
+ WINE_DEFAULT_DEBUG_CHANNEL(dwmapi);
+ 
++/* Window state goes to the server, which validates values and ownership and
++ * publishes it to the compositor. A server without the requests reports
++ * STATUS_NOT_IMPLEMENTED; callers then keep the previous stub results. */
++static HRESULT dwm_result(NTSTATUS status)
++{
++    switch (status)
++    {
++    case STATUS_SUCCESS: return S_OK;
++    case 0xc0010000 | ERROR_INVALID_WINDOW_HANDLE: return E_HANDLE;
++    case STATUS_ACCESS_DENIED: return E_ACCESSDENIED;
++    case STATUS_NO_MEMORY: return E_OUTOFMEMORY;
++    case STATUS_NOT_IMPLEMENTED: return E_NOTIMPL;
++    default: return E_INVALIDARG;
++    }
++}
++
+ 
+ /**********************************************************************
+  *           DwmIsCompositionEnabled         (DWMAPI.@)
+@@ -68,9 +87,21 @@ HRESULT WINAPI DwmEnableComposition(UINT uCompositionAction)
+  */
+ HRESULT WINAPI DwmExtendFrameIntoClientArea(HWND hwnd, const MARGINS* margins)
+ {
+-    FIXME("(%p, %p) stub\n", hwnd, margins);
++    struct ps5_dwm_params params = {.op = PS5_DWM_SET, .attribute = PS5_DWM_MARGINS};
++    NTSTATUS status;
+ 
+-    return S_OK;
++    TRACE("(%p, %p)\n", hwnd, margins);
++
++    if (!margins) return E_INVALIDARG;
++    if (!IsWindow(hwnd)) return E_HANDLE;
++    SetRect(&params.rect, margins->cxLeftWidth, margins->cyTopHeight, margins->cxRightWidth, margins->cyBottomHeight);
++    status = NtUserPs5Dwm(hwnd, &params);
++    if (status == STATUS_NOT_IMPLEMENTED)
++    {
++        FIXME("(%p, %p) stub\n", hwnd, margins);
++        return S_OK;
++    }
++    return dwm_result(status);
+ }
+ 
+ /**********************************************************************
+@@ -100,11 +131,33 @@ HRESULT WINAPI DwmInvalidateIconicBitmaps(HWND hwnd)
+  */
+ HRESULT WINAPI DwmSetWindowAttribute(HWND hwnd, DWORD attributenum, LPCVOID attribute, DWORD size)
+ {
++    struct ps5_dwm_params params = {.op = PS5_DWM_SET};
++    NTSTATUS status;
+     static BOOL once;
+ 
+-    if (!once++) FIXME("(%p, %lx, %p, %lx) stub\n", hwnd, attributenum, attribute, size);
++    TRACE("(%p, %lx, %p, %lx)\n", hwnd, attributenum, attribute, size);
+ 
+-    return S_OK;
++    switch (attributenum)
++    {
++    case DWMWA_WINDOW_CORNER_PREFERENCE: params.attribute = PS5_DWM_CORNER; break;
++    case DWMWA_BORDER_COLOR:             params.attribute = PS5_DWM_BORDER; break;
++    case DWMWA_SYSTEMBACKDROP_TYPE:      params.attribute = PS5_DWM_BACKDROP; break;
++    case 19: /* DWMWA_USE_IMMERSIVE_DARK_MODE before Windows 10 20H1 */
++    case DWMWA_USE_IMMERSIVE_DARK_MODE:  params.attribute = PS5_DWM_DARK; break;
++    default:
++        if (!once++) FIXME("(%p, %lx, %p, %lx) stub\n", hwnd, attributenum, attribute, size);
++        return S_OK;
++    }
++    if (!IsWindow(hwnd)) return E_HANDLE;
++    if (!attribute || size != sizeof(DWORD)) return E_INVALIDARG;
++    params.value = *(const DWORD *)attribute;
++    status = NtUserPs5Dwm(hwnd, &params);
++    if (status == STATUS_NOT_IMPLEMENTED)
++    {
++        if (!once++) FIXME("(%p, %lx, %p, %lx) stub\n", hwnd, attributenum, attribute, size);
++        return S_OK;
++    }
++    return dwm_result(status);
+ }
+ 
+ /**********************************************************************
+@@ -132,9 +185,14 @@ HRESULT WINAPI DwmGetTransportAttributes(BOOL *pfIsRemoting, BOOL *pfIsConnected
+  */
+ HRESULT WINAPI DwmUnregisterThumbnail(HTHUMBNAIL thumbnail)
+ {
+-    FIXME("(%p) stub\n", thumbnail);
++    struct ps5_dwm_params params = {.op = PS5_DWM_UNREGISTER, .id = HandleToUlong(thumbnail)};
++    NTSTATUS status;
+ 
+-    return E_NOTIMPL;
++    TRACE("(%p)\n", thumbnail);
++
++    status = NtUserPs5Dwm(NULL, &params);
++    if (status) return status == STATUS_NOT_IMPLEMENTED ? E_NOTIMPL : E_INVALIDARG;
++    return S_OK;
+ }
+ 
+ /**********************************************************************
+@@ -235,6 +293,24 @@ HRESULT WINAPI DwmGetWindowAttribute(HWND hwnd, DWORD attribute, PVOID pv_attrib
+         hr = S_OK;
+         break;
+ 
++    case DWMWA_SYSTEMBACKDROP_TYPE:
++    {
++        struct ps5_dwm_params params = {.op = PS5_DWM_GET, .attribute = PS5_DWM_BACKDROP};
++
++        if (size < sizeof(DWORD))
++            return E_INVALIDARG;
++        if (!(hr = dwm_result(NtUserPs5Dwm(hwnd, &params))))
++            *(DWORD *)pv_attribute = params.value;
++        break;
++    }
++
++    case DWMWA_VISIBLE_FRAME_BORDER_THICKNESS:
++        if (size < sizeof(UINT))
++            return E_INVALIDARG;
++        *(UINT *)pv_attribute = 1;
++        hr = S_OK;
++        break;
++
+     default:
+         FIXME("attribute %ld not implemented.\n", attribute);
+         hr = E_NOTIMPL;
+@@ -249,9 +325,41 @@ HRESULT WINAPI DwmGetWindowAttribute(HWND hwnd, DWORD attribute, PVOID pv_attrib
+  */
+ HRESULT WINAPI DwmRegisterThumbnail(HWND dest, HWND src, PHTHUMBNAIL thumbnail_id)
+ {
+-    FIXME("(%p %p %p) stub\n", dest, src, thumbnail_id);
++    struct ps5_dwm_params params = {.op = PS5_DWM_REGISTER, .source = HandleToUlong(src)};
++    NTSTATUS status;
+ 
+-    return E_NOTIMPL;
++    TRACE("(%p %p %p)\n", dest, src, thumbnail_id);
++
++    if (!thumbnail_id) return E_INVALIDARG;
++    *thumbnail_id = NULL;
++    if (!IsWindow(dest) || !IsWindow(src)) return E_INVALIDARG;
++    status = NtUserPs5Dwm(dest, &params);
++    if (status == STATUS_NOT_IMPLEMENTED)
++    {
++        FIXME("(%p %p %p) stub\n", dest, src, thumbnail_id);
++        return E_NOTIMPL;
++    }
++    if (status) return status == STATUS_NO_MEMORY ? E_OUTOFMEMORY : E_INVALIDARG;
++    *thumbnail_id = ULongToHandle(params.id);
++    return S_OK;
++}
++
++/**********************************************************************
++ *           DwmQueryThumbnailSourceSize         (DWMAPI.@)
++ */
++HRESULT WINAPI DwmQueryThumbnailSourceSize(HTHUMBNAIL thumbnail, PSIZE size)
++{
++    struct ps5_dwm_params params = {.op = PS5_DWM_QUERY, .id = HandleToUlong(thumbnail)};
++    NTSTATUS status;
++
++    TRACE("(%p %p)\n", thumbnail, size);
++
++    if (!size) return E_INVALIDARG;
++    status = NtUserPs5Dwm(NULL, &params);
++    if (status) return status == STATUS_NOT_IMPLEMENTED ? E_NOTIMPL : E_INVALIDARG;
++    size->cx = params.width;
++    size->cy = params.height;
++    return S_OK;
+ }
+ 
+ static int get_display_frequency(void)
+@@ -355,8 +463,20 @@ HRESULT WINAPI DwmDetachMilContent(HWND hwnd)
+  */
+ HRESULT WINAPI DwmUpdateThumbnailProperties(HTHUMBNAIL thumbnail, const DWM_THUMBNAIL_PROPERTIES *props)
+ {
+-    FIXME("(%p, %p) stub\n", thumbnail, props);
+-    return E_NOTIMPL;
++    struct ps5_dwm_params params = {.op = PS5_DWM_UPDATE, .id = HandleToUlong(thumbnail)};
++    NTSTATUS status;
++
++    TRACE("(%p, %p)\n", thumbnail, props);
++
++    if (!props) return E_INVALIDARG;
++    params.flags = props->dwFlags;
++    params.options = (props->fVisible ? 1 : 0) | (props->fSourceClientAreaOnly ? 2 : 0);
++    params.opacity = props->opacity;
++    params.rect = props->rcDestination;
++    params.source_rect = props->rcSource;
++    status = NtUserPs5Dwm(NULL, &params);
++    if (status) return status == STATUS_NOT_IMPLEMENTED ? E_NOTIMPL : E_INVALIDARG;
++    return S_OK;
+ }
+ 
+ /**********************************************************************
+diff --git a/dlls/win32u/window.c b/dlls/win32u/window.c
+index c9d6ee7f..d042db4c 100644
+--- a/dlls/win32u/window.c
++++ b/dlls/win32u/window.c
+@@ -6315,6 +6315,89 @@ ULONG_PTR WINAPI NtUserCallHwnd( HWND hwnd, DWORD code )
+     }
+ }
+ 
++/* PS5 DWM state: dwmapi's attributes and thumbnails reach the server here.
++ * The server owns validation and ownership; the compositor reads its snapshot. */
++static NTSTATUS ps5_dwm_call( HWND hwnd, struct ps5_dwm_params *params )
++{
++    NTSTATUS status = STATUS_INVALID_PARAMETER;
++
++    switch (params->op)
++    {
++    case PS5_DWM_SET:
++        SERVER_START_REQ( ps5_set_window_dwm )
++        {
++            req->window         = wine_server_user_handle( hwnd );
++            req->attribute      = params->attribute;
++            req->value          = params->value;
++            req->margins.left   = params->rect.left;
++            req->margins.top    = params->rect.top;
++            req->margins.right  = params->rect.right;
++            req->margins.bottom = params->rect.bottom;
++            status = wine_server_call( req );
++        }
++        SERVER_END_REQ;
++        break;
++    case PS5_DWM_GET:
++        SERVER_START_REQ( ps5_get_window_dwm )
++        {
++            req->window    = wine_server_user_handle( hwnd );
++            req->attribute = params->attribute;
++            if (!(status = wine_server_call( req ))) params->value = reply->value;
++        }
++        SERVER_END_REQ;
++        break;
++    case PS5_DWM_REGISTER:
++        SERVER_START_REQ( ps5_register_thumbnail )
++        {
++            req->destination = wine_server_user_handle( hwnd );
++            req->source      = wine_server_user_handle( UlongToHandle( params->source ));
++            if (!(status = wine_server_call( req ))) params->id = reply->id;
++        }
++        SERVER_END_REQ;
++        break;
++    case PS5_DWM_UPDATE:
++        SERVER_START_REQ( ps5_update_thumbnail )
++        {
++            req->id                      = params->id;
++            req->flags                   = params->flags;
++            req->options                 = params->options;
++            req->opacity                 = params->opacity;
++            req->destination_rect.left   = params->rect.left;
++            req->destination_rect.top    = params->rect.top;
++            req->destination_rect.right  = params->rect.right;
++            req->destination_rect.bottom = params->rect.bottom;
++            req->source_rect.left        = params->source_rect.left;
++            req->source_rect.top         = params->source_rect.top;
++            req->source_rect.right       = params->source_rect.right;
++            req->source_rect.bottom      = params->source_rect.bottom;
++            status = wine_server_call( req );
++        }
++        SERVER_END_REQ;
++        break;
++    case PS5_DWM_UNREGISTER:
++        SERVER_START_REQ( ps5_unregister_thumbnail )
++        {
++            req->id = params->id;
++            status = wine_server_call( req );
++        }
++        SERVER_END_REQ;
++        break;
++    case PS5_DWM_QUERY:
++        SERVER_START_REQ( ps5_query_thumbnail_size )
++        {
++            req->id = params->id;
++            if (!(status = wine_server_call( req )))
++            {
++                params->width  = reply->width;
++                params->height = reply->height;
++            }
++        }
++        SERVER_END_REQ;
++        break;
++    }
++    return status;
++}
++
+ /*****************************************************************************
+  *           NtUserCallHwndParam (win32u.@)
+  */
+@@ -6440,6 +6523,9 @@ ULONG_PTR WINAPI NtUserCallHwndParam( HWND hwnd, DWORD_PTR param, DWORD code )
+         return set_raw_window_pos( hwnd, params->rect, params->flags, params->internal );
+     }
+ 
++    case NtUserCallHwndParam_Ps5Dwm:
++        return ps5_dwm_call( hwnd, (struct ps5_dwm_params *)param );
++
+     default:
+         FIXME( "invalid code %u\n", code );
+         return 0;
+diff --git a/include/dwmapi.h b/include/dwmapi.h
+index 5381f6a3..b3c6b3af 100644
+--- a/include/dwmapi.h
++++ b/include/dwmapi.h
+@@ -69,6 +69,24 @@ enum DWMWINDOWATTRIBUTE {
+     DWMWA_LAST
+ };
+ 
++typedef enum DWM_WINDOW_CORNER_PREFERENCE {
++    DWMWCP_DEFAULT = 0,
++    DWMWCP_DONOTROUND = 1,
++    DWMWCP_ROUND = 2,
++    DWMWCP_ROUNDSMALL = 3
++} DWM_WINDOW_CORNER_PREFERENCE;
++
++typedef enum DWM_SYSTEMBACKDROP_TYPE {
++    DWMSBT_AUTO = 0,
++    DWMSBT_NONE = 1,
++    DWMSBT_MAINWINDOW = 2,
++    DWMSBT_TRANSIENTWINDOW = 3,
++    DWMSBT_TABBEDWINDOW = 4
++} DWM_SYSTEMBACKDROP_TYPE;
++
++#define DWMWA_COLOR_DEFAULT 0xFFFFFFFF
++#define DWMWA_COLOR_NONE    0xFFFFFFFE
++
+ enum DWMNCRENDERINGPOLICY {
+     DWMNCRP_USEWINDOWSTYLE,
+     DWMNCRP_DISABLED,
+@@ -215,6 +233,7 @@ DWMAPI DwmGetTransportAttributes(BOOL*, BOOL*, DWORD*);
+ DWMAPI DwmGetWindowAttribute(HWND, DWORD, PVOID, DWORD);
+ DWMAPI DwmInvalidateIconicBitmaps(HWND);
+ DWMAPI DwmIsCompositionEnabled(BOOL*);
++DWMAPI DwmQueryThumbnailSourceSize(HTHUMBNAIL, PSIZE);
+ DWMAPI DwmRegisterThumbnail(HWND, HWND, PHTHUMBNAIL);
+ DWMAPI DwmSetIconicLivePreviewBitmap(HWND, HBITMAP, POINT*, DWORD);
+ DWMAPI DwmSetIconicThumbnail(HWND, HBITMAP, DWORD);
+diff --git a/include/ntuser.h b/include/ntuser.h
+index 0011fa0e..15dcd9ec 100644
+--- a/include/ntuser.h
++++ b/include/ntuser.h
+@@ -1431,6 +1431,8 @@ enum
+     NtUserCallHwndParam_ExposeWindowSurface,
+     NtUserCallHwndParam_GetWinMonitorDpi,
+     NtUserCallHwndParam_SetRawWindowPos,
++    /* Wine-specific codes */
++    NtUserCallHwndParam_Ps5Dwm = 0x5000,
+ };
+ 
+ struct get_window_rects_params
+@@ -1661,4 +1663,46 @@ static inline BOOL NtUserSetRawWindowPos( HWND hwnd, RECT rect, UINT flags, BOOL
+     return NtUserCallHwndParam( hwnd, (UINT_PTR)&params, NtUserCallHwndParam_SetRawWindowPos );
+ }
+ 
++/* DWM state for the PS5 compositor. Integer-only, so PE32 and PE64 share the
++ * layout through WoW64's default pass-through. Returns an NTSTATUS. */
++enum ps5_dwm_op
++{
++    PS5_DWM_SET = 1,
++    PS5_DWM_GET,
++    PS5_DWM_REGISTER,
++    PS5_DWM_UPDATE,
++    PS5_DWM_UNREGISTER,
++    PS5_DWM_QUERY,
++};
++
++enum ps5_dwm_attribute
++{
++    PS5_DWM_CORNER = 1,
++    PS5_DWM_BORDER,
++    PS5_DWM_BACKDROP,
++    PS5_DWM_DARK,
++    PS5_DWM_MARGINS,
++};
++
++struct ps5_dwm_params
++{
++    UINT op;
++    UINT attribute;
++    UINT value;      /* SET/GET value */
++    UINT id;         /* thumbnail */
++    UINT source;     /* REGISTER source HWND */
++    UINT flags;      /* UPDATE DWM_TNP_* */
++    UINT options;    /* UPDATE: 1 visible, 2 client area only */
++    UINT opacity;
++    RECT rect;       /* SET margins (left/top/right/bottom) or UPDATE destination */
++    RECT source_rect;
++    INT  width;      /* QUERY reply */
++    INT  height;
++};
++
++static inline NTSTATUS NtUserPs5Dwm( HWND hwnd, struct ps5_dwm_params *params )
++{
++    return NtUserCallHwndParam( hwnd, (UINT_PTR)params, NtUserCallHwndParam_Ps5Dwm );
++}
++
+ #endif /* _NTUSER_ */
+diff --git a/server/protocol.def b/server/protocol.def
+index 7bda441f..4d4349bf 100644
+--- a/server/protocol.def
++++ b/server/protocol.def
+@@ -4382,3 +4382,47 @@ enum fsync_type
+     int top;
+     VARARG(mask,bytes);
+ @END
++
++/* DWM surface state for the PS5 retained compositor (visual only: Wine's own
++ * window state, regions and hit-testing are unchanged). Attributes may be set
++ * only by the window's process; thumbnails belong to their destination HWND. */
++@REQ(ps5_set_window_dwm)
++    user_handle_t window;
++    unsigned int  attribute;   /* 1 corner, 2 border, 3 backdrop, 4 dark material, 5 frame margins */
++    unsigned int  value;
++    struct rectangle margins;  /* MARGINS left/top/right/bottom widths */
++@END
++
++@REQ(ps5_get_window_dwm)
++    user_handle_t window;
++    unsigned int  attribute;
++@REPLY
++    unsigned int  value;
++@END
++
++@REQ(ps5_register_thumbnail)
++    user_handle_t destination;
++    user_handle_t source;
++@REPLY
++    unsigned int  id;
++@END
++
++@REQ(ps5_update_thumbnail)
++    unsigned int  id;
++    unsigned int  flags;       /* DWM_TNP_* fields present */
++    unsigned int  options;     /* 1 visible, 2 source client area only */
++    unsigned int  opacity;
++    struct rectangle destination_rect;
++    struct rectangle source_rect;
++@END
++
++@REQ(ps5_unregister_thumbnail)
++    unsigned int  id;
++@END
++
++@REQ(ps5_query_thumbnail_size)
++    unsigned int  id;
++@REPLY
++    int           width;
++    int           height;
++@END
+diff --git a/server/window.c b/server/window.c
+index 10a892b1..fab7a3ce 100644
+--- a/server/window.c
++++ b/server/window.c
+@@ -67,6 +67,11 @@ struct window
+     unsigned char   *ps5_input_shape;
+     unsigned int     ps5_input_mode, ps5_input_width, ps5_input_height, ps5_input_stride;
+     int              ps5_input_left, ps5_input_top;
++    /* DWM attributes from the owning process (dwmapi). Visual only. */
++    unsigned char    ps5_corner, ps5_backdrop, ps5_dark, ps5_border_mode;
++    unsigned int     ps5_border;      /* COLORREF when ps5_border_mode is 1 */
++    int              ps5_margins_set;
++    struct rectangle ps5_margins;     /* MARGINS: left, top, right, bottom widths */
+ #endif
+     struct window   *parent;          /* parent window */
+     user_handle_t    owner;           /* owner of this window */
+@@ -193,10 +198,166 @@ void ps5_windows_note_request(unsigned int request)
+     case REQ_set_parent: case REQ_set_window_owner: case REQ_set_window_region:
+     case REQ_update_window_zorder: case REQ_set_window_layered_info:
+     case REQ_create_desktop: case REQ_set_input_desktop: case REQ_set_thread_desktop:
++    case REQ_ps5_set_window_dwm: case REQ_ps5_update_thumbnail: case REQ_ps5_unregister_thumbnail:
+         ps5_windows_dirty = 1;break;
+     }
+ }
+ 
++/* DWM semantics adopted from Microsoft's Windows 11 rounded-corner guidance:
++ * frames (WS_CAPTION or WS_THICKFRAME) round at 8 px by default and standard
++ * menus at 4 px; maximized windows, window regions and layered windows never
++ * round; other pop-ups round only on request. Glass is the client area outside the frame-extension margins,
++ * and only for an explicit system backdrop: Wine still paints non-client
++ * frames itself, and applications that merely extend the frame keep today's
++ * opaque pixels. */
++enum { PS5_DWMWCP_DEFAULT, PS5_DWMWCP_DONOTROUND, PS5_DWMWCP_ROUND, PS5_DWMWCP_ROUNDSMALL };
++enum { PS5_DWMSBT_AUTO, PS5_DWMSBT_NONE, PS5_DWMSBT_MAINWINDOW, PS5_DWMSBT_TRANSIENTWINDOW, PS5_DWMSBT_TABBEDWINDOW };
++static int32_t ps5_clamp32(int64_t value)
++{
++    return value < INT32_MIN ? INT32_MIN : value > INT32_MAX ? INT32_MAX : (int32_t)value;
++}
++static void ps5_snapshot_dwm(PwWindowRow *row, const struct window *win)
++{
++    static const unsigned char kinds[] = {PW_BACKDROP_NONE, PW_BACKDROP_NONE, PW_BACKDROP_MICA,
++                                          PW_BACKDROP_ACRYLIC, PW_BACKDROP_MICA_ALT};
++    const int framed = (win->style & WS_CAPTION) == WS_CAPTION || (win->style & WS_THICKFRAME);
++    const int plain = !(win->style & WS_MAXIMIZE) && !win->win_region && !(win->ex_style & WS_EX_LAYERED);
++    const int dropshadow = win->class && (get_class_style( win->class ) & CS_DROPSHADOW);
++    const struct rectangle *margins = &win->ps5_margins;
++
++    if (plain && (win->ps5_corner == PS5_DWMWCP_ROUND || (win->ps5_corner == PS5_DWMWCP_DEFAULT && framed)))
++        row->radius = 8;
++    else if (plain && (win->ps5_corner == PS5_DWMWCP_ROUNDSMALL ||
++                       (win->ps5_corner == PS5_DWMWCP_DEFAULT && win->class &&
++                        get_class_atom( win->class ) == 32768 /* #32768: standard menus round small */)))
++        row->radius = 4;
++    if (plain && (framed || row->radius == 8)) row->shadow = PW_SHADOW_WINDOW;
++    else if (plain && (row->radius == 4 || dropshadow)) row->shadow = PW_SHADOW_SMALL;
++    if (win->ps5_border_mode == 1)
++    {
++        row->flags |= PW_WINDOW_BORDER;
++        row->border = ((win->ps5_border & 0xff) << 16) | (win->ps5_border & 0xff00) | ((win->ps5_border >> 16) & 0xff);
++    }
++    if (win->ps5_backdrop < sizeof(kinds) && kinds[win->ps5_backdrop] != PW_BACKDROP_NONE &&
++        win->ps5_margins_set && !(win->ex_style & WS_EX_LAYERED) &&
++        (margins->left || margins->top || margins->right || margins->bottom))
++    {
++        row->flags |= PW_WINDOW_GLASS;
++        row->backdrop = kinds[win->ps5_backdrop];
++        row->material = win->ps5_dark ? PW_MATERIAL_DARK : PW_MATERIAL_LIGHT;
++        if (margins->left < 0 || margins->top < 0 || margins->right < 0 || margins->bottom < 0)
++        {
++            /* "Sheet of glass": the whole client area. */
++            row->solid_left = row->solid_right = row->client_left;
++            row->solid_top = row->solid_bottom = row->client_top;
++        }
++        else
++        {
++            int64_t left = (int64_t)row->client_left + margins->left, top = (int64_t)row->client_top + margins->top;
++            int64_t right = (int64_t)row->client_right - margins->right, bottom = (int64_t)row->client_bottom - margins->bottom;
++            if (right < left) right = left;
++            if (bottom < top) bottom = top;
++            row->solid_left = ps5_clamp32( left ); row->solid_top = ps5_clamp32( top );
++            row->solid_right = ps5_clamp32( right ); row->solid_bottom = ps5_clamp32( bottom );
++        }
++    }
++}
++
++/* Live thumbnails belong to their destination HWND and its process; the
++ * table is bounded like the snapshot that exports it. */
++struct ps5_thumbnail
++{
++    unsigned int     id, flags, options, opacity;
++    user_handle_t    destination, source;
++    struct rectangle destination_rect, source_rect;
++};
++static struct ps5_thumbnail ps5_thumbnails[PW_WINDOW_THUMBNAIL_LIMIT];
++static unsigned int ps5_thumbnail_serial;
++
++static struct ps5_thumbnail *ps5_find_thumbnail( unsigned int id )
++{
++    for (unsigned int i = 0; id && i < PW_WINDOW_THUMBNAIL_LIMIT; ++i)
++        if (ps5_thumbnails[i].id == id) return &ps5_thumbnails[i];
++    return NULL;
++}
++
++static void ps5_release_thumbnails( user_handle_t destination )
++{
++    for (unsigned int i = 0; i < PW_WINDOW_THUMBNAIL_LIMIT; ++i)
++        if (ps5_thumbnails[i].id && ps5_thumbnails[i].destination == destination)
++        {
++            memset( &ps5_thumbnails[i], 0, sizeof(ps5_thumbnails[i]) );
++            ps5_windows_dirty = 1;
++        }
++}
++
++static const PwWindowRow *ps5_snapshot_row( const PwWindowSnapshot *snapshot, user_handle_t handle )
++{
++    for (unsigned int i = 0; i < snapshot->count; ++i)
++        if (snapshot->windows[i].hwnd == handle) return &snapshot->windows[i];
++    return NULL;
++}
++
++static void ps5_snapshot_thumbnails( PwWindowSnapshot *snapshot )
++{
++    for (unsigned int i = 0; i < PW_WINDOW_THUMBNAIL_LIMIT; ++i)
++    {
++        const struct ps5_thumbnail *thumbnail = &ps5_thumbnails[i];
++        const PwWindowRow *destination, *source;
++        struct window *source_window;
++        PwWindowThumbnail *out;
++        int64_t base_x, base_y, base_w, base_h, left, top, right, bottom;
++
++        if (!thumbnail->id || !(thumbnail->options & 1) || !thumbnail->opacity ||
++            !(thumbnail->flags & 1 /* DWM_TNP_RECTDESTINATION */)) continue;
++        destination = ps5_snapshot_row( snapshot, thumbnail->destination );
++        source = ps5_snapshot_row( snapshot, thumbnail->source );
++        source_window = get_user_object( thumbnail->source, NTUSER_OBJ_WINDOW );
++        /* A minimized source has no retained restored-size image yet. */
++        if (!destination || !source || !source_window || (source_window->style & WS_MINIMIZE) ||
++            (destination->flags & (PW_WINDOW_CHILD | PW_WINDOW_DESKTOP)) || (source->flags & PW_WINDOW_CHILD)) continue;
++        left = (int64_t)destination->client_left + thumbnail->destination_rect.left;
++        top = (int64_t)destination->client_top + thumbnail->destination_rect.top;
++        right = (int64_t)destination->client_left + thumbnail->destination_rect.right;
++        bottom = (int64_t)destination->client_top + thumbnail->destination_rect.bottom;
++        if (right <= left || bottom <= top) continue;
++        if (right - left > 1920) right = left + 1920;
++        if (bottom - top > 1080) bottom = top + 1080;
++        base_x = (thumbnail->options & 2) ? (int64_t)source->client_left - source->left : 0;
++        base_y = (thumbnail->options & 2) ? (int64_t)source->client_top - source->top : 0;
++        base_w = (thumbnail->options & 2) ? (int64_t)source->client_right - source->client_left : (int64_t)source->right - source->left;
++        base_h = (thumbnail->options & 2) ? (int64_t)source->client_bottom - source->client_top : (int64_t)source->bottom - source->top;
++        out = &snapshot->thumbnails[snapshot->thumbnail_count];
++        *out = (PwWindowThumbnail){0};
++        out->source_left = ps5_clamp32( base_x );
++        out->source_top = ps5_clamp32( base_y );
++        out->source_right = ps5_clamp32( base_x + base_w );
++        out->source_bottom = ps5_clamp32( base_y + base_h );
++        if (thumbnail->flags & 2 /* DWM_TNP_RECTSOURCE */)
++        {
++            int64_t sl = base_x + thumbnail->source_rect.left, st = base_y + thumbnail->source_rect.top;
++            int64_t sr = base_x + thumbnail->source_rect.right, sb = base_y + thumbnail->source_rect.bottom;
++            if (sl > out->source_left) out->source_left = ps5_clamp32( sl );
++            if (st > out->source_top) out->source_top = ps5_clamp32( st );
++            if (sr < out->source_right) out->source_right = ps5_clamp32( sr );
++            if (sb < out->source_bottom) out->source_bottom = ps5_clamp32( sb );
++        }
++        if (out->source_left < 0) out->source_left = 0;
++        if (out->source_top < 0) out->source_top = 0;
++        if (out->source_right > 2176) out->source_right = 2176;
++        if (out->source_bottom > 1408) out->source_bottom = 1408;
++        if (out->source_right <= out->source_left || out->source_bottom <= out->source_top) continue;
++        out->destination = destination->hwnd;
++        out->destination_generation = destination->generation;
++        out->source = source->hwnd;
++        out->source_generation = source->generation;
++        out->left = ps5_clamp32( left ); out->top = ps5_clamp32( top );
++        out->right = ps5_clamp32( right ); out->bottom = ps5_clamp32( bottom );
++        out->opacity = thumbnail->opacity;
++        snapshot->thumbnail_count++;
++    }
++}
++
+ static void ps5_snapshot_add(PwWindowSnapshot *snapshot, const struct window *win, int desktop)
+ {
+     PwWindowRow *row;
+@@ -266,6 +427,7 @@ static void ps5_snapshot_add(PwWindowSnapshot *snapshot, const struct window *wi
+      * still require their own composition contract and must not paint opaque. */
+     if ((win->ex_style & WS_EX_LAYERED) && (row->flags & (PW_WINDOW_CLIENT|PW_WINDOW_CHILD)))
+         row->flags |= PW_WINDOW_UNSUPPORTED;
++    if (!desktop && !(row->flags & PW_WINDOW_CHILD)) ps5_snapshot_dwm( row, win );
+ }
+ 
+ /* GDI children draw into their parent's surface. Publish only child HWNDs
+@@ -305,6 +467,7 @@ void ps5_windows_publish(void)
+                 ps5_snapshot_add(&snapshot,win,0);
+             }
+             ps5_snapshot_add(&snapshot,desktop->top_window,1);
++            if (!snapshot.overflow) ps5_snapshot_thumbnails( &snapshot );
+         }
+         release_object(desktop);
+     }
+@@ -853,6 +1016,10 @@ static struct window *create_window( struct window *parent, struct window *owner
+     win->ps5_input_shape = NULL;
+     win->ps5_input_mode = win->ps5_input_width = win->ps5_input_height = win->ps5_input_stride = 0;
+     win->ps5_input_left = win->ps5_input_top = 0;
++    win->ps5_corner = win->ps5_backdrop = win->ps5_dark = win->ps5_border_mode = 0;
++    win->ps5_border = 0;
++    win->ps5_margins_set = 0;
++    win->ps5_margins = empty_rect;
+     ps5_windows_dirty = 1;
+ #endif
+     win->parent         = parent ? (struct window *)grab_object( parent ) : NULL;
+@@ -2398,6 +2565,9 @@ void free_window_handle( struct window *win )
+     if (win == win->desktop->taskman_window) win->desktop->taskman_window = NULL;
+     free_hotkeys( win->desktop, win->handle );
+     cleanup_clipboard_window( win->desktop, win->handle );
++#ifdef __PROSPERO__
++    ps5_release_thumbnails( win->handle );
++#endif
+     destroy_properties( win );
+     if (is_desktop_window(win))
+     {
+@@ -3531,3 +3701,175 @@ DECL_HANDLER(ps5_set_window_input_shape)
+     set_error(STATUS_NOT_IMPLEMENTED);
+ #endif
+ }
++
++#ifdef __PROSPERO__
++static int ps5_is_top_level( const struct window *win )
++{
++    return win->parent && is_desktop_window( win->parent );
++}
++
++static struct ps5_thumbnail *ps5_owned_thumbnail( unsigned int id )
++{
++    struct ps5_thumbnail *thumbnail = ps5_find_thumbnail( id );
++    struct window *destination = thumbnail ? get_user_object( thumbnail->destination, NTUSER_OBJ_WINDOW ) : NULL;
++
++    if (!destination || !destination->thread || destination->thread->process != current->process)
++    {
++        set_error( STATUS_INVALID_PARAMETER );
++        return NULL;
++    }
++    return thumbnail;
++}
++#endif
++
++/* DWM attributes are set by the window's own process, as on Windows. */
++DECL_HANDLER(ps5_set_window_dwm)
++{
++#ifdef __PROSPERO__
++    struct window *win = get_window( req->window );
++
++    if (!win) return;
++    if (!win->thread || win->thread->process != current->process)
++    {
++        set_error( STATUS_ACCESS_DENIED );
++        return;
++    }
++    switch (req->attribute)
++    {
++    case 1:
++        if (req->value > PS5_DWMWCP_ROUNDSMALL) break;
++        win->ps5_corner = req->value;
++        return;
++    case 2:
++        if (req->value == 0xffffffff) win->ps5_border_mode = 0;      /* DWMWA_COLOR_DEFAULT */
++        else if (req->value == 0xfffffffe) win->ps5_border_mode = 2; /* DWMWA_COLOR_NONE */
++        else if (req->value <= 0xffffff)
++        {
++            win->ps5_border_mode = 1;
++            win->ps5_border = req->value;
++        }
++        else break;
++        return;
++    case 3:
++        if (req->value > PS5_DWMSBT_TABBEDWINDOW) break;
++        win->ps5_backdrop = req->value;
++        return;
++    case 4:
++        win->ps5_dark = !!req->value;
++        return;
++    case 5:
++        win->ps5_margins = req->margins;
++        win->ps5_margins_set = 1;
++        return;
++    }
++    set_error( STATUS_INVALID_PARAMETER );
++#else
++    set_error( STATUS_NOT_IMPLEMENTED );
++#endif
++}
++
++DECL_HANDLER(ps5_get_window_dwm)
++{
++#ifdef __PROSPERO__
++    struct window *win = get_window( req->window );
++
++    if (!win) return;
++    switch (req->attribute)
++    {
++    case 1: reply->value = win->ps5_corner; return;
++    case 3: reply->value = win->ps5_backdrop; return;
++    case 4: reply->value = win->ps5_dark; return;
++    }
++    set_error( STATUS_INVALID_PARAMETER );
++#else
++    set_error( STATUS_NOT_IMPLEMENTED );
++#endif
++}
++
++/* The destination must be a top-level window of the calling process; the
++ * source any other top-level window or the desktop. */
++DECL_HANDLER(ps5_register_thumbnail)
++{
++#ifdef __PROSPERO__
++    struct window *destination = get_window( req->destination ), *source;
++    struct ps5_thumbnail *slot = NULL;
++
++    if (!destination || !(source = get_window( req->source ))) return;
++    if (destination == source || !ps5_is_top_level( destination ) ||
++        !destination->thread || destination->thread->process != current->process ||
++        !(ps5_is_top_level( source ) || is_desktop_window( source )))
++    {
++        set_error( STATUS_INVALID_PARAMETER );
++        return;
++    }
++    for (unsigned int i = 0; i < PW_WINDOW_THUMBNAIL_LIMIT && !slot; ++i)
++        if (!ps5_thumbnails[i].id) slot = &ps5_thumbnails[i];
++    if (!slot)
++    {
++        set_error( STATUS_NO_MEMORY );
++        return;
++    }
++    do if (!++ps5_thumbnail_serial) ps5_thumbnail_serial = 1;
++    while (ps5_find_thumbnail( ps5_thumbnail_serial ));
++    memset( slot, 0, sizeof(*slot) );
++    slot->id = ps5_thumbnail_serial;
++    slot->destination = destination->handle;
++    slot->source = source->handle;
++    slot->opacity = 255;
++    reply->id = slot->id;
++#else
++    set_error( STATUS_NOT_IMPLEMENTED );
++#endif
++}
++
++DECL_HANDLER(ps5_update_thumbnail)
++{
++#ifdef __PROSPERO__
++    struct ps5_thumbnail *thumbnail = ps5_owned_thumbnail( req->id );
++
++    if (!thumbnail) return;
++    if ((req->flags & ~0x1f) || (req->options & ~3) || ((req->flags & 4) && req->opacity > 255))
++    {
++        set_error( STATUS_INVALID_PARAMETER );
++        return;
++    }
++    if (req->flags & 1) thumbnail->destination_rect = req->destination_rect;
++    if (req->flags & 2) thumbnail->source_rect = req->source_rect;
++    if (req->flags & 4) thumbnail->opacity = req->opacity;
++    if (req->flags & 8) thumbnail->options = (thumbnail->options & ~1) | (req->options & 1);
++    if (req->flags & 0x10) thumbnail->options = (thumbnail->options & ~2) | (req->options & 2);
++    thumbnail->flags |= req->flags;
++#else
++    set_error( STATUS_NOT_IMPLEMENTED );
++#endif
++}
++
++DECL_HANDLER(ps5_unregister_thumbnail)
++{
++#ifdef __PROSPERO__
++    struct ps5_thumbnail *thumbnail = ps5_owned_thumbnail( req->id );
++
++    if (thumbnail) memset( thumbnail, 0, sizeof(*thumbnail) );
++#else
++    set_error( STATUS_NOT_IMPLEMENTED );
++#endif
++}
++
++DECL_HANDLER(ps5_query_thumbnail_size)
++{
++#ifdef __PROSPERO__
++    struct ps5_thumbnail *thumbnail = ps5_owned_thumbnail( req->id );
++    struct window *source = thumbnail ? get_user_object( thumbnail->source, NTUSER_OBJ_WINDOW ) : NULL;
++
++    if (!thumbnail) return;
++    if (!source)
++    {
++        set_error( STATUS_INVALID_PARAMETER );
++        return;
++    }
++    reply->width = source->window_rect.right - source->window_rect.left;
++    reply->height = source->window_rect.bottom - source->window_rect.top;
++#else
++    set_error( STATUS_NOT_IMPLEMENTED );
++#endif
++}

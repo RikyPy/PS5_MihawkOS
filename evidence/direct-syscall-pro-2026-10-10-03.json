@@ -1,0 +1,87 @@
+{
+ "telemetry_hold": null,
+ "launch_readiness": {
+  "ready": true,
+  "seconds": 0.171,
+  "settle_seconds": 0.0,
+  "census_seconds": 0.161,
+  "previous_cleanup_verified": false
+ },
+ "native_close_failures": [],
+ "run": "direct-syscall-pro-2026-10-10-03",
+ "what": "direct-syscall64-probe.exe",
+ "env": [
+  "WINE_PS5_DIRECT_SYSCALLS=1",
+  "WINEDEBUG=warn+all,+seh"
+ ],
+ "result": "crashed",
+ "seconds": 4.4,
+ "probe_verdict": null,
+ "clean_owner_restart": false,
+ "launcher_end_status": null,
+ "initial_status": null,
+ "closed_on_request": false,
+ "child_logs": [
+  "klog/direct-syscall-pro-2026-10-10-03-wine-child-2091.log",
+  "klog/direct-syscall-pro-2026-10-10-03-wine-child-2092.log"
+ ],
+ "syscall_traces": [
+  {
+   "native_pid": 2092,
+   "log": "klog/direct-syscall-pro-2026-10-10-03-syscall-trace-2092.log",
+   "passed": false,
+   "result": "FAIL",
+   "phase": "resume",
+   "errno": 37,
+   "entries": 1,
+   "foreign": 1,
+   "delivered": 1
+  }
+ ],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": false,
+ "bench": {},
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [],
+  "top": []
+ },
+ "shown": {
+  "frames": 0,
+  "per_10s": [],
+  "longest_gap_ms": 0
+ },
+ "broker": {
+  "local_offer": 8589934592,
+  "host_limit": 1073741824,
+  "windows": {
+   "presents": 0,
+   "effect_bytes": 0,
+   "mica_builds": 0,
+   "thumbnail_builds": 0,
+   "compositions": 0,
+   "compose_avg_us": 0,
+   "compose_max_us": 0
+  },
+  "refused": [],
+  "refused_count": 0,
+  "clients": [
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   }
+  ],
+  "wedged": false,
+  "failure_reasons": [],
+  "host_peak": 0,
+  "local_peak": 0
+ },
+ "pacing": null,
+ "captures": [],
+ "cleanup_verified": false,
+ "hooks_removed": false
+}

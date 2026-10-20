@@ -1,0 +1,37 @@
+{
+  "battery": "l4-payload-vm-contention-2026-10-16-01",
+  "expected_cases": [
+    "payload-vm-contention"
+  ],
+  "revision": "f3aa632b4a344d3e169a02d63e1895e648bea57e",
+  "dirty": true,
+  "cases": [
+    {
+      "case": "payload-vm-contention",
+      "run": "l4-payload-vm-contention-2026-10-16-01-payload-vm-contention",
+      "runner_status": 0,
+      "seconds": 64.8,
+      "result": "exited",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "run_seconds": 18.9,
+      "launch_readiness": {
+        "ready": true,
+        "seconds": 0.136,
+        "settle_seconds": 0.0,
+        "census_seconds": 0.126,
+        "previous_cleanup_verified": true
+      },
+      "runner_overhead_seconds": 45.9,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 8,
+      "protocol_errors": 0
+    }
+  ],
+  "complete": true,
+  "seconds": 64.8,
+  "passed": true
+}

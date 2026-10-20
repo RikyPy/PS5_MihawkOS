@@ -1,0 +1,62 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Sat, 3 Oct 2026 21:30:00 -0400
+Subject: [PATCH] kernelbase: the drives where no drive letter is a symbolic link object
+
+GetLogicalDrives lists the drive letters from the \DosDevices directory object, whose links the mount
+manager makes. The mount manager is a driver of winedevice.exe, which the PS5 cannot start, so the
+list was empty: GetLogicalDrives returned 0, GetLogicalDriveStrings returned nothing, and
+GetDriveType answered DRIVE_FIXED for letters that are no drive. When the directory lists no letter,
+the drives are now the letters whose root can be opened.
+---
+  dlls/kernelbase/volume.c | 28 +++++++++++++++++++++++++++-
+  1 file changed, 27 insertions(+), 1 deletion(-)
+
+diff --git a/dlls/kernelbase/volume.c b/dlls/kernelbase/volume.c
+index 1d46b21..aba43a6 100644
+--- a/dlls/kernelbase/volume.c
++++ b/dlls/kernelbase/volume.c
+@@ -490,6 +490,32 @@ DWORD WINAPI QueryDosDeviceW( LPCWSTR devname, LPWSTR target, DWORD bufsize )
+ }
+ 
+ 
++/* Where nothing made the drive letters visible as symbolic link objects (the mount manager, a driver of
++ * winedevice.exe, cannot run on the PS5), the drives are the letters under which a drive's root can be opened. */
++static DWORD probe_logical_drives(void)
++{
++    WCHAR name[] = L"\\??\\A:\\";
++    UNICODE_STRING nt_name = { sizeof(name) - sizeof(WCHAR), sizeof(name), name };
++    OBJECT_ATTRIBUTES attr;
++    IO_STATUS_BLOCK io;
++    DWORD bitmask = 0;
++    HANDLE handle;
++    unsigned int i;
++
++    InitializeObjectAttributes( &attr, &nt_name, OBJ_CASE_INSENSITIVE, 0, NULL );
++    for (i = 0; i < 26; i++)
++    {
++        name[4] = 'A' + i;
++        if (NtOpenFile( &handle, SYNCHRONIZE | FILE_LIST_DIRECTORY, &attr, &io,
++                        FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
++                        FILE_DIRECTORY_FILE | FILE_SYNCHRONOUS_IO_NONALERT )) continue;
++        bitmask |= 1 << i;
++        NtClose( handle );
++    }
++    return bitmask;
++}
++
++
+ /***********************************************************************
+  *           GetLogicalDrives   (kernelbase.@)
+  */
+@@ -517,7 +543,7 @@ DWORD WINAPI DECLSPEC_HOTPATCH GetLogicalDrives(void)
+         NtClose( handle );
+     }
+ 
+-    return bitmask;
++    return bitmask ? bitmask : probe_logical_drives();
+ }
+ 
+ 
+-- 
+2.43.0

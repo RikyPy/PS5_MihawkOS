@@ -1,0 +1,162 @@
+{
+  "battery": "step3-focus-2026-10-10-01",
+  "expected_cases": [
+    "shell64",
+    "wallpaper64",
+    "window-snapshot64",
+    "desktop-session",
+    "game-mode64",
+    "game-mode-dxvk64"
+  ],
+  "revision": "a62f349f9e5de5330366b88cce8596211ab5766e",
+  "dirty": true,
+  "cases": [
+    {
+      "case": "shell64",
+      "run": "step3-focus-2026-10-10-01-shell64",
+      "runner_status": 0,
+      "seconds": 44.5,
+      "result": "finished",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "run_seconds": 35.4,
+      "launch_readiness": {
+        "ready": true,
+        "seconds": 0.198,
+        "settle_seconds": 0.0,
+        "census_seconds": 0.181,
+        "previous_cleanup_verified": true
+      },
+      "runner_overhead_seconds": 9.1,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 13,
+      "protocol_errors": 0
+    },
+    {
+      "case": "wallpaper64",
+      "run": "step3-focus-2026-10-10-01-wallpaper64",
+      "runner_status": 0,
+      "seconds": 10.8,
+      "result": "finished",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "run_seconds": 10.1,
+      "launch_readiness": {
+        "ready": true,
+        "seconds": 0.203,
+        "settle_seconds": 0.0,
+        "census_seconds": 0.186,
+        "previous_cleanup_verified": true
+      },
+      "runner_overhead_seconds": 0.7,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 8,
+      "protocol_errors": 0
+    },
+    {
+      "case": "window-snapshot64",
+      "run": "step3-focus-2026-10-10-01-window-snapshot64",
+      "runner_status": 0,
+      "seconds": 16.1,
+      "result": "finished",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "run_seconds": 15.2,
+      "launch_readiness": {
+        "ready": true,
+        "seconds": 0.223,
+        "settle_seconds": 0.0,
+        "census_seconds": 0.208,
+        "previous_cleanup_verified": true
+      },
+      "runner_overhead_seconds": 0.9,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 11,
+      "protocol_errors": 0
+    },
+    {
+      "case": "desktop-session",
+      "run": "step3-focus-2026-10-10-01-desktop-session",
+      "runner_status": 0,
+      "seconds": 28.3,
+      "result": "finished",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "run_seconds": 23.5,
+      "launch_readiness": {
+        "ready": true,
+        "seconds": 0.212,
+        "settle_seconds": 0.0,
+        "census_seconds": 0.188,
+        "previous_cleanup_verified": true
+      },
+      "runner_overhead_seconds": 4.8,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 14,
+      "protocol_errors": 0
+    },
+    {
+      "case": "game-mode64",
+      "run": "step3-focus-2026-10-10-01-game-mode64",
+      "runner_status": 1,
+      "seconds": 37.1,
+      "result": "finished",
+      "probe_verdict": null,
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": false,
+      "run_seconds": 35.2,
+      "launch_readiness": {
+        "ready": true,
+        "seconds": 0.213,
+        "settle_seconds": 0.0,
+        "census_seconds": 0.189,
+        "previous_cleanup_verified": true
+      },
+      "runner_overhead_seconds": 1.9,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 11,
+      "protocol_errors": 0
+    },
+    {
+      "case": "game-mode-dxvk64",
+      "run": "step3-focus-2026-10-10-01-game-mode-dxvk64",
+      "runner_status": 1,
+      "seconds": 45.3,
+      "result": "finished",
+      "probe_verdict": null,
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": false,
+      "run_seconds": 35.5,
+      "launch_readiness": {
+        "ready": true,
+        "seconds": 8.004,
+        "settle_seconds": 7.798,
+        "census_seconds": 0.189,
+        "previous_cleanup_verified": false
+      },
+      "runner_overhead_seconds": 9.8,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 11,
+      "protocol_errors": 0
+    }
+  ],
+  "complete": true,
+  "seconds": 182.2,
+  "passed": false
+}

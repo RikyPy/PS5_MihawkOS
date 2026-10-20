@@ -1,0 +1,24 @@
+{
+  "review": "battery-readiness-preflight-2026-10-08-01",
+  "fresh_boot_confirmed_by_user": true,
+  "native_fresh_boot_evidence": {
+    "shell_core_start": 1791517208,
+    "previous_boot_core_start": 1791504597,
+    "websrv_pid": 95,
+    "websrv_start": 1791517293,
+    "control_pid": 97
+  },
+  "services_available": [
+    "control",
+    "ftp",
+    "klog",
+    "websrv"
+  ],
+  "shell_idle": true,
+  "leftover_websrv_helpers": 0,
+  "owned_hooks_removed": [
+    "/data/homebrew/PPSA99170/wine-run.txt",
+    "/data/homebrew/PPSA99170/test-run.txt"
+  ],
+  "production_fingerprint": "20294822ed0713a979689d2808699772ec32e2c468fb5d44f2e278b7966cac5a"
+}

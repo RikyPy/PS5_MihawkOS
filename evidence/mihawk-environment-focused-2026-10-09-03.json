@@ -1,0 +1,62 @@
+{
+  "battery": "mihawk-environment-focused-2026-10-09-03",
+  "expected_cases": [
+    "initial-env32",
+    "initial-env64"
+  ],
+  "revision": "2d420266ff36a04fb357ab82b67740c969f4da5b",
+  "dirty": true,
+  "cases": [
+    {
+      "case": "initial-env32",
+      "run": "mihawk-environment-focused-2026-10-09-03-initial-env32",
+      "runner_status": 0,
+      "seconds": 18.4,
+      "result": "finished",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "run_seconds": 17.7,
+      "launch_readiness": {
+        "ready": true,
+        "seconds": 0.173,
+        "settle_seconds": 0.0,
+        "census_seconds": 0.153,
+        "previous_cleanup_verified": true
+      },
+      "runner_overhead_seconds": 0.7,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 11,
+      "protocol_errors": 0
+    },
+    {
+      "case": "initial-env64",
+      "run": "mihawk-environment-focused-2026-10-09-03-initial-env64",
+      "runner_status": 0,
+      "seconds": 13.8,
+      "result": "finished",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "run_seconds": 13.1,
+      "launch_readiness": {
+        "ready": true,
+        "seconds": 0.193,
+        "settle_seconds": 0.0,
+        "census_seconds": 0.181,
+        "previous_cleanup_verified": true
+      },
+      "runner_overhead_seconds": 0.7,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 11,
+      "protocol_errors": 0
+    }
+  ],
+  "complete": true,
+  "seconds": 32.2,
+  "passed": true
+}

@@ -1,0 +1,62 @@
+{
+  "run": "syscall-trace-pro-redirect-2026-10-10-03",
+  "mode": "redirect",
+  "build": {
+    "sdk_revision": "611893fc25ef3e138f5bc2c90d829d8b58174cd2",
+    "source_sha256": "6ba06af23653229f68416a3ae2afac367837bc3dbf7a45bdffade310022231da",
+    "elf_sha256": "2380f6171a5dfce6d883b53306647bbb06eb6aa9beecaddc13f6e6cb331e2311",
+    "host_sha256": "2c379435c7710b094fafdcca3c83cbac0f8af8f669493dde7b80c08200fc5f5a"
+  },
+  "runner_sha256": "4d6b844f8cb6df515ca9120d48bc909b259afd48e747f412fd501e9f2e243196",
+  "question": "Can an owned payload stop native syscall entry, prevent the original pipe write and resume an owned dispatcher on the stopped thread?",
+  "production_changed": false,
+  "wine_integrated": false,
+  "title_launched": false,
+  "host_only": false,
+  "passed": false,
+  "host": {
+    "passed": true,
+    "tracee": [
+      "TRACE_READY pid=676737",
+      "TRACE_RESULT mode=redirect result=1349735538 dispatched=1 pipe_bytes=-1 empty=1 native_ok=1",
+      "TRACE_TRACEE PASS"
+    ],
+    "tracer": [
+      "TRACE_CAPABILITY attached=1 registers=1 register_bytes=216",
+      "TRACE_ENTRY owned=1 code=1 tid=676737",
+      "TRACE_STOP flags=2 kind=2 tid=676737 at_owned=1 result_matches=1",
+      "TRACE_EXIT replacement=getpid result_matches=1",
+      "TRACE_TRACER PASS mode=redirect stops=6 entries=3 exits=3 replaced=1 ms=8"
+    ],
+    "error": null
+  },
+  "readiness": {
+    "ready": true,
+    "seconds": 0.153,
+    "settle_seconds": 0.0,
+    "census_seconds": 0.133,
+    "previous_cleanup_verified": true
+  },
+  "tracee_pid": 2054,
+  "native": {
+    "tracee": [
+      "TRACE_READY pid=2054"
+    ],
+    "tracer": [
+      "TRACE_CAPABILITY attached=1 registers=1 register_bytes=176",
+      "TRACE_MASK replaced=0 request=20 status=22 mask=0 errno=2",
+      "TRACE_MASK replaced=0 request=20 status=22 mask=0 errno=2",
+      "TRACE_MASK replaced=0 request=20 status=22 mask=0 errno=2",
+      "TRACE_MASK replaced=0 request=20 status=22 mask=0 errno=2",
+      "TRACE_ENTRY owned=1 code=4 tid=102295",
+      "TRACE_MASK replaced=1 request=21 status=22 mask=0 errno=2",
+      "TRACE_ERROR role=tracer phase=exit-event-mask errno=2 attached=1 stopped=1",
+      "TRACE_TRACER FAIL mode=redirect stops=4 entries=4 exits=0 replaced=1 ms=3"
+    ],
+    "passed": false
+  },
+  "post_control": "ok procs app=4294967295 title= count=0 pids=",
+  "leftover_helpers": [],
+  "clean": true,
+  "seconds": 0.469
+}

@@ -1,0 +1,70 @@
+{
+  "reference": "Pinned Linux Wine; kernel32 CreateProcessW wrapper supplies an explicit UTF-16 Windows environment. This qualifies expected Windows values and inheritance, not the PS5 root transport.",
+  "wine_revision": "7e893751d256bfe062fd1d159375f024dedfa696",
+  "cases": [
+    {
+      "bits": 32,
+      "returncode": 0,
+      "seconds": 0.92,
+      "verdicts": [
+        {
+          "verdict": "PASS",
+          "checks": 7,
+          "failures": 0
+        },
+        {
+          "verdict": "PASS",
+          "checks": 10,
+          "failures": 0
+        },
+        {
+          "verdict": "PASS",
+          "checks": 3,
+          "failures": 0
+        },
+        {
+          "verdict": "PASS",
+          "checks": 19,
+          "failures": 0
+        }
+      ],
+      "probe_sha256": "74e7b718d2814bafb4aacf75a4ec84b0d23aa091e76c905d9958d4fb228082ed",
+      "passed": true
+    },
+    {
+      "bits": 64,
+      "returncode": 0,
+      "seconds": 0.11,
+      "verdicts": [
+        {
+          "verdict": "PASS",
+          "checks": 7,
+          "failures": 0
+        },
+        {
+          "verdict": "PASS",
+          "checks": 10,
+          "failures": 0
+        },
+        {
+          "verdict": "PASS",
+          "checks": 3,
+          "failures": 0
+        },
+        {
+          "verdict": "PASS",
+          "checks": 19,
+          "failures": 0
+        }
+      ],
+      "probe_sha256": "5dad2acf37c9bc4a04051a8fa19b352860abbe3295fd510d1168e7283edc0db4",
+      "passed": true
+    }
+  ],
+  "passed": true,
+  "wrapper_source": "#define UNICODE\n#include <windows.h>\nvoid mainCRTStartup(void)\n{\n    static WCHAR environment[]=L\"MIHAWK_ENV_ROOT=launch selected\\0MIHAWK_ENV_UTF8=caf\\x00e9 \\x03a9\\0MIHAWK_ENV_EMPTY=\\0MIHAWK_ENV_CASE=last wins\\0PATH=C:\\\\Selected Tools;C:\\\\windows\\\\system32\\0\\0\";\n    WCHAR command[2048];const WCHAR *p=GetCommandLineW();while(*p && *p!=' ')++p;while(*p==' ')++p;lstrcpyW(command,p);\n    STARTUPINFOW startup={0};PROCESS_INFORMATION process={0};startup.cb=sizeof(startup);\n    if(!CreateProcessW(NULL,command,NULL,NULL,FALSE,CREATE_UNICODE_ENVIRONMENT,environment,NULL,&startup,&process))ExitProcess(2);\n    DWORD wait=WaitForSingleObject(process.hProcess,60000),code=~0u;\n    if(wait!=WAIT_OBJECT_0) {TerminateProcess(process.hProcess,3);ExitProcess(3);}\n    GetExitCodeProcess(process.hProcess,&code);CloseHandle(process.hThread);CloseHandle(process.hProcess);ExitProcess(code);\n}\n",
+  "wrapper_sha256": "910ce1442af2bf0d776e2f8cf71965b3a41a7c1107e8511dff73a750ec84cf5c",
+  "probe_source_sha256": "74c98832ab423dd38fd1f6370c4daaa15606d9a358f099534b58b9824755bfa8",
+  "production_fingerprint": "5b3bc04da9eaa3dbebd5d09091c4d3163b8a3c12de976e35e27eb5af89a64932",
+  "scope": "Windows value and descendant semantics on the exact staged PE files; PS5 initial payload transport is proved separately on console."
+}

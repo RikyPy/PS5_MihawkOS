@@ -1,0 +1,362 @@
+/* Window manager surfaces (owner: wm, js/wm.js): the window frame and its chrome, caption
+   buttons, invisible resize borders, the snap preview, the top snap bar, the Snap Layouts
+   flyout and Snap Assist. Colours are WinUI tokens; the one literal is the caption close red,
+   which Windows draws in both themes (tier-a: Windows Terminal MinMaxCloseControl, #C42B1C). */
+
+:root { --wm-close: #c42b1c; }
+
+/* ---------- window and frame ---------- */
+.window {
+  --wm-titlebar-h: var(--titlebar-height);
+  position: absolute;
+  outline: none;
+}
+.window:focus-visible { outline: none; box-shadow: none; }
+.window.titlebar-tall { --wm-titlebar-h: var(--titlebar-tall-height); }
+.window.minimized, .window.off-desktop { display: none; }
+.window.minimizing { pointer-events: none; }
+
+.window-frame {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--SurfaceStrokeColorDefault);
+  border-radius: var(--radius-window);
+  box-shadow: var(--shadow-window-inactive);
+  transition: box-shadow var(--dur-fast) linear;
+}
+:is(.window, .window-snapshot).active .window-frame { box-shadow: var(--shadow-window); }
+:is(.window, .window-snapshot).snapped .window-frame { border-radius: 0; }
+:is(.window, .window-snapshot).maximized .window-frame { border-width: 0; border-radius: 0; box-shadow: none; }
+.window-frame.window-solid { background: var(--SolidBackgroundFillColorBase); }
+.window-frame.window-clear { background: transparent; }
+
+/* Mica falls back to its solid colour while the window is inactive, as Windows does. */
+.window-frame:is(.mica, .mica-alt)::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--mica-inactive);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--dur-fast) linear;
+}
+:is(.window, .window-snapshot):not(.active) .window-frame:is(.mica, .mica-alt)::before { opacity: 1; }
+
+/* ---------- title bar ---------- */
+.window-titlebar {
+  position: relative;
+  flex: none;
+  display: flex;
+  align-items: center;
+  height: var(--wm-titlebar-h);
+  min-width: 0;
+}
+.window-titlebar-icon {
+  flex: none;
+  display: flex;
+  margin-left: 16px;
+  transition: opacity var(--dur-fast) linear;
+}
+.window-title {
+  flex: 0 1 auto;
+  min-width: 0;
+  margin-left: 16px;
+  font: var(--type-caption);
+  color: var(--TextFillColorPrimary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color var(--dur-fast) linear;
+}
+.window-titlebar-content { flex: 0 1 auto; min-width: 0; align-self: stretch; display: flex; }
+.window-titlebar-fill { flex: 1 1 0; min-width: 0; align-self: stretch; }
+:is(.window, .window-snapshot):not(.active) .window-title { color: var(--TextFillColorTertiary); }
+:is(.window, .window-snapshot):not(.active) .window-titlebar-icon { opacity: 0.6; }
+
+/* ---------- caption buttons (46 x title bar height, Segoe Fluent glyphs as 10 px paths) ---------- */
+.window-caption { flex: none; display: flex; align-self: stretch; }
+.window-caption-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--caption-button-width);
+  height: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--TextFillColorPrimary);
+  /* tier-a: hover to normal fades background 150 ms, foreground 100 ms */
+  transition: background-color 150ms linear, color 100ms linear;
+}
+.window-caption-btn svg { width: 10px; height: 10px; fill: none; stroke: currentColor; stroke-width: 1; overflow: visible; }
+.window-caption-btn:hover { background-color: var(--SubtleFillColorSecondary); transition-duration: var(--dur-faster); }
+.window-caption-btn:active { background-color: var(--SubtleFillColorTertiary); color: var(--TextFillColorSecondary); }
+.window-caption-btn.close:hover { background-color: var(--wm-close); color: var(--TextOnAccentFillColorSelectedText); }
+.window-caption-btn.close:active {
+  background-color: color-mix(in srgb, var(--wm-close) 90%, transparent);
+  color: color-mix(in srgb, var(--TextOnAccentFillColorSelectedText) 70%, transparent);
+}
+.window-caption-btn:disabled { background-color: transparent; color: var(--TextFillColorDisabled); }
+.window-caption-btn:focus-visible { outline-offset: -2px; }
+:is(.window, .window-snapshot):not(.active) .window-caption-btn:not(:hover) { color: var(--TextFillColorDisabled); }
+
+/* ---------- body ---------- */
+.window-body {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.window-body > * { flex: 1 1 auto; min-height: 0; }
+
+/* ---------- resize borders: 8 px, invisible, outside the visible frame ---------- */
+.wm-resize { position: absolute; z-index: 1; }
+.wm-resize.n, .wm-resize.s { left: 8px; right: 8px; height: 8px; cursor: var(--cursor-ns); }
+.wm-resize.n { top: -8px; }
+.wm-resize.s { bottom: -8px; }
+.wm-resize.e, .wm-resize.w { top: 8px; bottom: 8px; width: 8px; cursor: var(--cursor-ew); }
+.wm-resize.e { right: -8px; }
+.wm-resize.w { left: -8px; }
+.wm-resize.nw, .wm-resize.ne, .wm-resize.sw, .wm-resize.se { width: 16px; height: 16px; }
+.wm-resize.nw { left: -8px; top: -8px; cursor: var(--cursor-nwse); }
+.wm-resize.se { right: -8px; bottom: -8px; cursor: var(--cursor-nwse); }
+.wm-resize.ne { right: -8px; top: -8px; cursor: var(--cursor-nesw); }
+.wm-resize.sw { left: -8px; bottom: -8px; cursor: var(--cursor-nesw); }
+.window.maximized .wm-resize, .window.moving .wm-resize { display: none; }
+
+/* While a move or resize holds the pointer, its cursor wins everywhere. */
+html.wm-cursor, html.wm-cursor * { cursor: var(--wm-cursor) !important; }
+
+/* ---------- snap preview: translucent, blurred, accent-tinted, grows from the pointer ---------- */
+#windows > .wm-snap-preview {
+  position: absolute;
+  display: none;
+  pointer-events: none;
+  opacity: 0;
+  border: 1px solid var(--SurfaceStrokeColorDefault);
+  border-radius: var(--radius-overlay);
+  background-color: color-mix(in srgb, var(--SystemAccentColorLight2) 24%, var(--acrylic-default));
+  box-shadow: var(--shadow-28);
+  transform-origin: 0 0;
+  /* Only transform and opacity animate (js/wm.js previewShow); the blur fades in once the box settles. */
+  transition: transform var(--dur-normal) var(--ease-in), opacity var(--dur-fast) linear, backdrop-filter var(--dur-faster) linear;
+}
+#windows > .wm-snap-preview.moving {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  transition: transform var(--dur-normal) var(--ease-in), opacity var(--dur-fast) linear;
+}
+[data-theme="dark"] #windows > .wm-snap-preview {
+  background-color: color-mix(in srgb, var(--SystemAccentColorLight2) 12%, var(--acrylic-default));
+}
+
+/* ---------- layouts (Snap Layouts flyout and the top snap bar share them) ---------- */
+.wm-layouts {
+  display: grid;
+  grid-template-columns: repeat(var(--cols, 3), auto);
+  gap: 12px;
+  padding: 12px;
+}
+.wm-layouts.wm-layouts-flyout { position: fixed; }
+.wm-layout { position: relative; transition: opacity var(--dur-fast) linear; }
+.wm-zone {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--ControlStrokeColorSecondary);
+  border-radius: var(--radius-control);
+  background-color: var(--ControlAltFillColorTertiary);
+  color: var(--TextFillColorPrimary);
+  transition: background-color 150ms linear, border-color 150ms linear;
+}
+.wm-zone:hover, .wm-zone.hot {
+  background-color: var(--AccentFillColorDefault);
+  border-color: var(--AccentFillColorDefault);
+  color: var(--TextOnAccentFillColorPrimary);
+  transition-duration: var(--dur-faster);
+}
+.wm-zone:active { background-color: var(--AccentFillColorTertiary); border-color: transparent; }
+.wm-zone:focus-visible { outline-offset: 1px; }
+
+/* Win+Z: number keys pick a layout, then a zone. */
+.wm-key { display: none; font: 600 12px/16px var(--font-ui); pointer-events: none; }
+.wm-layout-key {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 1;
+  min-width: 20px;
+  padding: 2px 6px;
+  transform: translate(-50%, -50%);
+  border-radius: var(--radius-control);
+  border: 1px solid var(--SurfaceStrokeColorFlyout);
+  background: var(--SolidBackgroundFillColorQuarternary);
+  color: var(--TextFillColorPrimary);
+  text-align: center;
+  box-shadow: var(--shadow-2);
+}
+.wm-layouts.keyboard:not(.phase-zone) .wm-layout-key { display: block; }
+.wm-layouts.phase-zone .wm-layout.chosen .wm-zone .wm-key { display: block; }
+.wm-layouts.phase-zone .wm-layout:not(.chosen) { opacity: 0.35; }
+
+/* The top snap bar: wakes as a small pill while a window is dragged near the top, grows into
+   the layouts when the pointer reaches it. Hit-tested by geometry, never by pointer events. */
+#flyouts > .wm-snapbar {
+  position: fixed;
+  top: 8px;
+  pointer-events: none;
+  transform-origin: 50% 0;
+  transition: transform var(--dur-fast) var(--ease-in), opacity var(--dur-fast) linear;
+}
+#flyouts > .wm-snapbar[data-state="hidden"] { opacity: 0; transform: translateY(-24px) scale(0.42); }
+#flyouts > .wm-snapbar[data-state="collapsed"] { transform: scale(0.42); }
+
+/* ---------- Snap Assist ---------- */
+.wm-assist-zone.acrylic {
+  position: fixed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  overflow: hidden;
+  border: 1px solid var(--SurfaceStrokeColorFlyout);
+  border-radius: var(--radius-overlay);
+  box-shadow: var(--shadow-flyout);
+}
+.wm-assist-zone:focus-visible { outline: none; box-shadow: var(--shadow-flyout); }
+.wm-assist-zone.pending { background-color: color-mix(in srgb, var(--acrylic-default) 55%, transparent); }
+.wm-assist-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-content: center;
+  gap: 16px;
+  max-width: 100%;
+  max-height: 100%;
+}
+.wm-assist-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-overlay);
+  outline: none;
+  transition: background-color 150ms linear, border-color 150ms linear;
+}
+.wm-assist-item:hover {
+  background-color: var(--SubtleFillColorSecondary);
+  border-color: var(--ControlStrokeColorDefault);
+  transition-duration: var(--dur-faster);
+}
+.wm-assist-item:active { background-color: var(--SubtleFillColorTertiary); }
+.wm-assist-item:focus-visible { outline: 2px solid var(--FocusStrokeColorOuter); outline-offset: 0; }
+.wm-assist-head { display: flex; align-items: center; gap: 8px; height: 20px; min-width: 0; }
+.wm-assist-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  font: var(--type-caption);
+  color: var(--TextFillColorPrimary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.wm-assist-close {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--TextFillColorSecondary);
+  opacity: 0;
+  transition: opacity var(--dur-faster) linear, background-color 150ms linear;
+}
+.wm-assist-close svg { width: 8px; height: 8px; fill: none; stroke: currentColor; stroke-width: 1; overflow: visible; }
+.wm-assist-item:hover .wm-assist-close, .wm-assist-item:focus-visible .wm-assist-close { opacity: 1; }
+.wm-assist-close:hover { background-color: var(--wm-close); color: var(--TextOnAccentFillColorSelectedText); }
+.wm-assist-thumb { display: flex; align-items: center; justify-content: center; }
+
+/* ---------- snapshots (taskbar thumbnails, Task View, Alt+Tab, Snap Assist) ---------- */
+.window-snapshot { position: relative; flex: none; overflow: hidden; pointer-events: none; }
+.window-snapshot > .window-frame { inset: auto; left: 0; top: 0; transform-origin: 0 0; transition: none; }
+
+/* ---------- debug window for ?open=snaplayouts when no app is present ---------- */
+.wm-demo {
+  margin: 0 0 0 0;
+  padding: 16px;
+  border-top: 1px solid var(--CardStrokeColorDefault);
+  border-top-left-radius: var(--radius-window);
+  background: var(--LayerFillColorDefault);
+  color: var(--TextFillColorSecondary);
+}
+
+/* ---------- not responding: input frozen, then Windows' ghost window (js/wm.js setNotResponding) ---------- */
+/* The ghost's frozen client area is washed with white in both themes, as DWM draws it. */
+:root { --wm-ghost-wash: rgba(255, 255, 255, 0.5); }
+.window.hung .window-frame::after,
+:is(.window, .window-snapshot).ghost .window-frame::after {
+  content: "";
+  position: absolute;
+  inset: var(--wm-titlebar-h, var(--titlebar-height)) 0 0 0;
+  z-index: 2;
+}
+.window.hung .window-frame::after { cursor: var(--cursor-busy); }
+:is(.window, .window-snapshot).ghost .window-frame::after {
+  background: var(--wm-ghost-wash);
+  animation: wm-ghost-in var(--dur-normal) linear;
+}
+@keyframes wm-ghost-in { from { background-color: transparent; } }
+/* Its plain title strip covers an app's own title bar content; the caption buttons stay on top. */
+.wm-ghost-title { display: none; }
+:is(.window, .window-snapshot).ghost .wm-ghost-title {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  background: var(--SolidBackgroundFillColorBase);
+}
+.window.ghost .window-caption { position: relative; z-index: 2; }
+.window.ghost .window-titlebar-content { visibility: hidden; }
+
+/* "<App> is not responding" when the dialogs module is absent: a task dialog with command links. */
+.wm-hang {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 24px 20px;
+  background: var(--SolidBackgroundFillColorQuarternary);
+}
+.wm-hang-instruction { font: 400 16px/22px var(--font-ui); color: var(--AccentTextFillColorPrimary); }
+.wm-hang-text { margin: 0 0 8px; font: var(--type-caption); color: var(--TextFillColorPrimary); }
+.wm-hang-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 12px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-control);
+  background: var(--SubtleFillColorTransparent);
+  color: var(--AccentTextFillColorPrimary);
+  font: 400 15px/20px var(--font-ui);
+  text-align: left;
+  transition: background-color var(--dur-faster) linear, border-color var(--dur-faster) linear;
+}
+.wm-hang-link .icon { color: var(--SystemFillColorSuccess); }
+.wm-hang-link:hover { background: var(--SubtleFillColorSecondary); border-color: var(--ControlStrokeColorDefault); }
+.wm-hang-link:active { background: var(--SubtleFillColorTertiary); color: var(--TextFillColorSecondary); }
+.wm-hang-link:focus-visible { outline: 2px solid var(--FocusStrokeColorOuter); outline-offset: -2px; }

@@ -1,0 +1,31 @@
+{
+ "run": "gate-2026-10-07-09-descendants",
+ "what": "process-probe.exe",
+ "env": [],
+ "result": "finished",
+ "seconds": 8.6,
+ "probe_verdict": "PASS",
+ "clean_owner_restart": true,
+ "launcher_end_status": 0,
+ "initial_status": 0,
+ "closed_on_request": false,
+ "child_logs": [
+  "klog/gate-2026-10-07-09-descendants-wine-child-411.log",
+  "klog/gate-2026-10-07-09-descendants-wine-child-412.log",
+  "klog/gate-2026-10-07-09-descendants-wine-child-413.log",
+  "klog/gate-2026-10-07-09-descendants-wine-child-414.log",
+  "klog/gate-2026-10-07-09-descendants-wine-child-415.log",
+  "klog/gate-2026-10-07-09-descendants-wine-child-416.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": true,
+ "bench": {},
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [],
+  "top": []
+ }
+}

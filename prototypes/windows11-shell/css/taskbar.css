@@ -1,0 +1,317 @@
+/* Taskbar (Windows 11 23H2): 48 px acrylic bar, centred or left-aligned group, notification area,
+   thumbnails, overflow and hidden-icons flyouts. Owner: js/taskbar.js.
+   Plates follow WinUI's control fills on acrylic: lighter than the bar in both themes
+   (ControlFillColorDefault at rest-selected, Secondary on hover over it, Tertiary pressed). */
+
+.tb {
+  /* Windows' caption close red, identical in both themes (tier-a title_bar close_hover_background). */
+  --tb-close-red: #c42b1c;
+  /* Attention (FlashWindowEx) is Windows' own orange in every accent; no WinUI resource carries
+     it, so it is the accent palette's "Orange bright" swatch. */
+  --tb-attention: #f7630c;
+  --tb-attention-plate: color-mix(in srgb, var(--tb-attention) 28%, transparent);
+  --tb-attention-plate-hover: color-mix(in srgb, var(--tb-attention) 38%, transparent);
+  position: relative;
+  height: 100%;
+  background-color: var(--acrylic-taskbar);
+  box-shadow: inset 0 1px 0 var(--DividerStrokeColorDefault);
+  color: var(--TextFillColorPrimary);
+  font: var(--type-caption);
+}
+[data-theme="dark"] .tb {
+  --tb-attention-plate: color-mix(in srgb, var(--tb-attention) 36%, transparent);
+  --tb-attention-plate-hover: color-mix(in srgb, var(--tb-attention) 46%, transparent);
+}
+[data-transparency="off"] .tb.acrylic { background-color: var(--SolidBackgroundFillColorSecondary); }
+
+/* Auto-hide: the bar slides below the screen edge and back (js/taskbar.js holds it up while in use). */
+.tb { transition: transform var(--dur-normal) var(--ease-in); }
+.tb.is-autohidden { transform: translateY(100%); transition-timing-function: var(--ease-standard); }
+#taskbar.tb-host-hidden { pointer-events: none; }
+
+/* ---------- buttons ---------- */
+.tb-btn {
+  position: relative;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  min-width: 40px;
+  margin: 0 2px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--radius-control);
+  background-color: transparent;
+  color: var(--TextFillColorPrimary);
+  /* fade out at Windows' 150 ms hover-to-rest, in at 83 ms */
+  transition: background-color 150ms linear, border-color 150ms linear;
+}
+.tb-btn:hover, .tb-btn.is-hover,
+.tb-btn.is-active, .tb-btn.is-open {
+  background-color: var(--ControlFillColorDefault);
+  border-color: var(--ControlStrokeColorDefault);
+  transition-duration: var(--dur-faster);
+}
+.tb-btn.is-active:hover, .tb-btn.is-open:hover { background-color: var(--ControlFillColorSecondary); }
+.tb-btn:active { background-color: var(--ControlFillColorTertiary); border-color: var(--ControlStrokeColorDefault); transition-duration: var(--dur-faster); }
+.tb-btn:disabled { color: var(--TextFillColorDisabled); background-color: transparent; border-color: transparent; }
+.tb-btn:focus-visible { outline-offset: 0; }
+
+/* Glyphs shrink while pressed and settle back on release with a barely visible spring
+   (taskbar.js adds the launch, restore and minimize motions with Shell.animate). */
+.tb-glyph {
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  transition: transform var(--dur-normal) cubic-bezier(0.34, 1.2, 0.64, 1);
+}
+.tb-btn:active .tb-glyph { transform: scale(0.9); transition: transform var(--dur-faster) var(--ease-in); }
+.tb-start:active .tb-glyph { transform: scale(0.82); }
+
+/* ---------- centre group ---------- */
+.tb-group {
+  position: absolute;
+  top: 4px;
+  left: 0;
+  height: 40px;
+  width: max-content;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+.tb-apps { display: flex; align-items: center; }
+.tb-apps.is-dragging .tb-app:not(.is-dragged) { transition: transform var(--dur-fast) var(--ease-in), background-color 150ms linear; }
+.tb-apps.is-dragging .tb-glyph { transform: none; }
+.tb-app.is-dragged { z-index: 1; background-color: var(--ControlFillColorDefault); border-color: var(--ControlStrokeColorDefault); }
+
+/* Search box: the 23H2 pill, 220 x 32. */
+.tb-searchbox {
+  width: 220px;
+  height: 32px;
+  margin: 0 2px;
+  justify-content: flex-start;
+  gap: 10px;
+  padding: 0 16px 0 11px;
+  border-radius: 16px;
+  background-color: var(--ControlFillColorDefault);
+  border-color: var(--ControlStrokeColorDefault);
+}
+.tb-searchbox:hover { background-color: var(--ControlFillColorSecondary); }
+.tb-searchbox:active { background-color: var(--ControlFillColorTertiary); }
+.tb-searchbox.is-open { background-color: var(--ControlFillColorInputActive); }
+.tb-search-text { font: var(--type-body); color: var(--TextFillColorSecondary); }
+
+/* Running indicator: 6 x 3 grey pill, 16 x 3 accent pill on the focused app. */
+.tb-pill {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 0;
+  height: 3px;
+  border-radius: 1.5px;
+  transform: translateX(-50%);
+  background-color: var(--ControlStrongFillColorDefault);
+  opacity: 0;
+  pointer-events: none;
+  transition: width var(--dur-normal) var(--ease-in), background-color var(--dur-fast) linear, opacity var(--dur-fast) linear;
+}
+.tb-app.is-running .tb-pill { width: 6px; opacity: 1; }
+.tb-app.is-active .tb-pill { width: 16px; background-color: var(--AccentFillColorDefault); }
+
+/* Attention request: the orange plate pulses seven times (twice the 530 ms caret blink each,
+   FLASH_MS in js), then stays with the orange pill until the app is focused. */
+.tb-btn.is-flashing {
+  background-color: var(--tb-attention-plate);
+  border-color: var(--ControlStrokeColorDefault);
+  animation: tb-flash 1060ms ease-in-out 7;
+}
+.tb-btn.is-flashing:hover { background-color: var(--tb-attention-plate-hover); }
+.tb-btn.is-flashing:active { background-color: var(--tb-attention-plate); }
+.tb-app.is-flashing .tb-pill { width: 16px; opacity: 1; background-color: var(--tb-attention); }
+@keyframes tb-flash {
+  0%, 100% { background-color: var(--tb-attention-plate); }
+  50% { background-color: transparent; border-color: transparent; }
+}
+
+/* Progress (ITaskbarList3) across the bottom of the button, in place of the running pill:
+   green, yellow when paused, red on error, a sweeping segment when indeterminate. */
+.tb-progress {
+  position: absolute;
+  left: 5px;
+  right: 5px;
+  bottom: 0;
+  height: 3px;
+  border-radius: 1.5px;
+  overflow: hidden;
+  display: none;
+  pointer-events: none;
+  background-color: var(--ControlStrongStrokeColorDisabled);
+  color: var(--SystemFillColorSuccess);
+}
+.tb-app.has-progress .tb-progress { display: block; }
+.tb-app.has-progress .tb-pill { opacity: 0; }
+.tb-progress::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: calc(var(--value, 0) * 100%);
+  border-radius: inherit;
+  background-color: currentColor;
+  transition: width var(--dur-normal) var(--ease-in);
+}
+.tb-progress[data-state="paused"] { color: var(--SystemFillColorCaution); }
+.tb-progress[data-state="error"] { color: var(--SystemFillColorCritical); }
+/* the segment rests in the middle when animations are off */
+.tb-progress[data-state="indeterminate"]::after { left: 30%; width: 40%; transition: none; animation: tb-progress-sweep 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+@keyframes tb-progress-sweep {
+  from { transform: translateX(-175%); }
+  to { transform: translateX(175%); }
+}
+
+/* Badge (InfoBadge from ui.css) on the icon's top-right corner. */
+.tb-appbadge { position: absolute; top: 2px; left: 21px; pointer-events: none; }
+.tb-appbadge:empty { top: 6px; left: 27px; }
+
+/* ---------- notification area ---------- */
+.tb-tray {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+.tb-chevron { min-width: 24px; width: 24px; }
+.tb-chevron .tb-glyph .icon { transition: transform var(--dur-fast) var(--ease-in); }
+.tb-chevron.is-open .tb-glyph .icon { transform: rotate(180deg); }
+.tb.is-narrow .tb-chevron { display: none; }
+
+.tb-status { gap: 6px; padding: 0 9px; }
+.tb-status-icon { display: grid; place-items: center; width: 16px; height: 16px; }
+.tb.is-tiny .tb-status-icon:last-child { display: none; }
+
+.tb-clock { gap: 8px; padding: 0 9px; }
+.tb-clock-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  font: 12px/17px var(--font-ui); /* appearance.json taskbar_clock_line_height 17 */
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+.tb-badge {
+  display: grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background-color: var(--TextFillColorPrimary);
+  color: var(--TextFillColorInverse);
+  font: 600 11px/18px var(--font-ui);
+}
+.tb-badge.is-bell { min-width: 16px; padding: 0; background: none; color: var(--TextFillColorPrimary); }
+
+/* Show desktop: the far-right sliver; a thin divider appears on hover. */
+.tb-peek {
+  position: relative;
+  flex: none;
+  width: 8px;
+  height: 100%;
+  margin-left: 4px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+.tb-peek::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 16px;
+  width: 1px;
+  height: 16px;
+  background-color: var(--ControlStrongStrokeColorDefault);
+  opacity: 0;
+  transition: opacity 150ms linear;
+}
+.tb-peek:hover::after, .tb-peek:focus-visible::after { opacity: 1; transition-duration: var(--dur-faster); }
+
+/* Peek: resting on a thumbnail shows that window alone; every other window fades out. */
+#windows.tb-peek-anim > .window { transition: opacity var(--dur-fast) linear; }
+#windows.tb-peeking > .window:not(.tb-peek-target) { opacity: 0 !important; pointer-events: none; }
+#windows.tb-peeking > .window.tb-peek-target.minimized { display: block; }
+
+/* Peek at desktop: every window turns into a glass outline (the same in both themes). */
+#windows {
+  --tb-glass-edge: rgba(255, 255, 255, 0.6);
+  --tb-glass-shade: rgba(0, 0, 0, 0.2);
+  --tb-glass-fill: rgba(255, 255, 255, 0.06);
+}
+#windows.tb-desk-peek-anim > .window { transition: box-shadow var(--dur-fast) linear, background-color var(--dur-fast) linear; }
+#windows.tb-desk-peek-anim > .window > .window-frame { transition: opacity var(--dur-fast) linear; }
+#windows.tb-desk-peek > .window {
+  pointer-events: none;
+  border-radius: var(--radius-window);
+  background-color: var(--tb-glass-fill);
+  box-shadow: inset 0 0 0 1px var(--tb-glass-edge), 0 0 0 1px var(--tb-glass-shade), 0 2px 8px var(--tb-glass-shade);
+}
+#windows.tb-desk-peek > .window > .window-frame { opacity: 0; }
+#windows.tb-desk-peek > :is(.maximized, .snapped) { border-radius: 0; }
+
+/* ---------- flyouts ---------- */
+.tb-thumbs, .tb-overflow, .tb-trayflyout { position: fixed; left: 0; color: var(--TextFillColorPrimary); font: var(--type-caption); }
+
+.tb-thumbs { display: flex; align-items: flex-start; gap: 4px; padding: 4px; }
+.tb-thumb {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 6px 8px 8px;
+  border-radius: var(--radius-control);
+  transition: background-color 150ms linear;
+}
+.tb-thumb:hover { background-color: var(--SubtleFillColorSecondary); transition-duration: var(--dur-faster); }
+.tb-thumb:active { background-color: var(--SubtleFillColorTertiary); }
+.tb-thumb-head { display: flex; align-items: center; gap: 8px; height: 24px; min-width: 0; }
+.tb-thumb-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tb-thumb-close {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 24px;
+  height: 24px;
+  margin-right: -4px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-control);
+  background-color: transparent;
+  color: var(--TextFillColorPrimary);
+  opacity: 0;
+  transition: opacity var(--dur-faster) linear, background-color 150ms linear;
+}
+.tb-thumb:hover .tb-thumb-close, .tb-thumb-close:focus-visible { opacity: 1; }
+.tb-thumb-close:hover { background-color: var(--tb-close-red); color: #fff; transition-duration: var(--dur-faster); }
+.tb-thumb-close:active { background-color: color-mix(in srgb, var(--tb-close-red) 90%, transparent); color: rgba(255, 255, 255, 0.7); }
+.tb-thumb-view {
+  position: relative;
+  align-self: center;
+  overflow: hidden;
+  border-radius: var(--radius-control);
+  pointer-events: none;
+}
+.tb-thumb-view.is-empty {
+  display: grid;
+  place-items: center;
+  background-color: var(--LayerFillColorDefault);
+  box-shadow: inset 0 0 0 1px var(--CardStrokeColorDefault);
+}
+
+.tb-overflow, .tb-trayflyout {
+  display: grid;
+  grid-template-columns: repeat(var(--cols, 4), 44px);
+  padding: 4px;
+}
+.tb-overflow .tb-btn, .tb-trayflyout .tb-btn { margin: 2px; }

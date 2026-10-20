@@ -1,0 +1,26 @@
+{
+ "run": "section-lease-native-2026-10-08-01",
+ "read_only": false,
+ "temporary_direct_backing_bytes": 0,
+ "kernel_reads": false,
+ "kernel_writes": false,
+ "no_overwrite": true,
+ "payload": true,
+ "elf_sha256": "f0441e71b0f9bb79ecf5baede32410332e55f6aec13d9de9dfc5876fb2b4d003",
+ "source_sha256": "c0db5045dfeb907ba47db757ac829d98abd3755298886481691f0310dfadc458",
+ "inputs": {
+  "/tmp/pw_wine_section.h": "429ab9df3e843d01213b4b503b6f0651daccd8f20f20e43fd5c17cfe9c5fad4a",
+  "/tmp/pw_wine_section.c": "549eaea0ab72a3b9bcb021290608d124fbdac670d78287e4eb44498ab78f44cf",
+  "/tmp/test_pw_wine_section_lease_native.c": "c0db5045dfeb907ba47db757ac829d98abd3755298886481691f0310dfadc458"
+ },
+ "completed": true,
+ "full_contiguous_view_supported": false,
+ "bounded_native_cache_contract_passed": true,
+ "passed": true,
+ "purpose": "shared-file descriptor lease survives original close and first alias removal, releases after final alias; not Wine integration",
+ "lines": [
+  "SECTION_NATIVE threads=8 errors=0",
+  "SECTION_NATIVE lease_lifetime=PASS",
+  "SECTION_NATIVE PASS aliases=2 virtual_bytes=14495514624 threads=8 cache_pages=4 faults=389 evictions=384 cleanup=1 stage=0 failures=0"
+ ]
+}

@@ -1,0 +1,74 @@
+{
+  "title": "PPSA99170",
+  "identity": "9c89b67e4fbc44bf89375fa35fccc62b",
+  "kind": "service-native",
+  "build": {
+    "revision": "2f1998752532bf695f99f4eb2da63dafc85166ab",
+    "kind": "service-native",
+    "sdk_revision": "611893fc25ef3e138f5bc2c90d829d8b58174cd2",
+    "source_sha256": {
+      "ps5/src/main.cpp": "f1eb468f9603425c6543f0b02d8cf91e3e85a6919d7248dec85a24fd2f5aa457",
+      "ps5/CMakeLists.txt": "f7af78e0e2836e5cfbf06bf5723a85e90589db17c7b23c66d07d22f2d68c389c",
+      "native/proton_service_preflight.h": "3a8a7611112a1b454b8844fc7d8a5aec695d6fc9b706c714f72568787e68773b",
+      "native/proton_service_preflight.cpp": "d837e02b42bf1ff1a2760462d0ef055d67f064dda7d6e20d405bd0b9c7d16d07",
+      "native/proton_service_helper.c": "55bc776592bc60dcf4672492991a2225f6d438ce92c610b90eb00a5d683bdc10",
+      "native/proton_gpu_broker_probe.h": "fbb8a50303d1d235b470e99437dd503bf833dffb9e5099e1fc50c30890e99a9f",
+      "native/proton_gpu_broker_probe.cpp": "2276b5e5f37873d47d55acbe12714037c74eb4e786b02a42079928ba159967c3"
+    },
+    "radv_recipe_sha256": "e2844f49e4af12a9718d5b8b6055ace83e7eaa1d68870de2a79d39d1c92fa674",
+    "radv_platform_header_sha256": "24e770da15304fe95a4e0191271bc33f545dc8f964e186408c7996f5bce2aa97",
+    "radv_archive_sha256": "0ffa39311881236b4872ec77a56bca417ce56c71cefca5954224b9ea8f3a1bf5",
+    "helper_tool_sha256": "614377a0e37006e1454c67f228fc370a2f785c060205cb9f0264f27af04b5f18",
+    "helper_tool_revision": "ab37acd506305ba3e575435e3ae9a351cfaf7cf4",
+    "helper_patch_sha256": "defd28005f7c15664658f8d61928886864f00e4e3df586396460b4d27057275c",
+    "helper_layout_sha256": "fbc52518761b58b703a2225c847c5f44a81523cd0e751755adf890ae0f0dd74c",
+    "helper_symbols_sha256": "470ce72a27a7be8e35dd7a25b485faa733d61570bdaf24d3c75bb4e3e3c63cf7",
+    "helper_preload_mask": "0x8000000000000002",
+    "helper_recipe_sha256": "c1d39fa8ec438db0b67b82cdc85d7294bfd97b746acc88de953699812474fc69",
+    "helper_sha256": "085fbb476d1cc7168c83f444a6a7fd94b0b6435f03b3dec69eb447f8086a5088",
+    "helper_needed": [
+      "libkernel.sprx"
+    ],
+    "identity": "82680fca4ba2a52cde3e924e24d2166d95866ee212451fdd77cc1d267abc5ed3",
+    "eboot_sha256": "b8b484016b6ca0cbfdcfd1a113447d2b79667e479a10c2a238b22390039685e3"
+  },
+  "capture": "klog/graphics-child-gpu-broker-native-01",
+  "expected_missing_image": false,
+  "mode": "gpu-broker",
+  "passed": false,
+  "status": "complete",
+  "production_sha256": "8f63bbc57bd9203520653d9e3eb765798a434b737ac6c1f79b106437542761c3",
+  "production_restored": true,
+  "root_reference_balance_verified": false,
+  "forced_title_close": false,
+  "installed_readback_sha256": "d3d7cb497833ebb57876fe4465257217608ac9765f9a360a3ca0e658b845f325",
+  "production_executable_sha256": "bc5c7a75f249a59e7bce80218c6e749b9ea2f426e9bec4c96939ce7f75ceb17d",
+  "probe_readback_sha256": "57202610558f623d9ae638b7c36128f20f7e3f1eb6cc2f52982c77f53e8f5fea",
+  "probe_executable_sha256": "8ff15b9a5263818e6427dcdf82c1c8d672c820855d91162d211ba54cfe214dc9",
+  "helper_uploaded": true,
+  "helper_executable_verified": true,
+  "shell_idle_after_run": true,
+  "post_launch_fault_records": 0,
+  "parent_shell_exit_seen": true,
+  "observations": [
+    "service-native identity=9c89b67e4fbc44bf89375fa35fccc62b revision=3 parent=1005 elevated=1",
+    "gpu-broker owner=1005 initialized=1 available_before=12866027520",
+    "gpu-broker client=0 service=469862305 pid=1008 cpu_alias=0 map_status=0x8002000d",
+    "gpu-broker client=0 closed=0 absent=1",
+    "gpu-broker descriptors before=12 after=12 available_before=12866027520 available_after=12866027520",
+    "result=FAIL"
+  ],
+  "fresh_identity_seen": true,
+  "shared_gpu_clients": [
+    {
+      "client": 0,
+      "service_id": 469862305,
+      "pid": 1008,
+      "cpu_alias": 0,
+      "map_status": 2147614733
+    }
+  ],
+  "gpu_completion_checks": [],
+  "restored_readback_sha256": "d3d7cb497833ebb57876fe4465257217608ac9765f9a360a3ca0e658b845f325",
+  "helper_removed": true
+}

@@ -1,0 +1,66 @@
+From 3fb97b50550a7806708ecb050b70e4ef4a82729d Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Wed, 7 Oct 2026 18:34:07 -0400
+Subject: [PATCH] wineboot: PS5: a prefix gets its WoW64 side.
+
+wineboot updates a prefix when wine.inf's time differs from the one its
+.update-timestamp holds; the update runs Wow64Install in a 32-bit
+rundll32 for each machine the runtime supports besides the native one,
+which installs the prefix's 32-bit side (its registry view among it).
+A prefix updated before the runtime had its i386 modules matches the
+time and is never updated again, so it would stay without that side.
+
+When the runtime runs 32-bit programs, the timestamp now carries
+" wow64" after the time; one without it is updated once more, as a
+Wine upgrade would update it.
+---
+ programs/wineboot/wineboot.c | 17 +++++++++++++++--
+ 1 file changed, 15 insertions(+), 2 deletions(-)
+
+diff --git a/programs/wineboot/wineboot.c b/programs/wineboot/wineboot.c
+index 6b5d3d2..4f09ce5 100644
+--- a/programs/wineboot/wineboot.c
++++ b/programs/wineboot/wineboot.c
+@@ -119,6 +119,17 @@ static WCHAR *get_wine_inf_path(void)
+     return name;
+ }
+ 
++/* PS5: whether this runtime runs 32-bit programs (a machine besides the native one), whose side of a prefix an
++ * update installs too (Wow64Install). The timestamp says whether it did: a prefix updated before the runtime had
++ * its i386 modules is updated once more (PS5_Proton's docs/IA32_DESIGN.md, M4 step 2). */
++static BOOL runs_wow64(void)
++{
++    unsigned int i;
++
++    for (i = 0; i < ARRAY_SIZE(machines) && machines[i].Machine; i++) if (!machines[i].Native) return TRUE;
++    return FALSE;
++}
++
+ /* update the timestamp if different from the reference time */
+ static BOOL update_timestamp( const WCHAR *config_dir, unsigned long timestamp )
+ {
+@@ -135,9 +146,11 @@ static BOOL update_timestamp( const WCHAR *config_dir, unsigned long timestamp )
+     {
+         if ((count = read( fd, buffer, sizeof(buffer) - 1 )) >= 0)
+         {
++            char *end;
++
+             buffer[count] = 0;
+             if (!strncmp( buffer, "disable", sizeof("disable")-1 )) goto done;
+-            if (timestamp == strtoul( buffer, NULL, 10 )) goto done;
++            if (timestamp == strtoul( buffer, &end, 10 ) && (!runs_wow64() || !strncmp( end, " wow64", 6 ))) goto done;
+         }
+         lseek( fd, 0, SEEK_SET );
+         chsize( fd, 0 );
+@@ -148,7 +161,7 @@ static BOOL update_timestamp( const WCHAR *config_dir, unsigned long timestamp )
+         if ((fd = _wopen( file, O_WRONLY | O_CREAT | O_TRUNC, 0666 )) == -1) goto done;
+     }
+ 
+-    count = sprintf( buffer, "%lu\n", timestamp );
++    count = sprintf( buffer, runs_wow64() ? "%lu wow64\n" : "%lu\n", timestamp );
+     if (write( fd, buffer, count ) != count)
+     {
+         WINE_WARN( "failed to update timestamp in %s\n", debugstr_w(file) );
+-- 
+2.56.0
+

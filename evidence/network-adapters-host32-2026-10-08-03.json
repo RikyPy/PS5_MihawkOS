@@ -1,0 +1,16 @@
+{
+  "run": "network-adapters-host32-2026-10-08-03",
+  "bits": 32,
+  "probe_sha256": "2784e77cc0d0d0abe2d4efef8beeb84af43372799f31b41ea64e31a49edd6132",
+  "exit_code": 1,
+  "seconds": 2.18,
+  "markers": [
+    "0024:warn:debugstr:OutputDebugStringA \"network-adapters: family=0 size-status=111 bytes=2336\\n\"",
+    "0024:warn:debugstr:OutputDebugStringA \"network-adapters: family=2 size-status=111 bytes=2200\\n\"",
+    "0024:warn:debugstr:OutputDebugStringA \"network-adapters: family=23 size-status=9852 bytes=0\\n\"",
+    "0024:warn:debugstr:OutputDebugStringA \"network-adapters: FAIL size-query status error=0\\n\"",
+    "0024:warn:debugstr:OutputDebugStringA \"network-adapters: FAIL bounded size error=0\\n\"",
+    "0024:warn:debugstr:OutputDebugStringA \"PS5_PROTON_NETWORK_ADAPTERS FAIL checks=38 failures=2\\n\""
+  ],
+  "passed": false
+}

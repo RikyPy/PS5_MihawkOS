@@ -1,0 +1,1093 @@
+{
+ "telemetry_hold": null,
+ "launch_readiness": {
+  "ready": true,
+  "seconds": 0.156,
+  "settle_seconds": 0.0,
+  "census_seconds": 0.144,
+  "previous_cleanup_verified": true
+ },
+ "native_close_failures": [],
+ "run": "frame-pacing-2026-10-16-01",
+ "what": "profile mihawk-os",
+ "env": [
+  "PROTON_STOP_TERMINATE=0"
+ ],
+ "result": "finished",
+ "seconds": 68.6,
+ "probe_verdict": "PASS",
+ "stages": {
+  "launched": 1.0,
+  "title_started": 1.59,
+  "elevated": 1.59,
+  "wine_loaded": 1.79,
+  "wineboot_started": 3.1,
+  "wineboot_ended": 9.34,
+  "program_started": 20.02,
+  "marker": 64.78,
+  "program_ended": 64.8,
+  "wine_ended": 66.38,
+  "launcher_started": 67.84,
+  "launcher_ended": 68.12,
+  "closed": 68.63
+ },
+ "clean_owner_restart": true,
+ "launcher_end_status": 0,
+ "initial_status": 0,
+ "closed_on_request": false,
+ "child_logs": [
+  "klog/frame-pacing-2026-10-16-01-wine-child-4748.log",
+  "klog/frame-pacing-2026-10-16-01-wine-child-4749.log",
+  "klog/frame-pacing-2026-10-16-01-wine-child-4750.log",
+  "klog/frame-pacing-2026-10-16-01-wine-child-4751.log",
+  "klog/frame-pacing-2026-10-16-01-wine-child-4752.log",
+  "klog/frame-pacing-2026-10-16-01-wine-child-4753.log",
+  "klog/frame-pacing-2026-10-16-01-wine-child-4754.log",
+  "klog/frame-pacing-2026-10-16-01-wine-child-4755.log",
+  "klog/frame-pacing-2026-10-16-01-wine-child-4756.log",
+  "klog/frame-pacing-2026-10-16-01-wine-child-4757.log",
+  "klog/frame-pacing-2026-10-16-01-wine-child-4758.log",
+  "klog/frame-pacing-2026-10-16-01-wine-child-4759.log"
+ ],
+ "child_logs_missing": [],
+ "session_logs_status": 0,
+ "storage_errors": 0,
+ "stop_terminate": "0",
+ "injected_fault": null,
+ "exec_protection": {
+  "refused": 0,
+  "conversions": 308,
+  "converted_kib": 41312,
+  "convert_failed": 0,
+  "exec_refused": 0,
+  "grant_retries": 0,
+  "modules": 29,
+  "sdk_refused": 0
+ },
+ "foreign_mappings": {
+  "found": 0,
+  "skipped_unmaps": 0,
+  "refused_maps": 0,
+  "query_failed": 0,
+  "holes": 0,
+  "hole_list": []
+ },
+ "helper_sched": {
+  "helpers": [
+   {
+    "kind": "memory",
+    "mode": "rr",
+    "main_tid": "101573",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xea00",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xea00",
+    "service": "700",
+    "program": "767",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "3/700",
+    "now_kernel": "2/700"
+   },
+   {
+    "kind": "program",
+    "mode": "rr",
+    "main_tid": "101421",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xea00",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xea00",
+    "service": "700",
+    "program": "767",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "3/700",
+    "now_kernel": "2/700"
+   },
+   {
+    "kind": "program",
+    "mode": "rr",
+    "main_tid": "102020",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xea00",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xea00",
+    "service": "700",
+    "program": "767",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "3/700",
+    "now_kernel": "2/700"
+   },
+   {
+    "kind": "program",
+    "mode": "rr",
+    "main_tid": "101979",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xea00",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xea00",
+    "service": "700",
+    "program": "767",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "3/700",
+    "now_kernel": "2/700"
+   },
+   {
+    "kind": "program",
+    "mode": "rr",
+    "main_tid": "101677",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xea00",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xea00",
+    "service": "700",
+    "program": "767",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "3/700",
+    "now_kernel": "2/700"
+   },
+   {
+    "kind": "program",
+    "mode": "rr",
+    "main_tid": "101665",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xea00",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xea00",
+    "service": "700",
+    "program": "767",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "3/700",
+    "now_kernel": "2/700"
+   },
+   {
+    "kind": "program",
+    "mode": "rr",
+    "main_tid": "102111",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xea00",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xea00",
+    "service": "700",
+    "program": "767",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "3/700",
+    "now_kernel": "2/700"
+   },
+   {
+    "kind": "program",
+    "mode": "rr",
+    "main_tid": "102092",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xea00",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xea00",
+    "service": "700",
+    "program": "767",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "3/700",
+    "now_kernel": "2/700"
+   },
+   {
+    "kind": "program",
+    "mode": "rr",
+    "main_tid": "102127",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xea00",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xea00",
+    "service": "700",
+    "program": "767",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "3/700",
+    "now_kernel": "2/700"
+   },
+   {
+    "kind": "program",
+    "mode": "rr",
+    "main_tid": "102247",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xea00",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xea00",
+    "service": "700",
+    "program": "767",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "3/700",
+    "now_kernel": "2/700"
+   },
+   {
+    "kind": "program",
+    "mode": "rr",
+    "main_tid": "102478",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xea00",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xea00",
+    "service": "700",
+    "program": "767",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "3/700",
+    "now_kernel": "2/700"
+   },
+   {
+    "kind": "program",
+    "mode": "rr",
+    "main_tid": "101808",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xea00",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xea00",
+    "service": "700",
+    "program": "767",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "3/700",
+    "now_kernel": "2/700"
+   }
+  ],
+  "workers": [
+   {
+    "worker": "3/767",
+    "worker_kernel": "2/767",
+    "worker_cpus": "0xea00",
+    "status": "0",
+    "inherit": "3/767",
+    "inherit_kernel": "2/767",
+    "inherit_cpus": "0xea00"
+   },
+   {
+    "worker": "3/767",
+    "worker_kernel": "2/767",
+    "worker_cpus": "0xea00",
+    "status": "0",
+    "inherit": "3/767",
+    "inherit_kernel": "2/767",
+    "inherit_cpus": "0xea00"
+   },
+   {
+    "worker": "3/767",
+    "worker_kernel": "2/767",
+    "worker_cpus": "0xea00",
+    "status": "0",
+    "inherit": "3/767",
+    "inherit_kernel": "2/767",
+    "inherit_cpus": "0xea00"
+   },
+   {
+    "worker": "3/767",
+    "worker_kernel": "2/767",
+    "worker_cpus": "0xea00",
+    "status": "0",
+    "inherit": "3/767",
+    "inherit_kernel": "2/767",
+    "inherit_cpus": "0xea00"
+   },
+   {
+    "worker": "3/767",
+    "worker_kernel": "2/767",
+    "worker_cpus": "0xea00",
+    "status": "0",
+    "inherit": "3/767",
+    "inherit_kernel": "2/767",
+    "inherit_cpus": "0xea00"
+   },
+   {
+    "worker": "3/767",
+    "worker_kernel": "2/767",
+    "worker_cpus": "0xea00",
+    "status": "0",
+    "inherit": "3/767",
+    "inherit_kernel": "2/767",
+    "inherit_cpus": "0xea00"
+   },
+   {
+    "worker": "3/767",
+    "worker_kernel": "2/767",
+    "worker_cpus": "0xea00",
+    "status": "0",
+    "inherit": "3/767",
+    "inherit_kernel": "2/767",
+    "inherit_cpus": "0xea00"
+   },
+   {
+    "worker": "3/767",
+    "worker_kernel": "2/767",
+    "worker_cpus": "0xea00",
+    "status": "0",
+    "inherit": "3/767",
+    "inherit_kernel": "2/767",
+    "inherit_cpus": "0xea00"
+   },
+   {
+    "worker": "3/767",
+    "worker_kernel": "2/767",
+    "worker_cpus": "0xea00",
+    "status": "0",
+    "inherit": "3/767",
+    "inherit_kernel": "2/767",
+    "inherit_cpus": "0xea00"
+   },
+   {
+    "worker": "3/767",
+    "worker_kernel": "2/767",
+    "worker_cpus": "0xea00",
+    "status": "0",
+    "inherit": "3/767",
+    "inherit_kernel": "2/767",
+    "inherit_cpus": "0xea00"
+   },
+   {
+    "worker": "3/767",
+    "worker_kernel": "2/767",
+    "worker_cpus": "0xea00",
+    "status": "0",
+    "inherit": "3/767",
+    "inherit_kernel": "2/767",
+    "inherit_cpus": "0xea00"
+   }
+  ],
+  "program_threads": {
+   "set": 20,
+   "failed": 0
+  },
+  "census": null,
+  "census_processes": 0,
+  "row": null,
+  "scheduled": {
+   "ok": true,
+   "reasons": []
+  }
+ },
+ "helpers_ended": {
+  "why": null,
+  "count": 0,
+  "signals": {},
+  "gone_ms": {},
+  "still_there": [],
+  "after_kill": null,
+  "stalled": null,
+  "wedge_s": null,
+  "recorder_rows": "process rows from kern.proc (the title's own: state=3 pri=10/0 cpu=15 threads=16)"
+ },
+ "helper_doom": [
+  {
+   "seen": [
+    "exit"
+   ],
+   "doomed": null,
+   "stamped_ms_ago": null,
+   "ended": true
+  },
+  {
+   "seen": [
+    "exit"
+   ],
+   "doomed": null,
+   "stamped_ms_ago": null,
+   "ended": true
+  },
+  {
+   "seen": [
+    "exit"
+   ],
+   "doomed": null,
+   "stamped_ms_ago": null,
+   "ended": true
+  },
+  {
+   "seen": [
+    "exit"
+   ],
+   "doomed": null,
+   "stamped_ms_ago": null,
+   "ended": true
+  },
+  {
+   "seen": [
+    "exit"
+   ],
+   "doomed": null,
+   "stamped_ms_ago": null,
+   "ended": true
+  },
+  {
+   "seen": [
+    "exit"
+   ],
+   "doomed": null,
+   "stamped_ms_ago": null,
+   "ended": true
+  },
+  {
+   "seen": [
+    "exit"
+   ],
+   "doomed": null,
+   "stamped_ms_ago": null,
+   "ended": true
+  },
+  {
+   "seen": [
+    "exit"
+   ],
+   "doomed": null,
+   "stamped_ms_ago": null,
+   "ended": true
+  },
+  {
+   "seen": [
+    "exit"
+   ],
+   "doomed": null,
+   "stamped_ms_ago": null,
+   "ended": true
+  }
+ ],
+ "broker_phases": null,
+ "memory_helper_slowest": {
+  "census": 54,
+  "alloc": 0,
+  "shared": 0,
+  "touch": 0,
+  "dmem": 0,
+  "grant": 0,
+  "free": 1,
+  "stall": 0
+ },
+ "memory_helper": {
+  "dead": [],
+  "stall_tests": 0,
+  "sections_mib": [],
+  "given_back": 0,
+  "lost": 0,
+  "gave_back_lines": 0
+ },
+ "assertion": false,
+ "chunk_maps": null,
+ "mapped_mib": null,
+ "ask_failures_max": null,
+ "misplaced_max": null,
+ "rep_step_us": null,
+ "exec_rewrites_us": null,
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": true,
+ "bench": {},
+ "steady": {
+  "server": {
+   "calls": 0.0,
+   "per_s": 0.0,
+   "avg_us": 0.0,
+   "selects": 0.0,
+   "blocked": 0.0,
+   "block_avg_us": 0.0,
+   "waits": 0.0,
+   "handles_avg": 0.0,
+   "wait_all": 0.0,
+   "polled": 0.0,
+   "delays": 0.0,
+   "yields": 0.0,
+   "intervals": 11
+  }
+ },
+ "intervals": {
+  "frames": [],
+  "server": [
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   }
+  ],
+  "top": []
+ },
+ "shown": {
+  "frames": 505,
+  "per_10s": [
+   1,
+   6,
+   32,
+   1,
+   20,
+   112,
+   333
+  ],
+  "longest_gap_ms": 10467
+ },
+ "broker": {
+  "local_offer": 8589934592,
+  "host_limit": 1073741824,
+  "windows": {
+   "presents": 516,
+   "effect_bytes": 2116320,
+   "mica_builds": 0,
+   "thumbnail_builds": 0,
+   "compositions": 400,
+   "compose_avg_us": 1782,
+   "compose_max_us": 27597
+  },
+  "refused": [],
+  "refused_count": 0,
+  "clients": [
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": 4758,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": 4749,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   }
+  ],
+  "wedged": false,
+  "failure_reasons": [],
+  "host_peak": 4227072,
+  "local_peak": 0
+ },
+ "pacing": null,
+ "captures": [
+  "klog/frame-pacing-2026-10-16-01-capture-01.png",
+  "klog/frame-pacing-2026-10-16-01-capture-02.png",
+  "klog/frame-pacing-2026-10-16-01-capture-03.png",
+  "klog/frame-pacing-2026-10-16-01-capture-04.png",
+  "klog/frame-pacing-2026-10-16-01-capture-05.png",
+  "klog/frame-pacing-2026-10-16-01-capture-06.png",
+  "klog/frame-pacing-2026-10-16-01-capture-07.png",
+  "klog/frame-pacing-2026-10-16-01-capture-08.png"
+ ],
+ "cleanup_verified": true,
+ "hooks_removed": true,
+ "frame_pacing": {
+  "phases": [
+   {
+    "phase": "start-up",
+    "compositions": 38,
+    "compose_avg_us": 1914,
+    "compose_max_us": 4925,
+    "compose_hist": [
+     25,
+     0,
+     13,
+     0,
+     0,
+     0,
+     0
+    ],
+    "seconds": 21.6,
+    "frames": 39,
+    "fps": 1.8,
+    "interval_ms": {
+     "mean": 522.04,
+     "p50": 18.75,
+     "p95": 10448.95,
+     "p99": 10448.95,
+     "max": 10448.95
+    },
+    "over_20ms": 19,
+    "over_34ms": 16,
+    "present_ms": {
+     "mean": 17.07,
+     "max": 102.45
+    }
+   },
+   {
+    "phase": "idle",
+    "compositions": 0,
+    "compose_avg_us": 0,
+    "compose_max_us": 0,
+    "compose_hist": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "seconds": 9.1,
+    "frames": 1,
+    "fps": 0.1,
+    "interval_ms": {
+     "mean": 2606.73,
+     "p50": 2606.73,
+     "p95": 2606.73,
+     "p99": 2606.73,
+     "max": 2606.73
+    },
+    "over_20ms": 1,
+    "over_34ms": 1,
+    "present_ms": {
+     "mean": 631.14,
+     "max": 631.14
+    }
+   },
+   {
+    "phase": "start-opening",
+    "compositions": 12,
+    "compose_avg_us": 7386,
+    "compose_max_us": 27597,
+    "compose_hist": [
+     8,
+     0,
+     1,
+     0,
+     0,
+     3,
+     0
+    ],
+    "seconds": 2.2,
+    "frames": 13,
+    "fps": 5.9,
+    "interval_ms": {
+     "mean": 728.28,
+     "p50": 17.0,
+     "p95": 9126.76,
+     "p99": 9126.76,
+     "max": 9126.76
+    },
+    "over_20ms": 5,
+    "over_34ms": 5,
+    "present_ms": {
+     "mean": 54.86,
+     "max": 626.45
+    }
+   },
+   {
+    "phase": "start-held",
+    "compositions": 0,
+    "compose_avg_us": 0,
+    "compose_max_us": 0,
+    "compose_hist": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "seconds": 7.1,
+    "frames": 1,
+    "fps": 0.1,
+    "interval_ms": {
+     "mean": 1848.2,
+     "p50": 1848.2,
+     "p95": 1848.2,
+     "p99": 1848.2,
+     "max": 1848.2
+    },
+    "over_20ms": 1,
+    "over_34ms": 1,
+    "present_ms": {
+     "mean": 630.11,
+     "max": 630.11
+    }
+   },
+   {
+    "phase": "quicksettings-opening",
+    "compositions": 7,
+    "compose_avg_us": 5948,
+    "compose_max_us": 12896,
+    "compose_hist": [
+     4,
+     0,
+     0,
+     1,
+     2,
+     0,
+     0
+    ],
+    "seconds": 2.0,
+    "frames": 8,
+    "fps": 3.9,
+    "interval_ms": {
+     "mean": 915.24,
+     "p50": 22.25,
+     "p95": 7106.61,
+     "p99": 7106.61,
+     "max": 7106.61
+    },
+    "over_20ms": 5,
+    "over_34ms": 4,
+    "present_ms": {
+     "mean": 83.19,
+     "max": 631.67
+    }
+   },
+   {
+    "phase": "quicksettings-held",
+    "compositions": 0,
+    "compose_avg_us": 0,
+    "compose_max_us": 0,
+    "compose_hist": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "seconds": 7.1,
+    "frames": 107,
+    "fps": 15.0,
+    "interval_ms": {
+     "mean": 73.22,
+     "p50": 16.75,
+     "p95": 17.25,
+     "p99": 4133.89,
+     "max": 4133.89
+    },
+    "over_20ms": 5,
+    "over_34ms": 4,
+    "present_ms": {
+     "mean": 17.24,
+     "max": 627.3
+    }
+   },
+   {
+    "phase": "window-open",
+    "compositions": 7,
+    "compose_avg_us": 3188,
+    "compose_max_us": 4758,
+    "compose_hist": [
+     3,
+     0,
+     4,
+     0,
+     0,
+     0,
+     0
+    ],
+    "seconds": 5.1,
+    "frames": 9,
+    "fps": 1.8,
+    "interval_ms": {
+     "mean": 482.3,
+     "p50": 42.0,
+     "p95": 3014.65,
+     "p99": 3014.65,
+     "max": 3014.65
+    },
+    "over_20ms": 5,
+    "over_34ms": 5,
+    "present_ms": {
+     "mean": 73.88,
+     "max": 626.07
+    }
+   },
+   {
+    "phase": "drag",
+    "compositions": 326,
+    "compose_avg_us": 1465,
+    "compose_max_us": 1789,
+    "compose_hist": [
+     326,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "seconds": 7.1,
+    "frames": 327,
+    "fps": 46.0,
+    "interval_ms": {
+     "mean": 24.19,
+     "p50": 18.75,
+     "p95": 27.0,
+     "p99": 27.25,
+     "max": 1850.02
+    },
+    "over_20ms": 82,
+    "over_34ms": 2,
+    "present_ms": {
+     "mean": 6.74,
+     "max": 623.96
+    }
+   }
+  ],
+  "steady_phases": [
+   "idle",
+   "start-held",
+   "quicksettings-held",
+   "drag"
+  ],
+  "steady_compositions": 326,
+  "steady_compose_avg_us": 1465,
+  "steady_compose_max_us": 1789,
+  "phases_over_16_7ms": [],
+  "baseline_compose_avg_us": 3000,
+  "passed": true
+ },
+ "session_passed": true
+}

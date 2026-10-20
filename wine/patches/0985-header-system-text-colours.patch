@@ -1,0 +1,36 @@
+Subject: [PATCH] comctl32: initialise header DC colours before custom draw
+
+The unthemed header text path inherits a black DC foreground. Initialise it
+from the current system palette, preserving custom-draw overrides and restoring
+the caller DC. This applies to every native header, including shell file views.
+
+--- a/dlls/comctl32/header.c
++++ b/dlls/comctl32/header.c
+@@ -652,6 +652,7 @@
+ HEADER_Refresh (HEADER_INFO *infoPtr, HDC hdc)
+ {
+     HFONT hFont, hOldFont;
++    COLORREF old_text, old_background;
+     RECT rect, rcRest;
+     HBRUSH hbrBk;
+     UINT i;
+@@ -663,6 +664,10 @@
+ 
+     /* get rect for the bar, adjusted for the border */
+     GetClientRect (infoPtr->hwndSelf, &rect);
++    /* Initialise the DC before custom draw, so handlers can still override it.
++     * A reused DC otherwise keeps black text even after system colours change. */
++    old_text = SetTextColor(hdc, GetSysColor(COLOR_BTNTEXT));
++    old_background = SetBkColor(hdc, GetSysColor(COLOR_3DFACE));
+     lCDFlags = HEADER_SendCtrlCustomDraw(infoPtr, CDDS_PREPAINT, hdc, &rect);
+     
+     if (infoPtr->bDragging)
+@@ -699,6 +704,8 @@
+     
+     if (lCDFlags & CDRF_NOTIFYPOSTPAINT)
+         HEADER_SendCtrlCustomDraw(infoPtr, CDDS_POSTPAINT, hdc, &rect);
++    SetTextColor(hdc, old_text);
++    SetBkColor(hdc, old_background);
+ }
+ 
+ 

@@ -1,0 +1,59 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Sat, 3 Oct 2026 21:30:00 -0400
+Subject: [PATCH] ntdll: flush the write buffers by waiting them out on the PS5
+
+NtFlushProcessWriteBuffers was a stub on the console: no membarrier, and a program that relies on it (the .NET
+garbage collector does) could see another thread's stores out of order; kernel32's store buffer litmus test counted
+dozens of reordered stores. The page protection trick CoreCLR uses where it has no membarrier was tried and
+removed: it made a million mprotect calls in half a minute, ended the title, and the console dropped off the network.
+This CPU now fences and waits 5 microseconds, far longer than a store takes to leave its store buffer, which gives
+every thread that reads after the call the stores that came before it. It touches no kernel interface.
+---
+  dlls/ntdll/unix/virtual.c | 31 +++++++++++++++++++++++++++++++
+  1 file changed, 31 insertions(+)
+
+diff --git a/dlls/ntdll/unix/virtual.c b/dlls/ntdll/unix/virtual.c
+index 4fc7dea..03af6f6 100644
+--- a/dlls/ntdll/unix/virtual.c
++++ b/dlls/ntdll/unix/virtual.c
+@@ -7915,6 +7915,37 @@ NTSTATUS WINAPI NtFlushProcessWriteBuffers(void)
+     return STATUS_SUCCESS;
+ }
+ 
++#elif defined(__PROSPERO__)
++
++/**********************************************************************
++ *           NtFlushProcessWriteBuffers  (NTDLL.@)
++ *
++ * The console has no membarrier and no safe way to interrupt the CPUs that run the process's other threads (changing
++ * the protection of a dirty page, as CoreCLR does where it has no membarrier, ran the call about a million times in a
++ * kernel32 test, ended the title and the console dropped off the network). On x86 a store reaches the other CPUs when
++ * its store buffer drains, which takes tens to hundreds of nanoseconds and does not depend on anything the other CPU
++ * does; so this CPU fences, and waits for much longer than that. A thread whose store came before this call is then
++ * seen by every thread that reads after it, which is all that FlushProcessWriteBuffers promises: if the caller reads
++ * a location another thread wrote just before (and that thread read the caller's flag before the caller's store was
++ * visible), the wait is longer than the two drains the order needs. It relies on that bound. kernel32's store buffer
++ * litmus test passes with it, and passed on the host with no wait at all (only the fence), so the test cannot tell the
++ * wait from the fence: the wait rests on the argument, not on the test.
++ */
++NTSTATUS WINAPI NtFlushProcessWriteBuffers(void)
++{
++    static const long long drain_ns = 5000;
++    struct timespec start, now;
++
++    __atomic_thread_fence( __ATOMIC_SEQ_CST );
++    clock_gettime( CLOCK_MONOTONIC, &start );
++    do
++    {
++        __builtin_ia32_pause();
++        clock_gettime( CLOCK_MONOTONIC, &now );
++    } while ((now.tv_sec - start.tv_sec) * 1000000000LL + (now.tv_nsec - start.tv_nsec) < drain_ns);
++    return STATUS_SUCCESS;
++}
++
+ #else /* __linux__ */
+ 
+ /**********************************************************************
+-- 
+2.43.0

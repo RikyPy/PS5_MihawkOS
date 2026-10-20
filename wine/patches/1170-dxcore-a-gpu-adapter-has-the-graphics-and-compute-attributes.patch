@@ -1,0 +1,31 @@
+From: PS5_Proton <local>
+Subject: [PATCH] dxcore: a GPU adapter has the graphics and compute attributes
+
+IDXCoreAdapter::IsAttributeSupported answered FALSE for everything, so a program that sorts adapters by attribute
+took the console's GPU for something else. Chromium (CEF 150, MihawkBrowser) collects NPUs as the hardware adapters
+that support neither DXCORE_ADAPTER_ATTRIBUTE_D3D12_GRAPHICS nor ..._D3D11_GRAPHICS
+(gpu/config/gpu_info_collector_win.cc, CollectNPUInformation), took the GPU for one, and read its driver description
+with GetProperty(DriverDescription, &char_pointer): eight bytes, which the four of "PS5" fit, so the pointer became
+0x00355350 and its std::string read faulted in the browser's GPU thread at startup (console run
+2026-10-16; record removed from the tree; in git history). Every adapter dxcore lists is a wined3d GPU, so it reports Direct3D 11 and 12 graphics
+and core compute; other attributes stay unimplemented.
+---
+--- a/dlls/dxcore/dxcore.c
++++ b/dlls/dxcore/dxcore.c
+@@ -91,7 +91,15 @@
+ 
+ static BOOL STDMETHODCALLTYPE dxcore_adapter_IsAttributeSupported(IDXCoreAdapter *iface, REFGUID attribute)
+ {
+-    FIXME("iface %p, attribute %s stub!\n", iface, debugstr_guid(attribute));
++    TRACE("iface %p, attribute %s.\n", iface, debugstr_guid(attribute));
++
++    /* Every adapter here is a wined3d GPU: it draws through Direct3D 11 and 12 and computes. */
++    if (IsEqualGUID(attribute, &DXCORE_ADAPTER_ATTRIBUTE_D3D11_GRAPHICS)
++            || IsEqualGUID(attribute, &DXCORE_ADAPTER_ATTRIBUTE_D3D12_GRAPHICS)
++            || IsEqualGUID(attribute, &DXCORE_ADAPTER_ATTRIBUTE_D3D12_CORE_COMPUTE))
++        return TRUE;
++
++    FIXME("iface %p, attribute %s not implemented.\n", iface, debugstr_guid(attribute));
+     return FALSE;
+ }
+ 

@@ -1,0 +1,25 @@
+From: PS5_Proton <local@invalid>
+Subject: [PATCH] server: preserve advisory zero send buffers on PS5
+
+PS5 native sockets reject SO_SNDBUF=0 with EINVAL. Windows applications can
+request zero and expect it to remain readable while TCP still transfers data.
+Reuse the existing Apple-host handling at the shared wineserver socket boundary.
+A game launcher produces 67 rejected requests before its transport error; paired asset-free
+probes compare option transitions and loopback traffic against pinned Linux Wine.
+
+diff --git a/server/sock.c b/server/sock.c
+--- a/server/sock.c
++++ b/server/sock.c
+@@ -3429,10 +3429,10 @@
+         }
+         sndbuf = *(DWORD *)get_req_data();
+ 
+-#ifdef __APPLE__
++#if defined(__APPLE__) || defined(__PROSPERO__)
+         if (!sndbuf)
+         {
+-            /* setsockopt fails if a zero value is passed */
++            /* Native sockets reject zero; Windows keeps it as an advisory size. */
+             sock->sndbuf = sndbuf;
+             return;
+         }

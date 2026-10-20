@@ -1,0 +1,29 @@
+{
+  "probe_sha256": "5ba96ce7c339fc8207eac7324306c88294eb9347431542897989309b19d4f860",
+  "wine_revision": "a518d643873ff733bafb31595dfd01ab8bbdf790",
+  "cases": [
+    {
+      "case": "java",
+      "exit_code": 0,
+      "seconds": 3.17,
+      "verdict": "PASS",
+      "handles": [],
+      "java_nodes": 3,
+      "passed": true
+    }
+  ],
+  "passed": true,
+  "java_manifest": {
+    "runtime": "java-runtime-epsilon",
+    "entrypoint": "javaw.exe",
+    "host_wine_revision": "a518d643873ff733bafb31595dfd01ab8bbdf790",
+    "sha256": {
+      "JavaProcessProbe.java": "7bc98f6c33a6a53c3d8b5ccf1a6817d7c023ba1fc110d42db58062b47ce037aa",
+      "java.exe": "4c062924e741a9663353a8b44ce1c1523534063aa7d6c9be1df241126a1ce074",
+      "javaw.exe": "38ac81b6ef29e4f29235902fe56385e3c2e4f216f728baff9512aae4e5c7bc67",
+      "javac.exe": "a1057a56fe25875d9286661a1da0c604e21caed8472ae8101a43999590942bb4",
+      "release": "b2eaec1ef440f402b9fbbf31fc8defee6807a8083444982e274f665c21f46fa4",
+      "JavaProcessProbe.class": "f80bd9f15b6af9aa1c1f3768b2fd19718bba5eff6afd156c59c552fb1060df36"
+    }
+  }
+}

@@ -1,0 +1,56 @@
+{
+ "run": "clock-text-2026-10-16-01",
+ "what": "the taskbar clock drawn with the prototype's own glyphs (src/pw_text_glyphs.h, patch 1140) against the prototype",
+ "reference": "prototypes/windows11-shell ?fresh&light in headless Chromium 154 at 1920x1080, brightness 100, real Bloom, Shell.now fixed to the console's 3:26 PM 10/16/2026, notifications 0 (the native taskbar has no badge); ink = pixels where the prototype differs from itself with .tb-clock-text hidden",
+ "console": "klog/clock-text-2026-10-16-01-desktop-session-capture-0{1,2,3}.png, identical in these regions",
+ "metric": "per pixel, the largest channel difference",
+ "after": {
+  "clock ink pixels (539)": {
+   "exact": 0.6772,
+   "within1": 0.9944,
+   "worst": 2
+  },
+  "clock text lines 1834-1897 x 1039-1073": {
+   "exact": 0.767,
+   "within1": 0.9986,
+   "worst": 2
+  },
+  "tray 1680-1912 x 1032-1080": {
+   "exact": 0.7812,
+   "within1": 0.9997,
+   "worst": 2
+  }
+ },
+ "before": {
+  "source": "taskbar-2026-10-16-03 capture 3 (main 0d04fc0's GDI clock, 1:52 PM 10/16/2026) against the prototype at that time",
+  "clock ink pixels (515)": {
+   "exact": 0.0291,
+   "within1": 0.0369,
+   "worst": 219
+  },
+  "clock text lines 1834-1897 x 1039-1073": {
+   "exact": 0.5612,
+   "within1": 0.7035,
+   "worst": 220
+  },
+  "tray 1680-1912 x 1032-1080": {
+   "exact": 0.7008,
+   "within1": 0.9027,
+   "worst": 220
+  }
+ },
+ "host_prediction": {
+  "how": "the glyphs composed over the prototype's own text-less frame, against the prototype",
+  "light 3:26 PM ink": {
+   "exact": 0.7403,
+   "within1": 1.0,
+   "worst": 1
+  },
+  "dark 1:52 PM ink": {
+   "exact": 0.3301,
+   "within1": 0.9942,
+   "worst": 2
+  }
+ },
+ "not_measured": "dark theme on the console (the desktop session runs light)"
+}

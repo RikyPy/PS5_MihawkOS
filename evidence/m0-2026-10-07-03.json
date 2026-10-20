@@ -1,0 +1,27 @@
+{
+ "run": "m0-2026-10-07-03",
+ "elf_sha256": "abff579229fe9d0b221223aba20669da6173d3fa0b7589ef10b1fad28d36feed",
+ "process": "payload through websrv/elfldr, no title running",
+ "modes": {
+  "signal32": {
+   "lines": [
+    "M0 start mode=signal32",
+    "M0 low_page at=10000000",
+    "M0 signal32 armed",
+    "M0 signal32 recovered signal=11 address=0 teb_self_read=0",
+    "M0 end"
+   ],
+   "ended": true
+  },
+  "fsselector": {
+   "lines": [
+    "M0 start mode=fsselector",
+    "M0 low_page at=10000000",
+    "M0 fsselector loading fs=0x13 in 32-bit code",
+    "M0 fsselector faulted signal=11 address=0xff800080",
+    "M0 end"
+   ],
+   "ended": true
+  }
+ }
+}

@@ -1,0 +1,134 @@
+From ce7101c19242deaa85ffcc5235305bc825f7c3dd Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Sat, 3 Oct 2026 00:49:46 -0400
+Subject: [PATCH] server: give Windows threads native round-robin scheduling
+ and raised priorities on PS5
+
+Every thread of a PS5 title is SCHED_FIFO at priority 700, and the server
+had no priority mapping for the console, so Windows threads ran FIFO at
+one priority. Measured on the console: threads of equal FIFO priority never
+share a CPU, so with more busy threads than the game's 13 CPUs the rest
+never ran at all, where Windows threads of equal priority take turns; and a
+Windows priority change did nothing.
+
+With WINE_PS5_SCHED=1 the server sets every thread SCHED_RR (equal
+priorities share CPUs, measured: 32 busy threads ran within 6% of each
+other) and maps Windows priorities above normal one native step up each
+band, from 699 to 695 for the realtime class; normal and below stay at 700,
+because a lower native priority starves outright under load and this
+scheduler has no Windows-like boost for starved threads. Threads are found
+through the in-process thread registry (pw_wine_thread_set_priority) when
+they start and whenever their priority changes. ntdll unregisters before
+pthread_exit; the registry holds its lock through native calls so an exiting
+thread cannot leave a stale pthread handle behind.
+---
+ dlls/ntdll/unix/server.c | 9 +++++++++
+ dlls/ntdll/unix/thread.c | 2 ++
+ server/thread.c         | 47 +++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 58 insertions(+)
+
+diff --git a/server/thread.c b/server/thread.c
+index 2995d53..dec6851 100644
+--- a/server/thread.c
++++ b/server/thread.c
+@@ -387,6 +387,53 @@ static void apply_thread_priority( struct thread *thread )
+     mach_port_deallocate( mach_task_self(), thread_port );
+ }
+ 
++#elif defined(__PROSPERO__)
++
++/* Measured on the console (PS5_Proton native/proton_sched_probe.cpp,
++ * 2026-10-03): a title's threads are SCHED_FIFO at 700 on a scale from 256
++ * (highest) to 767, and a game has 13 CPUs. Threads of equal FIFO priority
++ * never share a CPU: with more busy threads than CPUs, the rest never run.
++ * Under SCHED_RR they take turns, as Windows threads of equal priority do.
++ * Priorities are strict under both: a thread one step higher preempts at
++ * once, and one step lower never runs while 13 higher threads are busy; this
++ * scheduler has nothing like Windows' boost for starved threads.
++ *
++ * So every Windows thread runs SCHED_RR; Windows priorities above normal
++ * raise the native priority, one native step per level band (the process's
++ * first thread gets Wine's +1, as everywhere); normal and below stay at the
++ * title's default, since lowering would starve them where Windows would
++ * not. Nothing goes above 695, below the title's own control thread (690).
++ * WINE_PS5_SCHED=1 turns it on. */
++static int ps5_scheduling;
++
++void init_threading(void)
++{
++    const char *enable = getenv( "WINE_PS5_SCHED" );
++    ps5_scheduling = enable && !strcmp( enable, "1" );
++}
++
++static int ps5_native_priority( int effective_priority )
++{
++    if (effective_priority <= 8) return 700;          /* normal and below: the default */
++    if (effective_priority <= 10) return 699;         /* above normal, highest */
++    if (effective_priority <= 12) return 698;
++    if (effective_priority <= 14) return 697;         /* the high priority class */
++    if (effective_priority < LOW_REALTIME_PRIORITY) return 696;   /* time critical */
++    return 695;                                       /* the realtime class */
++}
++
++static void apply_thread_priority( struct thread *thread )
++{
++    extern int pw_wine_thread_set_priority( long tid, int policy, int priority );
++    int status;
++
++    if (!ps5_scheduling || thread->unix_tid == -1) return;
++    status = pw_wine_thread_set_priority( thread->unix_tid, SCHED_RR,
++                                          ps5_native_priority( get_effective_thread_priority( thread )));
++    if (status && debug_level)
++        fprintf( stderr, "%04x: native priority not set: %d\n", thread->id, status );
++}
++
+ #else
+ 
+ void init_threading(void)
+diff --git a/dlls/ntdll/unix/server.c b/dlls/ntdll/unix/server.c
+--- a/dlls/ntdll/unix/server.c
++++ b/dlls/ntdll/unix/server.c
+@@ -1492,6 +1492,7 @@
+ #ifdef WINE_INPROCESS_SERVER
+ /* the in-process server signals threads through this table on PS5 */
+ static int (*register_server_thread)( long tid, pthread_t thread );
++static void (*unregister_server_thread)( long tid );
+ /* and saves the registry on request (the title asks before replacing the process) */
+ static int (*flush_server)( unsigned int timeout_ms );
+ 
+@@ -1546,6 +1547,7 @@
+     if (!(connect_server = dlsym( module, "pw_wineserver_connect" )))
+         fatal_error( "%s has no pw_wineserver_connect\n", module_path );
+     register_server_thread = dlsym( module, "pw_wine_thread_register" );
++    unregister_server_thread = dlsym( module, "pw_wine_thread_unregister" );
+     flush_server = dlsym( module, "pw_wineserver_flush" );
+     {
+         /* The synchronization device lives in ntdll (wine/ps5_ntsync.h); the
+@@ -1576,6 +1578,13 @@
+  *
+  * Let the in-process server reach this thread by its kernel id.
+  */
++static int get_unix_tid(void);
++
++void ps5_unregister_inprocess_thread(void)
++{
++    if (unregister_server_thread) unregister_server_thread( get_unix_tid() );
++}
++
+ static void register_inprocess_thread( int tid )
+ {
+     if (register_server_thread && register_server_thread( tid, pthread_self() ))
+diff --git a/dlls/ntdll/unix/thread.c b/dlls/ntdll/unix/thread.c
+--- a/dlls/ntdll/unix/thread.c
++++ b/dlls/ntdll/unix/thread.c
+@@ -1123,6 +1123,8 @@
+ {
+ #ifdef __PROSPERO__
+     {
++        extern void ps5_unregister_inprocess_thread(void);
++        ps5_unregister_inprocess_thread();
+         extern const struct ps5_ntsync_ops *ps5_ntsync;
+         if (ps5_ntsync && ntdll_get_thread_data()->alert_fd > 0)
+             ps5_ntsync->release( ntdll_get_thread_data()->alert_fd );
+-- 
+2.56.0

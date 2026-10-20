@@ -1,0 +1,57 @@
+From cc53cfc03dabd290b26791333890295350e70333 Mon Sep 17 00:00:00 2001
+From: prospero-win <prospero-win@invalid>
+Date: Sat, 26 Sep 2026 12:40:00 +0200
+Subject: [PATCH] server: Size the user shared data section to a host page.
+
+KUSER_SHARED_DATA is smaller than 4k, so the section is a single Windows
+page. With 16k host pages (PS5) the host page mapped at 0x7ffe0000 also
+covers 0x7ffe1000, where the x64 syscall dispatcher pointer is written
+through this view (patch 0530); a section shorter than the host page
+leaves that part of the mapping beyond the end of its backing object.
+Round the size up to the host page, as the other SEC_COMMIT sections here
+already do. On 4k hosts the size is unchanged.
+
+Rebased onto the pin for PS5_Proton (see wine/patches/README.md).
+---
+ server/mapping.c     |  4 +++-
+ server/mapping.c.rej | 13 +++++++++++++
+ 2 files changed, 16 insertions(+), 1 deletion(-)
+ create mode 100644 server/mapping.c.rej
+
+diff --git a/server/mapping.c b/server/mapping.c
+index b9b1b63..2b55739 100644
+--- a/server/mapping.c
++++ b/server/mapping.c
+@@ -1530,7 +1530,9 @@ struct object *create_user_data_mapping( struct object *root, const struct unico
+     void *ptr;
+     struct mapping *mapping;
+ 
+-    if (!(mapping = create_mapping( root, name, attr, sizeof(KUSER_SHARED_DATA),
++    /* a whole host page: with pages larger than 4k the page also holds the
++     * syscall dispatcher pointer that follows the structure at 0x7ffe1000 */
++    if (!(mapping = create_mapping( root, name, attr, round_size( sizeof(KUSER_SHARED_DATA), host_page_mask ),
+                                     SEC_COMMIT, 0, FILE_READ_DATA | FILE_WRITE_DATA, sd ))) return NULL;
+     ptr = mmap( NULL, mapping->size, PROT_WRITE, MAP_SHARED, get_unix_fd( mapping->fd ), 0 );
+     if (ptr != MAP_FAILED) user_shared_data = ptr;
+diff --git a/server/mapping.c.rej b/server/mapping.c.rej
+new file mode 100644
+index 0000000..304e9cd
+--- /dev/null
++++ b/server/mapping.c.rej
+@@ -0,0 +1,13 @@
++diff a/server/mapping.c b/server/mapping.c	(rejected hunks)
++@@ -1489,7 +1489,10 @@ struct object *create_user_data_mapping( struct object *root, struct unicode_str
++ {
++     void *ptr;
++     struct mapping *mapping;
++-    struct mapping_init_data data = { .size = sizeof(KUSER_SHARED_DATA), .flags = SEC_COMMIT,
+++    /* a whole host page: with pages larger than 4k the page also holds the
+++     * syscall dispatcher pointer that follows the structure at 0x7ffe1000 */
+++    struct mapping_init_data data = { .size = round_size( sizeof(KUSER_SHARED_DATA), host_page_mask ),
+++                                      .flags = SEC_COMMIT,
++                                       .file_access = FILE_READ_DATA | FILE_WRITE_DATA };
++     struct object_params params = { .ops = &mapping_ops, .root = root, .name = name,
++                                     .attr = attr, .sd = sd, .init_data = &data };
+-- 
+2.55.0
+

@@ -1,0 +1,25 @@
+{
+ "run": "m0-2026-10-07-07",
+ "elf_sha256": "4fe713442b103262bd5c2f6f20ce59419ee5e4cb3480a1ba31f691bbd81bfbe6",
+ "process": "payload through websrv/elfldr, no title running",
+ "modes": {
+  "ldt": {
+   "lines": [
+    "M0 start mode=ldt",
+    "M0 low_page at=10000000",
+    "M0 ldt set_ldt=-1",
+    "M0 end"
+   ],
+   "ended": true
+  },
+  "ldtsignal": {
+   "lines": [
+    "M0 start mode=ldtsignal",
+    "M0 low_page at=10000000",
+    "M0 ldt set_ldt=-1",
+    "M0 end"
+   ],
+   "ended": true
+  }
+ }
+}

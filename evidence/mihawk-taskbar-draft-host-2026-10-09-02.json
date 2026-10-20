@@ -1,0 +1,110 @@
+{
+ "scope": "Paired PE64/PE32 native taskbar draft semantics on named Linux Wine desktop, not production or PS5 qualification",
+ "oracle": "Installed GUI-capable Linux Wine 11.18; fixed Windows 11 reference unavailable",
+ "passed": true,
+ "checks": 38,
+ "failures": 0,
+ "console_qualified": false,
+ "windows_equivalence_verified": false,
+ "captures_qualified": false,
+ "host_adapter": "Only the unused GE-Proton EXPLORER_LD_PRELOAD bridge is omitted: host environment has no preload entry and host Wine lacks its private ntdll exports. Taskbar code is identical to the native draft. Host uses named TaskbarHost to avoid the existing Default desktop owner.",
+ "results": [
+  "real shell tray and named desktop",
+  "full-width bottom taskbar, 48 pixels at 96 DPI",
+  "real application window",
+  "accessible Start button and live clock/date",
+  "real-window taskbar entry",
+  "40-pixel buttons and 4-pixel gap",
+  "centered real buttons",
+  "normal minimize",
+  "taskbar restores real window",
+  "destroyed window entry removed"
+ ],
+ "prior_attempts": [
+  {
+   "result": "unqualified",
+   "reason": "Unmodified PS5-built Explorer stops before UI at unavailable host ntdll preload export"
+  },
+  {
+   "checks": 7,
+   "failures": 4,
+   "reason": "Default already owned by host Explorer; its legacy tray was observed instead of draft"
+  },
+  {
+   "checks": 12,
+   "failures": 1,
+   "reason": "Diagnostic class comparison was case-sensitive; native class is Static, not STATIC"
+  }
+ ],
+ "limitations": [
+  "temporary draft outside frozen production source",
+  "classic Start remains; approved Start panel not implemented",
+  "opaque material fallback only",
+  "no displayed-pixel, hardware-input, frame-pacing or fullscreen qualification"
+ ],
+ "source_sha256": {
+  "systray.c": "8659e5b42a136eb2ce7e5521961fe41cb0a9ac394b84dad082aff90e99e4bfaf",
+  "taskbar-helper.c": "ad33a0cb44bfdc1f69a6058103405a19adefdc57464af24b3023eaf2c2eafe19",
+  "desktop-host.c": "eaf432b7a127894cdcd6e93c1ee9f4c69e83d4fb6346fec868ad907487f00e43",
+  "taskbar-host-probe.c": "9ebc4b16b7f76be42da1c9964e01a769001477b4983be83f3a2e3f0db0b48847"
+ },
+ "verdict_lines": {
+  "64": [
+   "taskbar-host: PASS real-shell-tray",
+   "taskbar-host: PASS real-named-host-desktop",
+   "taskbar-host: PASS full-width-bottom-48",
+   "taskbar-host: PASS real-application-window",
+   "taskbar-host: static control length=17 newline=1",
+   "taskbar-host: PASS accessible-start-button",
+   "taskbar-host: PASS live-accessible-clock-date",
+   "taskbar-host: PASS real-window-taskbar-entry",
+   "taskbar-host: PASS item-size-spacing",
+   "taskbar-host: PASS centered-real-buttons",
+   "taskbar-host: PASS normal-minimize",
+   "taskbar-host: PASS native-win-t-input",
+   "taskbar-host: PASS win-t-focuses-start",
+   "taskbar-host: PASS native-arrow-input",
+   "taskbar-host: PASS arrow-moves-real-button-focus",
+   "taskbar-host: PASS native-space-input",
+   "taskbar-host: PASS keyboard-restores-real-window",
+   "taskbar-host: PASS native-button-minimizes-real-window",
+   "taskbar-host: PASS native-button-restores-real-window",
+   "taskbar-host: PASS destroyed-window-entry-removed",
+   "taskbar-host: RESULT checks=19 failures=0"
+  ],
+  "32": [
+   "taskbar-host: PASS real-shell-tray",
+   "taskbar-host: PASS real-named-host-desktop",
+   "taskbar-host: PASS full-width-bottom-48",
+   "taskbar-host: PASS real-application-window",
+   "taskbar-host: static control length=17 newline=1",
+   "taskbar-host: PASS accessible-start-button",
+   "taskbar-host: PASS live-accessible-clock-date",
+   "taskbar-host: PASS real-window-taskbar-entry",
+   "taskbar-host: PASS item-size-spacing",
+   "taskbar-host: PASS centered-real-buttons",
+   "taskbar-host: PASS normal-minimize",
+   "taskbar-host: PASS native-win-t-input",
+   "taskbar-host: PASS win-t-focuses-start",
+   "taskbar-host: PASS native-arrow-input",
+   "taskbar-host: PASS arrow-moves-real-button-focus",
+   "taskbar-host: PASS native-space-input",
+   "taskbar-host: PASS keyboard-restores-real-window",
+   "taskbar-host: PASS native-button-minimizes-real-window",
+   "taskbar-host: PASS native-button-restores-real-window",
+   "taskbar-host: PASS destroyed-window-entry-removed",
+   "taskbar-host: RESULT checks=19 failures=0"
+  ]
+ },
+ "checks_per_architecture": 19,
+ "architectures": [
+  "PE64",
+  "PE32"
+ ],
+ "added_results": [
+  "real Win+T keyboard queue focuses Start",
+  "arrow key moves real button focus",
+  "space restores real application",
+  "native button minimizes/restores actual window"
+ ]
+}

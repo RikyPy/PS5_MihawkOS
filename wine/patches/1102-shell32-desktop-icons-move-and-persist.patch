@@ -1,0 +1,705 @@
+From: PS5_Proton <local>
+Subject: [PATCH] shell32: the desktop's icons sit on the prototype's grid at its three sizes, arrange as asked, and stay where they are put
+
+Wine's shell view starts a shell drag when an icon is dragged, and a drop on empty ground goes to the folder's drop target: dragging an
+icon on the desktop copied the file into the Desktop folder, and no icon ever moved. The desktop's icons now behave as Windows' do, on the
+approved Windows 11 prototype's grid (PS5_Proton src/pw_desktop_icons.h, copied into dlls/shell32 at build time):
+
+- the desktop's list takes its icon size's image list (32, 48 or 96 px; 96 is shell32's own, patch 1183), the prototype's cells for that
+  size (75 x 75, 75 x 91, 123 x 139) and the desktop look (LVS_EX_TRANSPARENTSHADOWTEXT, which comctl32 draws as the prototype's desktop
+  and does not arrange on its first paint, patch 1105) when it is set up, before any item is placed and before any paint (the list keeps
+  each item's box where it was put: Explorer changing them afterwards put every icon off its cell, and a paint inside CreateViewWindow
+  arranged the icons first); the list is never auto-arranged (Wine made every view's list so, and its redraw at the end of filling put
+  the placed icons back in list order): shell32 places and arranges the desktop itself; the grid's size is the view's (the list has
+  none yet while the view fills);
+- This PC and the Recycle Bin show, and the shell's other items (Documents, Network, the Unix root) are hidden, unless
+  HideDesktopIcons\\NewStartPanel says otherwise;
+- an icon with no saved place takes the first free cell, going down the left column first, This PC first and the Recycle Bin second,
+  then the other items in the view's order; an icon added later takes the first free cell;
+- a drag that began among the desktop's own icons and is over empty ground or a selected icon is a move of the selected icons by how far
+  the pointer went, each to the free cell nearest where it lands; the drop is not a file operation;
+- the icon size and Auto arrange and Align to grid are the desktop's view settings, kept where Windows keeps them
+  (HKCU\\Software\\Microsoft\\Windows\\Shell\\Bags\\1\\Desktop: IconSize, and FFlags' FWF_AUTOARRANGE and FWF_SNAPTOGRID), changed through
+  IFolderView2::SetViewModeAndIconSize (a stub until now) and SetCurrentFolderFlags, and Ctrl+Shift+1-4 as on Windows. A size change
+  keeps each icon's cell; Auto arrange packs the icons down the columns in the order of their cells (an added or removed icon too, a
+  drop inserting where it lands); with Align to grid off a dropped icon stays where it is let go, and turning it on snaps each icon to
+  the nearest free cell;
+- cells are kept by item name in HKCU\\Software\\Mihawk\\Shell\\Desktop (IconPositions, version 3: column and row in 1/256 of a cell, the
+  same at every size; version 2's whole cells are read too, version 1 held pixels of Wine's own spacing and is not read) and restored
+  when the view fills;
+- an item announced twice (by the program that made it and by the desktop's own watch) is added once.
+Only a view with FWF_DESKTOP and the large-icon mode is affected.
+---
+diff --git a/dlls/shell32/shlview.c b/dlls/shell32/shlview.c
+--- a/dlls/shell32/shlview.c
++++ b/dlls/shell32/shlview.c
+@@ -53,7 +53,10 @@
+ #include "wingdi.h"
+ #include "winuser.h"
+ #include "shlobj.h"
++#include "shlwapi.h"
++#include "winreg.h"
+ #include "shobjidl.h"
++#include "commoncontrols.h"
+ #include "shresdef.h"
+ #include "wine/debug.h"
+ 
+@@ -61,6 +64,7 @@
+ #include "pidl.h"
+ #include "shell32_main.h"
+ #include "shellfolder.h"
++#include "pw_desktop_icons.h"  /* the desktop's grid (PS5_Proton src/, copied here at build time) */
+ 
+ WINE_DEFAULT_DEBUG_CHANNEL(shell);
+ 
+@@ -144,6 +148,10 @@ typedef struct
+         UINT            cScrollDelay;   /* Send a WM_*SCROLL msg every 250 ms during drag-scroll */
+         POINT           ptLastMousePos; /* Mouse position at last DragOver call */
+         UINT            columns;        /* Number of shell folder columns */
++        BOOL            internal_drag;  /* the drag in progress started in this view: on the desktop, its icons move instead of being copied */
++        BOOL            internal_hover; /* ... and it is over empty ground or a selected icon, where a drop moves them */
++        POINT           drag_anchor;    /* list client coordinates where the drag began */
++        int             desktop_icon;   /* the desktop's icon size: 32, 48 or 96 px */
+ } IShellViewImpl;
+ 
+ static inline IShellViewImpl *impl_from_IShellView3(IShellView3 *iface)
+@@ -365,6 +373,10 @@ static BOOL ShellView_CreateList (IShellViewImpl * This)
+ 	if (This->FolderSettings.fFlags & FWF_AUTOARRANGE)	dwStyle |= LVS_AUTOARRANGE;
+ 	if (This->FolderSettings.fFlags & FWF_DESKTOP)
+ 	  This->FolderSettings.fFlags |= FWF_NOCLIENTEDGE | FWF_NOSCROLL;
++	/* the desktop places and arranges its icons itself, on the prototype's grid: an arranged list moves every icon back
++	 * into the list's order whenever it redraws */
++	if (This->FolderSettings.fFlags & FWF_DESKTOP)
++	  dwStyle &= ~LVS_AUTOARRANGE;
+ 	if (This->FolderSettings.fFlags & FWF_SINGLESEL)	dwStyle |= LVS_SINGLESEL;
+ 	if (This->FolderSettings.fFlags & FWF_NOCLIENTEDGE)
+ 	  dwExStyle &= ~WS_EX_CLIENTEDGE;
+@@ -409,6 +421,8 @@ static BOOL ShellView_CreateList (IShellViewImpl * This)
+ *
+ * - adds all needed columns to the shellview
+ */
++static void desktop_setup(IShellViewImpl *This);
++
+ static void ShellView_InitList(IShellViewImpl *This)
+ {
+     IShellDetails *details = NULL;
+@@ -427,6 +441,8 @@ static void ShellView_InitList(IShellViewImpl *This)
+     SendMessageW(This->hWndList, LVM_DELETEALLITEMS, 0, 0);
+     SendMessageW(This->hWndList, LVM_SETIMAGELIST, LVSIL_SMALL, (LPARAM)small_icons);
+     SendMessageW(This->hWndList, LVM_SETIMAGELIST, LVSIL_NORMAL, (LPARAM)big_icons);
++    /* the desktop (the Mihawk session): its icon size, grid and look, before any item is placed or painted */
++    desktop_setup(This);
+ 
+     lvColumn.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT;
+     lvColumn.pszText = nameW;
+@@ -630,6 +646,469 @@ static void shellview_add_item(IShellViewImpl *shellview, LPCITEMIDLIST pidl)
+     }
+ }
+ 
++/**********************************************************
++* The desktop's icons (the Mihawk session): where they are, how big, and how they move.
++*
++* The grid is the approved Windows 11 prototype's (PS5_Proton's src/pw_desktop_icons.h, copied here at build time) at its three
++* icon sizes, 32, 48 (the default) and 96 px: cells of 75 x 75, 75 x 91 and 123 x 139 from the work area's top left. This PC
++* comes first and the Recycle Bin second, then the other items in the view's order, each in the first free cell going down the
++* left column first. Icons stay where the user puts them; a new icon takes the first free cell; dragging icons within the
++* desktop moves them, each to the free cell nearest where it lands. Auto arrange packs the icons down the columns in the order
++* of their cells (a drop inserts at the drop's cell); with Align to grid off an icon stays where it is let go, between cells.
++*
++* The icon size and those two modes are the desktop's view settings, which Windows keeps in
++* HKCU\\Software\\Microsoft\\Windows\\Shell\\Bags\\1\\Desktop (IconSize; FFlags' FWF_AUTOARRANGE and FWF_SNAPTOGRID); they change
++* through IFolderView2 (SetViewModeAndIconSize, SetCurrentFolderFlags) and Ctrl+Shift+1-4. Cells are kept by item name in
++* HKCU\\Software\\Mihawk\\Shell\\Desktop, value IconPositions: version 3, then for each icon its column and row in 1/256 of a
++* cell, so they are the same at every icon size, and its name (version 2, whole cells, is still read). A list view item's
++* position is its icon's top left.
++*/
++#define DESKTOP_SETTINGS_KEY    L"Software\\Microsoft\\Windows\\Shell\\Bags\\1\\Desktop"
++#define DESKTOP_POSITIONS_KEY   L"Software\\Mihawk\\Shell\\Desktop"
++#define DESKTOP_POSITIONS_VALUE L"IconPositions"
++#define DESKTOP_POSITIONS_VERSION 3
++#define DESKTOP_MODES (FWF_AUTOARRANGE | FWF_SNAPTOGRID)
++#define DESKTOP_FIX 256             /* cells are kept in 1/256 of a cell */
++#define DESKTOP_MOVING (-0x40000000) /* a cell no icon has: the icon is being placed */
++
++static BOOL desktop_icons(const IShellViewImpl *This)
++{
++    return (This->FolderSettings.fFlags & FWF_DESKTOP) && This->FolderSettings.ViewMode == FVM_ICON;
++}
++
++static BOOL desktop_item_name(IShellViewImpl *This, LPCITEMIDLIST pidl, WCHAR *name, UINT size)
++{
++    STRRET str;
++
++    if (FAILED(IShellFolder_GetDisplayNameOf(This->pSFParent, pidl, SHGDN_INFOLDER | SHGDN_FORPARSING, &str))) return FALSE;
++    return SUCCEEDED(StrRetToBufW(&str, pidl, name, size));
++}
++
++/* The prototype's desktop shows This PC and the Recycle Bin and nothing else of the shell's own items; the user turns them on
++ * and off in HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\HideDesktopIcons\\NewStartPanel (a DWORD named by
++ * the item's CLSID: 0 shows it, 1 hides it). Only the desktop's own view is filtered; an Explorer window on the Desktop folder
++ * lists them all. */
++static BOOL desktop_item_hidden(IShellViewImpl *This, LPCITEMIDLIST pidl)
++{
++    static const WCHAR key[] = L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\HideDesktopIcons\\NewStartPanel";
++    DWORD value, size = sizeof(value);
++    const GUID *guid;
++    WCHAR name[40];
++
++    if (!(This->FolderSettings.fFlags & FWF_DESKTOP) || !(guid = _ILGetGUIDPointer(pidl))) return FALSE;
++    StringFromGUID2(guid, name, ARRAY_SIZE(name));
++    if (RegGetValueW(HKEY_CURRENT_USER, key, name, RRF_RT_REG_DWORD, NULL, &value, &size) == ERROR_SUCCESS) return value != 0;
++    return !IsEqualGUID(guid, &CLSID_MyComputer) && !IsEqualGUID(guid, &CLSID_RecycleBin);
++}
++
++/* Where an icon with no place goes first: This PC, then the Recycle Bin, then everything else in the view's order. */
++static int desktop_item_rank(IShellViewImpl *This, int index)
++{
++    LVITEMW item = { LVIF_PARAM, index };
++    const GUID *guid;
++
++    if (!SendMessageW(This->hWndList, LVM_GETITEMW, 0, (LPARAM)&item) || !item.lParam ||
++        !(guid = _ILGetGUIDPointer((LPCITEMIDLIST)item.lParam))) return 2;
++    return IsEqualGUID(guid, &CLSID_MyComputer) ? 0 : IsEqualGUID(guid, &CLSID_RecycleBin) ? 1 : 2;
++}
++
++/* The nearest of the prototype's icon sizes. */
++static int desktop_icon_size(int size)
++{
++    return size <= (PW_DESKTOP_SMALL + PW_DESKTOP_MEDIUM) / 2 ? PW_DESKTOP_SMALL :
++           size <= (PW_DESKTOP_MEDIUM + PW_DESKTOP_LARGE) / 2 ? PW_DESKTOP_MEDIUM : PW_DESKTOP_LARGE;
++}
++
++static void desktop_settings_load(IShellViewImpl *This)
++{
++    DWORD size = PW_DESKTOP_MEDIUM, flags = This->FolderSettings.fFlags, length = sizeof(DWORD);
++
++    RegGetValueW(HKEY_CURRENT_USER, DESKTOP_SETTINGS_KEY, L"IconSize", RRF_RT_REG_DWORD, NULL, &size, &length);
++    length = sizeof(DWORD);
++    RegGetValueW(HKEY_CURRENT_USER, DESKTOP_SETTINGS_KEY, L"FFlags", RRF_RT_REG_DWORD, NULL, &flags, &length);
++    This->desktop_icon = desktop_icon_size(size);
++    This->FolderSettings.fFlags = (This->FolderSettings.fFlags & ~DESKTOP_MODES) | (flags & DESKTOP_MODES);
++}
++
++static void desktop_settings_save(IShellViewImpl *This)
++{
++    DWORD size = This->desktop_icon, flags = This->FolderSettings.fFlags;
++
++    SHSetValueW(HKEY_CURRENT_USER, DESKTOP_SETTINGS_KEY, L"IconSize", REG_DWORD, &size, sizeof(size));
++    SHSetValueW(HKEY_CURRENT_USER, DESKTOP_SETTINGS_KEY, L"FFlags", REG_DWORD, &flags, sizeof(flags));
++}
++
++/* The desktop's list for its icon size: that size's image list (96 px: shell32's own, patch 1183), its cells and the desktop
++ * look (comctl32 draws the prototype's plates and labels, and does not arrange the icons on its first paint). Set before any
++ * item is placed: the list keeps each item's box where it was put, so a later change of size or spacing moves every icon off
++ * its cell until it is placed again. */
++static void desktop_style(IShellViewImpl *This)
++{
++    PwDesktopGrid grid = pw_desktop_grid(This->desktop_icon);
++    IImageList *list;
++
++    if (This->desktop_icon == PW_DESKTOP_LARGE)
++        SendMessageW(This->hWndList, LVM_SETIMAGELIST, LVSIL_NORMAL, (LPARAM)shell_desktop_large_icons());
++    else if (SUCCEEDED(SHGetImageList(This->desktop_icon == PW_DESKTOP_SMALL ? SHIL_LARGE : SHIL_EXTRALARGE, &IID_IImageList,
++                                      (void **)&list)))
++    {
++        SendMessageW(This->hWndList, LVM_SETIMAGELIST, LVSIL_NORMAL, (LPARAM)list);
++        IImageList_Release(list);   /* the list is the system's, and shared (LVS_SHAREIMAGELISTS) */
++    }
++    SendMessageW(This->hWndList, LVM_SETICONSPACING, 0, MAKELPARAM(grid.cell_w, grid.cell_h));
++    SendMessageW(This->hWndList, LVM_SETEXTENDEDLISTVIEWSTYLE, LVS_EX_TRANSPARENTSHADOWTEXT, LVS_EX_TRANSPARENTSHADOWTEXT);
++}
++
++/* The grid's size in the view (the work area; the list, which fills it, has no size yet while the view fills), and the farthest
++ * a free icon may go, in 1/256 of a cell. */
++static void desktop_grid(IShellViewImpl *This, int *columns, int *rows, POINT *farthest)
++{
++    PwDesktopGrid grid = pw_desktop_grid(This->desktop_icon);
++    RECT client;
++
++    GetClientRect(This->hWnd, &client);
++    *columns = pw_desktop_columns(&grid, client.right);
++    *rows = pw_desktop_rows(&grid, client.bottom);
++    if (!farthest) return;
++    farthest->x = max(0, MulDiv(client.right - 2 - grid.cell_w, DESKTOP_FIX, grid.cell_w));
++    farthest->y = max(0, MulDiv(client.bottom - 2 - grid.cell_h, DESKTOP_FIX, grid.cell_h));
++}
++
++/* A cell in 1/256 of a cell, to a whole one. */
++static int desktop_whole(int fixed)
++{
++    return fixed >= 0 ? (fixed + DESKTOP_FIX / 2) / DESKTOP_FIX : -((-fixed + DESKTOP_FIX / 2) / DESKTOP_FIX);
++}
++
++static void desktop_place(IShellViewImpl *This, int index, POINT cell)
++{
++    PwDesktopGrid grid = pw_desktop_grid(This->desktop_icon);
++    POINT at = { pw_desktop_cell_x(&grid, 0) + MulDiv(cell.x, grid.cell_w, DESKTOP_FIX) + grid.icon_x,
++                 pw_desktop_cell_y(&grid, 0) + MulDiv(cell.y, grid.cell_h, DESKTOP_FIX) + PW_DESKTOP_ICON_Y };
++
++    SendMessageW(This->hWndList, LVM_SETITEMPOSITION32, index, (LPARAM)&at);
++}
++
++static BOOL desktop_cell_taken(const POINT *cells, int count, int skip, int column, int row)
++{
++    int i;
++
++    for (i = 0; i < count; i++)
++        if (i != skip && desktop_whole(cells[i].x) == column && desktop_whole(cells[i].y) == row) return TRUE;
++    return FALSE;
++}
++
++/* The free cell nearest near (whole cells; column-major order breaks ties), or with near NULL the first free one, going down
++ * the left column first; FALSE when every cell is taken. The cell comes back in 1/256 of a cell. */
++static BOOL desktop_free_cell(IShellViewImpl *This, const POINT *cells, int count, int skip, const POINT *near, POINT *at)
++{
++    PwDesktopGrid grid = pw_desktop_grid(This->desktop_icon);
++    int columns, rows, column, row;
++    LONGLONG best = -1;
++
++    desktop_grid(This, &columns, &rows, NULL);
++    for (column = 0; column < columns; column++)
++        for (row = 0; row < rows; row++)
++        {
++            LONGLONG dx, dy;
++
++            if (desktop_cell_taken(cells, count, skip, column, row)) continue;
++            if (near)
++            {
++                dx = (LONGLONG)(column - near->x) * grid.cell_w;
++                dy = (LONGLONG)(row - near->y) * grid.cell_h;
++                if (best >= 0 && dx * dx + dy * dy >= best) continue;
++                best = dx * dx + dy * dy;
++            }
++            else best = 0;
++            at->x = column * DESKTOP_FIX;
++            at->y = row * DESKTOP_FIX;
++            if (!near) return TRUE;
++        }
++    return best >= 0;
++}
++
++/* Every icon's cell now, in 1/256 of a cell (whole cells while Align to grid is on). */
++static POINT *desktop_cells_read(IShellViewImpl *This, int *count)
++{
++    PwDesktopGrid grid = pw_desktop_grid(This->desktop_icon);
++    POINT *cells;
++    int i;
++
++    *count = SendMessageW(This->hWndList, LVM_GETITEMCOUNT, 0, 0);
++    if (!(cells = calloc(max(*count, 1), sizeof(*cells)))) return NULL;
++    for (i = 0; i < *count; i++)
++    {
++        POINT at;
++
++        SendMessageW(This->hWndList, LVM_GETITEMPOSITION, i, (LPARAM)&at);
++        cells[i].x = MulDiv(at.x - grid.icon_x - pw_desktop_cell_x(&grid, 0), DESKTOP_FIX, grid.cell_w);
++        cells[i].y = MulDiv(at.y - PW_DESKTOP_ICON_Y - pw_desktop_cell_y(&grid, 0), DESKTOP_FIX, grid.cell_h);
++        if (This->FolderSettings.fFlags & FWF_SNAPTOGRID)
++        {
++            cells[i].x = desktop_whole(cells[i].x) * DESKTOP_FIX;
++            cells[i].y = desktop_whole(cells[i].y) * DESKTOP_FIX;
++        }
++    }
++    return cells;
++}
++
++static void desktop_positions_save(IShellViewImpl *This, const POINT *cells, int count)
++{
++    int i, used = 0;
++    DWORD size = sizeof(DWORD), *data;
++    char *buffer;
++
++    for (i = 0; i < count; i++) size += 3 * sizeof(DWORD) + MAX_PATH * sizeof(WCHAR);
++    if (!(buffer = malloc(size))) return;
++    data = (DWORD *)buffer;
++    *data++ = DESKTOP_POSITIONS_VERSION;
++    for (i = 0; i < count; i++)
++    {
++        LVITEMW item = { LVIF_PARAM, i };
++        WCHAR name[MAX_PATH];
++
++        if (!SendMessageW(This->hWndList, LVM_GETITEMW, 0, (LPARAM)&item) || !item.lParam ||
++            !desktop_item_name(This, (LPCITEMIDLIST)item.lParam, name, MAX_PATH)) continue;
++        data[0] = cells[i].x;
++        data[1] = cells[i].y;
++        data[2] = lstrlenW(name);
++        memcpy(data + 3, name, data[2] * sizeof(WCHAR));
++        data += 3 + (data[2] * sizeof(WCHAR) + 3) / sizeof(DWORD);
++        used++;
++    }
++    if (used) SHSetValueW(HKEY_CURRENT_USER, DESKTOP_POSITIONS_KEY, DESKTOP_POSITIONS_VALUE, REG_BINARY, buffer, (char *)data - buffer);
++    free(buffer);
++}
++
++/* Auto arrange: the icons down the columns in the order of their cells (column by column, then row; an icon being placed
++ * goes last), then saved. */
++static void desktop_arrange(IShellViewImpl *This, POINT *cells, int count)
++{
++    int columns, rows, i, j, *order;
++
++    if (!(order = malloc(max(count, 1) * sizeof(*order)))) return;
++    desktop_grid(This, &columns, &rows, NULL);
++    for (i = 0; i < count; i++)
++    {
++        for (j = i; j > 0; j--)
++        {
++            const POINT *a = &cells[order[j - 1]], *b = &cells[i];
++            BOOL moving = b->x == DESKTOP_MOVING;
++
++            if (!moving && (a->x == DESKTOP_MOVING || a->x > b->x || (a->x == b->x && a->y > b->y))) order[j] = order[j - 1];
++            else break;
++        }
++        order[j] = i;
++    }
++    for (i = 0; i < count; i++)
++    {
++        POINT *cell = &cells[order[i]];
++
++        cell->x = min(i / rows, columns - 1) * DESKTOP_FIX;   /* a full screen stacks the rest on the last column */
++        cell->y = (i / rows < columns ? i % rows : rows - 1) * DESKTOP_FIX;
++    }
++    free(order);
++    for (i = 0; i < count; i++) desktop_place(This, i, cells[i]);
++    desktop_positions_save(This, cells, count);
++}
++
++/* Align to grid turned on: every icon to its nearest cell, or the free cell nearest that one, in the view's order; saved. */
++static void desktop_snap(IShellViewImpl *This, POINT *cells, int count)
++{
++    int i;
++
++    for (i = 0; i < count; i++)
++    {
++        POINT near = { desktop_whole(cells[i].x), desktop_whole(cells[i].y) };
++
++        cells[i].x = cells[i].y = DESKTOP_MOVING;
++        if (!desktop_free_cell(This, cells, i, -1, &near, &cells[i])) cells[i] = (POINT){ near.x * DESKTOP_FIX, near.y * DESKTOP_FIX };
++        desktop_place(This, i, cells[i]);
++    }
++    desktop_positions_save(This, cells, count);
++}
++
++/* Put each icon in its saved cell, while that cell is on the screen and free (with Align to grid off, where it was, kept on the
++ * screen), and every other icon in the first free cell; with Auto arrange on, packed in that order. */
++static void desktop_positions_load(IShellViewImpl *This)
++{
++    DWORD size = 0, type, *data, *end, version = 0;
++    BOOL free_mode = !(This->FolderSettings.fFlags & FWF_SNAPTOGRID);
++    char *buffer = NULL;
++    POINT *cells, farthest;
++    int count, columns, rows, i, rank;
++
++    if (!desktop_icons(This) || !(cells = desktop_cells_read(This, &count))) return;
++    for (i = 0; i < count; i++) cells[i].x = cells[i].y = DESKTOP_MOVING;
++    desktop_grid(This, &columns, &rows, &farthest);
++    if (SHGetValueW(HKEY_CURRENT_USER, DESKTOP_POSITIONS_KEY, DESKTOP_POSITIONS_VALUE, &type, NULL, &size) == ERROR_SUCCESS &&
++        type == REG_BINARY && size > sizeof(DWORD) && (buffer = malloc(size)) &&
++        SHGetValueW(HKEY_CURRENT_USER, DESKTOP_POSITIONS_KEY, DESKTOP_POSITIONS_VALUE, &type, buffer, &size) == ERROR_SUCCESS)
++        version = *(DWORD *)buffer;
++    if (version == 2 || version == DESKTOP_POSITIONS_VERSION)
++    {
++        data = (DWORD *)buffer + 1;
++        end = (DWORD *)(buffer + size);
++        while (data + 3 <= end && data[2] < MAX_PATH && data + 3 + (data[2] * sizeof(WCHAR) + 3) / sizeof(DWORD) <= end)
++        {
++            WCHAR *saved = (WCHAR *)(data + 3);
++            int scale = version == 2 ? DESKTOP_FIX : 1;   /* version 2 kept whole cells */
++            POINT cell = { (int)data[0] * scale, (int)data[1] * scale };
++
++            for (i = 0; i < count; i++)
++            {
++                LVITEMW item = { LVIF_PARAM, i };
++                WCHAR name[MAX_PATH];
++
++                if (cells[i].x != DESKTOP_MOVING || !SendMessageW(This->hWndList, LVM_GETITEMW, 0, (LPARAM)&item) || !item.lParam ||
++                    !desktop_item_name(This, (LPCITEMIDLIST)item.lParam, name, MAX_PATH)) continue;
++                if (lstrlenW(name) != (int)data[2] || memcmp(name, saved, data[2] * sizeof(WCHAR))) continue;
++                if (free_mode)
++                {
++                    cells[i].x = max(0, min(cell.x, farthest.x));
++                    cells[i].y = max(0, min(cell.y, farthest.y));
++                }
++                else
++                {
++                    POINT near = { desktop_whole(cell.x), desktop_whole(cell.y) };
++
++                    /* a cell the screen does not have goes to the first free one (below), and is not remembered */
++                    if (near.x >= 0 && near.y >= 0 && near.x < columns && near.y < rows &&
++                        !desktop_free_cell(This, cells, count, i, &near, &cells[i]))
++                        cells[i].x = cells[i].y = DESKTOP_MOVING;
++                }
++                break;
++            }
++            data += 3 + (data[2] * sizeof(WCHAR) + 3) / sizeof(DWORD);
++        }
++    }
++    free(buffer);
++    for (rank = 0; rank < 3; rank++)
++        for (i = 0; i < count; i++)
++            if (cells[i].x == DESKTOP_MOVING && desktop_item_rank(This, i) == rank &&
++                !desktop_free_cell(This, cells, count, i, NULL, &cells[i]))
++            {
++                cells[i].x = (columns - 1) * DESKTOP_FIX;   /* a full screen stacks the rest on the last cell */
++                cells[i].y = (rows - 1) * DESKTOP_FIX;
++            }
++    if (This->FolderSettings.fFlags & FWF_AUTOARRANGE) desktop_arrange(This, cells, count);
++    else for (i = 0; i < count; i++) desktop_place(This, i, cells[i]);
++    free(cells);
++}
++
++/* Once the view's list exists, before it fills: the desktop's settings, and its list styled for them. */
++static void desktop_setup(IShellViewImpl *This)
++{
++    if (!desktop_icons(This)) return;
++    desktop_settings_load(This);
++    desktop_style(This);
++}
++
++/* A new icon size (IFolderView2::SetViewModeAndIconSize, Ctrl+Shift+1-4): the icons keep their cells, laid out again. */
++static void desktop_set_icon_size(IShellViewImpl *This, int size)
++{
++    size = desktop_icon_size(size);
++    if (size == This->desktop_icon) return;
++    This->desktop_icon = size;
++    desktop_style(This);
++    desktop_positions_load(This);
++    desktop_settings_save(This);
++    InvalidateRect(This->hWndList, NULL, TRUE);
++}
++
++/* Auto arrange or Align to grid turned on or off (IFolderView2::SetCurrentFolderFlags). */
++static void desktop_set_modes(IShellViewImpl *This, DWORD before)
++{
++    DWORD now = This->FolderSettings.fFlags;
++    POINT *cells;
++    int count;
++
++    if (!desktop_icons(This) || !((before ^ now) & DESKTOP_MODES)) return;
++    if ((cells = desktop_cells_read(This, &count)))
++    {
++        if ((now & FWF_AUTOARRANGE) && !(before & FWF_AUTOARRANGE)) desktop_arrange(This, cells, count);
++        else if ((now & FWF_SNAPTOGRID) && !(before & FWF_SNAPTOGRID)) desktop_snap(This, cells, count);
++        free(cells);
++    }
++    desktop_settings_save(This);
++}
++
++/* An icon was added: it takes the first free cell, or with Auto arrange on goes last; an icon went: Auto arrange closes the gap. */
++static void desktop_settle_item(IShellViewImpl *This, int item)
++{
++    POINT *cells, at;
++    int count;
++
++    if (!desktop_icons(This) || !(cells = desktop_cells_read(This, &count))) return;
++    if (This->FolderSettings.fFlags & FWF_AUTOARRANGE)
++    {
++        if (item >= 0 && item < count) cells[item].x = cells[item].y = DESKTOP_MOVING;
++        desktop_arrange(This, cells, count);
++    }
++    else if (item >= 0 && item < count && desktop_free_cell(This, cells, count, item, NULL, &at)) desktop_place(This, item, at);
++    free(cells);
++}
++
++/* The drag that began in this view ended over empty ground or on a selected icon: the selected icons move by how far the
++ * pointer went, each to the free cell nearest where it lands (Align to grid off: exactly there; Auto arrange: inserted in
++ * the order at the cell the grabbed icon lands on). */
++static void desktop_move_selected(IShellViewImpl *This, POINT drop)
++{
++    PwDesktopGrid grid = pw_desktop_grid(This->desktop_icon);
++    POINT *cells, *origin, farthest;
++    LVHITTESTINFO hit = { This->drag_anchor };
++    int count, columns, rows, i, grabbed, dx = drop.x - This->drag_anchor.x, dy = drop.y - This->drag_anchor.y;
++    DWORD flags = This->FolderSettings.fFlags;
++
++    if (!(cells = desktop_cells_read(This, &count))) return;
++    if (!(origin = malloc(max(count, 1) * sizeof(*origin)))) { free(cells); return; }
++    memcpy(origin, cells, count * sizeof(*origin));
++    desktop_grid(This, &columns, &rows, &farthest);
++    grabbed = SendMessageW(This->hWndList, LVM_HITTEST, 0, (LPARAM)&hit);
++    if (grabbed < 0 || !(SendMessageW(This->hWndList, LVM_GETITEMSTATE, grabbed, LVIS_SELECTED) & LVIS_SELECTED))
++        grabbed = SendMessageW(This->hWndList, LVM_GETNEXTITEM, -1, LVNI_SELECTED);
++    if (grabbed < 0) { free(origin); free(cells); return; }
++    if (flags & FWF_AUTOARRANGE)
++    {
++        /* the selected icons go between the others where the grabbed one lands: just before the icon in that cell's place */
++        int column = max(0, min(desktop_whole(origin[grabbed].x + MulDiv(dx, DESKTOP_FIX, grid.cell_w)), columns - 1));
++        int row = max(0, min(desktop_whole(origin[grabbed].y + MulDiv(dy, DESKTOP_FIX, grid.cell_h)), rows - 1));
++
++        for (i = 0; i < count; i++)
++            if (SendMessageW(This->hWndList, LVM_GETITEMSTATE, i, LVIS_SELECTED) & LVIS_SELECTED)
++            {
++                cells[i].x = column * DESKTOP_FIX;
++                cells[i].y = row * DESKTOP_FIX - DESKTOP_FIX / 2 + (i == grabbed ? 0 : 1);   /* ahead of the icon there */
++            }
++        desktop_arrange(This, cells, count);
++        goto done;
++    }
++    /* the cells of the icons that stay are taken; those of the icons that move are free until each is put down */
++    for (i = 0; i < count; i++)
++        if (SendMessageW(This->hWndList, LVM_GETITEMSTATE, i, LVIS_SELECTED) & LVIS_SELECTED) cells[i].x = cells[i].y = DESKTOP_MOVING;
++    for (i = 0; i < count; i++)
++    {
++        POINT moved, near;
++
++        if (cells[i].x != DESKTOP_MOVING) continue;
++        moved.x = max(0, min(origin[i].x + MulDiv(dx, DESKTOP_FIX, grid.cell_w), farthest.x));
++        moved.y = max(0, min(origin[i].y + MulDiv(dy, DESKTOP_FIX, grid.cell_h), farthest.y));
++        if (!(flags & FWF_SNAPTOGRID)) cells[i] = moved;
++        else
++        {
++            near.x = min(desktop_whole(moved.x), columns - 1);
++            near.y = min(desktop_whole(moved.y), rows - 1);
++            if (!desktop_free_cell(This, cells, count, i, &near, &cells[i])) cells[i] = origin[i];
++        }
++        desktop_place(This, i, cells[i]);
++    }
++    desktop_positions_save(This, cells, count);
++done:
++    free(origin);
++    free(cells);
++}
++
+ /**********************************************************
+ * LV_RenameItem()
+ */
+@@ -685,13 +1164,14 @@ static HRESULT ShellView_FillList(IShellViewImpl *This)
+     /* copy the items into the array */
+     while ((S_OK == IEnumIDList_Next(pEnumIDList, 1, &pidl, &fetched)) && fetched)
+     {
+-        if (IncludeObject(This, pidl) == S_OK)
++        if (IncludeObject(This, pidl) == S_OK && !desktop_item_hidden(This, pidl))
+             shellview_add_item(This, pidl);
+         else
+             ILFree(pidl);
+     }
+ 
+     SendMessageW(This->hWndList, LVM_SORTITEMS, (WPARAM)This->pSFParent, (LPARAM)ShellView_CompareItems);
++    desktop_positions_load(This);
+ 
+     IFolderView2_SetRedraw(folderview, TRUE);
+ 
+@@ -1472,7 +1952,11 @@ static LRESULT ShellView_OnNotify(IShellViewImpl * This, UINT CtlID, LPNMHDR lpn
+ 	          if (pds)
+ 	          {
+ 	            DWORD dwEffect2;
++
++	            This->internal_drag = desktop_icons(This);
++	            This->drag_anchor = lpnmlv->ptAction;
+ 		    DoDragDrop(pda, pds, dwEffect, &dwEffect2);
++	            This->internal_drag = This->internal_hover = FALSE;
+ 		  }
+ 	          IDataObject_Release(pda);
+ 	      }
+@@ -1528,6 +2012,12 @@ static LRESULT ShellView_OnNotify(IShellViewImpl * This, UINT CtlID, LPNMHDR lpn
+               /* initiate a rename of the selected file or directory */
+               switch (plvKeyDown->wVKey)
+               {
++              case '1': case '2': case '3': case '4':
++                /* the desktop's icon size, as Windows' and the prototype's: Ctrl+Shift+1 or 2 large, 3 medium, 4 small */
++                if (desktop_icons(This) && GetKeyState(VK_CONTROL) < 0 && GetKeyState(VK_SHIFT) < 0)
++                  desktop_set_icon_size(This, plvKeyDown->wVKey <= '2' ? PW_DESKTOP_LARGE :
++                                              plvKeyDown->wVKey == '3' ? PW_DESKTOP_MEDIUM : PW_DESKTOP_SMALL);
++                break;
+               case VK_F2:
+                 {
+                   INT i = SendMessageW(This->hWndList, LVM_GETSELECTEDCOUNT, 0, 0);
+@@ -1634,14 +2124,18 @@ static LRESULT ShellView_OnChange(IShellViewImpl * This, const LPCITEMIDLIST *pi
+     {
+         case SHCNE_MKDIR:
+         case SHCNE_CREATE:
++            /* an item can be announced twice (the program that made it, and the desktop's own watch) */
++            if (LV_FindItemByPidl(This, ILFindLastID(pidls[0])) >= 0) break;
+             pidl = ILClone(ILFindLastID(pidls[0]));
+             shellview_add_item(This, pidl);
++            desktop_settle_item(This, LV_FindItemByPidl(This, pidl));
+             break;
+         case SHCNE_RMDIR:
+         case SHCNE_DELETE:
+         {
+             INT i = LV_FindItemByPidl(This, ILFindLastID(pidls[0]));
+             ret = SendMessageW(This->hWndList, LVM_DELETEITEM, i, 0);
++            desktop_settle_item(This, -1);
+             break;
+         }
+         case SHCNE_RENAMEFOLDER:
+@@ -2352,6 +2846,22 @@ static HRESULT drag_notify_subitem(IShellViewImpl *This, DWORD grfKeyState, POIN
+         This->cScrollDelay = 0; /* Reset, if the cursor is not over the listview's scroll-area */
+     }
+     This->ptLastMousePos = htinfo.pt;
++
++    /* On the desktop, a drag that began among its own icons and is over empty ground or a selected icon moves the icons. */
++    This->internal_hover = This->internal_drag &&
++        (lResult == -1 || (SendMessageW(This->hWndList, LVM_GETITEMSTATE, lResult, LVIS_SELECTED) & LVIS_SELECTED));
++    if (This->internal_hover)
++    {
++        if (This->pCurDropTarget)
++        {
++            IDropTarget_DragLeave(This->pCurDropTarget);
++            IDropTarget_Release(This->pCurDropTarget);
++            This->pCurDropTarget = NULL;
++        }
++        This->iDragOverItem = -2;
++        *pdwEffect = DROPEFFECT_MOVE;
++        return S_OK;
++    }
+  
+     /* If we are still over the previous sub-item, notify it via DragOver and return. */
+     if (This->pCurDropTarget && lResult == This->iDragOverItem)
+@@ -2437,6 +2947,17 @@ static HRESULT WINAPI ISVDropTarget_Drop(IDropTarget *iface, IDataObject* pDataO
+ {
+     IShellViewImpl *This = impl_from_IDropTarget(iface);
+ 
++    if (This->internal_hover)
++    {
++        POINT drop = { pt.x, pt.y };
++
++        ScreenToClient(This->hWndList, &drop);
++        desktop_move_selected(This, drop);
++        This->internal_hover = FALSE;
++        if (This->pCurDataObject) { IDataObject_Release(This->pCurDataObject); This->pCurDataObject = NULL; }
++        *pdwEffect = DROPEFFECT_NONE;   /* the icons moved; no file operation */
++        return S_OK;
++    }
+     if (!This->pCurDropTarget) return DRAGDROP_E_INVALIDHWND;
+ 
+     IDropTarget_Drop(This->pCurDropTarget, pDataObject, grfKeyState, pt, pdwEffect);
+@@ -2966,9 +3487,12 @@ static HRESULT WINAPI FolderView2_SetCurrentFolderFlags(IFolderView2 *iface, DWO
+ {
+     IShellViewImpl *shellview = impl_from_IFolderView2(iface);
+ 
++    DWORD before = shellview->FolderSettings.fFlags;
++
+     TRACE("folder view %p, mask %#lx, flags %#lx.\n", iface, mask, flags);
+ 
+     shellview->FolderSettings.fFlags = (shellview->FolderSettings.fFlags & ~mask) | (flags & mask);
++    desktop_set_modes(shellview, before);
+     return S_OK;
+ }
+ 
+@@ -3055,6 +3579,14 @@ static HRESULT WINAPI FolderView2_SetViewModeAndIconSize(IFolderView2 *iface, FO
+     int size)
+ {
+     IShellViewImpl *This = impl_from_IFolderView2(iface);
++
++    /* the desktop: its icon size (the desktop has icons only) */
++    if (desktop_icons(This))
++    {
++        TRACE("(%p)->(%d %d)\n", This, mode, size);
++        desktop_set_icon_size(This, size);
++        return S_OK;
++    }
+     FIXME("(%p)->(%d %d), stub\n", This, mode, size);
+     return S_OK;
+ }
+@@ -3064,9 +3596,9 @@ static HRESULT WINAPI FolderView2_GetViewModeAndIconSize(IFolderView2 *iface, FO
+ {
+     IShellViewImpl *This = impl_from_IFolderView2(iface);
+ 
+-    FIXME("(%p)->(%p %p), stub\n", This, mode, size);
++    if (!desktop_icons(This)) FIXME("(%p)->(%p %p), stub\n", This, mode, size);
+ 
+-    *size = 16; /* FIXME */
++    *size = desktop_icons(This) ? This->desktop_icon : 16; /* FIXME: other views */
+     *mode = This->FolderSettings.ViewMode;
+ 
+     return S_OK;

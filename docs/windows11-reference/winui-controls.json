@@ -1,0 +1,531 @@
+{
+ "source": "microsoft/microsoft-ui-xaml controls/dev/*/..._themeresources.xaml",
+ "revision": "4c45fb8ea98afafc5cf1b0bafc7febbe20d67b19",
+ "licence": "MIT",
+ "note": "Numeric resources (thickness, corner radius, size, duration) and brush colour references per control, as declared; brush references name resources in winui-colors.json.",
+ "controls": {
+  "AppBarButton": {
+   "metrics": {
+    "AppBarButtonContentViewboxMargin": "12,16,0,10",
+    "AppBarButtonContentViewboxCompactMargin": "0,12,0,12",
+    "AppBarButtonContentViewboxCollapsedMargin": "0,16,0,2",
+    "AppBarButtonOverflowTextTouchMargin": "0,9,0,12",
+    "AppBarButtonOverflowTextLabelPadding": "0,5,0,8",
+    "AppBarButtonTextLabelMargin": "2,0,2,8",
+    "AppBarButtonTextLabelOnRightMargin": "8,16,12,10",
+    "AppBarButtonInnerBorderMargin": "2,6,2,6",
+    "AppBarButtonInnerBorderCompactMargin": "2,6,2,22",
+    "AppBarButtonInnerBorderOverflowMargin": "4,0,4,0"
+   },
+   "brushes": {}
+  },
+  "AutoSuggestBox": {
+   "metrics": {
+    "AutoSuggestBoxTopHeaderMargin": "0,0,0,8",
+    "AutoSuggestBoxInnerButtonMargin": "1,3",
+    "AutoSuggestBoxDeleteButtonMargin": "0,4",
+    "AutoSuggestBoxQueryButtonPadding": "3,2",
+    "AutoSuggestBoxLeftButtonMargin": "3",
+    "AutoSuggestBoxRightButtonMargin": "4"
+   },
+   "brushes": {}
+  },
+  "Button": {
+   "metrics": {
+    "ButtonPadding": "11,5,11,6"
+   },
+   "brushes": {}
+  },
+  "CalendarView": {
+   "metrics": {
+    "CalendarViewNavigationButtonScalePressed": "0.875"
+   },
+   "brushes": {}
+  },
+  "CheckBox": {
+   "metrics": {
+    "CheckBoxBorderThickness": "1",
+    "CheckBoxSize": "20",
+    "CheckBoxGlyphSize": "12",
+    "CheckBoxHeight": "32",
+    "CheckBoxMinWidth": "120",
+    "CheckBoxPadding": "8,5,0,0",
+    "CheckBoxFocusVisualMargin": "-7,-3,-7,-3",
+    "CheckBoxCheckedGlyph": "\ue73e",
+    "CheckBoxIndeterminateGlyph": "\ue9ae"
+   },
+   "brushes": {}
+  },
+  "ComboBox": {
+   "metrics": {
+    "ComboBoxArrowThemeFontSize": "21",
+    "ComboBoxThemeMinWidth": "64",
+    "ComboBoxPopupThemeMinWidth": "80",
+    "ComboBoxPopupThemeTouchMinWidth": "240",
+    "ComboBoxItemPillHeight": "16",
+    "ComboBoxItemPillWidth": "3",
+    "ComboBoxItemPillMinScale": "0.625",
+    "ComboBoxMinHeight": "32",
+    "ComboBoxPopupMaxNumberOfItems": "15",
+    "ComboBoxPopupMaxNumberOfItemsThatCanBeShownOnOneSide": "7",
+    "ComboBoxItemScaleAnimationDuration": "00:00:00.167",
+    "ComboBoxBorderThemeThickness": "1",
+    "ComboBoxDropdownBorderThickness": "1",
+    "ComboBoxHeaderThemeMargin": "0,0,0,4",
+    "ComboBoxPopupBorderThemeThickness": "2",
+    "ComboBoxItemThemePadding": "11,5,11,7",
+    "ComboBoxItemThemeTouchPadding": "11,11,11,13",
+    "ComboBoxItemThemeGameControllerPadding": "11,11,11,13",
+    "ComboBoxBackgroundBorderThicknessFocused": "2",
+    "ComboBoxDropdownContentMargin": "0,4",
+    "ComboBoxTopHeaderMargin": "0,0,0,8",
+    "ComboBoxPadding": "12,5,0,7",
+    "ComboBoxEditableTextPadding": "11,5,38,6",
+    "ComboBoxHiglightBorderCornerRadius": "7",
+    "ComboBoxDropDownButtonBackgroundCornerRadius": "4",
+    "ComboBoxItemCornerRadius": "3",
+    "ComboBoxItemPillCornerRadius": "1.5",
+    "ComboBoxHeaderThemeFontWeight": "Normal",
+    "ComboBoxPlaceholderTextThemeFontWeight": "SemiLight"
+   },
+   "brushes": {}
+  },
+  "CommandBarFlyout": {
+   "metrics": {
+    "CommandBarFlyoutAppBarButtonInnerBorderMargin": "2",
+    "CommandBarFlyoutAppBarEllipsisButtonInnerBorderMargin": "2,2,6,2"
+   },
+   "brushes": {}
+  },
+  "CommandBar": {
+   "metrics": {
+    "AppBarThemeMinHeight": "64",
+    "AppBarThemeCompactHeight": "48",
+    "AppBarEllipsisButtonInnerBorderMargin": "2,6,6,6",
+    "AppBarMoreButtonColumnMinWidth": "6",
+    "CommandBarOverflowPresenterMargin": "0,4,0,4"
+   },
+   "brushes": {}
+  },
+  "Common": {
+   "metrics": {
+    "DateTimeFlyoutBorderPadding": "0"
+   },
+   "brushes": {}
+  },
+  "ContentDialog": {
+   "metrics": {},
+   "brushes": {}
+  },
+  "DatePicker": {
+   "metrics": {
+    "DatePickerTopHeaderMargin": "0,0,0,4",
+    "DatePickerFlyoutPresenterHighlightHeight": "40",
+    "DatePickerFlyoutPresenterItemHeight": "40",
+    "DatePickerFlyoutPresenterAcceptDismissHostGridHeight": "41",
+    "DatePickerThemeMinWidth": "296",
+    "DatePickerThemeMaxWidth": "456",
+    "DatePickerFlyoutPresenterItemPadding": "0,3,0,6",
+    "DatePickerFlyoutPresenterMonthPadding": "9,3,0,6",
+    "DatePickerHostPadding": "0,3,0,6",
+    "DatePickerHostMonthPadding": "9,3,0,6",
+    "DatePickerFlyoutPresenterAcceptMargin": "4,4,2,4",
+    "DatePickerFlyoutPresenterDismissMargin": "2,4,4,4"
+   },
+   "brushes": {}
+  },
+  "DropDownButton": {
+   "metrics": {},
+   "brushes": {}
+  },
+  "Expander": {
+   "metrics": {
+    "ExpanderMinHeight": "48",
+    "ExpanderHeaderPadding": "16,0,0,0",
+    "ExpanderChevronMargin": "20,0,8,0",
+    "ExpanderChevronUpGlyph": "\ue70e",
+    "ExpanderChevronDownGlyph": "\ue70d",
+    "ExpanderChevronButtonSize": "32",
+    "ExpanderChevronGlyphSize": "12",
+    "ExpanderContentPadding": "16",
+    "ExpanderContentDownBorderThickness": "1,0,1,1",
+    "ExpanderContentUpBorderThickness": "1,1,1,0"
+   },
+   "brushes": {}
+  },
+  "FlyoutPresenter": {
+   "metrics": {
+    "FlyoutContentPadding": "16,15,16,17"
+   },
+   "brushes": {}
+  },
+  "GridViewItem": {
+   "metrics": {},
+   "brushes": {}
+  },
+  "HyperlinkButton": {
+   "metrics": {},
+   "brushes": {}
+  },
+  "InfoBar": {
+   "metrics": {
+    "InfoBarTitleFontSize": "14",
+    "InfoBarTitleFontWeight": "SemiBold",
+    "InfoBarMessageFontSize": "14",
+    "InfoBarMessageFontWeight": "Normal",
+    "InfoBarMinHeight": "48",
+    "InfoBarCloseButtonSize": "38",
+    "InfoBarCloseButtonGlyphSize": "16",
+    "InfoBarHyperlinkButtonMargin": "-12,0,0,0",
+    "InfoBarIconBackgroundGlyph": "\uf136",
+    "InfoBarInformationalIconGlyph": "\uf13f",
+    "InfoBarErrorIconGlyph": "\uf13d",
+    "InfoBarWarningIconGlyph": "\uf13c",
+    "InfoBarSuccessIconGlyph": "\uf13e",
+    "InfoBarContentRootPadding": "16,0,0,0",
+    "InfoBarIconMargin": "0,16,14,16",
+    "InfoBarIconFontSize": "16",
+    "InfoBarPanelMargin": "0,0,16,0",
+    "InfoBarPanelHorizontalOrientationPadding": "0,0,0,0",
+    "InfoBarPanelVerticalOrientationPadding": "0,14,0,18",
+    "InfoBarTitleHorizontalOrientationMargin": "0,14,0,0",
+    "InfoBarTitleVerticalOrientationMargin": "0,14,0,0",
+    "InfoBarMessageHorizontalOrientationMargin": "12,14,0,0",
+    "InfoBarMessageVerticalOrientationMargin": "0,4,0,0",
+    "InfoBarActionHorizontalOrientationMargin": "16,8,0,0",
+    "InfoBarActionVerticalOrientationMargin": "0,12,0,0"
+   },
+   "brushes": {}
+  },
+  "ListViewItem": {
+   "metrics": {},
+   "brushes": {}
+  },
+  "MenuFlyout": {
+   "metrics": {
+    "MenuFlyoutSeparatorHeight": "1",
+    "MenuFlyoutPresenterThemePadding": "0,2,0,2",
+    "MenuFlyoutThemeMinHeight": "32",
+    "MenuFlyoutItemChevronMargin": "24,0,0,-1",
+    "MenuFlyoutSeparatorThemePadding": "-4,1,-4,1",
+    "MenuFlyoutItemMargin": "4,2,4,2",
+    "MenuFlyoutItemThemePadding": "11,8,11,9",
+    "MenuFlyoutItemThemePaddingNarrow": "11,4,11,5",
+    "SplitMenuFlyoutItemSeparatorHeight": "18",
+    "SplitMenuFlyoutItemChevronButtonWidth": "38"
+   },
+   "brushes": {}
+  },
+  "NavigationView": {
+   "metrics": {
+    "NavigationViewAutoSuggestBoxMargin": "16,0",
+    "TopNavigationViewAutoSuggestBoxMargin": "4,0",
+    "PaneToggleButtonHeight": "36",
+    "PaneToggleButtonWidth": "40",
+    "PaneOverlayShadowDepth": "16",
+    "NavigationViewCompactPaneLength": "48",
+    "NavigationViewIconBoxWidth": "40",
+    "NavigationViewTopPaneHeight": "48",
+    "NavigationViewAutoSuggestAreaHeight": "40",
+    "TopNavigationViewPaneCustomContentMinWidth": "48",
+    "TopNavigationViewOverflowButtonWidth": "40",
+    "TopNavigationViewOverflowButtonHeight": "40",
+    "TopNavigationViewSettingsButtonWidth": "40",
+    "TopNavigationViewSettingsButtonHeight": "40",
+    "NavigationViewItemOnLeftMinHeight": "36",
+    "NavigationViewPaneHeaderRowMinHeight": "40",
+    "NavigationViewItemOnLeftIconBoxHeight": "16",
+    "NavigationViewSelectionIndicatorWidth": "3",
+    "NavigationViewSelectionIndicatorHeight": "16",
+    "NavigationViewSelectionIndicatorRadius": "2",
+    "NavigationViewItemSeparatorHeight": "1",
+    "TopNavigationViewItemSeparatorWidth": "1",
+    "NavigationViewToggleBorderThickness": "0",
+    "NavigationViewItemBorderThickness": "1",
+    "NavigationViewItemOnLeftIconBoxMargin": "0",
+    "NavigationViewItemButtonMargin": "4,2",
+    "NavigationViewItemInnerHeaderMargin": "16,0",
+    "TopNavigationViewItemInnerHeaderMargin": "12,0",
+    "NavigationViewMinimalHeaderMargin": "-24,44,0,0",
+    "NavigationViewButtonHolderGridMargin": "0,4",
+    "NavigationViewPaneContentGridMargin": "-1,3",
+    "NavigationViewContentGridBorderThickness": "1,1,0,0",
+    "NavigationViewMinimalContentGridBorderThickness": "0,1,0,0",
+    "TopNavigationViewContentGridBorderThickness": "0,1,0,0",
+    "TopNavigationViewTopNavGridMargin": "4,0",
+    "NavigationViewBorderThickness": "1",
+    "NavigationViewHeaderMargin": "56,44,0,0",
+    "NavigationViewContentPresenterMargin": "0",
+    "NavigationViewContentMargin": "0",
+    "NavigationViewMinimalContentMargin": "0",
+    "TopNavigationViewContentMargin": "0",
+    "NavigationViewPaneTitlePresenterMargin": "8,4,0,0",
+    "NavigationViewItemMargin": "0",
+    "TopNavigationViewItemMargin": "0",
+    "NavigationViewItemSeparatorMargin": "0,3,0,4",
+    "NavigationViewCompactItemSeparatorMargin": "0,3,0,4",
+    "TopNavigationViewItemSeparatorMargin": "3,0,4,0",
+    "TopNavigationViewOverflowButtonMargin": "0",
+    "NavigationViewItemContentPresenterMargin": "4,-1,8,-1",
+    "NavigationViewCompactItemContentPresenterMargin": "0,0,0,0",
+    "TopNavigationViewItemContentPresenterMargin": "8,-1,12,-1",
+    "TopNavigationViewItemContentOnlyContentPresenterMargin": "12,0",
+    "NavigationViewItemExpandChevronMargin": "0,0,-14,0",
+    "TopNavigationViewItemExpandChevronMargin": "-16,0,0,0",
+    "TopNavigationViewItemIconOnlyExpandChevronMargin": "0,0,0,0",
+    "TopNavigationViewItemContentOnlyExpandChevronMargin": "-12,0,0,0",
+    "TopNavigationViewItemOnOverflowContentPresenterMargin": "12,0,20,0",
+    "TopNavigationViewItemOnOverflowNoIconContentPresenterMargin": "16,0,20,0",
+    "TopNavigationViewItemOnOverflowExpandChevronMargin": "-4,0,-8,0",
+    "TopNavigationViewItemOnOverflowExpandChevronPadding": "12,0,12,0",
+    "NavigationViewContentGridCornerRadius": "8,0,0,0",
+    "TopNavigationViewContentGridCornerRadius": "0",
+    "NavigationViewMinimalContentGridCornerRadius": "0",
+    "TopNavigationViewOverflowMenuPadding": "0,2",
+    "NavigationViewItemChildrenMenuFlyoutPadding": "0,2",
+    "NavigationViewItemExpandedGlyphFontSize": "8",
+    "NavigationViewItemExpandedGlyph": "\ue70d"
+   },
+   "brushes": {}
+  },
+  "NumberBox": {
+   "metrics": {
+    "NumberBoxSpinButtonBorderThickness": "0,1,1,1",
+    "NumberBoxIconMargin": "10,0,0,0",
+    "NumberBoxPopupHorizonalOffset": "-21",
+    "NumberBoxPopupVerticalOffset": "-27",
+    "NumberBoxPopupShadowDepth": "16",
+    "NumberBoxMinWidth": "120",
+    "NumberBoxPopupIndicatorMargin": "0,0,8,0"
+   },
+   "brushes": {}
+  },
+  "PasswordBox": {
+   "metrics": {
+    "PasswordBoxTopHeaderMargin": "0,0,0,8",
+    "PasswordBoxIconFontSize": "12"
+   },
+   "brushes": {}
+  },
+  "Pivot": {
+   "metrics": {
+    "PivotHeaderItemSelectedPipeCornerRadius": "1.5"
+   },
+   "brushes": {}
+  },
+  "ProgressBar": {
+   "metrics": {
+    "ProgressBarMinHeight": "3",
+    "ProgressBarTrackHeight": "1",
+    "ProgressBarCornerRadius": "1.5",
+    "ProgressBarTrackCornerRadius": "0.5"
+   },
+   "brushes": {}
+  },
+  "RadioButton": {
+   "metrics": {
+    "RadioButtonCheckGlyphSize": "12",
+    "RadioButtonCheckGlyphPointerOverSize": "14",
+    "RadioButtonCheckGlyphPressedOverSize": "10"
+   },
+   "brushes": {}
+  },
+  "RadioButtons": {
+   "metrics": {
+    "RadioButtonsColumnSpacing": "7",
+    "RadioButtonsRowSpacing": "8",
+    "RadioButtonsTopHeaderMargin": "0,0,0,8"
+   },
+   "brushes": {}
+  },
+  "RepeatButton": {
+   "metrics": {},
+   "brushes": {}
+  },
+  "RichEditBox": {
+   "metrics": {
+    "RichEditBoxTopHeaderMargin": "0,0,0,8"
+   },
+   "brushes": {}
+  },
+  "ScrollBar": {
+   "metrics": {
+    "ScrollBarExpandDuration": "00:00:00.167",
+    "ScrollBarOpacityChangeDuration": "00:00:00.083",
+    "ScrollBarColorChangeDuration": "00:00:00.083",
+    "ScrollBarContractDuration": "00:00:00.167",
+    "ScrollBarThumbOffset": "2",
+    "ScrollBarContractDelay": "00:00:02",
+    "ScrollBarContractFinalKeyframe": "00:00:02.1",
+    "ScrollBarSize": "12",
+    "ScrollBarVerticalThumbMinHeight": "30",
+    "ScrollBarVerticalThumbMinWidth": "8",
+    "ScrollBarHorizontalThumbMinWidth": "30",
+    "ScrollBarHorizontalThumbMinHeight": "8",
+    "ScrollBarThumbStrokeThickness": "6",
+    "ScrollBarButtonArrowIconFontSize": "8",
+    "ScrollBarButtonArrowScalePressed": "0.875",
+    "ScrollBarExpandBeginTime": "00:00:00.40",
+    "ScrollBarContractBeginTime": "00:00:00.50",
+    "ScrollBarCornerRadius": "3",
+    "ScrollBarHorizontalDecreaseMargin": "4,0,0,0",
+    "ScrollBarHorizontalIncreaseMargin": "0,0,4,0",
+    "ScrollBarVerticalDecreaseMargin": "0,4,0,0",
+    "ScrollBarVerticalIncreaseMargin": "0,0,0,4"
+   },
+   "brushes": {}
+  },
+  "ScrollViewer": {
+   "metrics": {
+    "ScrollViewerScrollBarMargin": "1",
+    "ScrollViewerSeparatorExpandBeginTime": "00:00:00.40",
+    "ScrollViewerSeparatorExpandDuration": "00:00:00.1",
+    "ScrollViewerSeparatorContractBeginTime": "00:00:02.00",
+    "ScrollViewerSeparatorContractDelay": "00:00:02",
+    "ScrollViewerSeparatorContractDuration": "00:00:00.1",
+    "ScrollViewerSeparatorContractFinalKeyframe": "00:00:02.1"
+   },
+   "brushes": {}
+  },
+  "Slider": {
+   "metrics": {
+    "SliderTopHeaderMargin": "0,0,0,4",
+    "SliderTrackCornerRadius": "2",
+    "SliderThumbCornerRadius": "10",
+    "SliderPreContentMargin": "14",
+    "SliderPostContentMargin": "14",
+    "SliderInnerThumbHeight": "12",
+    "SliderHorizontalHeight": "32",
+    "SliderVerticalWidth": "32",
+    "SliderHorizontalThumbWidth": "18",
+    "SliderHorizontalThumbHeight": "18",
+    "SliderVerticalThumbWidth": "18",
+    "SliderVerticalThumbHeight": "18",
+    "SliderInnerThumbWidth": "12"
+   },
+   "brushes": {}
+  },
+  "SplitButton": {
+   "metrics": {
+    "SplitButtonPrimaryButtonSize": "35",
+    "SplitButtonSecondaryButtonSize": "35",
+    "SplitButtonPadding": "11,6,11,7"
+   },
+   "brushes": {}
+  },
+  "TabView": {
+   "metrics": {
+    "TabViewHeaderPadding": "0,8,0,0",
+    "TabViewItemHeaderPadding": "8,3,4,3",
+    "TabViewSelectedItemHeaderPadding": "9,3,5,4",
+    "TabViewItemMinHeight": "32",
+    "TabViewItemMaxWidth": "240",
+    "TabViewItemMinWidth": "100",
+    "TabViewItemHeaderFontSize": "12",
+    "TabViewItemHeaderIconSize": "16",
+    "TabViewItemHeaderIconMargin": "0,0,10,0",
+    "TabViewItemHeaderCloseButtonHeight": "24",
+    "TabViewItemHeaderCloseButtonWidth": "32",
+    "TabViewItemHeaderCloseButtonSize": "16",
+    "TabViewItemHeaderCloseFontSize": "12",
+    "TabViewItemHeaderCloseMargin": "4,0,0,0",
+    "TabViewItemHeaderPaddingWithCloseButton": "8,3,4,3",
+    "TabViewItemHeaderPaddingWithoutCloseButton": "8,3,8,3",
+    "TabViewItemScrollButtonWidth": "32",
+    "TabViewItemScrollButtonHeight": "24",
+    "TabViewItemScrollButonFontSize": "8",
+    "TabViewItemScrollButtonPadding": "7,3,7,3",
+    "TabViewItemLeftScrollButtonContainerPadding": "8,0,3,3",
+    "TabViewItemRightScrollButtonContainerPadding": "3,0,8,3",
+    "TabViewItemAddButtonWidth": "32",
+    "TabViewItemAddButtonHeight": "24",
+    "TabViewItemAddButtonFontSize": "12",
+    "TabViewItemAddButtonContainerPadding": "3,0,0,3",
+    "TabViewShadowDepth": "16",
+    "TabViewItemSeparatorMargin": "0,8,0,8",
+    "TabViewItemBorderThickness": "1",
+    "TabViewSelectedItemBorderThickness": "1,1,1,0",
+    "TabViewSelectedItemHeaderMargin": "-1,0,-1,1"
+   },
+   "brushes": {}
+  },
+  "TeachingTip": {
+   "metrics": {
+    "TeachingTipMinHeight": "40",
+    "TeachingTipMaxHeight": "520",
+    "TeachingTipMinWidth": "320",
+    "TeachingTipMaxWidth": "336",
+    "TeachingTipButtonPanelMargin": "0,12,0,0",
+    "TeachingTipRightButtonMargin": "4,12,0,0",
+    "TeachingTipLeftButtonMargin": "0,12,4,0",
+    "TeachingTipMainContentPresentMargin": "0,12,0,0",
+    "TeachingTipMainContentAbsentMargin": "0,0,0,0",
+    "TeachingTipTitleStackPanelMarginWithHeaderCloseButton": "0,0,28,0",
+    "TeachingTipTitleStackPanelMarginWithFooterCloseButton": "0,0,0,0",
+    "TeachingTipIconPresenterMarginWithIcon": "0,0,12,0",
+    "TeachingTipIconPresenterMarginWithoutIcon": "0,0,0,0",
+    "TeachingTipContentBorderThicknessTop": "1,1,1,0",
+    "TeachingTipContentBorderThicknessBottom": "1,0,1,1",
+    "TeachingTipContentBorderThicknessLeft": "1,1,0,1",
+    "TeachingTipContentBorderThicknessRight": "0,1,1,1",
+    "TeachingTipContentBorderThicknessUntargeted": "1,1,1,1",
+    "TeachingTipTailPolygonMarginTop": "0,-1,0,0",
+    "TeachingTipTailPolygonMarginBottom": "0,0,0,-1",
+    "TeachingTipTailPolygonMarginLeft": "-1,0,0,0",
+    "TeachingTipTailPolygonMarginRight": "0,0,-1,0",
+    "TeachingTipAlternateCloseButtonSize": "40",
+    "TeachingTipAlternateCloseButtonGlyphSize": "16",
+    "TeachingTipContentMargin": "12",
+    "TeachingTipTopHighlightHeight": "1",
+    "TeachingTipBorderThickness": "1",
+    "TeachingTipTopHighlightOffsetForBorder": "0,1,0,0"
+   },
+   "brushes": {}
+  },
+  "TextBox": {
+   "metrics": {
+    "TextBoxTopHeaderMargin": "0,0,0,8",
+    "TextBoxInnerButtonMargin": "0,4,4,4",
+    "TextBoxIconFontSize": "12"
+   },
+   "brushes": {}
+  },
+  "TimePicker": {
+   "metrics": {
+    "TimePickerTopHeaderMargin": "0,0,0,4",
+    "TimePickerFlyoutPresenterHighlightHeight": "40",
+    "TimePickerFlyoutPresenterAcceptDismissHostGridHeight": "41",
+    "TimePickerThemeMinWidth": "242",
+    "TimePickerThemeMaxWidth": "456",
+    "TimePickerFlyoutPresenterItemHeight": "40",
+    "TimePickerFlyoutPresenterItemPadding": "0,3,0,6",
+    "TimePickerHostPadding": "0,3,0,6"
+   },
+   "brushes": {}
+  },
+  "ToggleButton": {
+   "metrics": {},
+   "brushes": {}
+  },
+  "ToggleSwitch": {
+   "metrics": {
+    "ToggleSwitchTopHeaderMargin": "0,0,0,4",
+    "ToggleSwitchPreContentMargin": "10",
+    "ToggleSwitchPostContentMargin": "10",
+    "ToggleSwitchThemeMinWidth": "154"
+   },
+   "brushes": {}
+  },
+  "ToolTip": {
+   "metrics": {
+    "ToolTipBorderPadding": "9,6,9,8",
+    "ToolTipMaxWidth": "320"
+   },
+   "brushes": {}
+  },
+  "TreeView": {
+   "metrics": {},
+   "brushes": {}
+  }
+ }
+}

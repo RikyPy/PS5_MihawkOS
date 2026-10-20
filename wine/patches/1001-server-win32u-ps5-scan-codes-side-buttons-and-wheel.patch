@@ -1,0 +1,159 @@
+From: PS5_Proton
+Subject: [PATCH] server, win32u: scan codes, side buttons and the wheel from the title
+
+A USB keyboard and mouse plugged into the PS5 reach Wine as the title's
+input (src/pw_usb_input.h in PS5_Proton). A key came with its virtual key
+only, so the server queued it with scan code 0: games that read scan
+codes (raw input, DirectInput) saw no key. The mouse had three buttons
+and no wheel.
+
+- A key's code now carries its set-1 scan code in bits 8-15 and the
+  extended flag (E0: arrows, the editing block, right Ctrl and Alt,
+  keypad Enter and /) in bit 16, as a PC keyboard sends them. The server
+  queues both (KEYEVENTF_EXTENDEDKEY), and the single-process driver path
+  keeps mapping a scan code itself when none is given.
+- Buttons 3 and 4 are the mouse's back and forward buttons (X1, X2).
+- Type 6 is the wheels, in WHEEL_DELTA units: y the vertical wheel,
+  x the horizontal one (MOUSEEVENTF_WHEEL, MOUSEEVENTF_HWHEEL).
+
+Codes below 256, which the DualSense paths send, mean what they meant.
+---
+diff --git a/server/queue.c b/server/queue.c
+--- a/server/queue.c
++++ b/server/queue.c
+@@ -3478,19 +3478,22 @@
+ /* Input the title injects itself (request.c, pw_wineserver_input): with every Windows program in a helper process
+  * the title has no Windows thread to send it from, and hardware input belongs to the desktop, not to a process. It
+  * goes where a real device's would: to the window under the cursor or the foreground window, in whichever process
+- * owns it. type 1 key (code: virtual key), 2 relative mouse motion (x, y), 3 mouse button (code 0 left, 1 right,
+- * 2 middle), 4 close: WM_CLOSE to the foreground window, as a user closing it would. The cursor it leaves is kept
++ * owns it. type 1 key (code: virtual key, scan code << 8, extended << 16), 2 relative mouse motion (x, y), 3 mouse
++ * button (code 0 left, 1 right, 2 middle, 3 X1, 4 X2), 4 close: WM_CLOSE to the foreground window, as a user closing
++ * it would, 6 the wheels (x horizontal, y vertical, WHEEL_DELTA units). The cursor it leaves is kept
+  * for pw_wineserver_cursor. */
+ /* The same authoritative input desktop used by hardware injection. */
+ struct desktop *ps5_hardware_desktop(void) { return get_hardware_input_desktop(0); }
+ 
+ void ps5_inject_input( unsigned int type, unsigned int code, int x, int y, unsigned int down )
+ {
+-    static const unsigned int buttons[3][2] =
++    static const unsigned int buttons[5][2] =
+     {
+         {MOUSEEVENTF_LEFTUP, MOUSEEVENTF_LEFTDOWN},
+         {MOUSEEVENTF_RIGHTUP, MOUSEEVENTF_RIGHTDOWN},
+         {MOUSEEVENTF_MIDDLEUP, MOUSEEVENTF_MIDDLEDOWN},
++        {MOUSEEVENTF_XUP, MOUSEEVENTF_XDOWN},
++        {MOUSEEVENTF_XUP, MOUSEEVENTF_XDOWN},
+     };
+     union hw_input input;
+     struct desktop *desktop;
+@@ -3505,10 +3508,13 @@
+     switch (type)
+     {
+     case 1:
+-        if (!code || code > 255) break;
++        /* the virtual key, its scan code and the extended flag (bits 0-7, 8-15, 16): a USB keyboard's, so games that
++         * read scan codes (raw input, DirectInput) see a PC keyboard's */
++        if (!(code & 0xff) || code > 0x1ffff) break;
+         input.kbd.type  = INPUT_KEYBOARD;
+-        input.kbd.vkey  = code;
+-        input.kbd.flags = down ? 0 : KEYEVENTF_KEYUP;
++        input.kbd.vkey  = code & 0xff;
++        input.kbd.scan  = (code >> 8) & 0xff;
++        input.kbd.flags = (down ? 0 : KEYEVENTF_KEYUP) | ((code >> 16) & 1 ? KEYEVENTF_EXTENDEDKEY : 0);
+         queue_keyboard_message( desktop, 0, &input, IMO_HARDWARE, NULL, 0, 0 );
+         break;
+     case 2:
+@@ -3519,11 +3525,28 @@
+         queue_mouse_message( desktop, 0, &input, IMO_HARDWARE, NULL, 0 );
+         break;
+     case 3:
+-        if (code > 2) break;
++        if (code > 4) break;
+         input.mouse.type  = INPUT_MOUSE;
+         input.mouse.flags = buttons[code][down != 0];
++        if (code >= 3) input.mouse.data = code == 3 ? XBUTTON1 : XBUTTON2;
+         queue_mouse_message( desktop, 0, &input, IMO_HARDWARE, NULL, 0 );
+         break;
++    case 6:
++        /* the wheels, in WHEEL_DELTA units: y the vertical one (> 0 away from the user), x the horizontal one */
++        input.mouse.type = INPUT_MOUSE;
++        if (y)
++        {
++            input.mouse.flags = MOUSEEVENTF_WHEEL;
++            input.mouse.data  = y;
++            queue_mouse_message( desktop, 0, &input, IMO_HARDWARE, NULL, 0 );
++        }
++        if (x)
++        {
++            input.mouse.flags = MOUSEEVENTF_HWHEEL;
++            input.mouse.data  = x;
++            queue_mouse_message( desktop, 0, &input, IMO_HARDWARE, NULL, 0 );
++        }
++        break;
+     case 4:
+         if (desktop->foreground_input && desktop->foreground_input->shared->active)
+             post_message( desktop->foreground_input->shared->active, WM_CLOSE, 0, 0 );
+diff --git a/dlls/win32u/ps5drv.c b/dlls/win32u/ps5drv.c
+--- a/dlls/win32u/ps5drv.c
++++ b/dlls/win32u/ps5drv.c
+@@ -68,8 +68,8 @@
+ /* the layout of PwWineInput in wine/ps5/pw_wine_sink.h */
+ struct ps5_input
+ {
+-    UINT type;              /* 1 key, 2 mouse move, 3 mouse button, 4 close, 5 terminate */
+-    UINT code;              /* virtual key, or button 0 left 1 right 2 middle */
++    UINT type;              /* 1 key, 2 mouse move, 3 mouse button, 4 close, 5 terminate, 6 wheel */
++    UINT code;              /* key: virtual key, scan << 8, extended << 16; button 0 left 1 right 2 middle 3 X1 4 X2 */
+     INT  x, y;              /* mouse move: relative motion in desktop pixels */
+     UINT down;
+ };
+@@ -696,9 +696,12 @@
+         switch (event.type)
+         {
+         case 1:
+-            input.ki.wVk = event.code;
+-            input.ki.wScan = NtUserMapVirtualKeyEx( event.code, MAPVK_VK_TO_VSC, NtUserGetKeyboardLayout( 0 ));
+-            input.ki.dwFlags = event.down ? 0 : KEYEVENTF_KEYUP;
++            /* the virtual key, and the scan code and extended flag a USB keyboard sends (bits 8-15, 16) */
++            input.ki.wVk = event.code & 0xff;
++            input.ki.wScan = (event.code >> 8) & 0xff;
++            if (!input.ki.wScan)
++                input.ki.wScan = NtUserMapVirtualKeyEx( input.ki.wVk, MAPVK_VK_TO_VSC, NtUserGetKeyboardLayout( 0 ));
++            input.ki.dwFlags = (event.down ? 0 : KEYEVENTF_KEYUP) | ((event.code >> 16) & 1 ? KEYEVENTF_EXTENDEDKEY : 0);
+             NtUserSendHardwareInput( hwnd, 0, &input, 0 );
+             break;
+         case 2:
+@@ -706,7 +709,32 @@
+             break;
+         case 3:
+             if (event.code < 3) send_mouse( hwnd, button_flags[event.code][event.down != 0], 0, 0 );
++            else if (event.code < 5)
++            {
++                INPUT button = {.type = INPUT_MOUSE};
++                button.mi.dwFlags = event.down ? MOUSEEVENTF_XDOWN : MOUSEEVENTF_XUP;
++                button.mi.mouseData = event.code == 3 ? XBUTTON1 : XBUTTON2;
++                NtUserSendHardwareInput( hwnd, 0, &button, 0 );
++            }
+             break;
++        case 6:
++        {
++            /* the wheels, in WHEEL_DELTA units */
++            INPUT wheel = {.type = INPUT_MOUSE};
++            if (event.y)
++            {
++                wheel.mi.dwFlags = MOUSEEVENTF_WHEEL;
++                wheel.mi.mouseData = event.y;
++                NtUserSendHardwareInput( hwnd, 0, &wheel, 0 );
++            }
++            if (event.x)
++            {
++                wheel.mi.dwFlags = MOUSEEVENTF_HWHEEL;
++                wheel.mi.mouseData = event.x;
++                NtUserSendHardwareInput( hwnd, 0, &wheel, 0 );
++            }
++            break;
++        }
+         case 4:
+             /* the title asks the game to close, as a user closing its window
+              * would; the game then ends through its own exit */

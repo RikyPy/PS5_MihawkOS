@@ -1,0 +1,31 @@
+{
+ "run": "sync-ntsync-default-01",
+ "what": "sync-probe.exe",
+ "env": [],
+ "result": "finished",
+ "seconds": 5.5,
+ "probe_verdict": "PASS",
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": false,
+ "passed": true,
+ "bench": {
+  "wait50_ms": 50.0,
+  "event_round_trip_us": 10.113,
+  "set_reset_pair_us": 0.2,
+  "wait_signalled_us": 0.989,
+  "wait_any4_us": 1.023,
+  "wait_all4_us": 1.042,
+  "sem_release_wait_us": 1.083,
+  "mutex_take_release_us": 1.094,
+  "critsec_contended_us": 0.065,
+  "sleep0_us": 4.606,
+  "sleep1_us": 1102.232
+ },
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [],
+  "top": []
+ }
+}

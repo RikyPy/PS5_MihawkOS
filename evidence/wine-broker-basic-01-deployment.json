@@ -1,0 +1,98 @@
+{
+  "case": "basic",
+  "loader": {
+    "sdk_revision": "611893fc25ef3e138f5bc2c90d829d8b58174cd2",
+    "converter_revision": "ab37acd506305ba3e575435e3ae9a351cfaf7cf4",
+    "converter_sha256": "614377a0e37006e1454c67f228fc370a2f785c060205cb9f0264f27af04b5f18",
+    "recipe_sha256": "b525c87f39d366757907cda56809df80f31903d14cbd896ba41c338714da28bd",
+    "sources": {
+      "native/proton_wine_child.c": "a1ac1771f38c87c79c3475118a5cc511ca7f2fbb21003913dfbedb66f3a99883",
+      "src/pw_wine_start.c": "52bdf039228ca13e9931fc7f7097b196ece76868990b6ea44588990714bf22e2",
+      "wine/ps5/pw_wine_prx.c": "67b8393fca62a72a7aaf53a409c9a34684dd7704037bf194066e5173808c16a2",
+      "wine/ps5/pw_wine_process_io.c": "5060d9d84fb8b0fab0d2b1641137cfdde0344f8c87afcca4a21928bd23fb2c0c",
+      "wine/ps5/pw_wine_process.h": "afe017fb1959c887f692e8e8f25e1e3b5fd04cf6cbf928b4aa94f0db80bc84ce",
+      "wine/ps5/pw_wine_process_io.h": "a6c2199190bd802205bca32dffc67f1f3e1a440c8b3f9f7f7662fa80d049c1dc",
+      "src/pw_wine_start.h": "f450215176a5bf7b898728ab0a84cbd6b8a3bfd497a4996ee4f590aab95c6ed7",
+      "wine/ps5/pw_wine_prx.h": "82e4cf6b56377bb3ca9e007bd78a3302633fa8675e77d5b507823829959f9bb0"
+    },
+    "preload_mask": "0x8000000000000002",
+    "ps5-pie.ld": "fbc52518761b58b703a2225c847c5f44a81523cd0e751755adf890ae0f0dd74c",
+    "app-symbols.map": "470ce72a27a7be8e35dd7a25b485faa733d61570bdaf24d3c75bb4e3e3c63cf7",
+    "identity": "b30db5def0b6a69fefd97514952bdd69b3e1d0b419a5a6d0ad8ab304cd2d2ee6",
+    "sha256": "8ceb6485701d4d2206265017ad2b5e52ca7031534767d8f1d2f532f4218920cb"
+  },
+  "runtime": {
+    "ntdll": "df1e9c5aaa0d99ac2d517d6daba0f2c2af9e59b75ff44e7d2aa954d0950d4c7f",
+    "wineserver": "9dc0637c4ba021ecacd43fc1f299c9842846f41d661bb6386e7b1dfbb7b3471d"
+  },
+  "passed": true,
+  "production_restored": true,
+  "helper_removed": true,
+  "status": "complete",
+  "deployed_modules": [
+    "ntdll",
+    "wineserver"
+  ],
+  "helper_uploaded": true,
+  "probe_uploaded": true,
+  "deployment_verified": true,
+  "probe_sha256": "13081f2a8de2a665b95386131807abc5a36e27a141b682023ca7911000cde52c",
+  "descendant_patch_sha256": "57fb947935f4178616a4ce3faeb753acd370fa737d691a86bf73d18c0322713f",
+  "patch_sha256": "2767c06d7ca2d2355275e644fe22f0045b713e90ab5f7946da7c3b22af5712a1",
+  "adapter_sha256": {
+    "pw_wine_process.c": "b4c1f1d67ab3239a8b2f0823ec81e3df6a4f13909684d16e00a1e9cdc05541bf",
+    "pw_wine_process.h": "afe017fb1959c887f692e8e8f25e1e3b5fd04cf6cbf928b4aa94f0db80bc84ce",
+    "pw_wine_threads.c": "9fb82ed67f775782a8ec9d9d0dbaf0837adb004cc1241ceebf6f58e60bbe38a0",
+    "pw_wine_threads.h": "a28177375ad16666504b3d05cb285c8f23634b800c2e4bd9b3c20ead21722d30",
+    "pw_wine_process_io.c": "5060d9d84fb8b0fab0d2b1641137cfdde0344f8c87afcca4a21928bd23fb2c0c",
+    "pw_wine_process_io.h": "a6c2199190bd802205bca32dffc67f1f3e1a440c8b3f9f7f7662fa80d049c1dc"
+  },
+  "runner_status": 0,
+  "post_launch_fault_records": 0,
+  "native_descriptor_samples": [
+    {
+      "stage": "before_spawn",
+      "count": 41,
+      "limit": 12555
+    },
+    {
+      "stage": "before_spawn",
+      "count": 100,
+      "limit": 12555
+    },
+    {
+      "stage": "closed",
+      "count": 101,
+      "limit": 12555
+    }
+  ],
+  "windows_handle_samples": [
+    {
+      "before": 12,
+      "after": 14
+    },
+    {
+      "before": 14,
+      "after": 14
+    }
+  ],
+  "native_children": [
+    {
+      "pid": 540,
+      "service_id": 369200289
+    },
+    {
+      "pid": 543,
+      "service_id": 369200305
+    }
+  ],
+  "native_child_deletions": [
+    540,
+    543
+  ],
+  "child_logs": [
+    "wine-child-540.log",
+    "wine-child-543.log"
+  ],
+  "probe_removed": true
+}

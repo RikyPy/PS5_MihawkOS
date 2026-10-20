@@ -1,0 +1,191 @@
+{
+  "title": "PPSA99170",
+  "identity": "ef3f58e4a36140d39279943a50adb4ad",
+  "kind": "service-native",
+  "build": {
+    "revision": "b03e6a3c887fa39034b59ebb42c234cfff4ceb8b",
+    "kind": "service-native",
+    "elevate_gpu_helper": true,
+    "sdk_revision": "611893fc25ef3e138f5bc2c90d829d8b58174cd2",
+    "source_sha256": {
+      "ps5/src/main.cpp": "f1eb468f9603425c6543f0b02d8cf91e3e85a6919d7248dec85a24fd2f5aa457",
+      "ps5/CMakeLists.txt": "f7af78e0e2836e5cfbf06bf5723a85e90589db17c7b23c66d07d22f2d68c389c",
+      "native/proton_service_preflight.h": "3a8a7611112a1b454b8844fc7d8a5aec695d6fc9b706c714f72568787e68773b",
+      "native/proton_service_preflight.cpp": "140b33be21c33060a45bb0f65ead6a710c6adf73048b2e9fae10078914f1d3c8",
+      "native/proton_service_helper.c": "0ff7c7f74d6a85f387f7b743cd54e82c64a0d34c3046b6e894f7eaa5a9ec6deb",
+      "native/proton_gpu_broker_probe.h": "0774d4c3b4a26fdbdfab681312ce98c43fae92508a0fe643d586f9d1da48a1d4",
+      "native/proton_gpu_broker_probe.cpp": "75788cacad88f3431eccaff0f13025cf5e91087662671dfc63157c06aeabbdc0"
+    },
+    "radv_recipe_sha256": "e2844f49e4af12a9718d5b8b6055ace83e7eaa1d68870de2a79d39d1c92fa674",
+    "radv_platform_header_sha256": "24e770da15304fe95a4e0191271bc33f545dc8f964e186408c7996f5bce2aa97",
+    "radv_archive_sha256": "0ffa39311881236b4872ec77a56bca417ce56c71cefca5954224b9ea8f3a1bf5",
+    "helper_tool_sha256": "614377a0e37006e1454c67f228fc370a2f785c060205cb9f0264f27af04b5f18",
+    "helper_tool_revision": "ab37acd506305ba3e575435e3ae9a351cfaf7cf4",
+    "helper_patch_sha256": "defd28005f7c15664658f8d61928886864f00e4e3df586396460b4d27057275c",
+    "helper_layout_sha256": "fbc52518761b58b703a2225c847c5f44a81523cd0e751755adf890ae0f0dd74c",
+    "helper_symbols_sha256": "470ce72a27a7be8e35dd7a25b485faa733d61570bdaf24d3c75bb4e3e3c63cf7",
+    "helper_preload_mask": "0x8000000000000002",
+    "helper_recipe_sha256": "d547a4fa05d93492b39370012b9aa182ef6b295d3d3f7f2fa245ec0f8ae3ab87",
+    "helper_sha256": "0717e6f466c81428353320c8e2a5ec21b7b690091458da0729f623da84c3f96b",
+    "helper_needed": [
+      "libkernel.sprx",
+      "libSceLibcInternal.sprx"
+    ],
+    "identity": "101ef887beeae5d2aafc6ad85db41b6fabf485c76b682e1171f8cbc18582d207",
+    "eboot_sha256": "400850d8dca7a2e82f9fe6eec7688de9f839cc7a8871e7eddebe6008af3ffdc1"
+  },
+  "capture": "klog/graphics-child-gpu-broker-shm-01",
+  "expected_missing_image": false,
+  "mode": "gpu-broker-shm",
+  "passed": false,
+  "status": "complete",
+  "production_sha256": "8f63bbc57bd9203520653d9e3eb765798a434b737ac6c1f79b106437542761c3",
+  "production_restored": true,
+  "root_reference_balance_verified": false,
+  "forced_title_close": false,
+  "installed_readback_sha256": "d3d7cb497833ebb57876fe4465257217608ac9765f9a360a3ca0e658b845f325",
+  "production_executable_sha256": "bc5c7a75f249a59e7bce80218c6e749b9ea2f426e9bec4c96939ce7f75ceb17d",
+  "probe_readback_sha256": "164a784c0ded385fb478549aa40505ab56b431b5cc5f8d2f62dbeffcd9a14ead",
+  "probe_executable_sha256": "5bdb8a0d53c91441eeff61f4072953b8a198606286f335bb542e8024d1f86e15",
+  "helper_uploaded": true,
+  "helper_executable_verified": true,
+  "shell_idle_after_run": true,
+  "post_launch_fault_records": 0,
+  "parent_shell_exit_seen": true,
+  "observations": [
+    "service-native identity=ef3f58e4a36140d39279943a50adb4ad revision=3 parent=1017 elevated=1",
+    "gpu-broker owner=1017 initialized=1 available_before=12866027520 shared_descriptor=1",
+    "gpu-broker client=0 shared_create=1 gpu_protection=1 errno=9",
+    "gpu-broker client=0 hello=1 elevation=0 euid=0",
+    "gpu-broker client=0 service=268535809 pid=1020 cpu_alias=1 map_status=0 elevation=0 euid=0 map_stage=2",
+    "gpu-broker client=1 shared_create=1 gpu_protection=1 errno=9",
+    "gpu-broker client=1 hello=1 elevation=0 euid=0",
+    "gpu-broker client=1 service=268535826 pid=1023 cpu_alias=1 map_status=0 elevation=0 euid=0 map_stage=2",
+    "gpu-broker live_clients=2 separate_native_processes=1",
+    "gpu-broker client=0 pid=1020 value=999 invalid=1 packet_valid=0 submit=22 gpu_value=0 child_observed=0 verdict=1",
+    "gpu-broker client=0 pid=1020 value=1001 invalid=0 packet_valid=1 submit=0 gpu_value=1001 child_observed=1001 verdict=1",
+    "gpu-broker client=1 pid=1023 value=2001 invalid=0 packet_valid=1 submit=0 gpu_value=2001 child_observed=2001 verdict=1",
+    "gpu-broker client=0 pid=1020 value=1002 invalid=0 packet_valid=1 submit=0 gpu_value=1002 child_observed=1002 verdict=1",
+    "gpu-broker client=1 pid=1023 value=2002 invalid=0 packet_valid=1 submit=0 gpu_value=2002 child_observed=2002 verdict=1",
+    "gpu-broker client=0 pid=1020 value=1003 invalid=0 packet_valid=1 submit=0 gpu_value=1003 child_observed=1003 verdict=1",
+    "gpu-broker client=1 pid=1023 value=2003 invalid=0 packet_valid=1 submit=0 gpu_value=2003 child_observed=2003 verdict=1",
+    "gpu-broker client=0 unmapped=1",
+    "gpu-broker client=0 closed=0 absent=1",
+    "gpu-broker client=1 unmapped=1",
+    "gpu-broker client=1 closed=0 absent=1",
+    "gpu-broker descriptors before=12 after=12 available_before=12866027520 available_after=12863930368",
+    "result=FAIL"
+  ],
+  "fresh_identity_seen": true,
+  "shared_gpu_clients": [
+    {
+      "client": 0,
+      "service_id": 268535809,
+      "pid": 1020,
+      "cpu_alias": 1,
+      "map_status": 0
+    },
+    {
+      "client": 1,
+      "service_id": 268535826,
+      "pid": 1023,
+      "cpu_alias": 1,
+      "map_status": 0
+    }
+  ],
+  "gpu_completion_checks": [
+    {
+      "client": 0,
+      "pid": 1020,
+      "value": 999,
+      "invalid": 1,
+      "packet_valid": 0,
+      "submit": 22,
+      "gpu_value": 0,
+      "child_observed": 0,
+      "verdict": 1
+    },
+    {
+      "client": 0,
+      "pid": 1020,
+      "value": 1001,
+      "invalid": 0,
+      "packet_valid": 1,
+      "submit": 0,
+      "gpu_value": 1001,
+      "child_observed": 1001,
+      "verdict": 1
+    },
+    {
+      "client": 1,
+      "pid": 1023,
+      "value": 2001,
+      "invalid": 0,
+      "packet_valid": 1,
+      "submit": 0,
+      "gpu_value": 2001,
+      "child_observed": 2001,
+      "verdict": 1
+    },
+    {
+      "client": 0,
+      "pid": 1020,
+      "value": 1002,
+      "invalid": 0,
+      "packet_valid": 1,
+      "submit": 0,
+      "gpu_value": 1002,
+      "child_observed": 1002,
+      "verdict": 1
+    },
+    {
+      "client": 1,
+      "pid": 1023,
+      "value": 2002,
+      "invalid": 0,
+      "packet_valid": 1,
+      "submit": 0,
+      "gpu_value": 2002,
+      "child_observed": 2002,
+      "verdict": 1
+    },
+    {
+      "client": 0,
+      "pid": 1020,
+      "value": 1003,
+      "invalid": 0,
+      "packet_valid": 1,
+      "submit": 0,
+      "gpu_value": 1003,
+      "child_observed": 1003,
+      "verdict": 1
+    },
+    {
+      "client": 1,
+      "pid": 1023,
+      "value": 2003,
+      "invalid": 0,
+      "packet_valid": 1,
+      "submit": 0,
+      "gpu_value": 2003,
+      "child_observed": 2003,
+      "verdict": 1
+    }
+  ],
+  "gpu_mapping_credentials": [
+    {
+      "client": 0,
+      "elevation": 0,
+      "euid": 0,
+      "map_stage": 2
+    },
+    {
+      "client": 1,
+      "elevation": 0,
+      "euid": 0,
+      "map_stage": 2
+    }
+  ],
+  "restored_readback_sha256": "d3d7cb497833ebb57876fe4465257217608ac9765f9a360a3ca0e658b845f325",
+  "helper_removed": true
+}

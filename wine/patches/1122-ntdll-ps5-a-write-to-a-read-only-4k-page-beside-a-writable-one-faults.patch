@@ -1,0 +1,409 @@
+From: PS5_Proton <local>
+Subject: [PATCH] ntdll: PS5: a write to a read-only 4 KiB page beside a writable one faults, as on Windows
+
+The console's host page is 16 KiB and holds four Windows pages; upstream maps it with what any of them allows. A
+program that tracks writes by making 4 KiB pages read-only and opening each one on its first write (an emulator's GPU
+caches, src/graphics/host_gpu/pageManager.cpp) saw the first write of a host page and none of the writes to the three
+pages still read-only beside it, and the GPU drew stale vertices: a Unity game's menu text came out as stretched
+blocks (2026-10-14; record removed from the tree; in git history). On the PC, with 4 KiB pages, the same build draws it right.
+
+A host page whose committed pages disagree on write is now mapped read-only (get_host_page_unix_prot). A write a page
+allows faults, opens the host page to what its pages allow, and runs as one instruction under the trap flag; the trap
+closes the page again (virtual_ps5_step_done), keeping a trap flag the program set itself. A system call writing into
+such a page (check_write_access: read, pread, recvmsg, server replies) opens it for the call and update_write_watches
+closes it. FreeBSD's read() or recvmsg() that faults part-way returns EFAULT with the copied bytes consumed, so
+virtual_locked_read puts the file position back before its retry and virtual_locked_recvmsg opens the buffer's pages
+before the call (the plain call stays for a buffer outside Wine's writable views). NtReadFileScatter goes through
+them too, and SystemInterruptInformation copies its random bytes rather than reading them into the caller's buffer.
+Image views and host pages with an executable page keep the upstream rule, so code beside data stays fast;
+reads keep the host page's granularity (no page is made inaccessible by a neighbour). Openings are counted
+(VM_STAT_HOST_PAGE_OPENS, the helper census's opened=). Contract: tests/vm-protect-probe.c, tracker_check.
+
+A step that does not complete closes its page as well: when the instruction raises an exception instead
+(setup_raise_exception), the page closes and the context the program gets keeps only its own trap flag. Before, the
+slots stayed set, the next unrelated trap was taken for the step, and a handler that continued carried our trap flag
+into an unexpected single step. A re-fault on a page another thread closed before the instruction ran reopens it in
+the slot that holds it (wine/ps5/pw_wine_vm.c, pw_wine_vm_step_slot, host-tested in tests/test_pw_wine_vm.c);
+before, two such closes ran the thread out of slots and a write its page allows got an access violation. A rep string
+instruction still traps after each element: one open and one trap per element (vm-protect-probe's rep case measures
+it). Thread exit does not close a page left open; the next protection change of that host page does.
+
+Console: single-thread stepping in a payload with kstuff loaded ran thousands of traps and the
+console survived (vmp-tracker-2026-10-14-03 to -06). Stepping from several threads at once, and this hardened form,
+have not run on the console yet (vm-protect-probe's contention case, run only on request).
+---
+diff --git a/dlls/ntdll/unix/file.c b/dlls/ntdll/unix/file.c
+index e3b1d70..629ba1a 100644
+--- a/dlls/ntdll/unix/file.c
++++ b/dlls/ntdll/unix/file.c
+@@ -6847,10 +6847,10 @@ NTSTATUS WINAPI NtReadFileScatter( HANDLE file, HANDLE event, PIO_APC_ROUTINE ap
+     while (length)
+     {
+         if (offset && offset->QuadPart != FILE_USE_FILE_POINTER_POSITION)
+-            result = pread( unix_handle, (char *)segments->Buffer + pos,
+-                            min( length - pos, page_size - pos ), offset->QuadPart + total );
++            result = virtual_locked_pread( unix_handle, (char *)segments->Buffer + pos,
++                                           min( length - pos, page_size - pos ), offset->QuadPart + total );
+         else
+-            result = read( unix_handle, (char *)segments->Buffer + pos, min( length - pos, page_size - pos ) );
++            result = virtual_locked_read( unix_handle, (char *)segments->Buffer + pos, min( length - pos, page_size - pos ) );
+ 
+         if (result == -1)
+         {
+diff --git a/dlls/ntdll/unix/signal_x86_64.c b/dlls/ntdll/unix/signal_x86_64.c
+index d676600..3ce1274 100644
+--- a/dlls/ntdll/unix/signal_x86_64.c
++++ b/dlls/ntdll/unix/signal_x86_64.c
+@@ -1790,6 +1790,11 @@ static void setup_raise_exception( ucontext_t *sigcontext, EXCEPTION_RECORD *rec
+     XSAVE_AREA_HEADER *src_xs;
+     void *callback;
+ 
++#ifdef __PROSPERO__
++    /* An exception in an instruction a page fault opened its host page for (virtual_handle_fault): it does not
++     * complete, so the page closes now, and the context the program gets keeps only its own trap flag. */
++    if (virtual_ps5_step_done() && !ntdll_get_thread_data()->ps5_step_tf) context->EFlags &= ~0x100;
++#endif
+     if (rec->ExceptionCode == EXCEPTION_SINGLE_STEP)
+     {
+         /* when single stepping can't tell whether this is a hw bp or a
+@@ -2926,6 +2931,15 @@ static void segv_handler( int signal, siginfo_t *siginfo, void *sigcontext )
+         rec.ExceptionInformation[1] = (ULONG_PTR)siginfo->si_addr;
+         if (!virtual_handle_fault( &rec, (void *)RSP_sig(ucontext) ) || check_invalid_gsbase( ucontext ))
+         {
++#ifdef __PROSPERO__
++            /* The fault opened a host page for this one instruction: trap after it to close the page again. */
++            struct ntdll_thread_data *data = ntdll_get_thread_data();
++            if (data->ps5_step_tf == 2)  /* this fault opened the instruction's first page */
++            {
++                data->ps5_step_tf = (EFL_sig(ucontext) & 0x100) != 0;
++                EFL_sig(ucontext) |= 0x100;
++            }
++#endif
+             leave_handler( ucontext );
+             return;
+         }
+@@ -2979,6 +2993,15 @@ static void trap_handler( int signal, siginfo_t *siginfo, void *sigcontext )
+     EXCEPTION_RECORD rec = { 0 };
+     struct xcontext context;
+ 
++#ifdef __PROSPERO__
++    /* The instruction a page fault opened its host page for has run (virtual_handle_fault). */
++    if (TRAP_sig(ucontext) == TRAP_x86_TRCTRAP && virtual_ps5_step_done() && !ntdll_get_thread_data()->ps5_step_tf)
++    {
++        EFL_sig(ucontext) &= ~0x100;
++        leave_handler( ucontext );
++        return;
++    }
++#endif
+     if (handle_syscall_trap( ucontext, siginfo )) return;
+ 
+     rec.ExceptionAddress = (void *)RIP_sig(ucontext);
+diff --git a/dlls/ntdll/unix/system.c b/dlls/ntdll/unix/system.c
+index dd1171b..3555b65 100644
+--- a/dlls/ntdll/unix/system.c
++++ b/dlls/ntdll/unix/system.c
+@@ -4045,7 +4045,22 @@ NTSTATUS WINAPI NtQuerySystemInformation( SYSTEM_INFORMATION_CLASS class,
+         if (size >= len)
+         {
+             if (!info) ret = STATUS_ACCESS_VIOLATION;
++#ifdef __PROSPERO__
++            else
++            {
++                /* Copied, not read into: a raw read into a host page closed beside the buffer fails unseen. */
++                char bytes[1024];
++                ULONG done, part;
++                for (done = 0; done < len; done += part)
++                {
++                    part = min( len - done, sizeof(bytes) );
++                    get_random( bytes, part );
++                    memcpy( (char *)info + done, bytes, part );
++                }
++            }
++#else
+             else get_random( info, len );
++#endif
+         }
+         else ret = STATUS_INFO_LENGTH_MISMATCH;
+         break;
+diff --git a/dlls/ntdll/unix/unix_private.h b/dlls/ntdll/unix/unix_private.h
+index 3907b36..ec79dd6 100644
+--- a/dlls/ntdll/unix/unix_private.h
++++ b/dlls/ntdll/unix/unix_private.h
+@@ -121,6 +121,8 @@ struct ntdll_thread_data
+     int                       ps5_terminating; /* 03e0 killed inside the Unix side: end at the boundary */
+     struct { ULONG_PTR address; ULONG64 generation; } ps5_section_retry;
+     unsigned int              ps5_exec_seen;   /* executable protection changes finished at this thread's last retry */
++    void                     *ps5_step_page[2]; /* host pages opened for the instruction being stepped */
++    int                       ps5_step_tf;     /* the program had the trap flag set itself; 2 until the handler looks */
+ #endif
+ };
+ 
+@@ -331,6 +333,9 @@ extern NTSTATUS virtual_alloc_thread_stack( INITIAL_TEB *stack, ULONG_PTR limit_
+ extern void virtual_map_user_shared_data(void);
+ extern void virtual_init_user_shared_data(void);
+ extern NTSTATUS virtual_handle_fault( EXCEPTION_RECORD *rec, void *stack );
++#ifdef __PROSPERO__
++extern BOOL virtual_ps5_step_done(void);
++#endif
+ extern unsigned int virtual_locked_server_call( void *req_ptr );
+ extern ssize_t virtual_locked_read( int fd, void *addr, size_t size );
+ extern ssize_t virtual_locked_pread( int fd, void *addr, size_t size, off_t offset );
+diff --git a/dlls/ntdll/unix/virtual.c b/dlls/ntdll/unix/virtual.c
+index 5cf22e5..e6c0e8b 100644
+--- a/dlls/ntdll/unix/virtual.c
++++ b/dlls/ntdll/unix/virtual.c
+@@ -118,7 +118,11 @@ WINE_DECLARE_DEBUG_CHANNEL(virtstat);
+  * never skipped. Counters are readable through __wine_virtual_stats. */
+ enum { VM_STAT_MMAP, VM_STAT_MUNMAP, VM_STAT_MPROTECT, VM_STAT_MPROTECT_BYTES,
+        VM_STAT_MPROTECT_SKIPPED, VM_STAT_FAULTS, VM_STAT_IMAGES, VM_STAT_IMAGE_MMAP,
+-       VM_STAT_IMAGE_MPROTECT, VM_STAT_FILE_READ, VM_STAT_COUNT };
++       VM_STAT_IMAGE_MPROTECT, VM_STAT_FILE_READ,
++#ifdef __PROSPERO__
++       VM_STAT_HOST_PAGE_OPENS,  /* host pages opened for one instruction or one system call (get_host_page_unix_prot) */
++#endif
++       VM_STAT_COUNT };
+ static ULONG64 vm_stats[VM_STAT_COUNT];
+ 
+ static inline void vm_stat_add( unsigned int index, ULONG64 value )
+@@ -206,6 +210,7 @@ extern int __wine_ps5_mprotect( void *addr, size_t len, int prot );
+ extern int __wine_ps5_dmem_region( void *base, size_t size );
+ typedef int (*pw_wine_vm_owned_query)( const void *, void **, void ** );
+ extern int pw_wine_vm_gap( const void *, const void *, pw_wine_vm_owned_query, void **, void ** );
++extern int pw_wine_vm_step_slot( void *const slots[2], const void *page );
+ #define host_mmap __wine_ps5_mmap
+ #define host_munmap __wine_ps5_munmap
+ #define host_mprotect __wine_ps5_mprotect
+@@ -2479,6 +2484,42 @@ static inline int mprotect_exec( void *base, size_t size, int unix_prot )
+ }
+ 
+ 
++/***********************************************************************
++ *           get_host_page_unix_prot
++ *
++ * The protection a host page is mapped with: what any of its pages allows (upstream), with the per-page set and
++ * clear applied. On the console a host page is 16 KiB and holds four Windows pages. A program that tracks writes by
++ * making 4 KiB pages read-only and opening each one on its first write (an emulator's GPU caches) saw nothing of the
++ * writes to the three still read-only beside an opened one, and the GPU drew stale vertices (a Unity game's text,
++ * 2026-10-14). So a host page whose committed pages disagree on write is mapped read-only, and a
++ * write a page allows runs as one instruction on the opened host page (virtual_handle_fault, virtual_ps5_step_done).
++ * Image views and pages beside executable ones keep the upstream rule: code beside data must stay fast.
++ */
++static int get_host_page_unix_prot( const void *addr, BYTE set, BYTE clear )
++{
++    int prot = get_unix_prot( (get_host_page_vprot( addr ) & ~clear) | set );
++#ifdef __PROSPERO__
++    if (host_page_size > page_size && (prot & PROT_WRITE) && !(prot & PROT_EXEC))
++    {
++        size_t i, idx = (size_t)ROUND_ADDR( addr, host_page_mask ) >> page_shift;
++        const BYTE *vprot_ptr = pages_vprot[idx >> pages_vprot_shift] + (idx & pages_vprot_mask);
++        struct file_view *view;
++
++        for (i = 0; i < host_page_size / page_size; i++)
++        {
++            BYTE vprot = (vprot_ptr[i] & ~clear) | set;
++            /* set reaches the whole host page (mprotect_range rounds): only pages committed themselves count; a free
++             * page beside a 4 KiB view took wineboot's write to KUSER_SHARED_DATA (usd-diag-2026-10-14-02). */
++            if ((vprot_ptr[i] & VPROT_COMMITTED) && !(get_unix_prot( vprot ) & PROT_WRITE)) break;
++        }
++        if (i < host_page_size / page_size && (view = find_view( addr, 0 )) && !(view->protect & SEC_IMAGE))
++            prot &= ~PROT_WRITE;
++    }
++#endif
++    return prot;
++}
++
++
+ /***********************************************************************
+  *           mprotect_range
+  *
+@@ -2489,16 +2530,13 @@ static int mprotect_range( void *base, size_t size, BYTE set, BYTE clear )
+     size_t i, count;
+     char *addr = ROUND_ADDR( base, host_page_mask );
+     int prot, next;
+-    BYTE vprot;
+ 
+     size = ROUND_SIZE( base, size, host_page_mask );
+ 
+-    vprot = get_host_page_vprot( addr );
+-    prot = get_unix_prot( (vprot & ~clear) | set );
++    prot = get_host_page_unix_prot( addr, set, clear );
+     for (count = i = 1; i < size / host_page_size; i++, count++)
+     {
+-        vprot = get_host_page_vprot( addr + count * host_page_size );
+-        next = get_unix_prot( (vprot & ~clear) | set );
++        next = get_host_page_unix_prot( addr + count * host_page_size, set, clear );
+         if (next == prot) continue;
+         if (mprotect_exec( addr, count * host_page_size, prot )) return -1;
+         addr += count * host_page_size;
+@@ -5729,7 +5767,7 @@ NTSTATUS virtual_handle_fault( EXCEPTION_RECORD *rec, void *stack )
+             }
+         }
+         /* ignore fault if page is writable now */
+-        if (get_unix_prot( get_host_page_vprot( page )) & PROT_WRITE)
++        if (get_host_page_unix_prot( page, 0, 0 ) & PROT_WRITE)
+         {
+             if ((vprot & VPROT_WRITEWATCH) || is_write_watch_range( page, 1 ))
+                 ret = STATUS_SUCCESS;
+@@ -5747,11 +5785,13 @@ NTSTATUS virtual_handle_fault( EXCEPTION_RECORD *rec, void *stack )
+         if (wanted > 1)
+         {
+             BYTE first = get_host_page_vprot( page );
++            int first_prot = get_host_page_unix_prot( page, 0, 0 );
+             while (run < wanted && (char *)page + (run + 1) * (size_t)host_page_size <= (char *)address_space_limit &&
+-                   get_host_page_vprot( page + run * (size_t)host_page_size ) == first) run++;
++                   get_host_page_vprot( page + run * (size_t)host_page_size ) == first &&
++                   get_host_page_unix_prot( page + run * (size_t)host_page_size, 0, 0 ) == first_prot) run++;
+         }
+         int resolved = __wine_ps5_section_fault( (uintptr_t)addr,
+-                           get_unix_prot( get_host_page_vprot( page ) ), access, retry, run );
++                           get_host_page_unix_prot( page, 0, 0 ), access, retry, run );
+         if (resolved > 0) ret = STATUS_SUCCESS;
+         else if (resolved < 0)
+         {
+@@ -5760,6 +5800,30 @@ NTSTATUS virtual_handle_fault( EXCEPTION_RECORD *rec, void *stack )
+             ret = STATUS_IN_PAGE_ERROR;
+         }
+     }
++    /* A write this page allows, refused because its host page holds read-only pages too (get_host_page_unix_prot):
++     * the host page is opened for the one instruction; the single-step trap closes it (virtual_ps5_step_done). An
++     * evicted page of a shared section is mapped first, opened. */
++    if (ret == STATUS_ACCESS_VIOLATION && err == EXCEPTION_WRITE_FAULT &&
++        (get_unix_prot( get_page_vprot( addr ) ) & PROT_WRITE) &&
++        !(get_host_page_unix_prot( page, 0, 0 ) & PROT_WRITE))
++    {
++        struct ntdll_thread_data *data = ntdll_get_thread_data();
++        int open = get_unix_prot( get_host_page_vprot( page ) );
++        /* The slot holding this page if another thread closed it before the instruction ran (wine/ps5/pw_wine_vm.h). */
++        int slot = pw_wine_vm_step_slot( data->ps5_step_page, page );
++
++        if (slot >= 0 &&
++            __wine_ps5_section_fault( (uintptr_t)addr, open, PROT_WRITE,
++                                      (PwWineSectionRetry *)&data->ps5_section_retry, 1 ) >= 0 &&
++            !mprotect_exec( page, host_page_size, open ))
++        {
++            /* The instruction's first open: the signal handler sets the trap flag, keeping the program's own. */
++            if (!data->ps5_step_page[0]) data->ps5_step_tf = 2;
++            data->ps5_step_page[slot] = page;
++            vm_stat_add( VM_STAT_HOST_PAGE_OPENS, 1 );
++            ret = STATUS_SUCCESS;
++        }
++    }
+ #endif
+     fault_top_note( addr, err, get_page_vprot( addr ), vprot, ret, rec->ExceptionAddress );
+     mutex_unlock( &virtual_mutex );
+@@ -5768,6 +5832,32 @@ NTSTATUS virtual_handle_fault( EXCEPTION_RECORD *rec, void *stack )
+ }
+ 
+ 
++#ifdef __PROSPERO__
++/***********************************************************************
++ *           virtual_ps5_step_done
++ *
++ * The single-step trap after the instruction virtual_handle_fault opened its host page for, or an exception that
++ * instruction raised instead (setup_raise_exception): the page takes its own protection again and the slots are
++ * free. TRUE when this thread had one open. Takes the virtual mutex only then.
++ */
++BOOL virtual_ps5_step_done(void)
++{
++    struct ntdll_thread_data *data = ntdll_get_thread_data();
++    unsigned int i;
++
++    if (!data->ps5_step_page[0]) return FALSE;
++    mutex_lock( &virtual_mutex );
++    for (i = 0; i < ARRAY_SIZE(data->ps5_step_page); i++)
++    {
++        if (data->ps5_step_page[i]) mprotect_range( data->ps5_step_page[i], host_page_size, 0, 0 );
++        data->ps5_step_page[i] = NULL;
++    }
++    mutex_unlock( &virtual_mutex );
++    return TRUE;
++}
++#endif
++
++
+ /***********************************************************************
+  *           virtual_setup_exception
+  */
+@@ -5828,6 +5918,14 @@ static NTSTATUS check_write_access( void *base, size_t size, BOOL *has_write_wat
+ {
+     size_t i;
+     char *addr = ROUND_ADDR( base, host_page_mask );
++#ifdef __PROSPERO__
++    char *end = (char *)base + size, *p;
++
++    /* Each Windows page the buffer covers must allow the write itself (get_host_page_unix_prot). */
++    for (p = ROUND_ADDR( base, page_mask ); p < end; p += page_size)
++        if (!(get_unix_prot( get_page_vprot( p ) & ~VPROT_WRITEWATCH ) & PROT_WRITE))
++            return STATUS_INVALID_USER_BUFFER;
++#endif
+ 
+     size = ROUND_SIZE( base, size, host_page_mask );
+     for (i = 0; i < size; i += host_page_size)
+@@ -5839,6 +5937,16 @@ static NTSTATUS check_write_access( void *base, size_t size, BOOL *has_write_wat
+     }
+     if (*has_write_watch)
+         mprotect_range( addr, size, 0, VPROT_WRITEWATCH );  /* temporarily enable write access */
++#ifdef __PROSPERO__
++    /* A host page holding read-only pages beside the buffer's is opened for the call; update_write_watches closes it. */
++    for (i = 0; i < size; i += host_page_size)
++        if (!(get_host_page_unix_prot( addr + i, 0, VPROT_WRITEWATCH ) & PROT_WRITE))
++        {
++            *has_write_watch = TRUE;
++            mprotect_exec( addr + i, host_page_size, get_unix_prot( get_host_page_vprot( addr + i ) & ~VPROT_WRITEWATCH ) );
++            vm_stat_add( VM_STAT_HOST_PAGE_OPENS, 1 );
++        }
++#endif
+     return STATUS_SUCCESS;
+ }
+ 
+@@ -5877,9 +5985,17 @@ ssize_t virtual_locked_read( int fd, void *addr, size_t size )
+     sigset_t sigset;
+     BOOL has_write_watch = FALSE;
+     int err = EFAULT;
++#ifdef __PROSPERO__
++    /* A read that faults part-way (a host page closed beside the buffer) returns EFAULT with the copied bytes
++     * consumed: the retry starts where the call found the file. A file that cannot seek behaves as upstream. */
++    off_t offset = lseek( fd, 0, SEEK_CUR );
++#endif
+ 
+     ssize_t ret = read( fd, addr, size );
+     if (ret != -1 || use_kernel_writewatch || errno != EFAULT) return ret;
++#ifdef __PROSPERO__
++    if (offset != -1) lseek( fd, offset, SEEK_SET );
++#endif
+ 
+     server_enter_uninterrupted_section( &virtual_mutex, &sigset );
+     if (!check_write_access( addr, size, &has_write_watch ))
+@@ -5929,8 +6045,15 @@ ssize_t virtual_locked_recvmsg( int fd, struct msghdr *hdr, int flags )
+     BOOL has_write_watch = FALSE;
+     int err = EFAULT;
+ 
++#ifdef __PROSPERO__
++    /* A recvmsg that faults part-way returns EFAULT with the stream's bytes consumed, so the buffer's host pages are
++     * opened before the call. The server's sockets are non-blocking, so the lock is held briefly, as in the retry. */
++    ssize_t ret = -1;
++    if (use_kernel_writewatch) return recvmsg( fd, hdr, flags );
++#else
+     ssize_t ret = recvmsg( fd, hdr, flags );
+     if (ret != -1 || use_kernel_writewatch || errno != EFAULT) return ret;
++#endif
+ 
+     server_enter_uninterrupted_section( &virtual_mutex, &sigset );
+     for (i = 0; i < hdr->msg_iovlen; i++)
+@@ -5941,10 +6064,16 @@ ssize_t virtual_locked_recvmsg( int fd, struct msghdr *hdr, int flags )
+         ret = recvmsg( fd, hdr, flags );
+         err = errno;
+     }
++#ifdef __PROSPERO__
++    else err = -1;  /* a buffer outside Wine's writable views: the plain call below, as upstream's first one */
++#endif
+     if (has_write_watch)
+         while (i--) update_write_watches( hdr->msg_iov[i].iov_base, hdr->msg_iov[i].iov_len, 0 );
+ 
+     server_leave_uninterrupted_section( &virtual_mutex, &sigset );
++#ifdef __PROSPERO__
++    if (err == -1) return recvmsg( fd, hdr, flags );
++#endif
+     errno = err;
+     return ret;
+ }

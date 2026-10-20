@@ -1,0 +1,28 @@
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Subject: [PATCH] ntdll: PS5: allocate protection tables from the native heap
+
+Large placeholder reservations can occupy the console's anonymous mmap
+placement area. Wine then fails a 1 MiB page-protection table allocation,
+even with over 11 GiB of application memory free. Use the existing native
+heap for these zeroed process-lifetime tables. This separates Wine's
+bookkeeping storage from the Windows address space it describes.
+
+SPDX-License-Identifier: LGPL-2.1-or-later
+---
+--- a/dlls/ntdll/unix/virtual.c
++++ b/dlls/ntdll/unix/virtual.c
+@@ -1709,7 +1709,14 @@
+     for (i = idx >> pages_vprot_shift; i < (end + pages_vprot_mask) >> pages_vprot_shift; i++)
+     {
+         if (pages_vprot[i]) continue;
++#ifdef __PROSPERO__
++        /* These zeroed tables live until process teardown. Native mmap's
++         * placement area can be occupied by Windows reservations; use the
++         * existing application-memory heap for host bookkeeping instead. */
++        if (!(ptr = calloc( 1, pages_vprot_mask + 1 )))
++#else
+         if ((ptr = anon_mmap_alloc( pages_vprot_mask + 1, PROT_READ | PROT_WRITE )) == MAP_FAILED)
++#endif
+         {
+             ERR( "anon mmap error %s for vprot table, size %08lx\n", strerror(errno), pages_vprot_mask + 1 );
+             return FALSE;

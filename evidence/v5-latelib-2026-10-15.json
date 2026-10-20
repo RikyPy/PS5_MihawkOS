@@ -1,0 +1,37 @@
+{
+  "battery": "v5-latelib-2026-10-15",
+  "expected_cases": [
+    "late-library"
+  ],
+  "revision": "f129706985bced268cf942fe319ba5db88242f66",
+  "dirty": true,
+  "cases": [
+    {
+      "case": "late-library",
+      "run": "v5-latelib-2026-10-15-late-library",
+      "runner_status": 1,
+      "seconds": 17.3,
+      "result": "crashed",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": false,
+      "run_seconds": 16.4,
+      "launch_readiness": {
+        "ready": true,
+        "seconds": 0.164,
+        "settle_seconds": 0.0,
+        "census_seconds": 0.152,
+        "previous_cleanup_verified": true
+      },
+      "runner_overhead_seconds": 0.9,
+      "layout": "launcher",
+      "fault_records": 1,
+      "helpers": 8,
+      "protocol_errors": 0
+    }
+  ],
+  "complete": true,
+  "seconds": 17.3,
+  "passed": false
+}

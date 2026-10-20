@@ -1,0 +1,28 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Fri, 17 Oct 2026 19:30:00 -0400
+Subject: [PATCH] win32u: on PS5, say which process publishes which display rate
+
+With PROTON_120HZ=1 a program in the Mihawk OS session was offered only 60 Hz modes although its own
+WINE_PS5_REFRESH was 120 (PS5_Proton's modes-p2-2026-10-17-02; the same probe as the initial program in the probe
+prefix was offered 60 and 120). Every process that first takes the desktop window publishes the driver's mode from its
+own environment, and the last one wins; one line per publish names the rate, the variable and the native process, so a
+run shows which one published 60.
+---
+ dlls/win32u/ps5drv.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+--- a/dlls/win32u/ps5drv.c
++++ b/dlls/win32u/ps5drv.c
+@@ -237,6 +237,11 @@
+                          NtUserGetSystemDpiForProcess( NULL ), param );
+     manager->add_monitor( &monitor, param );
+     manager->add_modes( &mode, 1, &mode, param );
++    /* Which process publishes which rate: every process that first takes the desktop window publishes from its own
++     * environment, and the last one wins (PS5_Proton's docs/PLAN.md, modes-p2-2026-10-17-02) */
++    fprintf( stderr, "wine-ps5: display published %ux%u@%u Hz (WINE_PS5_REFRESH=%s) by native process %d\n",
++             (UINT)mode.dmPelsWidth, (UINT)mode.dmPelsHeight, (UINT)mode.dmDisplayFrequency, refresh ? refresh : "unset",
++             (int)getpid() );
+     return STATUS_SUCCESS;
+ }
+ 

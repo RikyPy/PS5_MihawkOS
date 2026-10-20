@@ -1,0 +1,117 @@
+{
+ "launch_readiness": {
+  "ready": true,
+  "seconds": 0.162,
+  "settle_seconds": 0.0,
+  "census_seconds": 0.146,
+  "previous_cleanup_verified": true
+ },
+ "run": "mihawk-environment-gate-2026-10-09-03-large-shared-section",
+ "what": "section-view-probe.exe",
+ "env": [
+  "PROTON_LAYOUT=launcher"
+ ],
+ "result": "finished",
+ "seconds": 10.6,
+ "probe_verdict": "PASS",
+ "clean_owner_restart": true,
+ "launcher_end_status": 0,
+ "initial_status": 0,
+ "closed_on_request": false,
+ "child_logs": [
+  "klog/mihawk-environment-gate-2026-10-09-03-large-shared-section-wine-child-3645.log",
+  "klog/mihawk-environment-gate-2026-10-09-03-large-shared-section-wine-child-3646.log",
+  "klog/mihawk-environment-gate-2026-10-09-03-large-shared-section-wine-child-3647.log",
+  "klog/mihawk-environment-gate-2026-10-09-03-large-shared-section-wine-child-3648.log",
+  "klog/mihawk-environment-gate-2026-10-09-03-large-shared-section-wine-child-3649.log",
+  "klog/mihawk-environment-gate-2026-10-09-03-large-shared-section-wine-child-3650.log",
+  "klog/mihawk-environment-gate-2026-10-09-03-large-shared-section-wine-child-3651.log",
+  "klog/mihawk-environment-gate-2026-10-09-03-large-shared-section-wine-child-3652.log",
+  "klog/mihawk-environment-gate-2026-10-09-03-large-shared-section-wine-child-3653.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": true,
+ "bench": {},
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   }
+  ],
+  "top": []
+ },
+ "shown": {
+  "frames": 0,
+  "per_10s": [],
+  "longest_gap_ms": 0
+ },
+ "broker": {
+  "local_offer": 8589934592,
+  "host_limit": 1073741824,
+  "refused": [],
+  "refused_count": 0,
+  "clients": [
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   }
+  ],
+  "wedged": false,
+  "failure_reasons": [],
+  "host_peak": 0,
+  "local_peak": 0
+ },
+ "cleanup_verified": true,
+ "hooks_removed": true
+}

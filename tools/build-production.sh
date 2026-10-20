@@ -1,0 +1,103 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Build everything the production install holds, from this checkout's pins:
+#
+#   the runtime and its helper modules   tools/build-wine-ps5.sh twice, from one patch series: with the pinned
+#                                        OpenGL SDK for the title (.deps/wine-ps5), without it for programs in
+#                                        helper processes (.deps/wine-gpu-broker; a helper cannot use the
+#                                        driver's system libraries)
+#   the GPU broker's Vulkan client       tools/link_gpu_client.sh (.deps/gpu-wsi-client), RADV for a helper
+#   the helper-process loader            tools/build-payload-loader.sh (a payload; stage-wine.py stages it)
+#   the title                            ps5/tools/build.sh, with the GPU broker (PS5_GPU_BROKER)
+#   Mesa's WGL over Zink                 tools/build-mesa-windows-zink.sh (.deps/mesa-foundation-wgl), OpenGL in helpers
+#   ...and its i686 build                tools/build-mesa-windows-zink-i686.sh, OpenGL for 32-bit programs
+#   VKD3D-Proton and the release DXVK    tools/extract-dxvk.py (.deps/dxvk-release), from the pinned GE-Proton archive
+#   the staged runtime and test prefix   tools/stage-wine.py (.deps/staged)
+#   the runtime's install pieces         tools/pack-runtime.py (dist/runtime, the manifest in the title folder)
+#
+# Then ps5/tools/deploy.sh puts the title folder on the console and tools/deploy-wine.py the runtime.
+#
+#   tools/build-production.sh [--jobs N]
+set -euo pipefail
+root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+jobs=12
+while [ $# -gt 0 ]; do
+    case $1 in
+    --jobs) jobs=$2; shift ;;
+    *) echo "usage: tools/build-production.sh [--jobs N]" >&2; exit 2 ;;
+    esac
+    shift
+done
+title=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["titleId"])' "$root/ps5/sce_sys/param.json")
+# The title starts the resident Lapy daemon itself when no daemon answers its /data request
+# (proton_data_grant), so the library is there on every launch: the pinned resident build ships in
+# the title folder. tools/build-lapy-validation.py --resident builds it (platform/lapy/README.md),
+# checked first, so a build that cannot ship stops before hours of building.
+daemon=$root/.deps/lapy-validation/source/build/owned_root_daemon-service-verified-client
+daemon_sha256=c9710b7addda8615c995113c5db3f32334a3cb5814ec8053391108da41621ab4
+python3 - "$daemon" "$daemon_sha256" "$title" <<'EOF'
+import hashlib, json, sys
+from pathlib import Path
+build, pinned, title = Path(sys.argv[1]), sys.argv[2], sys.argv[3]
+if not (build / 'manifest.json').is_file():
+    sys.exit('no resident Lapy daemon: run tools/fetch-all.sh')
+manifest = json.loads((build / 'manifest.json').read_text())
+actual = hashlib.sha256((build / 'lapy-root-daemon.elf').read_bytes()).hexdigest()
+if (actual != pinned or manifest['elf_sha256'] != pinned or manifest['mode'] != 'service'
+        or manifest['max_requests'] is not None or manifest['target_title'] != title):
+    sys.exit('the resident Lapy daemon is not the pinned build (tools/fetch-all.sh keeps one that is there): '
+             'rebuild it from the checkout with python3 tools/build-lapy-validation.py --resident '
+             '--sdk-zip .deps/ps5-payload-sdk-v0.40.zip (clang/LLD 23.1.1; README.md, Host tools)')
+EOF
+# PS5_Vulkan at the pinned revision, with its RADV release archive built there (tools/setup-pinned-radv.sh): the
+# sibling checkout's own working tree moves on by itself.
+vulkan=$(bash "$root/tools/setup-pinned-radv.sh")
+foundation=$root/.deps/prx-foundation
+sdk=$(bash "$root/ps5/tools/setup-sdk.sh")
+
+"$root/tools/build-wine-ps5.sh" --work "$root/.deps/wine-ps5" --prx-foundation "$foundation" --radv "$vulkan" --jobs "$jobs"
+"$root/tools/build-wine-ps5.sh" --work "$root/.deps/wine-gpu-broker" --no-opengl --prx-foundation "$foundation" \
+    --radv "$vulkan" --jobs "$jobs"
+cmp -s "$root/.deps/wine-ps5/source-stamp" "$root/.deps/wine-gpu-broker/source-stamp" ||
+    { echo "the two runtime builds are not from one patch series" >&2; exit 1; }
+
+bash "$root/tools/link_gpu_client.sh" "$vulkan" "$root/.deps/gpu-wsi-client" "$foundation/build/host/ps5-native-tool" \
+    "$sdk" 0 0 1
+
+bash "$root/tools/build-payload-loader.sh"
+bash "$root/tools/build-graphics-process-probe.sh"
+bash "$root/tools/build-wine-probe.sh"
+bash "$root/tools/build-mihawk-browser.sh"
+
+# A build folder configured before the broker was the default keeps it off in its cache. A fresh one is configured by
+# ps5/tools/build.sh (Ninja, the broker on by default): configuring it here first chose Makefiles, and build.sh's Ninja
+# then refused the folder (build-production-own-3, 2026-10-11).
+if [ -f "$root/build/ps5/build.ninja" ]; then
+    cmake -S "$root/ps5" -B "$root/build/ps5" -DPS5_GPU_BROKER=ON -DPS5_VULKAN_DIR="$vulkan" > /dev/null
+fi
+PS5_VULKAN_DIR="$vulkan" bash "$root/ps5/tools/build.sh"
+# The helper loader is the payload one (tools/build-payload-loader.sh, staged by stage-wine.py); the title folder
+# carries no other since the Sony-managed route was removed.
+rm -f "$root/dist/$title/wine-child.bin"
+
+cp "$daemon/lapy-root-daemon.elf" "$root/dist/$title/lapy-root-daemon.elf"
+# Mesa's WGL over Zink, OpenGL for programs in helper processes; stage-wine.py puts it in the runtime.
+bash "$root/tools/build-mesa-windows-zink.sh"
+bash "$root/tools/build-mesa-windows-zink-i686.sh"
+# The title's own licence and notices, and those of what eboot.bin links and the Lapy daemon (tools/stage-licences.py).
+# After Mesa's build: the title's Mesa licence is read from its source, which a fresh clone has only from then on.
+python3 "$root/tools/stage-licences.py" title "$root/dist/$title"
+python3 "$root/tools/build-dxvk.py" --jobs "$jobs"
+# VKD3D-Proton (d3d12) and the release DXVK, from the pinned GE-Proton archive (tools/fetch-all.sh fetches it).
+python3 "$root/tools/extract-dxvk.py"
+# Read-only harness adapter built from the production control parser.
+"${CC:-cc}" -std=gnu11 -O2 -Wall -Wextra -Werror -I"$root/src" \
+    "$root/tools/controls-id.c" "$root/src/pw_controls.c" -o "$root/.deps/controls-id"
+python3 "$root/tools/stage-wine.py"
+# The runtime this title was built with: the launcher compares the installed runtime's stamp with this copy.
+cp "$root/.deps/staged/runtime/ge11-7/runtime-stamp" "$root/dist/$title/runtime-stamp"
+# The runtime's pieces (dist/runtime) and their manifest, pinned in the title folder: what the title installs from.
+python3 "$root/tools/pack-runtime.py" --title "$root/dist/$title"
+# The source this build was made from, for the commit gate (tools/gate.py).
+python3 "$root/tools/gate.py" record
+echo "production build: dist/$title, dist/runtime, .deps/staged"

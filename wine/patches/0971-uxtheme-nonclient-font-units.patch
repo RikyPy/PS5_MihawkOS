@@ -1,0 +1,25 @@
+From: PS5_Proton
+Subject: [PATCH] uxtheme: convert theme nonclient font points to logical pixels
+
+The INI font parser returns point sizes. Applying that positive LOGFONT
+height leaves live system font caches using the cell height in pixels,
+while a registry reload converts it to a negative point-derived height.
+Use the same conversion as theme property fonts before setting unaware
+nonclient metrics. Caption, menu, dialog and icon fonts keep their sizes
+across live theme changes and relaunch. The appearance probe checks both
+architecture variants at the console target of 96 logical DPI.
+
+--- a/dlls/uxtheme/msstyles.c
++++ b/dlls/uxtheme/msstyles.c
+@@ -796,6 +796,11 @@
+     if (SUCCEEDED (MSSTYLES_GetFont (lpValue, lpValue + dwValueLen, &lpValue,
+         &font)))
+     {
++        /* Theme INI sizes are points, while LOGFONT passed to SPI is in
++         * logical pixels. Positive cached heights otherwise draw tiny fonts
++         * until registry reload converts them, changing appearance on restart.
++         * parse_apply_nonclient uses the 96-DPI unaware coordinate space. */
++        font.lfHeight = -MulDiv( font.lfHeight, USER_DEFAULT_SCREEN_DPI, 72 );
+         switch (iPropertyId)
+         {
+ 	  case TMT_CAPTIONFONT:

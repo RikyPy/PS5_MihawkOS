@@ -1,0 +1,13 @@
+{
+ "method": "Bounded read-only active FTP transfer through the known console service",
+ "passed": false,
+ "files_changed": false,
+ "firewall_changed": false,
+ "result": "No reachability verdict: the active FTP transfer and QUIT returned FTP 550 Bad file descriptor. The second port was not attempted.",
+ "ports_attempted": [
+  1749
+ ],
+ "ports_not_attempted": [
+  1750
+ ]
+}

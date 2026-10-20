@@ -1,0 +1,41 @@
+{
+  "run": "syscall-trace-host-entry-gate-2026-10-10-01",
+  "mode": "redirect",
+  "build": {
+    "sdk_revision": "611893fc25ef3e138f5bc2c90d829d8b58174cd2",
+    "source_sha256": "4192be6666aae4d2ed914b49caedb982e82ac9557c321c7a7e2a8ae43694e5ab",
+    "ptrace_adapter_sha256": "32e980c4d690dd0fc358153ec2c8c96ec0a46adbae662625a458d8ae7034f245",
+    "elf_sha256": "3870c3f5b944d320ea4e6cd2dd129b729524615a1c5ee592aea50d4529a50900",
+    "host_sha256": "4639b6f7aaea076315f668c2673d9a78e7a9d304fe38b6f5297e9f13b8590873"
+  },
+  "runner_sha256": "a5df5d5d6c2d205b0558b5386008e66e84b5317de41a44abd04611e9e05dcba1",
+  "question": "Can an owned payload stop native syscall entry, prevent the original pipe write and resume an owned dispatcher on the stopped thread?",
+  "production_changed": false,
+  "wine_integrated": false,
+  "title_launched": false,
+  "host_only": true,
+  "passed": true,
+  "host": {
+    "passed": true,
+    "tracee": [
+      "TRACE_READY pid=781802",
+      "TRACE_RESULT mode=redirect result=1349735538 dispatched=1 pipe_bytes=-1 empty=1 native_ok=1",
+      "TRACE_TRACEE PASS"
+    ],
+    "tracer": [
+      "TRACE_CAPABILITY attached=1 registers=1 register_bytes=216",
+      "TRACE_EVENT status=857f flags=1 tid=781802 signal=0 kind=1",
+      "TRACE_EVENT status=857f flags=2 tid=781802 signal=0 kind=2",
+      "TRACE_EVENT status=857f flags=1 tid=781802 signal=0 kind=1",
+      "TRACE_EVENT status=857f flags=2 tid=781802 signal=0 kind=2",
+      "TRACE_EVENT status=857f flags=1 tid=781802 signal=0 kind=1",
+      "TRACE_ENTRY owned=1 code=1 tid=781802",
+      "TRACE_EVENT status=57f flags=0 tid=781802 signal=5 kind=0",
+      "TRACE_STOP flags=0 kind=2 tid=781802 at_owned=0 result_matches=1",
+      "TRACE_EXIT replacement=getpid result_matches=1 method=owned-return-gate",
+      "TRACE_TRACER PASS mode=redirect stops=6 entries=3 exits=3 replaced=1 ms=8"
+    ],
+    "error": null
+  },
+  "seconds": 0.009
+}

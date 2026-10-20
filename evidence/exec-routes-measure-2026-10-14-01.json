@@ -1,0 +1,25 @@
+{
+ "run": "exec-routes-measure-2026-10-14-01",
+ "elf_sha256": "c1e76b19d8c9505d66c1bc25fce90fe41803be2666e2040bebc54bf6e6eb9beb",
+ "passed": true,
+ "lines": [
+  "--- exec2",
+  "PS5_PROTON_EXEC_GRANT type=jit create=0 alias=0 map=0 rw=0 errno=0",
+  "PS5_PROTON_EXEC_GRANT type=jit-rx query=0 prot=0x5",
+  "PS5_PROTON_EXEC_GRANT type=jit-rx used=ok",
+  "PS5_PROTON_EXEC_GRANT type=jit-placed map=0 errno=0 at_reserve=1",
+  "PS5_PROTON_EXEC_GRANT type=jit-placed query=0 prot=0x5",
+  "PS5_PROTON_EXEC_GRANT type=jit-placed used=ok",
+  "PS5_PROTON_EXEC_GRANT type=jit-alias-rx protection=5 rc=0 query=0 prot=0x1",
+  "PS5_PROTON_EXEC_GRANT type=jit-alias-rx used=skipped",
+  "PS5_PROTON_EXEC_GRANT type=credentials authid_self=0x480000001000000e authid_title=0x4801000000000013 caps_read=0 caps_differ=1",
+  "PS5_PROTON_EXEC_GRANT type=authid-direct-rx protection=5 rc=0 query=0 prot=0x1",
+  "PS5_PROTON_EXEC_GRANT type=authid-direct-rx set=0 restored=0 now=0x480000001000000e",
+  "PS5_PROTON_EXEC_GRANT type=authid-direct-rx used=skipped",
+  "PS5_PROTON_EXEC_GRANT type=caps-direct-rx protection=5 rc=0 query=0 prot=0x1",
+  "PS5_PROTON_EXEC_GRANT type=caps-direct-rx set=0 restored=0",
+  "PS5_PROTON_EXEC_GRANT type=caps-direct-rx used=skipped",
+  "PS5_PROTON_EXEC_GRANT DONE routes",
+  ""
+ ]
+}

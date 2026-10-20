@@ -1,0 +1,37 @@
+{
+  "battery": "mihawk-effects-tls-2026-10-10-02",
+  "expected_cases": [
+    "launcher-tls"
+  ],
+  "revision": "24c8923dfd15a5fc93cef4c4310be91511f551b8",
+  "dirty": true,
+  "cases": [
+    {
+      "case": "launcher-tls",
+      "run": "mihawk-effects-tls-2026-10-10-02-launcher-tls",
+      "runner_status": 0,
+      "seconds": 202.2,
+      "result": "finished",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "run_seconds": 147.4,
+      "launch_readiness": {
+        "ready": true,
+        "seconds": 0.175,
+        "settle_seconds": 0.0,
+        "census_seconds": 0.152,
+        "previous_cleanup_verified": true
+      },
+      "runner_overhead_seconds": 54.8,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 19,
+      "protocol_errors": 0
+    }
+  ],
+  "complete": true,
+  "seconds": 202.2,
+  "passed": true
+}

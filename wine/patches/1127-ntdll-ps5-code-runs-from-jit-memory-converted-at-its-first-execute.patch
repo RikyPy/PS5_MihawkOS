@@ -1,0 +1,190 @@
+From: PS5_Proton <local>
+Subject: [PATCH] ntdll: PS5: code runs from JIT memory, converted at its first execute
+
+A payload's kernel keeps execute only on JIT shared memory. On direct, flexible, file and granted memory
+sceKernelMprotect answers success and drops execute (0x1, 0x3), and execute asked at map time is dropped too; a JIT
+object mapped read-write takes RX (0x5) and RWX (0x7) by sceKernelMprotect, one call of about 32 us, and a live
+direct-memory mapping can be replaced by a JIT object with the same contents at the same address
+(exec-kernel-2026-10-14-01 to -03, K1-K8). Until now execute came from the payload SDK's kernel_mprotect, which
+writes the kernel's vm_map entry without its lock while other threads change the map; that write is gone.
+
+virtual_handle_fault, under the virtual mutex, now:
+(a) runs the instruction again when the host already allows the access Wine allows: the thread faulted while another
+    one changed the page (a conversion makes its pages read-only while it copies them). This replaces patch 0954's
+    wait before the lock, whose call and thread field are removed. Guard and write-watch pages never qualify, as
+    their own protection does not allow the access; the same fault twice in a row, with no conversion tried between,
+    on a page the host allows takes the upstream path (a pager error raises SIGBUS on a mapped page), so it cannot
+    loop, while a second race at the same address after another conversion still runs again;
+(b) on an execute fault Wine allows in a private or image view, converts the faulting host page and its neighbours
+    with the same host protection, within the view and a 64 KiB window, into one JIT object of exactly that size
+    (__wine_ps5_exec_convert, wine/ps5/pw_wine_dmem_ps5.c), and runs the instruction again, also when another piece
+    of the cluster failed after the faulting page's own became JIT memory (counted as convert_failed);
+(c) counts an execute fault Wine allows that is still an access violation (a section view, which must stay coherent
+    with its other views, or a failed conversion: __wine_ps5_exec_refused), one log line rate-limited.
+Wine's host-protection cache follows the kernel: a conversion records what the kernel now holds over the cluster, and a
+failed one records it as not known. Without that, a host page another thread had opened for a 4 KiB step (patch 1122,
+cached as RWX under forced execute) stayed cached as open after the conversion made it RX, the step's reopen was
+skipped as unchanged, and the store faulted forever. Later protection changes of a converted range are one
+sceKernelMprotect each through the dmem engine, so the 4 KiB write-tracking open and step of patches 1122 and 1123
+work on JIT pages as on direct ones; host pages with an executable page keep the upstream union, as before.
+
+Host: tests of this hook extracted from the patched virtual.c (grant retry, its bound and its reset by a conversion or
+another fault, guard and write-watch pages, read and write faults on code never converted, the cluster's window, view
+and protection limits, view kinds, forced execute, a failed conversion, one that failed beside a converted faulting
+page, the host-protection cache after both), gcc and clang with ASan and UBSan, every mutation tried caught.
+tests/vm-protect-probe.c cases E1-E7 pass on the pinned desktop Wine.
+Console: not run with this patch.
+---
+diff --git a/dlls/ntdll/unix/unix_private.h b/dlls/ntdll/unix/unix_private.h
+index ec79dd6..f8a3789 100644
+--- a/dlls/ntdll/unix/unix_private.h
++++ b/dlls/ntdll/unix/unix_private.h
+@@ -120,7 +120,7 @@ struct ntdll_thread_data
+ #ifdef __PROSPERO__
+     int                       ps5_terminating; /* 03e0 killed inside the Unix side: end at the boundary */
+     struct { ULONG_PTR address; ULONG64 generation; } ps5_section_retry;
+-    unsigned int              ps5_exec_seen;   /* executable protection changes finished at this thread's last retry */
++    struct { void *address; ULONG64 conversions; } ps5_granted; /* the fault last run again because the host allowed it */
+     void                     *ps5_step_page[2]; /* host pages opened for the instruction being stepped */
+     int                       ps5_step_tf;     /* the program had the trap flag set itself; 2 until the handler looks */
+ #endif
+diff --git a/dlls/ntdll/unix/virtual.c b/dlls/ntdll/unix/virtual.c
+index 4626be1..900d4a3 100644
+--- a/dlls/ntdll/unix/virtual.c
++++ b/dlls/ntdll/unix/virtual.c
+@@ -214,7 +214,9 @@ static BOOL host_prot_unchanged( const void *addr, size_t len, int prot )
+  * reserved areas comes from the console's direct memory instead of its
+  * ~440 MiB of flexible memory; every other call passes through. */
+ extern void *__wine_ps5_mmap( void *addr, size_t len, int prot, int flags, int fd, off_t off );
+-extern int __wine_ps5_exec_fault_retry( unsigned int *seen );
++extern int __wine_ps5_exec_convert( void *address, size_t bytes, int unix_prot );
++extern int __wine_ps5_host_allows( const void *address, int access );
++extern void __wine_ps5_exec_refused( const void *address );
+ extern int __wine_ps5_munmap( void *addr, size_t len );
+ extern int __wine_ps5_mprotect( void *addr, size_t len, int prot );
+ extern int __wine_ps5_dmem_region( void *base, size_t size );
+@@ -5726,6 +5728,88 @@ static NTSTATUS grow_thread_stack( char *page, struct thread_stack_info *stack_i
+ }
+ 
+ 
++#ifdef __PROSPERO__
++/* 64 KiB (docs/CONSOLE_QUEUE.md, "MihawkBrowser"): 256 KiB, the first guess, copied code that never ran, 55-73%
++ * of CEF 150's conversions. 16 KiB copied least but is not the default until a gate passes with it (its first stalled
++ * winedevice.exe's exit, gate-2026-10-16-browser-01: the race patch 1171 closes). A JIT object keeps every page until
++ * its last mapping goes, so a partial decommit keeps the cut pages (at most 4 host pages an object). */
++#define PS5_EXEC_CLUSTER (64 * 1024)
++
++/* Conversions tried, under the virtual mutex: each changes host protection, so a fault the host allows after one is a
++ * new race, not a loop. */
++static ULONG64 ps5_conversions;
++
++/* What Wine asked the host for: a page's own protection, or a host page's (get_host_page_unix_prot), with the execute
++ * mprotect_exec forces on readable memory. */
++static int ps5_page_prot( const void *addr )
++{
++    int prot = get_unix_prot( get_page_vprot( addr ) );
++    return force_exec_prot && (prot & PROT_READ) ? prot | PROT_EXEC : prot;
++}
++
++static int ps5_host_prot( const void *page )
++{
++    int prot = get_host_page_unix_prot( page, 0, 0 );
++    return force_exec_prot && (prot & PROT_READ) ? prot | PROT_EXEC : prot;
++}
++
++/***********************************************************************
++ *           ps5_fault_served
++ *
++ * In a payload the kernel gives execute only to JIT shared memory; direct, flexible and file memory keep the rest of
++ * their protection and silently lose execute (exec-kernel-2026-10-14). So an execute fault on code Wine allows is
++ * where the code becomes JIT memory: the faulting host page and its neighbours with the same protection, within one
++ * view and one PS5_EXEC_CLUSTER window, are copied into one JIT object (wine/ps5/pw_wine_dmem_ps5.c) and the
++ * instruction runs again. Private and image views only: a section view must stay coherent with its other views, and
++ * an execute fault there is refused and counted (virtual_handle_fault).
++ *
++ * First, a fault the host already allows runs again: the thread faulted while another one, holding the virtual
++ * mutex, changed the page (a conversion makes its pages read-only while it copies them). This replaces patch 0954's
++ * retry before the lock. Guard and write-watch pages never qualify, as their own protection does not allow the
++ * access. The same fault twice in a row, with no conversion between, on a page the host allows is neither run again nor
++ * converted: such a page can still fault (a pager error raises SIGBUS on a mapped page), and it takes the upstream path
++ * instead of looping. Called with the virtual mutex held.
++ */
++static BOOL ps5_fault_served( void *addr, char *page, ULONG_PTR err )
++{
++    struct ntdll_thread_data *data = ntdll_get_thread_data();
++    int access = err == EXCEPTION_EXECUTE_FAULT ? PROT_EXEC : err == EXCEPTION_WRITE_FAULT ? PROT_WRITE : PROT_READ;
++    int want = ps5_page_prot( addr ), prot, failed;
++    struct file_view *view;
++    char *start = page, *end = page + host_page_size, *low, *high;
++
++    if ((want & access) && __wine_ps5_host_allows( addr, access ))
++    {
++        BOOL again = data->ps5_granted.address == addr && data->ps5_granted.conversions == ps5_conversions;
++        data->ps5_granted.address = again ? NULL : addr;
++        data->ps5_granted.conversions = ps5_conversions;
++        return !again;
++    }
++    data->ps5_granted.address = NULL;
++
++    if (access != PROT_EXEC || !(want & PROT_EXEC) || !((prot = ps5_host_prot( page )) & PROT_EXEC)) return FALSE;
++    if (!(view = find_view( addr, 0 )) || !(is_view_valloc( view ) || (view->protect & SEC_IMAGE))) return FALSE;
++    low = ROUND_ADDR( page, PS5_EXEC_CLUSTER - 1 );
++    high = min( low + PS5_EXEC_CLUSTER, (char *)view->base + view->size );
++    low = max( low, (char *)view->base );
++    while (start - host_page_size >= low && ps5_host_prot( start - host_page_size ) == prot) start -= host_page_size;
++    while (end + host_page_size <= high && ps5_host_prot( end ) == prot) end += host_page_size;
++    failed = __wine_ps5_exec_convert( start, end - start, prot );
++    ps5_conversions++;
++    /* A host page another thread opened for a 4 KiB step (patch 1122) is cached as what that thread asked; the kernel
++     * now holds prot, or after a failure something not known, so the next change of it reaches the kernel. */
++    host_prot_record( start, end - start, failed ? 0 : prot | HOST_PROT_KNOWN );
++    if (!failed) return TRUE;
++    /* Another piece of the cluster failed after the faulting page's own became JIT memory: it runs, and the same fault
++     * again takes the upstream path. */
++    if (!__wine_ps5_host_allows( addr, PROT_EXEC )) return FALSE;
++    data->ps5_granted.address = addr;
++    data->ps5_granted.conversions = ps5_conversions;
++    return TRUE;
++}
++#endif
++
++
+ /***********************************************************************
+  *           virtual_handle_fault
+  */
+@@ -5737,17 +5821,16 @@ NTSTATUS virtual_handle_fault( EXCEPTION_RECORD *rec, void *stack )
+     char *page = ROUND_ADDR( addr, host_page_mask );
+     BYTE vprot;
+ 
+-#ifdef __PROSPERO__
+-    /* Executable protection is set in two calls on the console, between which the pages cannot be executed
+-     * (wine/ps5/pw_wine_dmem_ps5.c): a thread running code there waits for the change and runs the instruction
+-     * again. Before the lock, which the changing thread holds. */
+-    if (err == EXCEPTION_EXECUTE_FAULT &&
+-        __wine_ps5_exec_fault_retry( &ntdll_get_thread_data()->ps5_exec_seen ))
+-        return STATUS_SUCCESS;
+-#endif
+     mutex_lock( &virtual_mutex );  /* no need for signal masking inside signal handler */
+     vprot = get_host_page_vprot( page );
+     vm_stat_add( VM_STAT_FAULTS, 1 );
++#ifdef __PROSPERO__
++    if (ps5_fault_served( addr, page, err ))
++    {
++        ret = STATUS_SUCCESS;
++        goto done;
++    }
++#endif
+ 
+ #ifdef __APPLE__
+     /* Rosetta on Apple Silicon misreports certain write faults as read faults. */
+@@ -5845,6 +5928,10 @@ NTSTATUS virtual_handle_fault( EXCEPTION_RECORD *rec, void *stack )
+             ret = STATUS_SUCCESS;
+         }
+     }
++    /* Code Wine lets run that no conversion could make executable (a section view, or a failed conversion). */
++    if (ret == STATUS_ACCESS_VIOLATION && err == EXCEPTION_EXECUTE_FAULT && (ps5_page_prot( addr ) & PROT_EXEC))
++        __wine_ps5_exec_refused( addr );
++done:
+ #endif
+     fault_top_note( addr, err, get_page_vprot( addr ), vprot, ret, rec->ExceptionAddress );
+     mutex_unlock( &virtual_mutex );

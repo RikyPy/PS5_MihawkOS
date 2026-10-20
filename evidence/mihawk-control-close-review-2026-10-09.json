@@ -1,0 +1,58 @@
+{
+  "question": "Does releasing the owning control socket before native-absence polling remove the reproduced shell helper shutdown delay?",
+  "scope": "Focused console proof only; full build09 gate stopped at payload-eight after 50 passing cases because console services timed out.",
+  "before": [
+    {
+      "arch": 32,
+      "evidence": "evidence/mihawk-terminal-focus-2026-10-09-08-shell32.json",
+      "native_pid": 333,
+      "absence_wait_ms": 10010,
+      "terminal_observed_after_wait_ms": 0,
+      "final_flush_ms": 28,
+      "main_return_after_wait_ms": 49,
+      "passed": false
+    },
+    {
+      "arch": 64,
+      "evidence": "evidence/mihawk-terminal-focus-2026-10-09-08-shell64.json",
+      "native_pid": 357,
+      "absence_wait_ms": 10010,
+      "terminal_observed_after_wait_ms": 0,
+      "final_flush_ms": 17,
+      "main_return_after_wait_ms": 35,
+      "passed": false
+    }
+  ],
+  "after": [
+    {
+      "arch": 32,
+      "evidence": "evidence/mihawk-control-close-focus-2026-10-09-09-shell32.json",
+      "native_closes": 15,
+      "maximum_close_ms": 601,
+      "native_close_failures": [],
+      "passed": true,
+      "cleanup_verified": true
+    },
+    {
+      "arch": 64,
+      "evidence": "evidence/mihawk-control-close-focus-2026-10-09-09-shell64.json",
+      "native_closes": 15,
+      "maximum_close_ms": 600,
+      "native_close_failures": [],
+      "passed": true,
+      "cleanup_verified": true
+    }
+  ],
+  "host": {
+    "command": "bash tools/host-tests.sh payload_close",
+    "asan_ubsan": true,
+    "passed": true,
+    "checks": [
+      "close before absence poll",
+      "single descriptor owner",
+      "shutdown failure still releases endpoint",
+      "EPERM never proves absence"
+    ]
+  },
+  "explanation": "Both delayed helpers entered their terminal path when the owner finally closed its endpoint after timing out. Final log flush and main return followed within milliseconds. Consuming the endpoint before waiting removes that circular lifetime dependency; ESRCH remains required."
+}

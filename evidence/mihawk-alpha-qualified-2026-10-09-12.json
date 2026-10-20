@@ -1,0 +1,37 @@
+{
+  "gate": "mihawk-alpha-gate-2026-10-09-12",
+  "build_fingerprint": "fc1dc2db483b895d8325c826304065a1fc1f649aa71275646ee64cec237ab7b3",
+  "passed": true,
+  "cases": 59,
+  "seconds": 1893.9,
+  "fault_records": 0,
+  "process_protocol_errors": 0,
+  "native_close_failures": 0,
+  "recorded_native_closes": 591,
+  "maximum_native_close_ms": 305,
+  "composition": {
+    "architectures": [
+      "PE32",
+      "PE64"
+    ],
+    "checks_each": 55,
+    "pixel_captures_each": 14,
+    "scope": "shaped/layered top-level GDI surfaces with authoritative input coverage"
+  },
+  "appearance": {
+    "checks_each": 1037,
+    "scope": "current system brush during synchronous repaint and light/dark captures"
+  },
+  "lifecycle": [
+    "eight simultaneous Windows children and clean exits",
+    "descendants",
+    "graphics teardown",
+    "native absence while telemetry worker is held"
+  ],
+  "limits": [
+    "Layered GPU and child windows remain explicitly unsupported.",
+    "Blur, shadows, thumbnails, animation and full Windows 11 parity remain unqualified.",
+    "No captured kernel or scheduler stack proves the entire earlier console outage cause.",
+    "No new real-game compatibility run is claimed."
+  ]
+}

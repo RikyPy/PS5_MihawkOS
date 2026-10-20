@@ -1,0 +1,174 @@
+From: PS5_Proton <local>
+Subject: [PATCH] comctl32: list view infotips
+
+Wine's list view accepted LVS_EX_INFOTIP and never showed a tip: it added no tool to its tooltip and never sent
+LVN_GETINFOTIP. With LVS_EX_INFOTIP the list now
+- adds one tool to its tooltip, creating it then (TTS_ALWAYSTIP, since the desktop is seldom the active window, and
+  TTS_NOPREFIX, since file names keep their '&'): the whole list (TTF_IDISHWND), its text asked for
+  (LPSTR_TEXTCALLBACK);
+- relays the pointer to the tooltip and pops the tip when the item under the pointer changes, on a key, the wheel, the
+  pointer leaving and the focus going; the tooltip hides it on a press (patch 1210 keeps it hidden until another item);
+- answers TTN_GETDISPINFO with its owner's LVN_GETINFOTIP for that item (LVGIT_UNFOLDED, nothing to append), converted
+  for an ANSI owner; the tooltip's NF_QUERY is answered in Unicode whatever the owner's format.
+A tooltip the list made for its infotips is destroyed with the list.
+---
+diff --git a/dlls/comctl32/listview.c b/dlls/comctl32/listview.c
+--- a/dlls/comctl32/listview.c
++++ b/dlls/comctl32/listview.c
+@@ -232,6 +232,10 @@ typedef struct tagLISTVIEW_INFO
+ 
+   /* tooltips */
+   HWND hwndToolTip;
++  HWND hwndInfoTip;             /* LVS_EX_INFOTIP: the tooltip holding the infotip tool */
++  BOOL bInfoTipCreated;         /* ... which the list created */
++  INT nInfoTipItem;             /* ... the item under the pointer, whose tip it shows (-1: none) */
++  WCHAR szInfoTip[INFOTIPSIZE]; /* ... and that tip's text */
+ 
+   /* items */
+   INT nItemCount;		/* the number of items in the list */
+@@ -4906,6 +4910,99 @@ static void desktop_set_hot(LISTVIEW_INFO *infoPtr, const POINT *pt)
+     _TrackMouseEvent(&track);
+ }
+ 
++/* LVS_EX_INFOTIP: one tool, the whole list, whose tip is the item under the pointer's (LVN_GETINFOTIP). The list
++ * relays the pointer to the tooltip and pops the tip when that item changes, a key is pressed or the wheel turns; the
++ * tooltip hides it on a press. */
++static void infotip_add_tool(LISTVIEW_INFO *infoPtr)
++{
++    TTTOOLINFOW tool = { sizeof(tool), TTF_IDISHWND, infoPtr->hwndSelf, (UINT_PTR)infoPtr->hwndSelf };
++
++    if (infoPtr->hwndInfoTip) return;
++    if (!infoPtr->hwndToolTip)
++    {
++        infoPtr->hwndToolTip = COMCTL32_CreateToolTip(infoPtr->hwndSelf);
++        infoPtr->bInfoTipCreated = infoPtr->hwndToolTip != NULL;
++    }
++    if (!infoPtr->hwndToolTip) return;
++    /* a tip for an inactive list too (the desktop), and file names keep their '&' */
++    SetWindowLongW(infoPtr->hwndToolTip, GWL_STYLE,
++                   GetWindowLongW(infoPtr->hwndToolTip, GWL_STYLE) | TTS_ALWAYSTIP | TTS_NOPREFIX);
++    tool.lpszText = LPSTR_TEXTCALLBACKW;
++    if (!SendMessageW(infoPtr->hwndToolTip, TTM_ADDTOOLW, 0, (LPARAM)&tool)) return;
++    infoPtr->hwndInfoTip = infoPtr->hwndToolTip;
++    infoPtr->nInfoTipItem = -1;
++}
++
++static void infotip_relay(LISTVIEW_INFO *infoPtr, UINT msg, WPARAM wParam, LPARAM lParam)
++{
++    MSG relay = { infoPtr->hwndSelf, msg, wParam, lParam };
++    LVHITTESTINFO ht;
++    INT item = -1;
++
++    if (!(infoPtr->dwLvExStyle & LVS_EX_INFOTIP) || !infoPtr->hwndInfoTip) return;
++    switch (msg)
++    {
++    case WM_MOUSEMOVE:
++        ht.pt.x = (short)LOWORD(lParam);
++        ht.pt.y = (short)HIWORD(lParam);
++        item = LISTVIEW_HitTest(infoPtr, &ht, FALSE, FALSE);
++        break;
++    case WM_LBUTTONDOWN: case WM_LBUTTONUP: case WM_MBUTTONDOWN: case WM_MBUTTONUP: case WM_RBUTTONDOWN: case WM_RBUTTONUP:
++        SendMessageW(infoPtr->hwndInfoTip, TTM_RELAYEVENT, 0, (LPARAM)&relay);
++        return;
++    case WM_KEYDOWN: case WM_SYSKEYDOWN: case WM_MOUSEWHEEL: case WM_MOUSELEAVE: case WM_KILLFOCUS:
++        break;
++    default:
++        return;
++    }
++    if (item != infoPtr->nInfoTipItem || msg != WM_MOUSEMOVE)
++    {
++        infoPtr->nInfoTipItem = item;
++        SendMessageW(infoPtr->hwndInfoTip, TTM_POP, 0, 0);
++    }
++    if (item >= 0) SendMessageW(infoPtr->hwndInfoTip, TTM_RELAYEVENT, 0, (LPARAM)&relay);
++}
++
++#ifndef LVGIT_UNFOLDED
++#define LVGIT_UNFOLDED 0x0001  /* commctrl.h: the item's label is shown whole, so the owner's tip has nothing to add to */
++#endif
++
++/* The tooltip asks for the tip: the list asks its owner for the item's (LVN_GETINFOTIP, with nothing to append since
++ * the label is shown). */
++static LRESULT infotip_get_text(LISTVIEW_INFO *infoPtr, NMTTDISPINFOW *disp)
++{
++    NMLVGETINFOTIPW tip = { { 0 } };
++    LVITEMW item = { LVIF_PARAM };
++
++    infoPtr->szInfoTip[0] = 0;
++    item.iItem = infoPtr->nInfoTipItem;
++    if (item.iItem >= 0 && item.iItem < infoPtr->nItemCount && LISTVIEW_GetItemW(infoPtr, &item))
++    {
++        tip.dwFlags = LVGIT_UNFOLDED;
++        tip.iItem = item.iItem;
++        tip.lParam = item.lParam;
++        if (infoPtr->notifyFormat == NFR_ANSI)
++        {
++            char text[INFOTIPSIZE] = "";
++
++            tip.pszText = (WCHAR *)text;
++            tip.cchTextMax = sizeof(text);
++            notify_hdr(infoPtr, LVN_GETINFOTIPA, &tip.hdr);
++            text[sizeof(text) - 1] = 0;
++            MultiByteToWideChar(CP_ACP, 0, text, -1, infoPtr->szInfoTip, INFOTIPSIZE);
++        }
++        else
++        {
++            tip.pszText = infoPtr->szInfoTip;
++            tip.cchTextMax = INFOTIPSIZE;
++            notify_hdr(infoPtr, LVN_GETINFOTIPW, &tip.hdr);
++            infoPtr->szInfoTip[INFOTIPSIZE - 1] = 0;
++        }
++    }
++    disp->lpszText = infoPtr->szInfoTip;
++    return 0;
++}
++
+ /* The soft shadow under a desktop label whose characters the prototype's glyphs lack: the text is drawn white on black in a bitmap, the
+  * coverage is blurred twice with a three-pixel box, and the result is blended in black one pixel down and to the right of the text. */
+ static void draw_label_shadow(HDC hdc, const WCHAR *text, const RECT *label, UINT format)
+@@ -8946,6 +9043,9 @@ static DWORD LISTVIEW_SetExtendedListViewStyle(LISTVIEW_INFO *infoPtr, DWORD mas
+             LISTVIEW_SetBkColor(infoPtr, CLR_NONE);
+     }
+ 
++    if (infoPtr->dwLvExStyle & LVS_EX_INFOTIP)
++        infotip_add_tool(infoPtr);
++
+     if((infoPtr->dwLvExStyle ^ old_ex_style) & LVS_EX_HEADERINALLVIEWS)
+     {
+         if (infoPtr->dwLvExStyle & LVS_EX_HEADERINALLVIEWS)
+@@ -9933,6 +10033,8 @@ static LRESULT LISTVIEW_Destroy(LISTVIEW_INFO *infoPtr)
+ {
+     COMCTL32_CloseThemeForWindow(infoPtr->hwndSelf);
+ 
++    if (infoPtr->bInfoTipCreated && infoPtr->hwndToolTip == infoPtr->hwndInfoTip) DestroyWindow(infoPtr->hwndInfoTip);
++
+     /* delete all items */
+     LISTVIEW_DeleteAllItems(infoPtr, TRUE);
+ 
+@@ -10778,6 +10880,8 @@ static LRESULT LISTVIEW_Notify(LISTVIEW_INFO *infoPtr, NMHDR *lpnmhdr)
+     
+     TRACE("(lpnmhdr=%p)\n", lpnmhdr);
+ 
++    if (lpnmhdr && infoPtr->hwndInfoTip && lpnmhdr->hwndFrom == infoPtr->hwndInfoTip && lpnmhdr->code == TTN_GETDISPINFOW)
++        return infotip_get_text(infoPtr, (NMTTDISPINFOW *)lpnmhdr);
+     if (!lpnmhdr || lpnmhdr->hwndFrom != infoPtr->hwndHeader) return 0;
+ 
+     /* remember: HDN_LAST < HDN_FIRST */
+@@ -11004,6 +11108,8 @@ static LRESULT LISTVIEW_NotifyFormat(LISTVIEW_INFO *infoPtr, HWND hwndFrom, INT
+ {
+     TRACE("(hwndFrom=%p, nCommand=%d)\n", hwndFrom, nCommand);
+ 
++    /* the infotip's tooltip asks the list, which answers it in Unicode whatever its owner's format */
++    if (hwndFrom && hwndFrom == infoPtr->hwndToolTip && nCommand == NF_QUERY) return NFR_UNICODE;
+     if (nCommand == NF_REQUERY)
+         infoPtr->notifyFormat = SendMessageW(infoPtr->hwndNotify, WM_NOTIFYFORMAT, (WPARAM)infoPtr->hwndSelf, NF_QUERY);
+ 
+@@ -11664,6 +11770,8 @@ LISTVIEW_WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+   if (!infoPtr && (uMsg != WM_NCCREATE))
+     return DefWindowProcW(hwnd, uMsg, wParam, lParam);
+ 
++  if (infoPtr) infotip_relay(infoPtr, uMsg, wParam, lParam);
++
+   switch (uMsg)
+   {
+   case LVM_APPROXIMATEVIEWRECT:

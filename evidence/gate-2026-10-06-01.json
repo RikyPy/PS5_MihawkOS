@@ -1,0 +1,83 @@
+{
+  "battery": "gate-2026-10-06-01",
+  "revision": "fe0d6141e1f53b89f946bf1bd58ccc5d18b53aa8",
+  "dirty": false,
+  "cases": [
+    {
+      "case": "pe64",
+      "run": "gate-2026-10-06-01-pe64",
+      "runner_status": 0,
+      "seconds": 7.5,
+      "result": "finished",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 2,
+      "protocol_errors": 0
+    },
+    {
+      "case": "payload-eight",
+      "run": "gate-2026-10-06-01-payload-eight",
+      "runner_status": 0,
+      "seconds": 68.5,
+      "result": "finished",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 10,
+      "protocol_errors": 0
+    },
+    {
+      "case": "descendants",
+      "run": "gate-2026-10-06-01-descendants",
+      "runner_status": 0,
+      "seconds": 52.4,
+      "result": "finished",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 5,
+      "protocol_errors": 0
+    },
+    {
+      "case": "launcher-render",
+      "run": "gate-2026-10-06-01-launcher-render",
+      "runner_status": 0,
+      "seconds": 63.0,
+      "result": "finished",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 6,
+      "protocol_errors": 0
+    },
+    {
+      "case": "launcher-tls",
+      "run": "gate-2026-10-06-01-launcher-tls",
+      "runner_status": 0,
+      "seconds": 58.0,
+      "result": "finished",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 2,
+      "protocol_errors": 0
+    }
+  ],
+  "passed": true
+}

@@ -1,0 +1,41 @@
+{
+ "run": "m0-fsalias-2026-10-07-01",
+ "elf_sha256": "f7dc25f0709746a87ca9feab8b75b1bac324c3f811bdf4575e3e4644c4c72e30",
+ "process": "payload through websrv/elfldr, no title running",
+ "modes": {
+  "fsalias": {
+   "lines": [
+    "M0 start mode=fsalias",
+    "M0 low_page at=10000000",
+    "M0 fsalias host=0x8ff800080 alias=0xff800080 mapped=ff800000"
+   ],
+   "ended": false
+  },
+  "tcbs": {
+   "lines": [
+    "M0 start mode=tcbs",
+    "M0 low_page at=10000000",
+    "M0 tcbs main=0x8ff800080 threads=16 lowest=0x8ff804080 highest=0x8ff840080 stride_min=0x4000 stride_max=0x4000",
+    "M0 tcbs thread=0 fsbase=0x8ff804080",
+    "M0 tcbs thread=1 fsbase=0x8ff808080",
+    "M0 tcbs thread=2 fsbase=0x8ff80c080",
+    "M0 tcbs thread=3 fsbase=0x8ff810080",
+    "M0 tcbs thread=4 fsbase=0x8ff814080",
+    "M0 tcbs thread=5 fsbase=0x8ff818080",
+    "M0 tcbs thread=6 fsbase=0x8ff81c080",
+    "M0 tcbs thread=7 fsbase=0x8ff820080",
+    "M0 tcbs thread=8 fsbase=0x8ff824080",
+    "M0 tcbs thread=9 fsbase=0x8ff828080",
+    "M0 tcbs thread=10 fsbase=0x8ff82c080",
+    "M0 tcbs thread=11 fsbase=0x8ff830080",
+    "M0 tcbs thread=12 fsbase=0x8ff834080",
+    "M0 tcbs thread=13 fsbase=0x8ff838080",
+    "M0 tcbs thread=14 fsbase=0x8ff83c080",
+    "M0 tcbs thread=15 fsbase=0x8ff840080",
+    "M0 tcbs joined",
+    "M0 end"
+   ],
+   "ended": true
+  }
+ }
+}

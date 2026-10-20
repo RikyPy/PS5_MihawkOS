@@ -1,0 +1,37 @@
+{
+  "battery": "v13-track-2026-10-15-b",
+  "expected_cases": [
+    "large-shared-section"
+  ],
+  "revision": "f3aa632b4a344d3e169a02d63e1895e648bea57e",
+  "dirty": true,
+  "cases": [
+    {
+      "case": "large-shared-section",
+      "run": "v13-track-2026-10-15-b-large-shared-section",
+      "runner_status": 0,
+      "seconds": 87.1,
+      "result": "finished",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "run_seconds": 36.1,
+      "launch_readiness": {
+        "ready": true,
+        "seconds": 0.139,
+        "settle_seconds": 0.0,
+        "census_seconds": 0.127,
+        "previous_cleanup_verified": false
+      },
+      "runner_overhead_seconds": 51.0,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 8,
+      "protocol_errors": 0
+    }
+  ],
+  "complete": true,
+  "seconds": 87.1,
+  "passed": true
+}

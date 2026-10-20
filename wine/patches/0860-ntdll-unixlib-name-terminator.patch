@@ -1,0 +1,27 @@
+From 52ccd68c1bec86a856195693f0230cb921f045e3 Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Fri, 2 Oct 2026 21:05:25 -0400
+Subject: [PATCH] ntdll: retain the last character of extensionless Unix
+ library names
+
+load_unixlib_by_name decrements pos to prepend a slash. Its extension pointer must still address the original terminator, otherwise xinput1_3 becomes xinput1_.so and the PS5 controller bridge never loads.
+---
+ dlls/ntdll/unix/loader.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/dlls/ntdll/unix/loader.c b/dlls/ntdll/unix/loader.c
+index eb8516c..c836516 100644
+--- a/dlls/ntdll/unix/loader.c
++++ b/dlls/ntdll/unix/loader.c
+@@ -1845,7 +1845,7 @@ NTSTATUS load_unixlib_by_name( const UNICODE_STRING *nt_name, void **handle_ret
+     }
+     file[pos + len] = 0;
+     file[--pos] = '/';
+-    if (!ext) ext = file + pos + len;
++    if (!ext) ext = file + pos + len + 1; /* pos now includes the leading slash */
+ 
+     if (build_dir)
+     {
+-- 
+2.56.0
+

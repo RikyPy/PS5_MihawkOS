@@ -1,0 +1,66 @@
+{
+  "run": "mihawk-alpha-gate-2026-10-09-09",
+  "build_fingerprint": "de8a0fff128f3c50446eacfe0c8037b6da5abd656b66efb90a822d297a2caae8",
+  "passed": false,
+  "scope": "Saved-log review only; no console access or new launch during this review.",
+  "battery": {
+    "passed_cases": 50,
+    "attempted_cases": 51,
+    "expected_cases": 59,
+    "seconds": 1785.0,
+    "stopped_after": "payload-eight"
+  },
+  "observed": {
+    "ready_native_pids": [
+      1439,
+      1440,
+      1441,
+      1442,
+      1443,
+      1444,
+      1445,
+      1446,
+      1447,
+      1448,
+      1449,
+      1450,
+      1451,
+      1452,
+      1453,
+      1454
+    ],
+    "probe_child_pids": [
+      1447,
+      1448,
+      1449,
+      1450,
+      1451,
+      1452,
+      1453,
+      1454
+    ],
+    "last_event": "broker requester=1439 child=1454 status=0",
+    "probe_verdict_captured": false,
+    "cleanup_verified": false,
+    "control_service": "timed out",
+    "post_run_process_query": "timed out",
+    "post_run_klog_bytes": 0,
+    "captured_fatal_or_gpu_records": 0,
+    "last_direct_memory_free_mib": 11072,
+    "last_flexible_memory_free_mib": 956,
+    "last_descriptor_count": 444,
+    "descriptor_limit": 12555
+  },
+  "limits": [
+    "Native READY is not proof that all eight Windows children reached their semaphore or exited.",
+    "The user confirms a console crash; no kernel panic record or specific crash cause was captured.",
+    "The last resource sample does not demonstrate exhaustion; it cannot exclude a later fault.",
+    "No helper file logs were retrieved before the outage; only the saved klog is available."
+  ],
+  "next": [
+    "Wait for fresh full reboot confirmation since this outage; leave drop guard active.",
+    "After restored services, preserve the failed session helper logs over existing FTP before another launch overwrites them.",
+    "Use those logs to select focused instrumentation/testing of the eight-child lifecycle before another full gate."
+  ],
+  "user_observation": "User subsequently reported: Console crashed."
+}

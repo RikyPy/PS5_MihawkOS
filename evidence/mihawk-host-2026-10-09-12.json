@@ -1,0 +1,17 @@
+{
+ "passed": true,
+ "suites": 41,
+ "sanitizers": [
+  "address",
+  "undefined",
+  "leak"
+ ],
+ "log": "klog/mihawk-host-2026-10-09-12-untraced.log",
+ "appearance_verdict_host_tests": 7,
+ "battery_runner_host_tests": 5,
+ "earlier_attempt": {
+  "passed": false,
+  "reason": "LeakSanitizer cannot run under sandbox ptrace; rerun untraced without changing source or sanitizer options",
+  "log": "klog/mihawk-host-2026-10-09-12.log"
+ }
+}

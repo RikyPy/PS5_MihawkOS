@@ -1,0 +1,76 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Subject: [PATCH] winedmo: Count demuxer opens, seeks and byte stream reads for
+ the PS5 helper's telemetry.
+
+A Direct3D 12 game's first scene read about 160 MiB with a ~690 ms hitch every
+~20 s (2026-10-17, record removed from the tree; in git history), and no record said whether Media Foundation
+was reopening or re-reading a looping video each time. Every MF media
+source, DirectShow parser and WM reader reads its file through a winedmo
+demuxer, so the Unix side counts, on the PS5 only, into the helper's runtime
+counters (pw_wine_perf_media, logged every 10 s): demuxers opened, seeks by
+time and those to time 0, byte stream repositions to offset 0, and the
+reads from the byte stream with the bytes they returned. Relaxed atomic adds,
+no logging.
+---
+diff --git a/dlls/winedmo/unix_demuxer.c b/dlls/winedmo/unix_demuxer.c
+index 606e484..602e247 100644
+--- a/dlls/winedmo/unix_demuxer.c
++++ b/dlls/winedmo/unix_demuxer.c
+@@ -937,6 +937,7 @@ NTSTATUS demuxer_create( void *arg )
+     }
+ 
+     if (!demuxer->direct_url && strstr( format->name, "mp4" )) parse_mp4_streams_metadata( demuxer );
++    winedmo_count( OPENS, 1 );
+     return STATUS_SUCCESS;
+ 
+ failed:
+@@ -1108,6 +1109,8 @@ NTSTATUS demuxer_seek( void *arg )
+     int i, ret;
+ 
+     TRACE( "demuxer %p, timestamp 0x%s\n", demuxer, wine_dbgstr_longlong( params->timestamp ) );
++    winedmo_count( SEEKS, 1 );
++    if (!params->timestamp) winedmo_count( SEEKS_TO_START, 1 );
+ 
+     if (demuxer->nonseekable)
+     {
+diff --git a/dlls/winedmo/unix_private.h b/dlls/winedmo/unix_private.h
+index 8dee70b..a174919 100644
+--- a/dlls/winedmo/unix_private.h
++++ b/dlls/winedmo/unix_private.h
+@@ -43,6 +43,14 @@ typedef struct AVRational AVRational;
+ #include "unixlib.h"
+ #include "wine/debug.h"
+ 
++#ifdef __PROSPERO__
++/* The PS5 helper's media counters (PS5_Proton wine/ps5/pw_wine_perf.h), in its 10 s telemetry. */
++#include "pw_wine_perf.h"
++#define winedmo_count( what, value ) pw_wine_perf_media( PW_PERF_MEDIA_##what, (value) )
++#else
++#define winedmo_count( what, value ) do {} while (0)
++#endif
++
+ /* media-converter/demuxer.c */
+ extern void mediaconv_demuxer_init(void);
+ extern void mediaconv_demuxer_exit(void);
+diff --git a/dlls/winedmo/unixlib.c b/dlls/winedmo/unixlib.c
+index 29dfba7..cd87c2a 100644
+--- a/dlls/winedmo/unixlib.c
++++ b/dlls/winedmo/unixlib.c
+@@ -49,6 +49,7 @@ int64_t unix_seek_callback( void *opaque, int64_t offset, int whence )
+ 
+     if (offset / context->capacity != context->position / context->capacity)
+     {
++        if (offset < context->capacity) winedmo_count( REWINDS, 1 );
+         for (;;)
+         {
+             /* seek stream to multiples of buffer capacity */
+@@ -76,6 +77,8 @@ static int stream_context_read( struct stream_context *context )
+     status = KeUserDispatchCallback( &params.dispatch, sizeof(params), &ret_ptr, &ret_len );
+     if (status || ret_len != sizeof(ULONG)) return AVERROR( EINVAL );
+     context->size = *(ULONG *)ret_ptr;
++    winedmo_count( READS, 1 );
++    winedmo_count( BYTES, context->size );
+     return 0;
+ }
+ 

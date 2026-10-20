@@ -1,0 +1,151 @@
+{
+  "case": "descendants",
+  "loader": {
+    "sdk_revision": "611893fc25ef3e138f5bc2c90d829d8b58174cd2",
+    "converter_revision": "ab37acd506305ba3e575435e3ae9a351cfaf7cf4",
+    "converter_sha256": "614377a0e37006e1454c67f228fc370a2f785c060205cb9f0264f27af04b5f18",
+    "recipe_sha256": "014b5334a5516d2240ff6e0c7b794635c5a4868b199d0d0201f02eb7ee6870d7",
+    "sources": {
+      "native/proton_wine_child.c": "d90f813dfcd1a12444778db1206424340de61ffb64121c2eefeeb3ff80c8e37c",
+      "src/pw_wine_start.c": "52bdf039228ca13e9931fc7f7097b196ece76868990b6ea44588990714bf22e2",
+      "wine/ps5/pw_wine_prx.c": "67b8393fca62a72a7aaf53a409c9a34684dd7704037bf194066e5173808c16a2",
+      "wine/ps5/pw_wine_process_io.c": "dd3ccac3b63058aaf743146fbf5791217ec9b6451ad0dc4c61dcbbad7abbd6c5",
+      "wine/ps5/pw_wine_process.h": "6a94782704d6b2edd588221f17fe902e6d07cba5382a898574a9e1ab288e807e",
+      "wine/ps5/pw_wine_process_io.h": "c375a67872391d47ef20cb7bc0001b66655aa29c44c446af31102c0fe5f937a7",
+      "src/pw_wine_start.h": "f450215176a5bf7b898728ab0a84cbd6b8a3bfd497a4996ee4f590aab95c6ed7",
+      "wine/ps5/pw_wine_prx.h": "82e4cf6b56377bb3ca9e007bd78a3302633fa8675e77d5b507823829959f9bb0"
+    },
+    "preload_mask": "0x8000000000000002",
+    "gpu_preflight": false,
+    "gpu_device_query": false,
+    "ps5-pie.ld": "fbc52518761b58b703a2225c847c5f44a81523cd0e751755adf890ae0f0dd74c",
+    "app-symbols.map": "470ce72a27a7be8e35dd7a25b485faa733d61570bdaf24d3c75bb4e3e3c63cf7",
+    "identity": "03362814e5e65dd93907e85d47bcf8913e59dc689faf8ab94d4600cc959bc2af",
+    "sha256": "1bd75e1ffedbfeec17c6ab07becc58af2b777c44d4749437e7e358844d5b56e4"
+  },
+  "runtime": {
+    "ntdll": "7849d8991b908ae871d62e45a56c9bd935859534899142d89ea4de0d58fcacc6",
+    "wineserver": "9dc0637c4ba021ecacd43fc1f299c9842846f41d661bb6386e7b1dfbb7b3471d"
+  },
+  "passed": true,
+  "production_restored": true,
+  "helper_removed": true,
+  "status": "complete",
+  "deployed_modules": [
+    "ntdll",
+    "wineserver"
+  ],
+  "helper_uploaded": true,
+  "probe_uploaded": true,
+  "deployment_verified": true,
+  "probe_sha256": "3e97bbaaea32a076c952e380a19f9e4e4cd96a0fd040f901d82df809b648b81a",
+  "descendant_patch_sha256": "57fb947935f4178616a4ce3faeb753acd370fa737d691a86bf73d18c0322713f",
+  "patch_sha256": "2767c06d7ca2d2355275e644fe22f0045b713e90ab5f7946da7c3b22af5712a1",
+  "adapter_sha256": {
+    "pw_wine_process.c": "ee833438146acfb386293a256cd9c45a95eb52872aa32db4e119faa03d1e4ea9",
+    "pw_wine_process.h": "6a94782704d6b2edd588221f17fe902e6d07cba5382a898574a9e1ab288e807e",
+    "pw_wine_threads.c": "9fb82ed67f775782a8ec9d9d0dbaf0837adb004cc1241ceebf6f58e60bbe38a0",
+    "pw_wine_threads.h": "a28177375ad16666504b3d05cb285c8f23634b800c2e4bd9b3c20ead21722d30",
+    "pw_wine_process_io.c": "dd3ccac3b63058aaf743146fbf5791217ec9b6451ad0dc4c61dcbbad7abbd6c5",
+    "pw_wine_process_io.h": "c375a67872391d47ef20cb7bc0001b66655aa29c44c446af31102c0fe5f937a7"
+  },
+  "runner_status": 0,
+  "post_launch_fault_records": 0,
+  "native_descriptor_samples": [
+    {
+      "stage": "before_spawn",
+      "count": 41,
+      "limit": 12555
+    },
+    {
+      "stage": "before_spawn",
+      "count": 100,
+      "limit": 12555
+    },
+    {
+      "stage": "closed",
+      "count": 101,
+      "limit": 12555
+    },
+    {
+      "stage": "before_spawn",
+      "count": 109,
+      "limit": 12555
+    },
+    {
+      "stage": "before_spawn",
+      "count": 118,
+      "limit": 12555
+    },
+    {
+      "stage": "closed",
+      "count": 73,
+      "limit": 12555
+    },
+    {
+      "stage": "closed",
+      "count": 73,
+      "limit": 12555
+    },
+    {
+      "stage": "closed",
+      "count": 73,
+      "limit": 12555
+    },
+    {
+      "stage": "all_children_closed",
+      "count": 73,
+      "limit": 12555
+    }
+  ],
+  "windows_handle_samples": [
+    {
+      "before": 12,
+      "after": 12
+    }
+  ],
+  "native_children": [
+    {
+      "pid": 914,
+      "service_id": 503416161
+    },
+    {
+      "pid": 917,
+      "service_id": 503416177
+    },
+    {
+      "pid": 920,
+      "service_id": 503416194
+    },
+    {
+      "pid": 923,
+      "service_id": 503416211
+    }
+  ],
+  "native_child_deletions": [
+    914,
+    917,
+    920,
+    923
+  ],
+  "child_logs": [
+    "wine-child-914.log",
+    "wine-child-917.log",
+    "wine-child-920.log",
+    "wine-child-923.log"
+  ],
+  "descendant_node_verdicts": 3,
+  "broker_spawns": [
+    {
+      "requester": 917,
+      "child": 920,
+      "status": 0
+    },
+    {
+      "requester": 920,
+      "child": 923,
+      "status": 0
+    }
+  ],
+  "probe_removed": true
+}

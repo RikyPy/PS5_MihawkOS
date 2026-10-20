@@ -1,0 +1,50 @@
+{
+  "title": "PPSA99170",
+  "identity": "c6698d185c4a46768a27b351fe1ec282",
+  "kind": "service-preflight",
+  "build": {
+    "revision": "f7f3b2d21944dc004ef6ec20468a6e71cfecf921",
+    "kind": "service-preflight",
+    "sdk_revision": "611893fc25ef3e138f5bc2c90d829d8b58174cd2",
+    "source_sha256": {
+      "ps5/src/main.cpp": "aadfdeb135b0268e2bc5abb2ace1aa99adc46eae9ae1abf4c9d8f6b867d8dc2b",
+      "ps5/CMakeLists.txt": "ff82f24b44bbfdc6816fd710f8df003d7d7e3fac65d772ea448ac737acef4fcd",
+      "native/proton_service_preflight.h": "f2baf9215f73d5460486c196ebb822a50a52f80a4b9ca44c948f7d66f9446b69",
+      "native/proton_service_preflight.cpp": "4a592776ef9e71a58b3f97343aea1addc12617a3e58431cf951ad22e9216ef44"
+    },
+    "radv_recipe_sha256": "bcb92ff14ae32fbee7991399a7b79c065c78bda3162c76d41c49d170a46b4022",
+    "identity": "966235e7b71b14db07a6862b6fffce69da240d4644e74f3b67150d68d858ac27",
+    "eboot_sha256": "8c7d065414a0bab1c6457e6e1981dee5b2d145940e5bf077a5224a4e529f6910"
+  },
+  "capture": "klog/service-preflight-01",
+  "passed": true,
+  "status": "complete",
+  "production_sha256": "8f63bbc57bd9203520653d9e3eb765798a434b737ac6c1f79b106437542761c3",
+  "production_restored": true,
+  "root_reference_balance_verified": false,
+  "forced_title_close": false,
+  "installed_readback_sha256": "d3d7cb497833ebb57876fe4465257217608ac9765f9a360a3ca0e658b845f325",
+  "production_executable_sha256": "bc5c7a75f249a59e7bce80218c6e749b9ea2f426e9bec4c96939ce7f75ceb17d",
+  "probe_readback_sha256": "f601c3d23596bb94dfddd9ec2878108bd50ed443418b29dd71ee2bdf06a2303c",
+  "probe_executable_sha256": "e333816903ca30db40c147a8c68df9df7169da7654e609faac91be7b93dc12ca",
+  "shell_idle_after_run": true,
+  "post_launch_fault_records": 0,
+  "parent_shell_exit_seen": true,
+  "observations": [
+    "service-preflight identity=c6698d185c4a46768a27b351fe1ec282 revision=1 parent=114 elevated=1",
+    "bindings app=1 list=1 add=1 parent_socket=1",
+    "stage=app_status",
+    "app status=0 id=24600 guard=1",
+    "stage=local_process_list",
+    "local_processes status=0 count=1 guard=1",
+    "parent_socket descriptor=3 validated_socket=0",
+    "stage=null_options_rejection",
+    "invalid_null_options status=0x80940005 expected=0x80940005",
+    "stage=oversized_argv_rejection bytes=4097",
+    "invalid_oversized_argv status=0x80940005 expected=0x80940005",
+    "descriptors before=12 after=12 spawn_requests=0",
+    "result=PASS"
+  ],
+  "fresh_identity_seen": true,
+  "restored_readback_sha256": "d3d7cb497833ebb57876fe4465257217608ac9765f9a360a3ca0e658b845f325"
+}

@@ -1,0 +1,133 @@
+From: PS5_Proton
+Subject: [PATCH] server: the title ends one process, not the desktop session
+
+The title's memory guard ended the whole Wine session when the console's
+memory stood past its end mark. In the Mihawk OS desktop session that is
+the user's whole Windows: a launcher's GPU process reached 462 MiB, the guard
+ended everything, and the user was back at PS5 Proton's menu
+(user-desktop-2026-10-10-01).
+
+Input type 7 names one process by its native helper's pid, the way the
+title's memory census does. On the server thread:
+
+- down 1: WM_CLOSE to each of its visible top-level windows, as a user
+  closing them would; a process with none (Chromium's GPU process) is
+  ended, and Chromium starts a new one.
+- down 0: the process is ended, as a TerminateProcess from another
+  process would (ps5_terminate_process, logged with its ids).
+---
+diff --git a/server/process.c b/server/process.c
+--- a/server/process.c
++++ b/server/process.c
+@@ -1029,6 +1029,26 @@
+     }
+     kill_all_processes();
+ }
++
++/* The running process whose native helper is unix_pid (the title's memory census names helpers so), grabbed; or
++ * NULL. */
++struct process *ps5_process_from_unix_pid( int unix_pid )
++{
++    struct process *process;
++
++    LIST_FOR_EACH_ENTRY( process, &process_list, struct process, entry )
++        if (process->unix_pid == unix_pid && process->running_threads)
++            return (struct process *)grab_object( process );
++    return NULL;
++}
++
++/* One process ended from outside, as a TerminateProcess would: the title's memory guard in the desktop session ends
++ * the process that holds the memory, not the session (queue.c, ps5_inject_input). */
++void ps5_terminate_process( struct process *process )
++{
++    fprintf( stderr, "wine-ps5: ending process %04x (unix %d) for the title\n", process->id, process->unix_pid );
++    terminate_process( process, NULL, 1 );
++}
+ #endif
+ 
+ /* kill all processes being attached to a console renderer */
+diff --git a/server/process.h b/server/process.h
+--- a/server/process.h
++++ b/server/process.h
+@@ -119,6 +119,8 @@
+ extern void kill_process( struct process *process, int violent_death );
+ #ifdef __PROSPERO__
+ extern void terminate_all_processes(void);
++extern struct process *ps5_process_from_unix_pid( int unix_pid );
++extern void ps5_terminate_process( struct process *process );
+ #endif
+ extern void kill_console_processes( struct thread *renderer, int exit_code );
+ extern void detach_debugged_processes( struct debug_obj *debug_obj, int exit_code );
+diff --git a/server/queue.c b/server/queue.c
+--- a/server/queue.c
++++ b/server/queue.c
+@@ -3480,7 +3480,8 @@
+  * goes where a real device's would: to the window under the cursor or the foreground window, in whichever process
+  * owns it. type 1 key (code: virtual key, scan code << 8, extended << 16), 2 relative mouse motion (x, y), 3 mouse
+  * button (code 0 left, 1 right, 2 middle, 3 X1, 4 X2), 4 close: WM_CLOSE to the foreground window, as a user closing
+- * it would, 6 the wheels (x horizontal, y vertical, WHEEL_DELTA units). The cursor it leaves is kept
++ * it would, 6 the wheels (x horizontal, y vertical, WHEEL_DELTA units), 7 one process by its native pid (code):
++ * its windows asked to close (down 1) or the process ended. The cursor it leaves is kept
+  * for pw_wineserver_cursor. */
+ /* The same authoritative input desktop used by hardware injection. */
+ struct desktop *ps5_hardware_desktop(void) { return get_hardware_input_desktop(0); }
+@@ -3531,6 +3532,17 @@
+         if (code >= 3) input.mouse.data = code == 3 ? XBUTTON1 : XBUTTON2;
+         queue_mouse_message( desktop, 0, &input, IMO_HARDWARE, NULL, 0 );
+         break;
++    case 7:
++    {
++        /* one process, named by its native helper's pid (code), for the title's memory guard in the desktop session:
++         * down 1 asks its visible top-level windows to close and ends a process that has none; down 0 ends it */
++        struct process *process = ps5_process_from_unix_pid( code );
++
++        if (!process) break;
++        if (!down || !ps5_close_process_windows( desktop, process )) ps5_terminate_process( process );
++        release_object( process );
++        break;
++    }
+     case 6:
+         /* the wheels, in WHEEL_DELTA units: y the vertical one (> 0 away from the user), x the horizontal one */
+         input.mouse.type = INPUT_MOUSE;
+diff --git a/server/user.h b/server/user.h
+--- a/server/user.h
++++ b/server/user.h
+@@ -171,6 +171,9 @@
+ /* window functions */
+ 
+ extern struct process *get_top_window_owner( struct desktop *desktop );
++#ifdef __PROSPERO__
++extern unsigned int ps5_close_process_windows( struct desktop *desktop, struct process *process );
++#endif
+ extern void get_virtual_screen_rect( struct desktop *desktop, struct rectangle *rect, int is_raw );
+ extern void post_desktop_message( struct desktop *desktop, unsigned int message,
+                                   lparam_t wparam, lparam_t lparam );
+diff --git a/server/window.c b/server/window.c
+--- a/server/window.c
++++ b/server/window.c
+@@ -1270,6 +1270,25 @@
+     return 1;
+ }
+ 
++#ifdef __PROSPERO__
++/* WM_CLOSE to each visible top-level window of process, as a user closing them would (the title's memory guard in
++ * the desktop session, queue.c ps5_inject_input); how many were asked. */
++unsigned int ps5_close_process_windows( struct desktop *desktop, struct process *process )
++{
++    struct window *win;
++    unsigned int count = 0;
++
++    if (!desktop->top_window) return 0;
++    LIST_FOR_EACH_ENTRY( win, &desktop->top_window->children, struct window, entry )
++    {
++        if (!win->thread || win->thread->process != process || !is_visible( win )) continue;
++        post_message( win->handle, WM_CLOSE, 0, 0 );
++        count++;
++    }
++    return count;
++}
++#endif
++
+ /* same as is_visible but takes a window handle */
+ int is_window_visible( user_handle_t window )
+ {

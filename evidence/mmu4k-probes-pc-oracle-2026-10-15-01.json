@@ -1,0 +1,22 @@
+{
+ "run": "mmu4k-probes-pc-oracle-2026-10-15-01",
+ "where": "host PC under the system Wine (wine-11.19, a throwaway prefix); no console run",
+ "what": "MMU4K step 4 (docs/MMU4K.md, section 12): the console probes for patch 1134 run on the PC's 4 KiB pages, which need no 4 KiB MMU, so every case must hold there. Binaries: the production build's .deps/probes (build fingerprint c11a7f54d7a7a15c).",
+ "vm_protect_probe_64": {
+  "default": "PASS (tracker_check with no early report; stepped cases; E1-E7)",
+  "truth": "PASS: V1 #UD and #DE with registers and ymm0-15 intact; V2 two rounds, each written page one fault at the store with the old bytes in place, unwritten pages none, none beside a no-access page; V3 30 straddling stores fault at the read-only page's first byte",
+  "speed_us_best_of_3": {"stores_4_byte_1024": 0, "sse_256": 0, "avx_128": 0, "rep_movsb_4096": 0, "rep_stosq_4096": 0, "bound": 600, "verdict": "PASS"},
+  "rearm": {"cycles": 100000, "violations": 0, "changed_after_a_fault": 99815, "verdict": "PASS", "note": "a second run of the production binary; an earlier scratch build gave 99791"},
+  "contention": "PASS (two threads x 100000 stores, a re-protection every 100 us, no access violation, the last stores landed)"
+ },
+ "vm_protect_probe_32": {
+  "default": "PASS",
+  "truth": "PASS (V2 only: WoW64 keeps 1122's step)"
+ },
+ "section_view_probe": {
+  "verdict": "PASS cases=3",
+  "tracked_faults": {"section_2_MiB": 957, "section_13824_MiB": 957, "private_1_MiB": 957},
+  "strays": 0
+ },
+ "not_shown_here": "whether the console's runs take these paths (census runs=, alias=), uc_sigmask's place, the speed on Zen 2: docs/CONSOLE_QUEUE.md, 'The 4 KiB MMU'"
+}

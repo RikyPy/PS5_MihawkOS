@@ -1,0 +1,29 @@
+{
+ "question": "Can a poll/MSG_PEEK observer report zero bytes while another reader drains an open SEQPACKET socket?",
+ "source_sha256": "d145702c7bf3026fdac683e5e15d0d963e781f736b25feebf626f950fa0d8721",
+ "elf_sha256": "d88f32ce9d5aef8f7ef18e2ad44404248a1f5db7de0a05c4cd9a07c3fd59af38",
+ "marker": "PASS",
+ "counters": {
+  "sent": 100000,
+  "received": 100000,
+  "events": 52925,
+  "peeks": 31793,
+  "empty": 0,
+  "again": 21132,
+  "errors": 0,
+  "hups": 0,
+  "reader_error": 0,
+  "writer_error": 0,
+  "timeout": 0,
+  "milliseconds": 196
+ },
+ "scope": "Owned native socketpairs and pthreads; peer stays open until all observations finish; no title launch, graphics, kernel writes or Wine code",
+ "console_readiness": {
+  "ready": true,
+  "seconds": 0.188,
+  "settle_seconds": 0.0,
+  "census_seconds": 0.166,
+  "previous_cleanup_verified": true
+ },
+ "passed": true
+}

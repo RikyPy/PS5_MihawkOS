@@ -1,0 +1,27 @@
+{
+ "run": "query-limit-host-2026-10-08-02",
+ "host_only": true,
+ "wine_revision": "7e893751d256bfe062fd1d159375f024dedfa696",
+ "source_sha256": "fbb29b58131ece35eea1dd40bde04e4c928f78f6a25b7cbfbcdd1fbe539f3fc9",
+ "cases": [
+  {
+   "bits": 32,
+   "exit_code": 1,
+   "seconds": 0.01,
+   "lines": [],
+   "exe_sha256": "fa9dcb246998a19d2d871b16dfacceafe20af2b2eccd13c07d552eface348311",
+   "passed": false
+  },
+  {
+   "bits": 64,
+   "exit_code": 1,
+   "seconds": 0.01,
+   "lines": [],
+   "exe_sha256": "77dd0ac85b2ac822fa3f3d64fe2fdbcff697664266bfbbfaa77e01df63a4357a",
+   "passed": false
+  }
+ ],
+ "passed": false,
+ "runner_failure": "The prefix was created, but the sandbox refused wineserver Unix-socket bind; probes did not execute.",
+ "windows_probe_executed": false
+}

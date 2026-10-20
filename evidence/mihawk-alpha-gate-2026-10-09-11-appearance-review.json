@@ -1,0 +1,35 @@
+{
+  "gate": "mihawk-alpha-gate-2026-10-09-11",
+  "fingerprint": "dbd2a4a6ad6aa71c7677c66a064b556fcaa952ee786f24c580cbf4395e7d822d",
+  "completed": 19,
+  "passed_cases": 18,
+  "seconds": 507.7,
+  "stopped": "requested at a clean case boundary",
+  "failure": {
+    "case": "appearance32",
+    "api_passed": true,
+    "cleanup_verified": true,
+    "dark_pane_actual": [
+      255,
+      255,
+      255
+    ],
+    "dark_pane_expected": [
+      32,
+      32,
+      32
+    ],
+    "dark_caption_samples_passed": true,
+    "peer_appearance64_passed": true
+  },
+  "source_findings": [
+    "ApplyTheme posts WM_THEMECHANGED asynchronously.",
+    "Appearance cached its pane brush and refreshed it only while handling WM_THEMECHANGED.",
+    "Theme selection updates icon/text state and can synchronously repaint before that posted message is handled."
+  ],
+  "candidate": "Use GetSysColorBrush(COLOR_WINDOW) at each paint/control-colour request and invalidate on WM_SYSCOLORCHANGE. Add a synchronous painted-pane check before queued notification dispatch.",
+  "limits": [
+    "Not a console crash or payload teardown failure.",
+    "Candidate12 still requires focused and full exact-source console validation."
+  ]
+}

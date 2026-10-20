@@ -1,0 +1,17 @@
+{
+  "passed": true,
+  "sanitized_host_suites": 42,
+  "log": "klog/mihawk-environment-all-host-2026-10-09-03.log",
+  "sanitizers": [
+    "address",
+    "undefined",
+    "leak"
+  ],
+  "image_verdict_tests": 7,
+  "battery_runner_tests": 5,
+  "wine_patches_replayed": 142,
+  "original_signal_test_failure_preserved": true,
+  "deterministic_signal_repeats": "evidence/mihawk-environment-signal-host-2026-10-09.json",
+  "linux_wine_oracle": "evidence/mihawk-initial-environment-host-oracle-2026-10-09-02.json",
+  "production_fingerprint": "5b3bc04da9eaa3dbebd5d09091c4d3163b8a3c12de976e35e27eb5af89a64932"
+}

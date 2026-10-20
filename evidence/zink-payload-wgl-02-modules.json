@@ -1,0 +1,19 @@
+{
+  "run": "zink-payload-wgl-02",
+  "mesa": {
+    "mesa_version": "26.2.0",
+    "mesa_sha256": "efd4bb08cdb7c365a812cd4e6c9202ab55b2f22cdcd13c7d6c4f9647b799a4ef",
+    "llvm_mingw": "20260922-ucrt",
+    "build_script": "ba72ebf54061ff7312e1b8626e595a265c9b95f5dbc0ab6a5d82b62e9ae7ab18",
+    "architecture": "x86_64",
+    "driver": "zink",
+    "files": {
+      "libgallium_wgl.dll": "2e3c0a183cbd39ed41024a2aea68ac2cf9512ce95790c09e398c9cfdf77f3c81",
+      "opengl32.dll": "1fda34a76526efdfb34500d14ba2de9a7465e9b9ec1e76aa4878a5aceb54b479"
+    },
+    "console_validated": false
+  },
+  "restored": true,
+  "passed": true,
+  "runner_status": 0
+}

@@ -1,0 +1,196 @@
+{
+ "telemetry_hold": null,
+ "launch_readiness": {
+  "ready": true,
+  "seconds": 0.213,
+  "settle_seconds": 0.0,
+  "census_seconds": 0.189,
+  "previous_cleanup_verified": true
+ },
+ "native_close_failures": [],
+ "run": "step3-focus-2026-10-10-01-game-mode64",
+ "what": "C:\\windows\\system32\\mihawk.exe",
+ "env": [
+  "PROTON_LAYOUT=launcher",
+  "WINE_PS5_WINDOW_SURFACES=1",
+  "MIHAWK_DESKTOP=1"
+ ],
+ "result": "finished",
+ "seconds": 35.2,
+ "probe_verdict": null,
+ "clean_owner_restart": true,
+ "launcher_end_status": 0,
+ "initial_status": 0,
+ "closed_on_request": false,
+ "child_logs": [
+  "klog/step3-focus-2026-10-10-01-game-mode64-wine-child-9768.log",
+  "klog/step3-focus-2026-10-10-01-game-mode64-wine-child-9769.log",
+  "klog/step3-focus-2026-10-10-01-game-mode64-wine-child-9770.log",
+  "klog/step3-focus-2026-10-10-01-game-mode64-wine-child-9771.log",
+  "klog/step3-focus-2026-10-10-01-game-mode64-wine-child-9772.log",
+  "klog/step3-focus-2026-10-10-01-game-mode64-wine-child-9773.log",
+  "klog/step3-focus-2026-10-10-01-game-mode64-wine-child-9774.log",
+  "klog/step3-focus-2026-10-10-01-game-mode64-wine-child-9775.log",
+  "klog/step3-focus-2026-10-10-01-game-mode64-wine-child-9776.log",
+  "klog/step3-focus-2026-10-10-01-game-mode64-wine-child-9777.log",
+  "klog/step3-focus-2026-10-10-01-game-mode64-wine-child-9778.log",
+  "klog/step3-focus-2026-10-10-01-game-mode64-wine-child-9779.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": false,
+ "bench": {},
+ "steady": {
+  "server": {
+   "calls": 0.0,
+   "per_s": 0.0,
+   "avg_us": 0.0,
+   "selects": 0.0,
+   "blocked": 0.0,
+   "block_avg_us": 0.0,
+   "waits": 0.0,
+   "handles_avg": 0.0,
+   "wait_all": 0.0,
+   "polled": 0.0,
+   "delays": 0.0,
+   "yields": 0.0,
+   "intervals": 1
+  }
+ },
+ "intervals": {
+  "frames": [],
+  "server": [
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   }
+  ],
+  "top": []
+ },
+ "shown": {
+  "frames": 344,
+  "per_10s": [
+   1,
+   343
+  ],
+  "longest_gap_ms": 2197
+ },
+ "broker": {
+  "local_offer": null,
+  "host_limit": null,
+  "windows": {
+   "presents": 49,
+   "effect_bytes": 388800,
+   "mica_builds": 2,
+   "thumbnail_builds": 0,
+   "compositions": 49,
+   "compose_avg_us": 1554,
+   "compose_max_us": 8161
+  },
+  "refused": [],
+  "refused_count": 0,
+  "clients": [],
+  "wedged": false,
+  "failure_reasons": [],
+  "host_peak": null,
+  "local_peak": null
+ },
+ "pacing": {
+  "windows": [
+   {
+    "cookie": 9,
+    "pid": 9777,
+    "route": "independent",
+    "final": true,
+    "refused": "none",
+    "direct": 307.0,
+    "composed": 0.0,
+    "seconds": 24.0,
+    "frames": 307.0,
+    "hidden": 0.0,
+    "fps": 12.8,
+    "mean": 19.23,
+    "p50": 16.75,
+    "p95": 24.75,
+    "p99": 30.5,
+    "max": 673.77,
+    "over20": 24.0,
+    "over34": 3.0,
+    "present_avg": 16.05,
+    "present_max": 671.99
+   }
+  ],
+  "clients": {
+   "9": {
+    "pid": 9777,
+    "route": "independent",
+    "routes": {
+     "independent": 307
+    },
+    "windows": 1,
+    "seconds": 24.0,
+    "frames": 307,
+    "hidden": 0,
+    "direct": 307,
+    "composed": 0,
+    "refused": [],
+    "fps": 12.8,
+    "p50_median_ms": 16.75,
+    "p95_worst_ms": 24.75,
+    "p99_worst_ms": 30.5,
+    "max_ms": 673.77,
+    "over20": 24,
+    "over34": 3,
+    "present_avg_ms": 16.05,
+    "present_max_ms": 671.99
+   }
+  }
+ },
+ "captures": [
+  "klog/step3-focus-2026-10-10-01-game-mode64-capture-01.png"
+ ],
+ "cleanup_verified": false,
+ "hooks_removed": true,
+ "api": "opengl",
+ "game_mode": {
+  "direct_entries": 1,
+  "unloads": [
+   306
+  ],
+  "restores": [
+   {
+    "status": 0,
+    "ms": 231
+   }
+  ],
+  "kept": 0,
+  "could_not_start": 0,
+  "session_root": true
+ },
+ "probe_passed": false
+}

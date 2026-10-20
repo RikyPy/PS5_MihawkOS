@@ -1,0 +1,23 @@
+{
+ "run": "mem-02 big 5 12000",
+ "what": "mem-probe.exe",
+ "env": [
+  "MEM_PROBE_MODE=",
+  "MEM_PROBE_GIB=",
+  "MEM_PROBE_COUNT="
+ ],
+ "result": "finished",
+ "seconds": 3.9,
+ "probe_verdict": "PASS",
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": true,
+ "bench": {},
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [],
+  "top": []
+ }
+}

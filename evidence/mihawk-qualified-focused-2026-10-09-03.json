@@ -1,0 +1,37 @@
+{
+  "battery": "mihawk-qualified-focused-2026-10-09-03",
+  "expected_cases": [
+    "launcher-tls"
+  ],
+  "revision": "c573c46e00ba58c1aed605d9c00f6f4905f6273a",
+  "dirty": true,
+  "cases": [
+    {
+      "case": "launcher-tls",
+      "run": "mihawk-qualified-focused-2026-10-09-03-launcher-tls",
+      "runner_status": 0,
+      "seconds": 193.9,
+      "result": "finished",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "run_seconds": 142.7,
+      "launch_readiness": {
+        "ready": true,
+        "seconds": 0.17,
+        "settle_seconds": 0.0,
+        "census_seconds": 0.153,
+        "previous_cleanup_verified": false
+      },
+      "runner_overhead_seconds": 51.2,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 19,
+      "protocol_errors": 0
+    }
+  ],
+  "complete": true,
+  "seconds": 193.9,
+  "passed": true
+}

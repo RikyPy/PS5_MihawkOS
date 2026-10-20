@@ -1,0 +1,2603 @@
+{
+ "atom": {
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: end atom 0",
+  "seconds": 47.6,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 164064,
+   "todo": 1
+  },
+  "todo_lines": 1
+ },
+ "change": {
+  "failure_count": 6,
+  "failures": [
+   {
+    "file": "change.c",
+    "line": 241,
+    "text": "should be ready"
+   },
+   {
+    "file": "change.c",
+    "line": 247,
+    "text": "action wrong"
+   },
+   {
+    "file": "change.c",
+    "line": 262,
+    "text": "should be ready"
+   },
+   {
+    "file": "change.c",
+    "line": 264,
+    "text": "status not successful"
+   },
+   {
+    "file": "change.c",
+    "line": 277,
+    "text": "should be ready"
+   },
+   {
+    "file": "change.c",
+    "line": 280,
+    "text": "info not set"
+   }
+  ],
+  "guarded": null,
+  "last_line": "winetest-batch: end change 6",
+  "seconds": 47.6,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 6,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 82,
+   "todo": 0
+  },
+  "todo_lines": 0
+ },
+ "directory": {
+  "failure_count": 12,
+  "failures": [
+   {
+    "file": "directory.c",
+    "line": 176,
+    "text": "file L\"..a\": expected (null) (80), got 2"
+   },
+   {
+    "file": "directory.c",
+    "line": 176,
+    "text": "file L\".a\": expected (null) (80), got 2"
+   },
+   {
+    "file": "directory.c",
+    "line": 176,
+    "text": "file L\".a.a\": expected (null) (80), got 2"
+   },
+   {
+    "file": "directory.c",
+    "line": 176,
+    "text": "file L\".aa\": expected (null) (80), got 2"
+   },
+   {
+    "file": "directory.c",
+    "line": 176,
+    "text": "file L\"h.tmp\": expected (null) (2), got 0"
+   },
+   {
+    "file": "directory.c",
+    "line": 176,
+    "text": "file L\"s.tmp\": expected (null) (4), got 0"
+   },
+   {
+    "file": "directory.c",
+    "line": 1447,
+    "text": "failed to set reparse point, status 0xc0000001"
+   },
+   {
+    "file": "directory.c",
+    "line": 1569,
+    "text": "class 2: got 0"
+   },
+   {
+    "file": "directory.c",
+    "line": 1576,
+    "text": "class 3: got 0"
+   },
+   {
+    "file": "directory.c",
+    "line": 1584,
+    "text": "class 37: got 0"
+   },
+   {
+    "file": "directory.c",
+    "line": 1594,
+    "text": "class 38: got 0"
+   },
+   {
+    "file": "directory.c",
+    "line": 1625,
+    "text": "class 63: got tag 0"
+   }
+  ],
+  "guarded": null,
+  "last_line": "winetest-batch: end directory 12",
+  "seconds": 47.6,
+  "skipped_lines": [
+   "directory.c:1243: Tests skipped: Wow64 redirection not supported"
+  ],
+  "status": "complete",
+  "summary": {
+   "failures": 12,
+   "flaky": 0,
+   "skipped": 1,
+   "tests": 7882,
+   "todo": 34
+  },
+  "todo_lines": 34
+ },
+ "env": {
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: end env 0",
+  "seconds": 47.6,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 603,
+   "todo": 0
+  },
+  "todo_lines": 0
+ },
+ "error": {
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: end error 0",
+  "seconds": 47.6,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 1448,
+   "todo": 0
+  },
+  "todo_lines": 0
+ },
+ "exception": {
+  "failure_count": 25,
+  "failures": [
+   {
+    "file": "exception.c",
+    "line": 3132,
+    "text": "debug registers broken"
+   },
+   {
+    "file": "exception.c",
+    "line": 3354,
+    "text": "got 0 exceptions, expected 1"
+   },
+   {
+    "file": "exception.c",
+    "line": 3377,
+    "text": "wrong fs 0000 / 0013"
+   },
+   {
+    "file": "exception.c",
+    "line": 3378,
+    "text": "wrong gs 003b / 001b"
+   },
+   {
+    "file": "exception.c",
+    "line": 3398,
+    "text": "wrong fs 0000 / 0013"
+   },
+   {
+    "file": "exception.c",
+    "line": 3399,
+    "text": "wrong gs 003b / 001b"
+   },
+   {
+    "file": "exception.c",
+    "line": 9241,
+    "text": "test 0: expected 42424240, got cccccccccccccccc"
+   },
+   {
+    "file": "exception.c",
+    "line": 9242,
+    "text": "test 0: expected 0, got cccccccccccccccc"
+   },
+   {
+    "file": "exception.c",
+    "line": 9243,
+    "text": "test 0: expected 126bb070, got cccccccccccccccc"
+   },
+   {
+    "file": "exception.c",
+    "line": 9244,
+    "text": "test 0: expected badbad0, got cccccccccccccccc"
+   },
+   {
+    "file": "exception.c",
+    "line": 9245,
+    "text": "test 0: expected 0, got cccccccccccccccc"
+   },
+   {
+    "file": "exception.c",
+    "line": 9246,
+    "text": "test 0: expected ffff0115, got cccccccccccccccc"
+   },
+   {
+    "file": "exception.c",
+    "line": 9241,
+    "text": "test 1: expected 42424242, got cccccccccccccccc"
+   },
+   {
+    "file": "exception.c",
+    "line": 9242,
+    "text": "test 1: expected 0, got cccccccccccccccc"
+   },
+   {
+    "file": "exception.c",
+    "line": 9243,
+    "text": "test 1: expected 100f0fe7, got cccccccccccccccc"
+   },
+   {
+    "file": "exception.c",
+    "line": 9244,
+    "text": "test 1: expected abebabe, got cccccccccccccccc"
+   },
+   {
+    "file": "exception.c",
+    "line": 9245,
+    "text": "test 1: expected 0, got cccccccccccccccc"
+   },
+   {
+    "file": "exception.c",
+    "line": 9246,
+    "text": "test 1: expected 115, got cccccccccccccccc"
+   },
+   {
+    "file": "exception.c",
+    "line": 9294,
+    "text": "CreateProcessA failed"
+   },
+   {
+    "file": "exception.c",
+    "line": 9297,
+    "text": "expected Wow64 process"
+   },
+   {
+    "file": "exception.c",
+    "line": 9304,
+    "text": "GetThreadContext failed"
+   },
+   {
+    "file": "exception.c",
+    "line": 9312,
+    "text": "SetThreadContext failed"
+   },
+   {
+    "file": "exception.c",
+    "line": 9370,
+    "text": "Wow64SetThreadContext failed with c0000008"
+   },
+   {
+    "file": "exception.c",
+    "line": 9375,
+    "text": "Wow64GetThreadContext failed with c0000008"
+   },
+   {
+    "file": "exception.c",
+    "line": 9388,
+    "text": "GetThreadContext failed"
+   }
+  ],
+  "guarded": null,
+  "last_line": "0020 unhandled exception c0000005 at 0000001001F700F3 rip 0000001001F700F3 eflags 10602",
+  "seconds": 47.6,
+  "skipped_lines": [],
+  "status": "incomplete",
+  "summary": null,
+  "todo_lines": 1
+ },
+ "file": {
+  "failure_count": 176,
+  "failures": [
+   {
+    "file": "file.c",
+    "line": 350,
+    "text": "QueryDosDeviceW failed with error 2"
+   },
+   {
+    "file": "file.c",
+    "line": 359,
+    "text": "query L\"0\\\\windows\\\\notepad.exe\" failed c000003b"
+   },
+   {
+    "file": "file.c",
+    "line": 364,
+    "text": "query L\"\\\\SystemRoot\\\\explorer.exe\" failed c0000033"
+   },
+   {
+    "file": "file.c",
+    "line": 1520,
+    "text": "access time mismatch, set: 200deadcafebeef get: 1dc7da20832e780"
+   },
+   {
+    "file": "file.c",
+    "line": 1557,
+    "text": "attribute 20 not FILE_ATTRIBUTE_SYSTEM"
+   },
+   {
+    "file": "file.c",
+    "line": 1570,
+    "text": "attribute 20 not FILE_ATTRIBUTE_HIDDEN"
+   },
+   {
+    "file": "file.c",
+    "line": 1627,
+    "text": "attribute 20 not FILE_ATTRIBUTE_SYSTEM"
+   },
+   {
+    "file": "file.c",
+    "line": 1640,
+    "text": "attribute 20 not FILE_ATTRIBUTE_HIDDEN"
+   },
+   {
+    "file": "file.c",
+    "line": 2489,
+    "text": "io.Status expected STATUS_SUCCESS, got c0000022"
+   },
+   {
+    "file": "file.c",
+    "line": 2490,
+    "text": "res expected STATUS_SUCCESS, got c0000022"
+   },
+   {
+    "file": "file.c",
+    "line": 2494,
+    "text": "file should exist"
+   },
+   {
+    "file": "file.c",
+    "line": 2557,
+    "text": "io.Status expected STATUS_SUCCESS, got c0000022"
+   },
+   {
+    "file": "file.c",
+    "line": 2558,
+    "text": "res expected STATUS_SUCCESS, got c0000022"
+   },
+   {
+    "file": "file.c",
+    "line": 2562,
+    "text": "file should exist"
+   },
+   {
+    "file": "file.c",
+    "line": 2588,
+    "text": "io.Status expected STATUS_SUCCESS, got c0000022"
+   },
+   {
+    "file": "file.c",
+    "line": 2589,
+    "text": "res expected STATUS_SUCCESS, got c0000022"
+   },
+   {
+    "file": "file.c",
+    "line": 2593,
+    "text": "file should exist"
+   },
+   {
+    "file": "file.c",
+    "line": 2597,
+    "text": "FindFirstFileW: failed, error 2"
+   },
+   {
+    "file": "file.c",
+    "line": 3111,
+    "text": "io.Status expected STATUS_SUCCESS, got c0000022"
+   },
+   {
+    "file": "file.c",
+    "line": 3112,
+    "text": "res expected STATUS_SUCCESS, got c0000022"
+   },
+   {
+    "file": "file.c",
+    "line": 3116,
+    "text": "file should exist"
+   },
+   {
+    "file": "file.c",
+    "line": 2489,
+    "text": "io.Status expected STATUS_SUCCESS, got c0000022"
+   },
+   {
+    "file": "file.c",
+    "line": 2490,
+    "text": "res expected STATUS_SUCCESS, got c0000022"
+   },
+   {
+    "file": "file.c",
+    "line": 2494,
+    "text": "file should exist"
+   },
+   {
+    "file": "file.c",
+    "line": 2557,
+    "text": "io.Status expected STATUS_SUCCESS, got c0000022"
+   },
+   {
+    "file": "file.c",
+    "line": 2558,
+    "text": "res expected STATUS_SUCCESS, got c0000022"
+   },
+   {
+    "file": "file.c",
+    "line": 2562,
+    "text": "file should exist"
+   },
+   {
+    "file": "file.c",
+    "line": 2588,
+    "text": "io.Status expected STATUS_SUCCESS, got c0000022"
+   },
+   {
+    "file": "file.c",
+    "line": 2589,
+    "text": "res expected STATUS_SUCCESS, got c0000022"
+   },
+   {
+    "file": "file.c",
+    "line": 2593,
+    "text": "file should exist"
+   },
+   {
+    "file": "file.c",
+    "line": 2597,
+    "text": "FindFirstFileW: failed, error 2"
+   },
+   {
+    "file": "file.c",
+    "line": 3111,
+    "text": "io.Status expected STATUS_SUCCESS, got c0000022"
+   },
+   {
+    "file": "file.c",
+    "line": 3112,
+    "text": "res expected STATUS_SUCCESS, got c0000022"
+   },
+   {
+    "file": "file.c",
+    "line": 3116,
+    "text": "file should exist"
+   },
+   {
+    "file": "file.c",
+    "line": 3282,
+    "text": "io.Status expected STATUS_SUCCESS, got c0000022"
+   },
+   {
+    "file": "file.c",
+    "line": 3283,
+    "text": "res expected STATUS_SUCCESS, got c0000022"
+   },
+   {
+    "file": "file.c",
+    "line": 3287,
+    "text": "file should exist"
+   },
+   {
+    "file": "file.c",
+    "line": 4705,
+    "text": "got attributes 0x22"
+   },
+   {
+    "file": "file.c",
+    "line": 4717,
+    "text": "got attributes 0x22"
+   },
+   {
+    "file": "file.c",
+    "line": 4718,
+    "text": "got attributes 0x22"
+   },
+   {
+    "file": "file.c",
+    "line": 4722,
+    "text": "got attributes 0x20"
+   },
+   {
+    "file": "file.c",
+    "line": 4823,
+    "text": "[13] NtOpenFile failed: c0000034"
+   },
+   {
+    "file": "file.c",
+    "line": 4827,
+    "text": "[13] can't get FileModeInformation: c0000008"
+   },
+   {
+    "file": "file.c",
+    "line": 4828,
+    "text": "[13] Mode = cccccccc, expected 0"
+   },
+   {
+    "file": "file.c",
+    "line": 4823,
+    "text": "[14] NtOpenFile failed: c0000034"
+   },
+   {
+    "file": "file.c",
+    "line": 4827,
+    "text": "[14] can't get FileModeInformation: c0000008"
+   },
+   {
+    "file": "file.c",
+    "line": 4828,
+    "text": "[14] Mode = cccccccc, expected 10"
+   },
+   {
+    "file": "file.c",
+    "line": 6198,
+    "text": "C: drive does not support reparse points"
+   },
+   {
+    "file": "file.c",
+    "line": 6261,
+    "text": "got 0xc0000001"
+   },
+   {
+    "file": "file.c",
+    "line": 6267,
+    "text": "got 0xc0000275"
+   },
+   {
+    "file": "file.c",
+    "line": 6270,
+    "text": "got 0xc0000275"
+   },
+   {
+    "file": "file.c",
+    "line": 6271,
+    "text": "expected size 0x2a, got 0x1"
+   },
+   {
+    "file": "file.c",
+    "line": 6272,
+    "text": "buffers didn't match"
+   },
+   {
+    "file": "file.c",
+    "line": 6274,
+    "text": "got 0xc0000275"
+   },
+   {
+    "file": "file.c",
+    "line": 6275,
+    "text": "expected size 0x2a, got 0x1"
+   },
+   {
+    "file": "file.c",
+    "line": 6276,
+    "text": "buffers didn't match"
+   },
+   {
+    "file": "file.c",
+    "line": 6280,
+    "text": "got 0xc0000275"
+   },
+   {
+    "file": "file.c",
+    "line": 6281,
+    "text": "expected size 0x2a, got 0x1"
+   },
+   {
+    "file": "file.c",
+    "line": 6282,
+    "text": "buffers didn't match"
+   },
+   {
+    "file": "file.c",
+    "line": 6286,
+    "text": "got attributes 0x10"
+   },
+   {
+    "file": "file.c",
+    "line": 6288,
+    "text": "got tag 0"
+   },
+   {
+    "file": "file.c",
+    "line": 6298,
+    "text": "got attributes 0x10"
+   },
+   {
+    "file": "file.c",
+    "line": 6300,
+    "text": "got tag 0"
+   },
+   {
+    "file": "file.c",
+    "line": 6323,
+    "text": "got attributes 0x10"
+   },
+   {
+    "file": "file.c",
+    "line": 6325,
+    "text": "got tag 0"
+   },
+   {
+    "file": "file.c",
+    "line": 6337,
+    "text": "got 0xc0000001"
+   },
+   {
+    "file": "file.c",
+    "line": 6341,
+    "text": "got 0"
+   },
+   {
+    "file": "file.c",
+    "line": 6347,
+    "text": "got 0xc0000001"
+   },
+   {
+    "file": "file.c",
+    "line": 6373,
+    "text": "expected no next entry"
+   },
+   {
+    "file": "file.c",
+    "line": 6377,
+    "text": "got error 32"
+   },
+   {
+    "file": "file.c",
+    "line": 6378,
+    "text": "got file L\"\""
+   },
+   {
+    "file": "file.c",
+    "line": 6380,
+    "text": "got error 6"
+   },
+   {
+    "file": "file.c",
+    "line": 6381,
+    "text": "got file L\"\""
+   },
+   {
+    "file": "file.c",
+    "line": 6383,
+    "text": "got error 6"
+   },
+   {
+    "file": "file.c",
+    "line": 6384,
+    "text": "got file L\"\""
+   },
+   {
+    "file": "file.c",
+    "line": 6387,
+    "text": "got error 6"
+   },
+   {
+    "file": "file.c",
+    "line": 6402,
+    "text": "got error 32"
+   },
+   {
+    "file": "file.c",
+    "line": 6405,
+    "text": "expected path L\"C:\\\\users\\\\steamuser\\\\AppData\\\\Local\\\\Temp\\\\testreparse_dirlink\", got L\"C:\\\\\""
+   },
+   {
+    "file": "file.c",
+    "line": 6408,
+    "text": "got 0xffffffff"
+   },
+   {
+    "file": "file.c",
+    "line": 6423,
+    "text": "got attributes 0x10"
+   },
+   {
+    "file": "file.c",
+    "line": 6425,
+    "text": "got tag 0"
+   },
+   {
+    "file": "file.c",
+    "line": 6482,
+    "text": "got 0xc0000001"
+   },
+   {
+    "file": "file.c",
+    "line": 6493,
+    "text": "got 0xc0000001"
+   },
+   {
+    "file": "file.c",
+    "line": 6497,
+    "text": "got 0"
+   },
+   {
+    "file": "file.c",
+    "line": 6503,
+    "text": "got 0xc0000001"
+   },
+   {
+    "file": "file.c",
+    "line": 6507,
+    "text": "got error 3"
+   },
+   {
+    "file": "file.c",
+    "line": 6513,
+    "text": "got error 2"
+   },
+   {
+    "file": "file.c",
+    "line": 6515,
+    "text": "got error 6"
+   },
+   {
+    "file": "file.c",
+    "line": 6517,
+    "text": "expected path L\"\\\\\\\\?\\\\C:\\\\users\\\\steamuser\\\\AppData\\\\Local\\\\Temp\\\\testreparse_dirlink\", got L\"C:\\\\\""
+   },
+   {
+    "file": "file.c",
+    "line": 6523,
+    "text": "got 0xc0000275"
+   },
+   {
+    "file": "file.c",
+    "line": 6525,
+    "text": "got 0xc0000275"
+   },
+   {
+    "file": "file.c",
+    "line": 6527,
+    "text": "got 0xc0000275"
+   },
+   {
+    "file": "file.c",
+    "line": 6530,
+    "text": "got 0xc0000275"
+   },
+   {
+    "file": "file.c",
+    "line": 6532,
+    "text": "got 0xc0000275"
+   },
+   {
+    "file": "file.c",
+    "line": 6536,
+    "text": "got 0xc0000275"
+   },
+   {
+    "file": "file.c",
+    "line": 6555,
+    "text": "got 0xc0000001"
+   },
+   {
+    "file": "file.c",
+    "line": 6604,
+    "text": "got 0xc0000001"
+   },
+   {
+    "file": "file.c",
+    "line": 6616,
+    "text": "got 0xc0000275"
+   },
+   {
+    "file": "file.c",
+    "line": 6619,
+    "text": "got 0xc0000275"
+   },
+   {
+    "file": "file.c",
+    "line": 6620,
+    "text": "expected size 0x1d, got 0x1"
+   },
+   {
+    "file": "file.c",
+    "line": 6621,
+    "text": "buffers didn't match"
+   },
+   {
+    "file": "file.c",
+    "line": 6625,
+    "text": "got 0xc0000275"
+   },
+   {
+    "file": "file.c",
+    "line": 6626,
+    "text": "expected size 0x1d, got 0x1"
+   },
+   {
+    "file": "file.c",
+    "line": 6627,
+    "text": "buffers didn't match"
+   },
+   {
+    "file": "file.c",
+    "line": 6638,
+    "text": "got 0"
+   },
+   {
+    "file": "file.c",
+    "line": 6661,
+    "text": "got 0xc0000001"
+   },
+   {
+    "file": "file.c",
+    "line": 6665,
+    "text": "got 0xc0000275"
+   },
+   {
+    "file": "file.c",
+    "line": 6666,
+    "text": "expected size 0x1d, got 0x1"
+   },
+   {
+    "file": "file.c",
+    "line": 6667,
+    "text": "buffers didn't match"
+   },
+   {
+    "file": "file.c",
+    "line": 6671,
+    "text": "got 0xc0000034"
+   },
+   {
+    "file": "file.c",
+    "line": 6674,
+    "text": "got 0xc0000034"
+   },
+   {
+    "file": "file.c",
+    "line": 6678,
+    "text": "got 0xc0000275"
+   },
+   {
+    "file": "file.c",
+    "line": 6680,
+    "text": "got 0xc0000275"
+   },
+   {
+    "file": "file.c",
+    "line": 6682,
+    "text": "got 0xc0000275"
+   },
+   {
+    "file": "file.c",
+    "line": 6694,
+    "text": "got 0xc0000101"
+   },
+   {
+    "file": "file.c",
+    "line": 6771,
+    "text": "got 0xc0000001"
+   },
+   {
+    "file": "file.c",
+    "line": 6779,
+    "text": "got 0xc0000001"
+   },
+   {
+    "file": "file.c",
+    "line": 6788,
+    "text": "got 0xc0000001"
+   },
+   {
+    "file": "file.c",
+    "line": 6792,
+    "text": "got 0"
+   },
+   {
+    "file": "file.c",
+    "line": 6796,
+    "text": "got 0xc0000001"
+   },
+   {
+    "file": "file.c",
+    "line": 6805,
+    "text": "got 0xc0000001"
+   },
+   {
+    "file": "file.c",
+    "line": 6831,
+    "text": "got 0xc0000275"
+   },
+   {
+    "file": "file.c",
+    "line": 6852,
+    "text": "got 0xc0000001"
+   },
+   {
+    "file": "file.c",
+    "line": 6865,
+    "text": "got size 0"
+   },
+   {
+    "file": "file.c",
+    "line": 6877,
+    "text": "got error 32"
+   },
+   {
+    "file": "file.c",
+    "line": 6886,
+    "text": "got data \"file1\""
+   },
+   {
+    "file": "file.c",
+    "line": 6913,
+    "text": "got error 5"
+   },
+   {
+    "file": "file.c",
+    "line": 6917,
+    "text": "got error 2"
+   },
+   {
+    "file": "file.c",
+    "line": 6919,
+    "text": "got 0xc0000024"
+   },
+   {
+    "file": "file.c",
+    "line": 6920,
+    "text": "got attributes 0x10"
+   },
+   {
+    "file": "file.c",
+    "line": 6922,
+    "text": "got tag 0"
+   },
+   {
+    "file": "file.c",
+    "line": 6924,
+    "text": "got 0xc0000024"
+   },
+   {
+    "file": "file.c",
+    "line": 6927,
+    "text": "got 1 links"
+   },
+   {
+    "file": "file.c",
+    "line": 6928,
+    "text": "got directory 1"
+   },
+   {
+    "file": "file.c",
+    "line": 6932,
+    "text": "got 0xc0000024"
+   },
+   {
+    "file": "file.c",
+    "line": 6933,
+    "text": "got ids 0x2219 vs 0x1"
+   },
+   {
+    "file": "file.c",
+    "line": 6939,
+    "text": "got error 2"
+   },
+   {
+    "file": "file.c",
+    "line": 6941,
+    "text": "got 0xc0000024"
+   },
+   {
+    "file": "file.c",
+    "line": 6949,
+    "text": "got error 2"
+   },
+   {
+    "file": "file.c",
+    "line": 7039,
+    "text": "got 0"
+   },
+   {
+    "file": "file.c",
+    "line": 7061,
+    "text": "got 0xc0000001"
+   },
+   {
+    "file": "file.c",
+    "line": 7073,
+    "text": "got error 145"
+   },
+   {
+    "file": "file.c",
+    "line": 7076,
+    "text": "got 0"
+   },
+   {
+    "file": "file.c",
+    "line": 7087,
+    "text": "got 0xc0000101"
+   },
+   {
+    "file": "file.c",
+    "line": 7091,
+    "text": "got 0xc0000275"
+   },
+   {
+    "file": "file.c",
+    "line": 7092,
+    "text": "expected size 0x70, got 0x1"
+   },
+   {
+    "file": "file.c",
+    "line": 7093,
+    "text": "buffers didn't match"
+   },
+   {
+    "file": "file.c",
+    "line": 7102,
+    "text": "got 0xc0000101"
+   },
+   {
+    "file": "file.c",
+    "line": 7107,
+    "text": "got 0"
+   },
+   {
+    "file": "file.c",
+    "line": 7113,
+    "text": "got 0xc0000101"
+   },
+   {
+    "file": "file.c",
+    "line": 7118,
+    "text": "got 0xc0000101"
+   },
+   {
+    "file": "file.c",
+    "line": 7121,
+    "text": "got 0"
+   },
+   {
+    "file": "file.c",
+    "line": 7125,
+    "text": "got 0xc0000101"
+   },
+   {
+    "file": "file.c",
+    "line": 7128,
+    "text": "got 0"
+   },
+   {
+    "file": "file.c",
+    "line": 7132,
+    "text": "got 0xc0000101"
+   },
+   {
+    "file": "file.c",
+    "line": 7135,
+    "text": "got 0"
+   },
+   {
+    "file": "file.c",
+    "line": 7143,
+    "text": "got 0xc0000101"
+   },
+   {
+    "file": "file.c",
+    "line": 7153,
+    "text": "got 0xc0000101"
+   },
+   {
+    "file": "file.c",
+    "line": 7157,
+    "text": "got 0"
+   },
+   {
+    "file": "file.c",
+    "line": 7169,
+    "text": "got 0xc0000101"
+   },
+   {
+    "file": "file.c",
+    "line": 7172,
+    "text": "got 0"
+   },
+   {
+    "file": "file.c",
+    "line": 7176,
+    "text": "got 0xc0000101"
+   },
+   {
+    "file": "file.c",
+    "line": 7184,
+    "text": "got 0xc0000275"
+   },
+   {
+    "file": "file.c",
+    "line": 7185,
+    "text": "expected size 0x98, got 0x1"
+   },
+   {
+    "file": "file.c",
+    "line": 7186,
+    "text": "buffers didn't match"
+   },
+   {
+    "file": "file.c",
+    "line": 7197,
+    "text": "got 0xc0000101"
+   },
+   {
+    "file": "file.c",
+    "line": 7200,
+    "text": "got 0"
+   },
+   {
+    "file": "file.c",
+    "line": 7205,
+    "text": "got 0xc0000101"
+   },
+   {
+    "file": "file.c",
+    "line": 7213,
+    "text": "got 0xc0000101"
+   },
+   {
+    "file": "file.c",
+    "line": 7221,
+    "text": "got 0xc0000101"
+   },
+   {
+    "file": "file.c",
+    "line": 7229,
+    "text": "got 0xc0000101"
+   },
+   {
+    "file": "file.c",
+    "line": 7232,
+    "text": "got 0"
+   },
+   {
+    "file": "file.c",
+    "line": 7236,
+    "text": "got error 2"
+   },
+   {
+    "file": "file.c",
+    "line": 7243,
+    "text": "got 0xc0000101"
+   },
+   {
+    "file": "file.c",
+    "line": 7251,
+    "text": "got error 2"
+   },
+   {
+    "file": "file.c",
+    "line": 7256,
+    "text": "got error 145"
+   }
+  ],
+  "guarded": null,
+  "last_line": "winetest-batch: end file 181",
+  "seconds": 15.2,
+  "skipped_lines": [
+   "file.c:4075: Tests skipped: Not running on WoW64, skipping test.",
+   "file.c:4209: Tests skipped: Not running on WoW64, skipping test."
+  ],
+  "status": "complete",
+  "summary": {
+   "failures": 181,
+   "flaky": 0,
+   "skipped": 2,
+   "tests": 2922,
+   "todo": 108
+  },
+  "todo_lines": 108
+ },
+ "generated": {
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: end generated 0",
+  "seconds": 22.7,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 0,
+   "todo": 0
+  },
+  "todo_lines": 0
+ },
+ "info": {
+  "failure_count": 94,
+  "failures": [
+   {
+    "file": "info.c",
+    "line": 2135,
+    "text": "CreateProcess failed, last error 0x32."
+   },
+   {
+    "file": "info.c",
+    "line": 2243,
+    "text": "debug object access 10000000: CreateProcess failed, last error 0x32."
+   },
+   {
+    "file": "info.c",
+    "line": 2243,
+    "text": "debug object access 001f000f: CreateProcess failed, last error 0x32."
+   },
+   {
+    "file": "info.c",
+    "line": 2243,
+    "text": "debug object access 001f0000: CreateProcess failed, last error 0x32."
+   },
+   {
+    "file": "info.c",
+    "line": 2510,
+    "text": "CreateProcess failed with last error 50"
+   },
+   {
+    "file": "info.c",
+    "line": 2733,
+    "text": "CreateProcess failed, last error 0x32."
+   },
+   {
+    "file": "info.c",
+    "line": 2751,
+    "text": "NtQueryInformationProcess failed, status 0xc0000008."
+   },
+   {
+    "file": "info.c",
+    "line": 2752,
+    "text": "Expected flag 1, got 0."
+   },
+   {
+    "file": "info.c",
+    "line": 2761,
+    "text": "WaitForDebugEvent failed, last error 0x79."
+   },
+   {
+    "file": "info.c",
+    "line": 2772,
+    "text": "Expected 0, got 4294967295."
+   },
+   {
+    "file": "info.c",
+    "line": 2776,
+    "text": "DebugActiveProcessStop failed, last error 0x57."
+   },
+   {
+    "file": "info.c",
+    "line": 2781,
+    "text": "NtQueryInformationProcess failed, status 0xc0000008."
+   },
+   {
+    "file": "info.c",
+    "line": 2782,
+    "text": "Expected flag 1, got 0."
+   },
+   {
+    "file": "info.c",
+    "line": 2785,
+    "text": "DebugActiveProcess failed, last error 0x57."
+   },
+   {
+    "file": "info.c",
+    "line": 2790,
+    "text": "NtQueryInformationProcess failed, status 0xc0000008."
+   },
+   {
+    "file": "info.c",
+    "line": 2803,
+    "text": "WaitForDebugEvent failed, last error 0x79."
+   },
+   {
+    "file": "info.c",
+    "line": 2818,
+    "text": "NtQueryInformationProcess failed, status 0xc0000008."
+   },
+   {
+    "file": "info.c",
+    "line": 2822,
+    "text": "CloseHandle failed, last error 0x6."
+   },
+   {
+    "file": "info.c",
+    "line": 2824,
+    "text": "CloseHandle failed, last error 0x6."
+   },
+   {
+    "file": "info.c",
+    "line": 2733,
+    "text": "CreateProcess failed, last error 0x32."
+   },
+   {
+    "file": "info.c",
+    "line": 2751,
+    "text": "NtQueryInformationProcess failed, status 0xc0000008."
+   },
+   {
+    "file": "info.c",
+    "line": 2761,
+    "text": "WaitForDebugEvent failed, last error 0x79."
+   },
+   {
+    "file": "info.c",
+    "line": 2772,
+    "text": "Expected 0, got 4294967295."
+   },
+   {
+    "file": "info.c",
+    "line": 2776,
+    "text": "DebugActiveProcessStop failed, last error 0x57."
+   },
+   {
+    "file": "info.c",
+    "line": 2781,
+    "text": "NtQueryInformationProcess failed, status 0xc0000008."
+   },
+   {
+    "file": "info.c",
+    "line": 2785,
+    "text": "DebugActiveProcess failed, last error 0x57."
+   },
+   {
+    "file": "info.c",
+    "line": 2790,
+    "text": "NtQueryInformationProcess failed, status 0xc0000008."
+   },
+   {
+    "file": "info.c",
+    "line": 2803,
+    "text": "WaitForDebugEvent failed, last error 0x79."
+   },
+   {
+    "file": "info.c",
+    "line": 2818,
+    "text": "NtQueryInformationProcess failed, status 0xc0000008."
+   },
+   {
+    "file": "info.c",
+    "line": 2822,
+    "text": "CloseHandle failed, last error 0x6."
+   },
+   {
+    "file": "info.c",
+    "line": 2824,
+    "text": "CloseHandle failed, last error 0x6."
+   },
+   {
+    "file": "info.c",
+    "line": 2733,
+    "text": "CreateProcess failed, last error 0x32."
+   },
+   {
+    "file": "info.c",
+    "line": 2751,
+    "text": "NtQueryInformationProcess failed, status 0xc0000008."
+   },
+   {
+    "file": "info.c",
+    "line": 2761,
+    "text": "WaitForDebugEvent failed, last error 0x79."
+   },
+   {
+    "file": "info.c",
+    "line": 2772,
+    "text": "Expected 0, got 4294967295."
+   },
+   {
+    "file": "info.c",
+    "line": 2776,
+    "text": "DebugActiveProcessStop failed, last error 0x57."
+   },
+   {
+    "file": "info.c",
+    "line": 2781,
+    "text": "NtQueryInformationProcess failed, status 0xc0000008."
+   },
+   {
+    "file": "info.c",
+    "line": 2785,
+    "text": "DebugActiveProcess failed, last error 0x57."
+   },
+   {
+    "file": "info.c",
+    "line": 2790,
+    "text": "NtQueryInformationProcess failed, status 0xc0000008."
+   },
+   {
+    "file": "info.c",
+    "line": 2803,
+    "text": "WaitForDebugEvent failed, last error 0x79."
+   },
+   {
+    "file": "info.c",
+    "line": 2818,
+    "text": "NtQueryInformationProcess failed, status 0xc0000008."
+   },
+   {
+    "file": "info.c",
+    "line": 2822,
+    "text": "CloseHandle failed, last error 0x6."
+   },
+   {
+    "file": "info.c",
+    "line": 2824,
+    "text": "CloseHandle failed, last error 0x6."
+   },
+   {
+    "file": "info.c",
+    "line": 2733,
+    "text": "CreateProcess failed, last error 0x32."
+   },
+   {
+    "file": "info.c",
+    "line": 2740,
+    "text": "NtQueryInformationProcess failed, status 0xc0000008."
+   },
+   {
+    "file": "info.c",
+    "line": 2741,
+    "text": "Expected flag TRUE, got 0."
+   },
+   {
+    "file": "info.c",
+    "line": 2744,
+    "text": "DebugActiveProcess failed, last error 0x57."
+   },
+   {
+    "file": "info.c",
+    "line": 2751,
+    "text": "NtQueryInformationProcess failed, status 0xc0000008."
+   },
+   {
+    "file": "info.c",
+    "line": 2776,
+    "text": "DebugActiveProcessStop failed, last error 0x57."
+   },
+   {
+    "file": "info.c",
+    "line": 2781,
+    "text": "NtQueryInformationProcess failed, status 0xc0000008."
+   },
+   {
+    "file": "info.c",
+    "line": 2785,
+    "text": "DebugActiveProcess failed, last error 0x57."
+   },
+   {
+    "file": "info.c",
+    "line": 2790,
+    "text": "NtQueryInformationProcess failed, status 0xc0000008."
+   },
+   {
+    "file": "info.c",
+    "line": 2803,
+    "text": "WaitForDebugEvent failed, last error 0x79."
+   },
+   {
+    "file": "info.c",
+    "line": 2818,
+    "text": "NtQueryInformationProcess failed, status 0xc0000008."
+   },
+   {
+    "file": "info.c",
+    "line": 2822,
+    "text": "CloseHandle failed, last error 0x6."
+   },
+   {
+    "file": "info.c",
+    "line": 2824,
+    "text": "CloseHandle failed, last error 0x6."
+   },
+   {
+    "file": "info.c",
+    "line": 4368,
+    "text": "got error 50"
+   },
+   {
+    "file": "info.c",
+    "line": 4393,
+    "text": "got 0xc0000008"
+   },
+   {
+    "file": "info.c",
+    "line": 4399,
+    "text": "got 0xc0000008"
+   },
+   {
+    "file": "info.c",
+    "line": 4402,
+    "text": "got error 6"
+   },
+   {
+    "file": "info.c",
+    "line": 4408,
+    "text": "got error 6"
+   },
+   {
+    "file": "info.c",
+    "line": 4409,
+    "text": "expected same IDs"
+   },
+   {
+    "file": "info.c",
+    "line": 4416,
+    "text": "got -1"
+   },
+   {
+    "file": "info.c",
+    "line": 4726,
+    "text": "got 0x2."
+   },
+   {
+    "file": "info.c",
+    "line": 4727,
+    "text": "got 0000001000237230."
+   },
+   {
+    "file": "info.c",
+    "line": 4733,
+    "text": "got 0xc000000d."
+   },
+   {
+    "file": "info.c",
+    "line": 4735,
+    "text": "wrong vector."
+   },
+   {
+    "file": "info.c",
+    "line": 4736,
+    "text": "got 0x28."
+   },
+   {
+    "file": "info.c",
+    "line": 4737,
+    "text": "got 0000001000237230."
+   },
+   {
+    "file": "info.c",
+    "line": 4770,
+    "text": "got 0xc0000005."
+   },
+   {
+    "file": "info.c",
+    "line": 4779,
+    "text": "got 0x28."
+   },
+   {
+    "file": "info.c",
+    "line": 4780,
+    "text": "got 000000100020BE00."
+   },
+   {
+    "file": "info.c",
+    "line": 4812,
+    "text": "got 0x2."
+   },
+   {
+    "file": "info.c",
+    "line": 4814,
+    "text": "got 0x28."
+   },
+   {
+    "file": "info.c",
+    "line": 4847,
+    "text": "got 0x2."
+   },
+   {
+    "file": "info.c",
+    "line": 4849,
+    "text": "got 0000000000000000."
+   },
+   {
+    "file": "info.c",
+    "line": 4900,
+    "text": "got error 50."
+   },
+   {
+    "file": "info.c",
+    "line": 4869,
+    "text": "got 0xc0000008."
+   },
+   {
+    "file": "info.c",
+    "line": 4871,
+    "text": "got error 6."
+   },
+   {
+    "file": "info.c",
+    "line": 4873,
+    "text": "got error 6."
+   },
+   {
+    "file": "info.c",
+    "line": 4909,
+    "text": "got error 50."
+   },
+   {
+    "file": "info.c",
+    "line": 4869,
+    "text": "got 0xc0000008."
+   },
+   {
+    "file": "info.c",
+    "line": 4871,
+    "text": "got error 6."
+   },
+   {
+    "file": "info.c",
+    "line": 4873,
+    "text": "got error 6."
+   },
+   {
+    "file": "info.c",
+    "line": 4911,
+    "text": "got 0x4001."
+   },
+   {
+    "file": "info.c",
+    "line": 4926,
+    "text": "got error 50."
+   },
+   {
+    "file": "info.c",
+    "line": 4869,
+    "text": "got 0xc0000008."
+   },
+   {
+    "file": "info.c",
+    "line": 4871,
+    "text": "got error 6."
+   },
+   {
+    "file": "info.c",
+    "line": 4873,
+    "text": "got error 6."
+   },
+   {
+    "file": "info.c",
+    "line": 4938,
+    "text": "got error 50."
+   },
+   {
+    "file": "info.c",
+    "line": 4869,
+    "text": "got 0xc0000008."
+   },
+   {
+    "file": "info.c",
+    "line": 4871,
+    "text": "got error 6."
+   },
+   {
+    "file": "info.c",
+    "line": 4873,
+    "text": "got error 6."
+   },
+   {
+    "file": "info.c",
+    "line": 4940,
+    "text": "got 0x4001."
+   }
+  ],
+  "guarded": null,
+  "last_line": "winetest-batch: end info 98",
+  "seconds": 22.7,
+  "skipped_lines": [
+   "info.c:2960: Tests skipped: Unable to turn off noexec"
+  ],
+  "status": "complete",
+  "summary": {
+   "failures": 98,
+   "flaky": 0,
+   "skipped": 1,
+   "tests": 2327,
+   "todo": 19
+  },
+  "todo_lines": 19
+ },
+ "large_int": {
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: end large_int 0",
+  "seconds": 22.7,
+  "skipped_lines": [
+   "large_int.c:311: Tests skipped: Value ffffffff80000001 broken on 64-bit windows",
+   "large_int.c:311: Tests skipped: Value fffffffffffffffe broken on 64-bit windows",
+   "large_int.c:311: Tests skipped: Value ffffffffffffffff broken on 64-bit windows",
+   "large_int.c:311: Tests skipped: Value fffffffffffffffe broken on 64-bit windows",
+   "large_int.c:311: Tests skipped: Value ffffffffffffffff broken on 64-bit windows",
+   "large_int.c:311: Tests skipped: Value ffffffff80000001 broken on 64-bit windows",
+   "large_int.c:311: Tests skipped: Value fffffffffffffffe broken on 64-bit windows",
+   "large_int.c:311: Tests skipped: Value ffffffffffffffff broken on 64-bit windows",
+   "large_int.c:398: Tests skipped: Value ffffffff80000001 broken on 64-bit windows",
+   "large_int.c:398: Tests skipped: Value fffffffffffffffe broken on 64-bit windows",
+   "large_int.c:398: Tests skipped: Value ffffffffffffffff broken on 64-bit windows",
+   "large_int.c:398: Tests skipped: Value fffffffffffffffe broken on 64-bit windows",
+   "large_int.c:398: Tests skipped: Value ffffffffffffffff broken on 64-bit windows",
+   "large_int.c:398: Tests skipped: Value ffffffff80000001 broken on 64-bit windows",
+   "large_int.c:398: Tests skipped: Value fffffffffffffffe broken on 64-bit windows",
+   "large_int.c:398: Tests skipped: Value ffffffffffffffff broken on 64-bit windows"
+  ],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 16,
+   "tests": 612,
+   "todo": 0
+  },
+  "todo_lines": 0
+ },
+ "om": {
+  "failure_count": 6,
+  "failures": [
+   {
+    "file": "om.c",
+    "line": 2597,
+    "text": "expected STATUS_SUCCESS, got c0000033"
+   },
+   {
+    "file": "om.c",
+    "line": 2600,
+    "text": "NtQueryObject failed c0000008"
+   },
+   {
+    "file": "om.c",
+    "line": 2600,
+    "text": "unexpected len 0"
+   },
+   {
+    "file": "om.c",
+    "line": 2600,
+    "text": "unexpected len 0"
+   },
+   {
+    "file": "om.c",
+    "line": 2600,
+    "text": "wrong name (null)"
+   },
+   {
+    "file": "om.c",
+    "line": 3663,
+    "text": "got 0."
+   }
+  ],
+  "guarded": null,
+  "last_line": "winetest-batch: end om 6",
+  "seconds": 22.7,
+  "skipped_lines": [
+   "om.c:3328: Tests skipped: no privileges, tests may be limited"
+  ],
+  "status": "complete",
+  "summary": {
+   "failures": 6,
+   "flaky": 0,
+   "skipped": 1,
+   "tests": 7723,
+   "todo": 30
+  },
+  "todo_lines": 30
+ },
+ "path": {
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: end path 0",
+  "seconds": 22.7,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 1011,
+   "todo": 0
+  },
+  "todo_lines": 0
+ },
+ "pipe": {
+  "failure_count": 17,
+  "failures": [
+   {
+    "file": "pipe.c",
+    "line": 146,
+    "text": "got 50."
+   },
+   {
+    "file": "pipe.c",
+    "line": 148,
+    "text": "got 6."
+   },
+   {
+    "file": "pipe.c",
+    "line": 3106,
+    "text": "other_process 1, i 0: failed, error 6."
+   },
+   {
+    "file": "pipe.c",
+    "line": 3111,
+    "text": "other_process 1, i 0: got 0xc000014b."
+   },
+   {
+    "file": "pipe.c",
+    "line": 3119,
+    "text": "other_process 1, i 0: got 0."
+   },
+   {
+    "file": "pipe.c",
+    "line": 3125,
+    "text": "other_process 1, i 0: failed, error 6."
+   },
+   {
+    "file": "pipe.c",
+    "line": 3106,
+    "text": "other_process 1, i 1: failed, error 6."
+   },
+   {
+    "file": "pipe.c",
+    "line": 3111,
+    "text": "other_process 1, i 1: got 0xc000014b."
+   },
+   {
+    "file": "pipe.c",
+    "line": 3125,
+    "text": "other_process 1, i 1: failed, error 6."
+   },
+   {
+    "file": "pipe.c",
+    "line": 3106,
+    "text": "other_process 1, i 4: failed, error 6."
+   },
+   {
+    "file": "pipe.c",
+    "line": 3111,
+    "text": "other_process 1, i 4: got 0xc000014b."
+   },
+   {
+    "file": "pipe.c",
+    "line": 3116,
+    "text": "other_process 1, i 4: GetQueuedCompletionStatus returned 0(109)"
+   },
+   {
+    "file": "pipe.c",
+    "line": 3119,
+    "text": "other_process 1, i 4: got 0."
+   },
+   {
+    "file": "pipe.c",
+    "line": 3125,
+    "text": "other_process 1, i 4: failed, error 6."
+   },
+   {
+    "file": "pipe.c",
+    "line": 3106,
+    "text": "other_process 1, i 5: failed, error 6."
+   },
+   {
+    "file": "pipe.c",
+    "line": 3114,
+    "text": "other_process 1, i 5: Status = c000014b"
+   },
+   {
+    "file": "pipe.c",
+    "line": 3125,
+    "text": "other_process 1, i 5: failed, error 6."
+   }
+  ],
+  "guarded": null,
+  "last_line": "winetest-batch: end pipe 17",
+  "seconds": 15.2,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 17,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 2398,
+   "todo": 36
+  },
+  "todo_lines": 36
+ },
+ "port": {
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 22.7,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 1,
+   "todo": 1
+  },
+  "todo_lines": 1
+ },
+ "reg": {
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: end reg 0",
+  "seconds": 8.3,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 3832,
+   "todo": 16
+  },
+  "todo_lines": 16
+ },
+ "rtl": {
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: end rtl 0",
+  "seconds": 8.3,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 600072,
+   "todo": 54
+  },
+  "todo_lines": 54
+ },
+ "rtlbitmap": {
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: end rtlbitmap 0",
+  "seconds": 8.3,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 378,
+   "todo": 0
+  },
+  "todo_lines": 0
+ },
+ "rtlstr": {
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: end rtlstr 0",
+  "seconds": 8.3,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 2178627,
+   "todo": 3
+  },
+  "todo_lines": 3
+ },
+ "string": {
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: end string 0",
+  "seconds": 8.3,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 1974183,
+   "todo": 0
+  },
+  "todo_lines": 0
+ },
+ "sync": {
+  "failure_count": 2,
+  "failures": [
+   {
+    "file": "sync.c",
+    "line": 854,
+    "text": "failed to create process, error 50"
+   },
+   {
+    "file": "sync.c",
+    "line": 857,
+    "text": "wait failed"
+   }
+  ],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 15.2,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 2,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 429,
+   "todo": 1
+  },
+  "todo_lines": 1
+ },
+ "thread": {
+  "failure_count": 4,
+  "failures": [
+   {
+    "file": "thread.c",
+    "line": 151,
+    "text": "Got unexpected status 0xc00000bb."
+   },
+   {
+    "file": "thread.c",
+    "line": 153,
+    "text": "Got unexpected status 0xc0000008."
+   },
+   {
+    "file": "thread.c",
+    "line": 266,
+    "text": "Got unexpected status 0xc00000bb."
+   },
+   {
+    "file": "thread.c",
+    "line": 268,
+    "text": "Got unexpected status 0xc0000008."
+   }
+  ],
+  "guarded": null,
+  "last_line": "winetest-batch: end thread 4",
+  "seconds": 8.3,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 4,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 49,
+   "todo": 0
+  },
+  "todo_lines": 0
+ },
+ "threadpool": {
+  "reason": "freezes the whole title (no klog heartbeat, its stop request ignored) and has to be killed; to be reduced to a reproducer before it runs again",
+  "status": "skipped"
+ },
+ "time": {
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 8.3,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 10657,
+   "todo": 2
+  },
+  "todo_lines": 2
+ },
+ "unwind": {
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: end unwind 0",
+  "seconds": 7.3,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 455178,
+   "todo": 2
+  },
+  "todo_lines": 2
+ },
+ "virtual": {
+  "failure_count": 83,
+  "failures": [
+   {
+    "file": "virtual.c",
+    "line": 445,
+    "text": "Unexpected count 4."
+   },
+   {
+    "file": "virtual.c",
+    "line": 446,
+    "text": "Unexpected address 0000001001810000."
+   },
+   {
+    "file": "virtual.c",
+    "line": 2547,
+    "text": "Unexpected status c0000018."
+   },
+   {
+    "file": "virtual.c",
+    "line": 2550,
+    "text": "Unexpected size 0000000000000FFF."
+   },
+   {
+    "file": "virtual.c",
+    "line": 2551,
+    "text": "Got addr 0000001001831001, addr1 0000001001830000."
+   },
+   {
+    "file": "virtual.c",
+    "line": 2556,
+    "text": "Unexpected status c0000018."
+   },
+   {
+    "file": "virtual.c",
+    "line": 2558,
+    "text": "Unexpected size 0000000000000FFF."
+   },
+   {
+    "file": "virtual.c",
+    "line": 2559,
+    "text": "Got addr 0000001001830001, addr1 0000001001830000."
+   },
+   {
+    "file": "virtual.c",
+    "line": 2564,
+    "text": "Unexpected status c0000018."
+   },
+   {
+    "file": "virtual.c",
+    "line": 2570,
+    "text": "Unexpected status 00000000."
+   },
+   {
+    "file": "virtual.c",
+    "line": 2574,
+    "text": "Unexpected status 00000000."
+   },
+   {
+    "file": "virtual.c",
+    "line": 2589,
+    "text": "Unexpected status c00000a0."
+   },
+   {
+    "file": "virtual.c",
+    "line": 2593,
+    "text": "Unexpected status c00000a0."
+   },
+   {
+    "file": "virtual.c",
+    "line": 1078,
+    "text": "unexpected guard_size 4000, expected 1000, 2000 or 3000"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1125,
+    "text": "unexpected guard_size 4000, expected 1000, 2000 or 3000"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1187,
+    "text": "unexpected RegionSize 2000, expected 4000"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1234,
+    "text": "unexpected RegionSize 2000, expected 1000"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1078,
+    "text": "unexpected guard_size 4000, expected 1000, 2000 or 3000"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1125,
+    "text": "unexpected guard_size 4000, expected 1000, 2000 or 3000"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1187,
+    "text": "unexpected RegionSize 2000, expected 4000"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1234,
+    "text": "unexpected RegionSize 2000, expected 1000"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1078,
+    "text": "unexpected guard_size 4000, expected 1000, 2000 or 3000"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1078,
+    "text": "unexpected guard_size 4000, expected 1000, 2000 or 3000"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1078,
+    "text": "unexpected guard_size 4000, expected 1000, 2000 or 3000"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1078,
+    "text": "unexpected guard_size 4000, expected 1000, 2000 or 3000"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1078,
+    "text": "unexpected guard_size 4000, expected 1000, 2000 or 3000"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1078,
+    "text": "unexpected guard_size 4000, expected 1000, 2000 or 3000"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1078,
+    "text": "unexpected guard_size 4000, expected 1000, 2000 or 3000"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1078,
+    "text": "unexpected guard_size 4000, expected 1000, 2000 or 3000"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1078,
+    "text": "unexpected guard_size 4000, expected 1000, 2000 or 3000"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1078,
+    "text": "unexpected guard_size 4000, expected 1000, 2000 or 3000"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1078,
+    "text": "unexpected guard_size 4000, expected 1000, 2000 or 3000"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1078,
+    "text": "unexpected guard_size 4000, expected 1000, 2000 or 3000"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1078,
+    "text": "unexpected guard_size 4000, expected 1000, 2000 or 3000"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1078,
+    "text": "unexpected guard_size 4000, expected 1000, 2000 or 3000"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1078,
+    "text": "unexpected guard_size 4000, expected 1000, 2000 or 3000"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1078,
+    "text": "unexpected guard_size 4000, expected 1000, 2000 or 3000"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1078,
+    "text": "unexpected guard_size 4000, expected 1000, 2000 or 3000"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1078,
+    "text": "unexpected guard_size 4000, expected 1000, 2000 or 3000"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1078,
+    "text": "unexpected guard_size 4000, expected 1000, 2000 or 3000"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1078,
+    "text": "unexpected guard_size 4000, expected 1000, 2000 or 3000"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1078,
+    "text": "unexpected guard_size 4000, expected 1000, 2000 or 3000"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1078,
+    "text": "unexpected guard_size 4000, expected 1000, 2000 or 3000"
+   },
+   {
+    "file": "virtual.c",
+    "line": 72,
+    "text": "error: 50"
+   },
+   {
+    "file": "virtual.c",
+    "line": 74,
+    "text": "error 6"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1464,
+    "text": "Can't start process"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1476,
+    "text": "NtMapViewOfSection returned c0000008"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1480,
+    "text": "ReadProcessMemory failed"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1481,
+    "text": "ReadProcessMemory didn't read all data (0)"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1482,
+    "text": "Wrong data read"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1490,
+    "text": "NtMapViewOfSection returned c0000008"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1507,
+    "text": "NtMapViewOfSection with 2 zero_bits returned c0000008"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1507,
+    "text": "NtMapViewOfSection with 3 zero_bits returned c0000008"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1507,
+    "text": "NtMapViewOfSection with 4 zero_bits returned c0000008"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1507,
+    "text": "NtMapViewOfSection with 5 zero_bits returned c0000008"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1507,
+    "text": "NtMapViewOfSection with 6 zero_bits returned c0000008"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1507,
+    "text": "NtMapViewOfSection with 7 zero_bits returned c0000008"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1507,
+    "text": "NtMapViewOfSection with 8 zero_bits returned c0000008"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1507,
+    "text": "NtMapViewOfSection with 9 zero_bits returned c0000008"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1507,
+    "text": "NtMapViewOfSection with 10 zero_bits returned c0000008"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1507,
+    "text": "NtMapViewOfSection with 11 zero_bits returned c0000008"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1507,
+    "text": "NtMapViewOfSection with 12 zero_bits returned c0000008"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1507,
+    "text": "NtMapViewOfSection with 13 zero_bits returned c0000008"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1507,
+    "text": "NtMapViewOfSection with 14 zero_bits returned c0000008"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1507,
+    "text": "NtMapViewOfSection with 15 zero_bits returned c0000008"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1507,
+    "text": "NtMapViewOfSection with 16 zero_bits returned c0000008"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1507,
+    "text": "NtMapViewOfSection with 17 zero_bits returned c0000008"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1507,
+    "text": "NtMapViewOfSection with 18 zero_bits returned c0000008"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1507,
+    "text": "NtMapViewOfSection with 19 zero_bits returned c0000008"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1507,
+    "text": "NtMapViewOfSection with 20 zero_bits returned c0000008"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1524,
+    "text": "NtMapViewOfSection returned c0000008"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1548,
+    "text": "NtMapViewOfSection returned c0000008"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1566,
+    "text": "NtMapViewOfSection returned c0000008"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1669,
+    "text": "NtUnmapViewOfSection returned c0000008"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1691,
+    "text": "NtMapViewOfSection returned c0000008"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1696,
+    "text": "NtUnmapViewOfSection returned c0000008"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1716,
+    "text": "NtMapViewOfSection returned c0000008"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1722,
+    "text": "NtMapViewOfSection returned c0000008"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1724,
+    "text": "got unexpected sizes 0, 0"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1729,
+    "text": "ReadProcessMemory failed"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1730,
+    "text": "ReadProcessMemory didn't read all data (0)"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1734,
+    "text": "ReadProcessMemory failed"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1735,
+    "text": "ReadProcessMemory didn't read all data (0)"
+   }
+  ],
+  "guarded": null,
+  "last_line": "virtual.c:1735: Test failed: ReadProcessMemory didn't read all data (0)",
+  "seconds": 7.3,
+  "skipped_lines": [],
+  "status": "incomplete",
+  "summary": null,
+  "todo_lines": 106
+ },
+ "wow64": {
+  "failure_count": 4,
+  "failures": [
+   {
+    "file": "wow64.c",
+    "line": 1466,
+    "text": "Failed to open version.dll"
+   },
+   {
+    "file": "wow64.c",
+    "line": 1469,
+    "text": "CreateFileMapping failed"
+   },
+   {
+    "file": "wow64.c",
+    "line": 1476,
+    "text": "NtMapViewOfSection returned c0000008"
+   },
+   {
+    "file": "wow64.c",
+    "line": 1482,
+    "text": "NtMapViewOfSection returned c0000008"
+   }
+  ],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 4.7,
+  "skipped_lines": [
+   "wow64.c:1335: Tests skipped: NtSetLdtEntries not supported"
+  ],
+  "status": "complete",
+  "summary": {
+   "failures": 4,
+   "flaky": 0,
+   "skipped": 1,
+   "tests": 1014,
+   "todo": 0
+  },
+  "todo_lines": 0
+ }
+}

@@ -1,0 +1,43 @@
+{
+ "oracle": "Wine 11.18 on Linux, secondary GUI-capable Wine reference",
+ "dxvk_version": "601930949d111edbbcf9dd463948426d9f8f6ddd dxvk (v3.1-19-g601930949)",
+ "runs": [
+  {
+   "bits": 64,
+   "exit_code": 0,
+   "marker": [
+    [
+     "PASS",
+     "64",
+     "4096",
+     "pixels",
+     "0x0"
+    ]
+   ],
+   "passed": true
+  },
+  {
+   "bits": 32,
+   "exit_code": 0,
+   "marker": [
+    [
+     "PASS",
+     "32",
+     "4096",
+     "pixels",
+     "0x0"
+    ]
+   ],
+   "passed": true
+  }
+ ],
+ "passed": true,
+ "console_qualified": false,
+ "windows_equivalence_verified": false,
+ "source_sha256": "e54c2c4c03b77e91b1f7630d9bdae4b805f6157da219d9cdaeffde2b39c01f14",
+ "probe_sha256": {
+  "32": "99a1c3c44ed4ec1678ce3e04ee5b8d4f152126f7af47a3bdf6bf0ce08a3fe596",
+  "64": "aa08a89773efdddedeb8cb10be60aee9b9554f9d33faac21540b6764f83d362d"
+ },
+ "proof": "Unbound 64x64 RGBA8 render-target ClearRenderTargetView, CopyResource to a staging texture and D3D11 Map: all 4096 pixels match RGBA 220,50,60,255 in each architecture."
+}

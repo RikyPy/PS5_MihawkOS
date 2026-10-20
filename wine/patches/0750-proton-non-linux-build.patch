@@ -1,0 +1,220 @@
+From 1bb8e1652225d22956fd31d6d69532deb970ef59 Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Fri, 2 Oct 2026 19:35:46 -0400
+Subject: [PATCH] Restore non-Linux synchronization and thread portability
+
+Guard Linux ntsync and futex syscalls, glibc heap options and thread GS setup. Keep framebuffer type definitions and no-EGL fallback callbacks available when building without EGL. Cast link_map addresses to the platform field type. Found by the PS5 cross-build; console validation pending. SPDX-License-Identifier: LGPL-2.1-or-later
+---
+ dlls/ntdll/unix/fsync.c         | 14 ++++++++++++++
+ dlls/ntdll/unix/loader.c        |  6 ++++++
+ dlls/ntdll/unix/signal_x86_64.c |  8 ++++++++
+ dlls/ntdll/unix/sync.c          |  2 ++
+ dlls/ntdll/unix/virtual.c       |  4 ++--
+ dlls/win32u/opengl.c            | 16 ++++++++++++++--
+ server/fsync.c                  |  5 +++++
+ server/inproc_sync.c            |  2 ++
+ 8 files changed, 53 insertions(+), 4 deletions(-)
+
+diff --git a/dlls/ntdll/unix/fsync.c b/dlls/ntdll/unix/fsync.c
+index 25d41ca..88c2c0c 100644
+--- a/dlls/ntdll/unix/fsync.c
++++ b/dlls/ntdll/unix/fsync.c
+@@ -141,15 +141,25 @@ static void simulate_sched_quantum(void)
+ static inline int futex_wait_multiple( const struct futex_waitv *futexes,
+         int count, const struct timespec64 *end, clockid_t clock_id )
+ {
++#ifdef __linux__
+    if (end)
+         return syscall( __NR_futex_waitv, futexes, count, 0, end, clock_id );
+    else
+         return syscall( __NR_futex_waitv, futexes, count, 0, NULL, 0 );
++#else
++    errno = ENOSYS;
++    return -1;
++#endif
+ }
+ 
+ static inline int futex_wake( int *addr, int val )
+ {
++#ifdef __linux__
+     return syscall( __NR_futex, addr, 1, val, NULL, 0, 0 );
++#else
++    errno = ENOSYS;
++    return -1;
++#endif
+ }
+ 
+ struct fsync
+@@ -456,7 +466,11 @@ void fsync_init( DWORD pid )
+ 
+ 
+     fsync_enabled = 1;
++#ifdef __linux__
+     syscall( __NR_futex_waitv, NULL, 0, 0, NULL, 0 );
++#else
++    errno = ENOSYS;
++#endif
+     if (errno == ENOSYS || errno == EPERM)
+     {
+         ERR("Server is running with WINEFSYNC but this process can't use __NR_futex_waitv.\n");
+diff --git a/dlls/ntdll/unix/loader.c b/dlls/ntdll/unix/loader.c
+index 625abcf..eb8516c 100644
+--- a/dlls/ntdll/unix/loader.c
++++ b/dlls/ntdll/unix/loader.c
+@@ -38,7 +38,9 @@
+ #include <sys/mman.h>
+ #include <sys/wait.h>
+ #include <unistd.h>
++#ifdef __GLIBC__
+ #include <malloc.h>
++#endif
+ #include <dlfcn.h>
+ #ifdef HAVE_PWD_H
+ # include <pwd.h>
+@@ -2563,7 +2565,9 @@ static void start_main_thread(void)
+     set_thread_teb( teb );
+ #endif
+ 
++#ifdef __GLIBC__
+     mallopt( M_PERTURB, 0xff );
++#endif
+     init_startup_info();
+     *(ULONG_PTR *)&peb->CloudFileFlags = get_image_address();
+     set_load_order_app_name( main_wargv[0] );
+@@ -2572,7 +2576,9 @@ static void start_main_thread(void)
+     load_ntdll();
+     load_wow64_ntdll( main_image_info.Machine );
+     load_apiset_dll();
++#ifdef __GLIBC__
+     mallopt( M_PERTURB, 0 );
++#endif
+     server_init_process_done();
+ }
+ 
+diff --git a/dlls/ntdll/unix/signal_x86_64.c b/dlls/ntdll/unix/signal_x86_64.c
+index 397282c..a83a851 100644
+--- a/dlls/ntdll/unix/signal_x86_64.c
++++ b/dlls/ntdll/unix/signal_x86_64.c
+@@ -3284,7 +3284,15 @@ void signal_init_process(void)
+ 
+ void set_thread_teb( TEB *teb )
+ {
++#ifdef __linux__
+     arch_prctl( ARCH_SET_GS, teb );
++#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
++    amd64_set_gsbase( teb );
++#elif defined(__NetBSD__)
++    sysarch( X86_64_SET_GSBASE, &teb );
++#elif defined(__APPLE__)
++    _thread_set_tsd_base( (ULONG_PTR)teb );
++#endif
+ }
+ 
+ /***********************************************************************
+diff --git a/dlls/ntdll/unix/sync.c b/dlls/ntdll/unix/sync.c
+index 67ab945..6f2c89c 100644
+--- a/dlls/ntdll/unix/sync.c
++++ b/dlls/ntdll/unix/sync.c
+@@ -61,7 +61,9 @@
+ # include <sys/event.h>
+ #endif
+ 
++#ifdef __linux__
+ # include "ntsync_tmp.h"
++#endif
+ 
+ #include "ntstatus.h"
+ #define WIN32_NO_STATUS
+diff --git a/dlls/ntdll/unix/virtual.c b/dlls/ntdll/unix/virtual.c
+index 892eed8..2a70d46 100644
+--- a/dlls/ntdll/unix/virtual.c
++++ b/dlls/ntdll/unix/virtual.c
+@@ -396,11 +396,11 @@ static void r_debug_add_module( void *module, int fd, INT_PTR offset )
+ 
+     r_debug_set_state( RT_ADD );
+ 
+-    if (ptr) entry->map.l_addr = offset;
++    if (ptr) entry->map.l_addr = (typeof(entry->map.l_addr))offset;
+     else if ((entry = calloc( 1, sizeof(*entry) )))
+     {
+         entry->module = module;
+-        entry->map.l_addr = offset;
++        entry->map.l_addr = (typeof(entry->map.l_addr))offset;
+         entry->map.l_name = r_debug_path_from_fd( fd );
+ 
+         entry->map.l_next = link_map.l_next;
+diff --git a/dlls/win32u/opengl.c b/dlls/win32u/opengl.c
+index c7aeea1..5534d7d 100644
+--- a/dlls/win32u/opengl.c
++++ b/dlls/win32u/opengl.c
+@@ -186,8 +186,6 @@ static int get_window_swap_interval( HWND hwnd )
+     return interval;
+ }
+ 
+-#ifdef SONAME_LIBEGL
+-
+ struct framebuffer_surface
+ {
+     struct opengl_drawable base;
+@@ -203,6 +201,8 @@ static struct framebuffer_surface *framebuffer_from_opengl_drawable( struct open
+     return CONTAINING_RECORD( base, struct framebuffer_surface, base );
+ }
+ 
++#ifdef SONAME_LIBEGL
++
+ static BOOL is_default_fbo_srgb_capable( void )
+ {
+     const struct opengl_funcs *funcs = &display_funcs;
+@@ -1600,6 +1600,18 @@ static void init_egl_platforms( struct opengl_funcs *funcs, const struct opengl_
+ 
+ #else /* SONAME_LIBEGL */
+ 
++/* No EGL backend can create a framebuffer surface in this build. */
++static const struct opengl_drawable_funcs framebuffer_surface_funcs;
++
++static BOOL needs_framebuffer_surface( HWND hwnd ) { return FALSE; }
++
++static struct opengl_drawable *framebuffer_surface_create( int format, struct client_surface *client,
++                                                         struct opengl_drawable *target )
++{
++    return NULL;
++}
++
++
+ static BOOL egl_init( const struct opengl_driver_funcs **driver_funcs )
+ {
+     WARN( "EGL support not compiled in!\n" );
+diff --git a/server/fsync.c b/server/fsync.c
+index 7d3ec64..362c406 100644
+--- a/server/fsync.c
++++ b/server/fsync.c
+@@ -310,7 +310,12 @@ int fsync_grab_shm_idx( unsigned int shm_idx )
+ 
+ static inline int futex_wake( int *addr, int val )
+ {
++#ifdef __linux__
+     return syscall( __NR_futex, addr, 1, val, NULL, 0, 0 );
++#else
++    errno = ENOSYS;
++    return -1;
++#endif
+ }
+ 
+ /* shm layout for events or event-like objects. */
+diff --git a/server/inproc_sync.c b/server/inproc_sync.c
+index a7020ef..0bfe3cc 100644
+--- a/server/inproc_sync.c
++++ b/server/inproc_sync.c
+@@ -36,7 +36,9 @@
+ 
+ #include "fsync.h"
+ 
++#ifdef __linux__
+ #include "ntsync_tmp.h"
++#endif
+ 
+ #ifdef NTSYNC_IOC_EVENT_READ
+ 
+-- 
+2.55.0
+

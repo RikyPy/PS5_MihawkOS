@@ -1,0 +1,30 @@
+From a518d643873ff733bafb31595dfd01ab8bbdf790 Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Sat, 3 Oct 2026 09:44:09 -0400
+Subject: [PATCH] include: list wine/ps5_ntsync.h in the public header sources
+
+Wine's makedep only resolves an #include "wine/..." to the headers that
+include/Makefile.in lists, wherever the file sits on disk. Patch 0890 added
+include/wine/ps5_ntsync.h and included it from dlls/ntdll/unix/server.c,
+sync.c and thread.c without listing it, so configuring the host build of the
+PE runtime stopped with "wine/ps5_ntsync.h: No such file or directory" and
+the runtime could not be rebuilt after 0890.
+---
+ include/Makefile.in | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/include/Makefile.in b/include/Makefile.in
+index 4351581..31aa3ba 100644
+--- a/include/Makefile.in
++++ b/include/Makefile.in
+@@ -986,6 +986,7 @@ SOURCES = \
+ 	wine/opengl_driver.h \
+ 	wine/orpc.idl \
+ 	wine/plugplay.idl \
++	wine/ps5_ntsync.h \
+ 	wine/rbtree.h \
+ 	wine/schrpc.idl \
+ 	wine/server.h \
+-- 
+2.56.0
+

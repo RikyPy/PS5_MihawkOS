@@ -1,0 +1,223 @@
+From: PS5_Proton
+Subject: [PATCH] win32u: share desktop work-area reservations across clients
+
+SPI_SETWORKAREA used a process-local rectangle, invisible to other clients
+and GetMonitorInfo. Keep the raw primary-monitor reservation in Wine's
+existing authoritative desktop shared object and read it under its seqlock.
+Normal monitor information, SPI and maximization then see the same rectangle.
+Preserve the original path for other drivers and ordinary desktop lifetime.
+
+--- a/server/protocol.def
++++ b/server/protocol.def
+@@ -1019,6 +1019,8 @@
+     unsigned char        keystate[256];    /* asynchronous key state */
+     unsigned __int64     monitor_serial;   /* winstation monitor update counter */
+     unsigned __int64     keystate_serial;  /* keystate update counter */
++    struct rectangle     work_area;        /* primary monitor work area in raw coordinates */
++    unsigned int         work_area_valid;  /* an explicit desktop reservation exists */
+ } desktop_shm_t;
+ 
+ typedef volatile struct
+@@ -4360,3 +4362,9 @@
+     unsigned int shm_idx;
+ @REPLY
+ @END
++
++/* Set a coherent, desktop-owned work-area reservation. Clients read the
++ * existing desktop shared object under its seqlock, not a private SPI cache. */
++@REQ(set_desktop_work_area)
++    struct rectangle rect;
++@END
+--- a/server/winstation.c
++++ b/server/winstation.c
+@@ -334,6 +334,8 @@
+                 shared->cursor.clip.right = 0;
+                 shared->cursor.clip.bottom = 0;
+                 memset( (void *)shared->keystate, 0, sizeof(shared->keystate) );
++                shared->work_area_valid = 0;
++                memset( (void *)&shared->work_area, 0, sizeof(shared->work_area) );
+                 shared->keystate_serial = 1;
+                 shared->monitor_serial = winstation->monitor_serial;
+             }
+@@ -1017,3 +1019,23 @@
+         set_error( STATUS_BUFFER_TOO_SMALL );
+     }
+ }
++
++/* The server serializes writers; the existing shared-object seqlock makes all
++ * four coordinates visible together to every process on this desktop. */
++DECL_HANDLER(set_desktop_work_area)
++{
++    struct desktop *desktop;
++    if (req->rect.left >= req->rect.right || req->rect.top >= req->rect.bottom)
++    {
++        set_error( STATUS_INVALID_PARAMETER );
++        return;
++    }
++    if (!(desktop = get_thread_desktop( current, DESKTOP_WRITEOBJECTS ))) return;
++    SHARED_WRITE_BEGIN( desktop->shared, desktop_shm_t )
++    {
++        shared->work_area = req->rect;
++        shared->work_area_valid = 1;
++    }
++    SHARED_WRITE_END;
++    release_object( desktop );
++}
+--- a/dlls/win32u/sysparams.c
++++ b/dlls/win32u/sysparams.c
+@@ -297,7 +297,9 @@
+ };
+ 
+ static UINT system_dpi;
++#ifndef WINE_PS5_USER_DRIVER
+ static RECT work_area;
++#endif
+ static DWORD process_layout = ~0u;
+ 
+ static HDC display_dc;
+@@ -2598,11 +2600,39 @@
+     return map_dpi_rect( rect, dpi_from, dpi );
+ }
+ 
++#ifdef WINE_PS5_USER_DRIVER
++/* No per-process cache: taskbar reservations follow the authoritative desktop
++ * across new and already-running PE32/PE64 clients. Shared reads use Wine's
++ * existing seqlock and preserve ordinary monitor geometry until a setter runs. */
++static BOOL get_desktop_work_area( RECT *rect )
++{
++    struct object_lock lock = OBJECT_LOCK_INIT;
++    const desktop_shm_t *desktop_shm;
++    NTSTATUS status;
++    BOOL valid = FALSE;
++
++    while ((status = get_shared_desktop( &lock, &desktop_shm )) == STATUS_PENDING)
++    {
++        valid = desktop_shm->work_area_valid;
++        *rect = wine_server_get_rect( desktop_shm->work_area );
++    }
++    return !status && valid;
++}
++#endif
++
+ /* display_lock must be held */
+ static void monitor_get_info( struct monitor *monitor, MONITORINFO *info, UINT dpi )
+ {
++    RECT work = monitor->rc_work;
++#ifdef WINE_PS5_USER_DRIVER
++    if (is_monitor_primary( monitor ))
++    {
++        RECT reserved;
++        if (get_desktop_work_area( &reserved )) work = reserved;
++    }
++#endif
+     info->rcMonitor = monitor_get_rect( monitor, dpi, MDT_DEFAULT );
+-    info->rcWork = map_monitor_rect( monitor, monitor->rc_work, 0, MDT_RAW_DPI, dpi, MDT_DEFAULT );
++    info->rcWork = map_monitor_rect( monitor, work, 0, MDT_RAW_DPI, dpi, MDT_DEFAULT );
+     intersect_rect( &info->rcWork, &info->rcWork, &info->rcMonitor );
+     info->dwFlags = is_monitor_primary( monitor ) ? MONITORINFOF_PRIMARY : 0;
+ 
+@@ -5927,6 +5957,7 @@
+ static USERPREF_ENTRY( CLEARTYPE,                4, 0x10 );
+ static USERPREF_ENTRY( SPEECHRECOGNITION,        4, 0x20 );
+ 
++#ifndef WINE_PS5_USER_DRIVER
+ /* System parameter indexes */
+ enum spi_index
+ {
+@@ -5936,6 +5967,7 @@
+ 
+ /* indicators whether system parameter value is loaded */
+ static char spi_loaded[SPI_INDEX_COUNT];
++#endif
+ 
+ static struct sysparam_rgb_entry system_colors[] =
+ {
+@@ -6335,7 +6367,9 @@
+         break
+ 
+     BOOL ret = user_driver->pSystemParametersInfo( action, val, ptr, winini );
++#ifndef WINE_PS5_USER_DRIVER
+     unsigned spi_idx = 0;
++#endif
+ 
+     if (!ret) switch (action)
+     {
+@@ -6576,10 +6610,33 @@
+     case SPI_SETWORKAREA:
+     {
+         if (!ptr) return FALSE;
++#ifdef WINE_PS5_USER_DRIVER
++        struct monitor *monitor;
++        RECT raw = *(RECT *)ptr;
++        BOOL found = FALSE;
++
++        if (!lock_display_devices( FALSE )) return FALSE;
++        LIST_FOR_EACH_ENTRY( monitor, &monitors, struct monitor, entry )
++        {
++            if (!is_monitor_primary( monitor )) continue;
++            raw = map_monitor_rect( monitor, raw, get_thread_dpi(), MDT_DEFAULT, 0, MDT_RAW_DPI );
++            found = TRUE;
++            break;
++        }
++        unlock_display_devices();
++        if (!found) return FALSE;
++        SERVER_START_REQ( set_desktop_work_area )
++        {
++            req->rect = wine_server_rectangle( raw );
++            ret = !wine_server_call_err( req );
++        }
++        SERVER_END_REQ;
++#else
+         spi_idx = SPI_SETWORKAREA_IDX;
+         work_area = *(RECT*)ptr;
+         spi_loaded[spi_idx] = TRUE;
+         ret = TRUE;
++#endif
+         break;
+     }
+     case SPI_GETWORKAREA:
+@@ -6589,6 +6646,24 @@
+ 
+         if (!ptr) return FALSE;
+ 
++#ifdef WINE_PS5_USER_DRIVER
++        {
++            struct monitor *monitor;
++            BOOL found = FALSE;
++            if (!lock_display_devices( FALSE )) return FALSE;
++            LIST_FOR_EACH_ENTRY( monitor, &monitors, struct monitor, entry )
++            {
++                if (!is_monitor_primary( monitor )) continue;
++                monitor_get_info( monitor, &info, dpi );
++                found = TRUE;
++                break;
++            }
++            unlock_display_devices();
++            if (!found) return FALSE;
++            *(RECT *)ptr = info.rcWork;
++            ret = TRUE;
++        }
++#else
+         spi_idx = SPI_SETWORKAREA_IDX;
+         if (!spi_loaded[spi_idx])
+         {
+@@ -6610,6 +6685,7 @@
+         *(RECT *)ptr = work_area;
+         ret = TRUE;
+         TRACE("work area %s\n", wine_dbgstr_rect( &work_area ));
++#endif
+         break;
+     }
+ 
+@@ -7143,7 +7219,11 @@
+ 	break;
+     }
+ 
++#ifdef WINE_PS5_USER_DRIVER
++    if (ret && ((winini & SPIF_UPDATEINIFILE) || action == SPI_SETWORKAREA))
++#else
+     if (ret && (winini & SPIF_UPDATEINIFILE))
++#endif
+     {
+         static const WCHAR emptyW[1];
+         if (winini & (SPIF_SENDWININICHANGE | SPIF_SENDCHANGE))

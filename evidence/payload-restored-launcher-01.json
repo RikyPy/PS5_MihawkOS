@@ -1,0 +1,35 @@
+{
+  "title": "PPSA99170",
+  "identity": "393c6f76b07f487391ea480bb4c4d4e4",
+  "frames_requested": 120,
+  "eboot_sha256": "55f5378cd69d7bf3ec50c0cde812a01b00dd905b798e72fe6647363084c3a5d0",
+  "fresh_identity_seen": true,
+  "shell_idle_after_run": true,
+  "title_finished_successfully": true,
+  "picture_and_log_check_passed": true,
+  "post_launch_fault_records": 0,
+  "post_launch_driver_errors": 0,
+  "elevation": [
+    "ok (filesystem access)"
+  ],
+  "sample": [
+    "starts",
+    "ok, 120 frames in 2.42 s, 59.9 fps after the first half"
+  ],
+  "library": [
+    "9 game(s); searched: /data/ps5proton/games (9 entries); /data/homebrew/PPSA99170/games (not there)"
+  ],
+  "startup_seconds": {
+    "exec": 0.0,
+    "starts": 0.55,
+    "elevation": 0.55,
+    "library": 0.61,
+    "ui": 0.73
+  },
+  "probe": null,
+  "probe_passed": null,
+  "probe_records": [],
+  "passed": true,
+  "capture": "klog/payload-restored-launcher-01",
+  "forced_close": false
+}

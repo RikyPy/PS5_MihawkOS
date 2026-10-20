@@ -1,0 +1,39 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Mon, 5 Oct 2026 22:30:00 -0400
+Subject: [PATCH] kernelbase: PS5: no console host for a console nobody sees.
+
+A console program started by a program without a console (a launcher's
+tool), or with CREATE_NO_WINDOW, got a console of its own, and with it a
+conhost.exe: another helper process, of the seven the console runs
+beside the title (process-limit: limit-01, limit-02). Nobody can see a
+console on the PS5. Such a program now starts as the session's first
+console program already does when no terminal is attached: with no
+console, its standard handles as given (CONSOLE_HANDLE_SHELL_NO_WINDOW).
+CREATE_NEW_CONSOLE and AllocConsole still make a console, and
+WINE_PS5_CONSOLES=1 in the starting process's environment keeps
+Windows' behaviour.
+---
+ dlls/kernelbase/process.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/dlls/kernelbase/process.c b/dlls/kernelbase/process.c
+--- a/dlls/kernelbase/process.c
++++ b/dlls/kernelbase/process.c
+@@ -200,6 +200,16 @@
+             params->ConsoleHandle = NtCurrentTeb()->Peb->ProcessParameters->ConsoleHandle;
+             if (!params->ConsoleHandle) params->ConsoleHandle = CONSOLE_HANDLE_ALLOC;
+         }
++        /* PS5: a console nobody can see costs a helper process (conhost.exe), and the
++         * console runs seven beside the title. A console program that would get one only
++         * because its parent has none, or with CREATE_NO_WINDOW, starts as the session's
++         * first console program does here: no console, its standard handles as given.
++         * CREATE_NEW_CONSOLE and AllocConsole still make one; WINE_PS5_CONSOLES=1 keeps
++         * Windows' behaviour. */
++        if ((params->ConsoleHandle == CONSOLE_HANDLE_ALLOC ||
++             params->ConsoleHandle == CONSOLE_HANDLE_ALLOC_NO_WINDOW) &&
++            GetEnvironmentVariableW( L"WINE_PS5_CONSOLES", NULL, 0 ) == 0)
++            params->ConsoleHandle = CONSOLE_HANDLE_SHELL_NO_WINDOW;
+     }
+ 
+     if (startup->dwFlags & STARTF_USESTDHANDLES)

@@ -1,0 +1,95 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Sat, 3 Oct 2026 21:30:00 -0400
+Subject: [PATCH] ntdll: report the free memory of the PS5 from its direct memory
+
+SystemPerformanceInformation (and so GlobalMemoryStatusEx and GetPerformanceInfo) took the free memory from
+the hw.usermem sysctl, which the console refuses, so a program that reads the available physical memory saw 0,
+and kernel32's heap test failed on AvailablePages. The free part of the console's direct memory, which every
+allocation of the process and of the GPU comes from, is now asked of the kernel (each answer splits the range
+into what lies before and after it), kept for a quarter of a second, and used where the sysctl gives nothing.
+---
+  dlls/ntdll/unix/system.c | 61 ++++++++++++++++++++++++++++++++++++++++++++++++
+  1 file changed, 61 insertions(+)
+
+diff --git a/dlls/ntdll/unix/system.c b/dlls/ntdll/unix/system.c
+index 647ccef..a944ded 100644
+--- a/dlls/ntdll/unix/system.c
++++ b/dlls/ntdll/unix/system.c
+@@ -2801,6 +2801,63 @@ static NTSTATUS get_firmware_info( SYSTEM_FIRMWARE_TABLE_INFORMATION *sfti, ULON
+     }
+ }
+ 
++#ifdef __PROSPERO__
++extern size_t sceKernelGetDirectMemorySize(void);
++extern int sceKernelAvailableDirectMemorySize( long long start, long long end, size_t alignment,
++                                               long long *start_out, size_t *size_out );
++
++/* The free part of the console's direct memory, which is where every allocation of the process and of the GPU
++ * comes from. The kernel can only be asked where the first free run in a range is, so each answer splits the
++ * range in the part before it and the part after, and both are asked in turn. The figure is a lower bound: a
++ * run that cannot be asked about (the number of questions is capped, and so is the number of ranges waiting) is
++ * not counted. The answer is kept for a quarter of a second, since programs ask for it every frame. */
++static ULONGLONG ps5_free_direct_memory(void)
++{
++    static pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
++    static ULONGLONG cached, cached_at;
++    struct range { long long low, high; } waiting[64], now;
++    const size_t alignment = 0x4000;
++    unsigned int count = 0, questions = 0;
++    ULONGLONG free_bytes = 0, when;
++    LARGE_INTEGER time;
++
++    NtQuerySystemTime( &time );
++    when = time.QuadPart;
++    pthread_mutex_lock( &lock );
++    if (cached_at && when - cached_at < 2500000)
++    {
++        free_bytes = cached;
++        pthread_mutex_unlock( &lock );
++        return free_bytes;
++    }
++    now.low = 0;
++    now.high = (long long)sceKernelGetDirectMemorySize();
++    for (;;)
++    {
++        long long start = 0;
++        size_t size = 0;
++
++        if (now.high - now.low >= (long long)alignment && questions++ < 512 &&
++            !sceKernelAvailableDirectMemorySize( now.low, now.high, alignment, &start, &size ) &&
++            size && start >= now.low && size <= (unsigned long long)(now.high - start))
++        {
++            struct range after = { start + (long long)size, now.high };
++
++            free_bytes += size;
++            if (after.high - after.low >= (long long)alignment && count < ARRAY_SIZE(waiting)) waiting[count++] = after;
++            now.high = start;
++            continue;
++        }
++        if (!count) break;
++        now = waiting[--count];
++    }
++    cached = free_bytes;
++    cached_at = when;
++    pthread_mutex_unlock( &lock );
++    return free_bytes;
++}
++#endif
++
+ static void get_performance_info( SYSTEM_PERFORMANCE_INFORMATION *info )
+ {
+     unsigned long long totalram = 0, freeram = 0, totalswap = 0, freeswap = 0;
+@@ -2954,6 +3011,10 @@ static void get_performance_info( SYSTEM_PERFORMANCE_INFORMATION *info )
+             size_sys = sizeof(val);
+             if (!sysctl(mib, 2, &val, &size_sys, NULL, 0) && size_sys == sizeof(val)) freeram = val;
+         }
++#ifdef __PROSPERO__
++        /* the console refuses the sysctl, and a free figure of 0 makes a program think the machine is out of memory */
++        if (!freeram) freeram = ps5_free_direct_memory();
++#endif
+ #ifdef VM_SWAPUSAGE
+         {
+             struct xsw_usage swap;
+-- 
+2.43.0

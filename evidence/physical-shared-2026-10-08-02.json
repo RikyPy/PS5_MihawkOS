@@ -1,0 +1,20 @@
+{
+ "name": "physical-shared-2026-10-08-02",
+ "question": "Does physical shared backing preserve cross-process and alias coherence without charging touched pages to FMEM?",
+ "bytes": 8388608,
+ "source_sha256": "7c036b1163f64c6bb82c5ca112bd3d71195d247b84eee13cf1a1a9a1a3337419",
+ "roles": [
+  {
+   "role": "producer",
+   "output": "physical-shared phase=baseline native=238 resident_status=0 resident_pages=214 direct_status=0x8002000c total=0 largest_available=0\nphysical-shared create=12 errno=0\nphysical-shared phase=producer-held native=238 resident_status=0 resident_pages=214 direct_status=0x8002000c total=0 largest_available=0\nphysical-shared phase=released native=238 resident_status=0 resident_pages=214 direct_status=0x8002000c total=0 largest_available=0\nPS5_PHYSICAL_SHARED FAIL role=producer errno=12\n",
+   "passed": false
+  },
+  {
+   "role": "reader",
+   "output": "physical-shared phase=baseline native=239 resident_status=0 resident_pages=214 direct_status=0x8002000c total=0 largest_available=0\nphysical-shared phase=released native=239 resident_status=0 resident_pages=214 direct_status=0x8002000c total=0 largest_available=0\nPS5_PHYSICAL_SHARED FAIL role=reader errno=12\n",
+   "passed": false
+  }
+ ],
+ "passed": false,
+ "post_control": "ok procs app=4294967295 title= count=0 pids="
+}

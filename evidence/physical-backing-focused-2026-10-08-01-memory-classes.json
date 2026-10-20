@@ -1,0 +1,14 @@
+{
+ "run": "physical-backing-focused-2026-10-08-01-memory-classes",
+ "what": "memory-class-probe.exe",
+ "env": [
+  "PROTON_LAYOUT=launcher"
+ ],
+ "passed": false,
+ "result": "runner_error",
+ "error": "1 helper process(es) outlived their title; restart the console before the next run; run refused",
+ "loaded": false,
+ "probe_verdict": null,
+ "stop_requested": null,
+ "cleanup_verified": false
+}

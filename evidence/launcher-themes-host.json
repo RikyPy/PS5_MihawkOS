@@ -1,0 +1,54 @@
+{
+  "date": "2026-10-04",
+  "scope": "host checks and PS5 title cross-build; no console run",
+  "template_revision": "ca553412935b6c50500e7dbf1329d133604446d4",
+  "ui_kit_revision": "2188642afbcc8d84d36149124f3d9e39dc1b1a05",
+  "default_theme": "gloss",
+  "theme_count": 30,
+  "build": {
+    "title_id": "PPSA99170",
+    "eboot_bytes": 29625474,
+    "eboot_sha256": "0853bbb0b43bab2881e0c5064b15d93647b3aa57df50367c9eb38c04d263f840",
+    "asset_entries": 15,
+    "passed": true
+  },
+  "host_tests": {
+    "command": "ASAN_OPTIONS=detect_leaks=0 tools/host-tests.sh",
+    "passed": 14,
+    "note": "LeakSanitizer cannot run under the sandbox tracer; address and undefined-behavior sanitizers remain enabled."
+  },
+  "ui_tests": {
+    "command": "python3 tools/test-launcher-ui.py --render",
+    "passed": true,
+    "checks": [
+      "30 selectable themes",
+      "all 30 stable ids save and apply",
+      "fresh-process saved-theme reload",
+      "invalid ids default to Gloss",
+      "out-of-range indices ignored",
+      "scripted tests preserve preference",
+      "deferred game handoff copies selection and dispatches once",
+      "preview then cancel",
+      "apply then return"
+    ],
+    "rendered_frames": 480,
+    "runs": [
+      "all-themes",
+      "gloss-picker",
+      "preview-cancel",
+      "apply-return"
+    ],
+    "pictures": "klog/ui-host/ (ignored; host rendering, visually inspected)",
+    "detail_panel": "Theme name, family, description, labeled color palette and selection status; no game-action samples. Gloss host image visually inspected after the change."
+  },
+  "console": {
+    "launches": 0,
+    "validated": false,
+    "pending": [
+      "rendering and frame rate",
+      "DualSense interaction and UI sounds",
+      "game handoff after UI teardown"
+    ],
+    "launch_guard_changed": false
+  }
+}

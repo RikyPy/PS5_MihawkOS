@@ -1,0 +1,52 @@
+{
+  "battery": "explorer-2026-10-16-04",
+  "expected_cases": [
+    "desktop-session"
+  ],
+  "revision": "f5e040004ed614fce63c5c1f0014b4ad48a6434e",
+  "dirty": false,
+  "cases": [
+    {
+      "case": "desktop-session",
+      "run": "explorer-2026-10-16-04-desktop-session",
+      "runner_status": 0,
+      "seconds": 95.8,
+      "result": "finished",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "run_seconds": 30.8,
+      "launch_readiness": {
+        "ready": true,
+        "seconds": 0.162,
+        "settle_seconds": 0.0,
+        "census_seconds": 0.136,
+        "previous_cleanup_verified": true
+      },
+      "stages": {
+        "launched": 1.02,
+        "title_started": 1.58,
+        "elevated": 1.58,
+        "wine_loaded": 1.77,
+        "wineboot_started": 3.12,
+        "wineboot_ended": 9.21,
+        "program_started": 14.9,
+        "marker": 26.82,
+        "program_ended": 26.83,
+        "wine_ended": 28.47,
+        "launcher_started": 30.0,
+        "launcher_ended": 30.22,
+        "closed": 30.75
+      },
+      "runner_overhead_seconds": 65.0,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 15,
+      "protocol_errors": 0
+    }
+  ],
+  "complete": true,
+  "seconds": 95.8,
+  "passed": true
+}

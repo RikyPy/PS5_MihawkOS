@@ -1,0 +1,37 @@
+{
+  "run": "directwrite-isolation-2026-10-08-01",
+  "reference_run": "prefix-existing64-2026-10-08-01",
+  "stdout_write": true,
+  "stderr_write": true,
+  "graphics_and_icu_imports": true,
+  "icu_utf8_converter": true,
+  "gdi_families": [
+    "Arial",
+    "Tahoma",
+    "Times New Roman",
+    "Courier New"
+  ],
+  "gdi_bitmap_pixels": [
+    1283,
+    1311,
+    951,
+    1300
+  ],
+  "dwrite_family_discovery": true,
+  "dwrite_glyph_mapping": true,
+  "dwrite_rasterization": false,
+  "failed_raster_checks": 4,
+  "native_fault": {
+    "module": "ntdll.prx",
+    "relative_address": "0x359ce",
+    "symbol": "__wine_unix_call_dispatcher",
+    "call_table": "NULL",
+    "first_call_index": 2
+  },
+  "cause": "dwrite.dll was staged without its Unix FreeType backend. Glyph parsing worked; rasterization invoked a missing Unix table.",
+  "change": "Build and stage upstream dwrite.prx with both Unix tables; export its additional FreeType functions.",
+  "fix_console_proven": true,
+  "corrected_run": "prefix-existing64-2026-10-08-02",
+  "corrected_checks": 42,
+  "corrected_failures": 0
+}

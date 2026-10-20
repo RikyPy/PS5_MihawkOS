@@ -1,0 +1,365 @@
+{
+ "run": "mc-01",
+ "what": "profile 7",
+ "env": [
+  "WINE_PS5_OPENGL=1"
+ ],
+ "result": "finished",
+ "seconds": 43.0,
+ "probe_verdict": null,
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": true,
+ "bench": {},
+ "steady": {
+  "opengl_first_frame_ms": 6783.0,
+  "opengl": {
+   "frames": 66.5,
+   "fps": 13.15,
+   "p50_ms": 53.375,
+   "p95_ms": 59.0,
+   "p99_ms": 64.25,
+   "max_ms": 64.25,
+   "present_avg_ms": 0.0575,
+   "present_max_all_ms": 0.374,
+   "intervals": 4,
+   "worst_p99_ms": 64.25,
+   "worst_max_ms": 64.25
+  },
+  "server": {
+   "calls": 9491.0,
+   "per_s": 1871.5,
+   "avg_us": 37.8,
+   "selects": 2712.5,
+   "blocked": 980.0,
+   "block_avg_us": 20058.5,
+   "waits": 2684.5,
+   "handles_avg": 1.23,
+   "wait_all": 0.0,
+   "polled": 1498.5,
+   "delays": 0.0,
+   "yields": 0.0,
+   "intervals": 6
+  }
+ },
+ "intervals": {
+  "frames": [
+   {
+    "api": "opengl",
+    "first_frame_ms": 6783.0
+   },
+   {
+    "api": "opengl",
+    "frames": 59.0,
+    "fps": 11.6,
+    "p50_ms": 53.75,
+    "p95_ms": 64.25,
+    "p99_ms": 64.25,
+    "max_ms": 64.25,
+    "present_avg_ms": 0.064,
+    "present_max_all_ms": 0.374
+   },
+   {
+    "api": "opengl",
+    "frames": 88.0,
+    "fps": 17.4,
+    "p50_ms": 53.5,
+    "p95_ms": 53.75,
+    "p99_ms": 64.25,
+    "max_ms": 64.25,
+    "present_avg_ms": 0.057,
+    "present_max_all_ms": 0.374
+   },
+   {
+    "api": "opengl",
+    "frames": 85.0,
+    "fps": 16.8,
+    "p50_ms": 53.25,
+    "p95_ms": 53.5,
+    "p99_ms": 64.25,
+    "max_ms": 64.25,
+    "present_avg_ms": 0.058,
+    "present_max_all_ms": 0.374
+   },
+   {
+    "api": "opengl",
+    "frames": 48.0,
+    "fps": 9.5,
+    "p50_ms": 53.5,
+    "p95_ms": 64.25,
+    "p99_ms": 64.25,
+    "max_ms": 64.25,
+    "present_avg_ms": 0.056,
+    "present_max_all_ms": 0.374
+   },
+   {
+    "api": "opengl",
+    "frames": 14.0,
+    "fps": 2.8,
+    "p50_ms": 17.5,
+    "p95_ms": 64.25,
+    "p99_ms": 64.25,
+    "max_ms": 64.25,
+    "present_avg_ms": 0.074,
+    "present_max_all_ms": 0.374
+   }
+  ],
+  "server": [
+   {
+    "calls": 17899.0,
+    "per_s": 3529.0,
+    "avg_us": 43.3,
+    "selects": 2098.0,
+    "blocked": 630.0,
+    "block_avg_us": 12339.3,
+    "waits": 2080.0,
+    "handles_avg": 1.26,
+    "wait_all": 0.0,
+    "polled": 1134.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 15461.0,
+    "per_s": 3050.0,
+    "avg_us": 46.8,
+    "selects": 4686.0,
+    "blocked": 2737.0,
+    "block_avg_us": 19755.7,
+    "waits": 4679.0,
+    "handles_avg": 1.13,
+    "wait_all": 0.0,
+    "polled": 1569.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 8351.0,
+    "per_s": 1647.0,
+    "avg_us": 28.8,
+    "selects": 2409.0,
+    "blocked": 861.0,
+    "block_avg_us": 26825.2,
+    "waits": 2405.0,
+    "handles_avg": 1.26,
+    "wait_all": 0.0,
+    "polled": 1422.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 7857.0,
+    "per_s": 1550.0,
+    "avg_us": 19.6,
+    "selects": 2485.0,
+    "blocked": 919.0,
+    "block_avg_us": 20361.3,
+    "waits": 2486.0,
+    "handles_avg": 1.25,
+    "wait_all": 0.0,
+    "polled": 1428.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 10631.0,
+    "per_s": 2096.0,
+    "avg_us": 70.3,
+    "selects": 2940.0,
+    "blocked": 1041.0,
+    "block_avg_us": 175061.3,
+    "waits": 2883.0,
+    "handles_avg": 1.21,
+    "wait_all": 0.0,
+    "polled": 1604.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 41661.0,
+    "per_s": 8216.0,
+    "avg_us": 96.6,
+    "selects": 18696.0,
+    "blocked": 14937.0,
+    "block_avg_us": 3895.3,
+    "waits": 18657.0,
+    "handles_avg": 1.03,
+    "wait_all": 0.0,
+    "polled": 1613.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 6998.0,
+    "per_s": 1383.0,
+    "avg_us": 14.1,
+    "selects": 1970.0,
+    "blocked": 674.0,
+    "block_avg_us": 15044.3,
+    "waits": 1970.0,
+    "handles_avg": 1.32,
+    "wait_all": 0.0,
+    "polled": 1296.0,
+    "delays": 0.0,
+    "yields": 0.0
+   }
+  ],
+  "top": [
+   {
+    "create_file": {
+     "count": 1781,
+     "avg_us": 146.8
+    },
+    "event_op": {
+     "count": 642,
+     "avg_us": 186.3
+    },
+    "create_mapping": {
+     "count": 125,
+     "avg_us": 942.9
+    },
+    "close_handle": {
+     "count": 3759,
+     "avg_us": 18.1
+    },
+    "select": {
+     "count": 2120,
+     "avg_us": 20.2
+    }
+   },
+   {
+    "event_op": {
+     "count": 2869,
+     "avg_us": 62.8
+    },
+    "select": {
+     "count": 4704,
+     "avg_us": 37.5
+    },
+    "create_file": {
+     "count": 145,
+     "avg_us": 711.7
+    },
+    "close_handle": {
+     "count": 2540,
+     "avg_us": 33.1
+    },
+    "set_fd_eof_info": {
+     "count": 9,
+     "avg_us": 5887.0
+    }
+   },
+   {
+    "select": {
+     "count": 2411,
+     "avg_us": 20.2
+    },
+    "event_op": {
+     "count": 819,
+     "avg_us": 58.2
+    },
+    "create_file": {
+     "count": 65,
+     "avg_us": 588.3
+    },
+    "close_handle": {
+     "count": 1978,
+     "avg_us": 17.7
+    },
+    "create_event": {
+     "count": 1867,
+     "avg_us": 17.2
+    }
+   },
+   {
+    "select": {
+     "count": 2486,
+     "avg_us": 19.5
+    },
+    "close_handle": {
+     "count": 1863,
+     "avg_us": 16.7
+    },
+    "create_event": {
+     "count": 1863,
+     "avg_us": 16.5
+    },
+    "event_op": {
+     "count": 814,
+     "avg_us": 34.1
+    },
+    "send_hardware_message": {
+     "count": 621,
+     "avg_us": 19.4
+    }
+   },
+   {
+    "event_op": {
+     "count": 1159,
+     "avg_us": 229.7
+    },
+    "create_file": {
+     "count": 132,
+     "avg_us": 1844.2
+    },
+    "select": {
+     "count": 2943,
+     "avg_us": 26.7
+    },
+    "close_handle": {
+     "count": 2180,
+     "avg_us": 21.0
+    },
+    "create_event": {
+     "count": 1847,
+     "avg_us": 18.0
+    }
+   },
+   {
+    "select": {
+     "count": 18713,
+     "avg_us": 83.8
+    },
+    "event_op": {
+     "count": 15865,
+     "avg_us": 97.3
+    },
+    "create_file": {
+     "count": 20,
+     "avg_us": 12066.0
+    },
+    "close_handle": {
+     "count": 2160,
+     "avg_us": 106.4
+    },
+    "release_mutex": {
+     "count": 1662,
+     "avg_us": 103.1
+    }
+   },
+   {
+    "select": {
+     "count": 1970,
+     "avg_us": 14.2
+    },
+    "create_event": {
+     "count": 1866,
+     "avg_us": 13.7
+    },
+    "close_handle": {
+     "count": 1866,
+     "avg_us": 12.9
+    },
+    "event_op": {
+     "count": 674,
+     "avg_us": 17.8
+    },
+    "send_hardware_message": {
+     "count": 622,
+     "avg_us": 15.0
+    }
+   }
+  ]
+ }
+}

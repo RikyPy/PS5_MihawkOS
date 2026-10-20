@@ -1,0 +1,33 @@
+{
+ "run": "sync-ntsync-0923-01",
+ "what": "sync-probe.exe",
+ "env": [
+  "WINE_PS5_NTSYNC=1"
+ ],
+ "result": "finished",
+ "seconds": 5.2,
+ "probe_verdict": "PASS",
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": false,
+ "passed": true,
+ "bench": {
+  "wait50_ms": 50.0,
+  "event_round_trip_us": 9.506,
+  "set_reset_pair_us": 0.219,
+  "wait_signalled_us": 0.983,
+  "wait_any4_us": 1.029,
+  "wait_all4_us": 1.037,
+  "sem_release_wait_us": 1.109,
+  "mutex_take_release_us": 1.118,
+  "critsec_contended_us": 0.08,
+  "sleep0_us": 4.541,
+  "sleep1_us": 1103.962
+ },
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [],
+  "top": []
+ }
+}

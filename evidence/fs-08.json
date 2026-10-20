@@ -1,0 +1,111 @@
+{
+ "run": "fs-08",
+ "what": "fs-probe.exe",
+ "env": [
+  "FS_PROBE_HANDLES=1"
+ ],
+ "result": "finished",
+ "seconds": 12.7,
+ "probe_verdict": "PASS",
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": true,
+ "bench": {},
+ "steady": {
+  "server": {
+   "calls": 5971.0,
+   "per_s": 1180.0,
+   "avg_us": 1023.0,
+   "selects": 1204.0,
+   "blocked": 279.0,
+   "block_avg_us": 36832.4,
+   "waits": 1202.0,
+   "handles_avg": 1.23,
+   "wait_all": 0.0,
+   "polled": 924.0,
+   "delays": 0.0,
+   "yields": 0.0,
+   "intervals": 1
+  }
+ },
+ "intervals": {
+  "frames": [],
+  "server": [
+   {
+    "calls": 8561.0,
+    "per_s": 1678.0,
+    "avg_us": 473.5,
+    "selects": 1452.0,
+    "blocked": 482.0,
+    "block_avg_us": 8587.2,
+    "waits": 1449.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 964.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 5971.0,
+    "per_s": 1180.0,
+    "avg_us": 1023.0,
+    "selects": 1204.0,
+    "blocked": 279.0,
+    "block_avg_us": 36832.4,
+    "waits": 1202.0,
+    "handles_avg": 1.23,
+    "wait_all": 0.0,
+    "polled": 924.0,
+    "delays": 0.0,
+    "yields": 0.0
+   }
+  ],
+  "top": [
+   {
+    "create_file": {
+     "count": 631,
+     "avg_us": 5041.4
+    },
+    "event_op": {
+     "count": 482,
+     "avg_us": 771.2
+    },
+    "close_handle": {
+     "count": 1889,
+     "avg_us": 44.5
+    },
+    "create_mapping": {
+     "count": 54,
+     "avg_us": 1122.0
+    },
+    "create_key": {
+     "count": 124,
+     "avg_us": 368.1
+    }
+   },
+   {
+    "close_handle": {
+     "count": 2221,
+     "avg_us": 1401.9
+    },
+    "create_event": {
+     "count": 1020,
+     "avg_us": 1062.1
+    },
+    "select": {
+     "count": 1202,
+     "avg_us": 664.3
+    },
+    "create_file": {
+     "count": 692,
+     "avg_us": 791.4
+    },
+    "send_hardware_message": {
+     "count": 462,
+     "avg_us": 1027.2
+    }
+   }
+  ]
+ }
+}

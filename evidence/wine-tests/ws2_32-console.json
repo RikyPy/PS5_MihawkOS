@@ -1,0 +1,888 @@
+{
+ "afd": {
+  "failure_count": 24,
+  "failures": [
+   {
+    "file": "afd.c",
+    "line": 444,
+    "text": "got flags 0x42"
+   },
+   {
+    "file": "afd.c",
+    "line": 1424,
+    "text": "got flags 0x50"
+   },
+   {
+    "file": "afd.c",
+    "line": 2642,
+    "text": "test 10: got 0x102"
+   },
+   {
+    "file": "afd.c",
+    "line": 2643,
+    "text": "test 10: got key 0xcc"
+   },
+   {
+    "file": "afd.c",
+    "line": 2644,
+    "text": "test 10: got value 0"
+   },
+   {
+    "file": "afd.c",
+    "line": 2639,
+    "text": "test 11: got 0"
+   },
+   {
+    "file": "afd.c",
+    "line": 2642,
+    "text": "test 11: got 0x102"
+   },
+   {
+    "file": "afd.c",
+    "line": 48,
+    "text": "got 50."
+   },
+   {
+    "file": "afd.c",
+    "line": 50,
+    "text": "got 6."
+   },
+   {
+    "file": "afd.c",
+    "line": 2878,
+    "text": "other_process 1, i 0: failed, error 6."
+   },
+   {
+    "file": "afd.c",
+    "line": 2884,
+    "text": "other_process 1, i 0: got 0"
+   },
+   {
+    "file": "afd.c",
+    "line": 2903,
+    "text": "other_process 1, i 0: got 0."
+   },
+   {
+    "file": "afd.c",
+    "line": 2909,
+    "text": "other_process 1, i 0: failed, error 6."
+   },
+   {
+    "file": "afd.c",
+    "line": 2878,
+    "text": "other_process 1, i 1: failed, error 6."
+   },
+   {
+    "file": "afd.c",
+    "line": 2884,
+    "text": "other_process 1, i 1: got 0"
+   },
+   {
+    "file": "afd.c",
+    "line": 2909,
+    "text": "other_process 1, i 1: failed, error 6."
+   },
+   {
+    "file": "afd.c",
+    "line": 2878,
+    "text": "other_process 1, i 4: failed, error 6."
+   },
+   {
+    "file": "afd.c",
+    "line": 2884,
+    "text": "other_process 1, i 4: got 0"
+   },
+   {
+    "file": "afd.c",
+    "line": 2899,
+    "text": "other_process 1, i 4: got 0"
+   },
+   {
+    "file": "afd.c",
+    "line": 2903,
+    "text": "other_process 1, i 4: got 0."
+   },
+   {
+    "file": "afd.c",
+    "line": 2909,
+    "text": "other_process 1, i 4: failed, error 6."
+   },
+   {
+    "file": "afd.c",
+    "line": 2878,
+    "text": "other_process 1, i 5: failed, error 6."
+   },
+   {
+    "file": "afd.c",
+    "line": 2895,
+    "text": "other_process 1, i 5: got 0"
+   },
+   {
+    "file": "afd.c",
+    "line": 2909,
+    "text": "other_process 1, i 5: failed, error 6."
+   }
+  ],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 24.2,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 24,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 1321,
+   "todo": 30
+  },
+  "todo_lines": 30
+ },
+ "protocol": {
+  "failure_count": 24,
+  "failures": [
+   {
+    "file": "protocol.c",
+    "line": 1759,
+    "text": "GetAddrInfoW failed with 11001"
+   },
+   {
+    "file": "protocol.c",
+    "line": 1760,
+    "text": "GetAddrInfoW failed"
+   },
+   {
+    "file": "protocol.c",
+    "line": 1761,
+    "text": "expected 0, got 11001"
+   },
+   {
+    "file": "protocol.c",
+    "line": 1826,
+    "text": "GetAddrInfoW failed with 11001"
+   },
+   {
+    "file": "protocol.c",
+    "line": 1827,
+    "text": "GetAddrInfoW failed"
+   },
+   {
+    "file": "protocol.c",
+    "line": 1830,
+    "text": "GetAddrInfoW failed with 11001"
+   },
+   {
+    "file": "protocol.c",
+    "line": 1831,
+    "text": "GetAddrInfoW failed"
+   },
+   {
+    "file": "protocol.c",
+    "line": 1913,
+    "text": "got 11001 expected success"
+   },
+   {
+    "file": "protocol.c",
+    "line": 1914,
+    "text": "got 0000000000000000"
+   },
+   {
+    "file": "protocol.c",
+    "line": 1924,
+    "text": "got 11001 expected success"
+   },
+   {
+    "file": "protocol.c",
+    "line": 1925,
+    "text": "got 0000000000000000"
+   },
+   {
+    "file": "protocol.c",
+    "line": 1936,
+    "text": "got 11001 expected success"
+   },
+   {
+    "file": "protocol.c",
+    "line": 1937,
+    "text": "got 0000000000000000"
+   },
+   {
+    "file": "protocol.c",
+    "line": 1947,
+    "text": "got 11001 expected success"
+   },
+   {
+    "file": "protocol.c",
+    "line": 1948,
+    "text": "got 0000000000000000"
+   },
+   {
+    "file": "protocol.c",
+    "line": 1963,
+    "text": "got 11001 expected success"
+   },
+   {
+    "file": "protocol.c",
+    "line": 1964,
+    "text": "got 0000000000000000"
+   },
+   {
+    "file": "protocol.c",
+    "line": 2035,
+    "text": "GetAddrInfoExW failed with 11001"
+   },
+   {
+    "file": "protocol.c",
+    "line": 2036,
+    "text": "GetAddrInfoW failed"
+   },
+   {
+    "file": "protocol.c",
+    "line": 2037,
+    "text": "expected 0, got 11001"
+   },
+   {
+    "file": "protocol.c",
+    "line": 2074,
+    "text": "overlapped result is 11001"
+   },
+   {
+    "file": "protocol.c",
+    "line": 2076,
+    "text": "overlapped.Internal = 2af9"
+   },
+   {
+    "file": "protocol.c",
+    "line": 2077,
+    "text": "overlapped.Pointer != &result"
+   },
+   {
+    "file": "protocol.c",
+    "line": 2078,
+    "text": "result == NULL"
+   }
+  ],
+  "guarded": null,
+  "last_line": "protocol.c:2078: Test failed: result == NULL",
+  "seconds": 5.1,
+  "skipped_lines": [],
+  "status": "incomplete",
+  "summary": null,
+  "todo_lines": 7
+ },
+ "sock": {
+  "failure_count": 120,
+  "failures": [
+   {
+    "file": "sock.c",
+    "line": 1335,
+    "text": "got -1, error 10022."
+   },
+   {
+    "file": "sock.c",
+    "line": 1413,
+    "text": "TCP_NODELAY should be 1"
+   },
+   {
+    "file": "sock.c",
+    "line": 1424,
+    "text": "TCP_NODELAY should be 1"
+   },
+   {
+    "file": "sock.c",
+    "line": 1435,
+    "text": "TCP_NODELAY should be 1"
+   },
+   {
+    "file": "sock.c",
+    "line": 1668,
+    "text": "i 0, level 65535, optname 32: Got unexpected value 0x20, expected 0x1."
+   },
+   {
+    "file": "sock.c",
+    "line": 1712,
+    "text": "i 0, level 65535, optname 32, len 1: Got unexpected value 0xdeadbe20, expected 0xdeadbe01."
+   },
+   {
+    "file": "sock.c",
+    "line": 1712,
+    "text": "i 0, level 65535, optname 32, len 2: Got unexpected value 0xdead0020, expected 0xdead0001."
+   },
+   {
+    "file": "sock.c",
+    "line": 1712,
+    "text": "i 0, level 65535, optname 32, len 4: Got unexpected value 0x20, expected 0x1."
+   },
+   {
+    "file": "sock.c",
+    "line": 1712,
+    "text": "i 2, level 65535, optname 128, len 4: Got unexpected value 0x80, expected 0x1."
+   },
+   {
+    "file": "sock.c",
+    "line": 1668,
+    "text": "i 3, level 65535, optname 256: Got unexpected value 0x100, expected 0x1."
+   },
+   {
+    "file": "sock.c",
+    "line": 1712,
+    "text": "i 3, level 65535, optname 256, len 1: Got unexpected value 0xdeadbe00, expected 0xdeadbe01."
+   },
+   {
+    "file": "sock.c",
+    "line": 1712,
+    "text": "i 3, level 65535, optname 256, len 2: Got unexpected value 0xdead0100, expected 0xdead0001."
+   },
+   {
+    "file": "sock.c",
+    "line": 1712,
+    "text": "i 3, level 65535, optname 256, len 4: Got unexpected value 0x100, expected 0x1."
+   },
+   {
+    "file": "sock.c",
+    "line": 1712,
+    "text": "i 5, level 65535, optname 8, len 1: Got unexpected value 0xdeadbe08, expected 0xdeadbe01."
+   },
+   {
+    "file": "sock.c",
+    "line": 1712,
+    "text": "i 5, level 65535, optname 8, len 2: Got unexpected value 0xdeadbe08, expected 0xdeadbe01."
+   },
+   {
+    "file": "sock.c",
+    "line": 1712,
+    "text": "i 5, level 65535, optname 8, len 4: Got unexpected value 0xdeadbe08, expected 0xdeadbe01."
+   },
+   {
+    "file": "sock.c",
+    "line": 1712,
+    "text": "i 13, level 6, optname 1, len 1: Got unexpected value 0xdeadbe04, expected 0xdeadbe01."
+   },
+   {
+    "file": "sock.c",
+    "line": 1712,
+    "text": "i 13, level 6, optname 1, len 2: Got unexpected value 0xdeadbe04, expected 0xdeadbe01."
+   },
+   {
+    "file": "sock.c",
+    "line": 1712,
+    "text": "i 13, level 6, optname 1, len 4: Got unexpected value 0xdeadbe04, expected 0xdeadbe01."
+   },
+   {
+    "file": "sock.c",
+    "line": 1656,
+    "text": "i 15, level 6, optname 16: Unexpected setsockopt result 0."
+   },
+   {
+    "file": "sock.c",
+    "line": 1657,
+    "text": "i 15, level 6, optname 16: Unexpected WSAGetLastError() 0."
+   },
+   {
+    "file": "sock.c",
+    "line": 1668,
+    "text": "i 17, level 0, optname 11: Got unexpected value 0, expected 0x1."
+   },
+   {
+    "file": "sock.c",
+    "line": 1704,
+    "text": "i 17, level 0, optname 11, len 2: Unexpected setsockopt result -1."
+   },
+   {
+    "file": "sock.c",
+    "line": 1705,
+    "text": "i 17, level 0, optname 11, len 2: Unexpected WSAGetLastError() 10022."
+   },
+   {
+    "file": "sock.c",
+    "line": 1712,
+    "text": "i 17, level 0, optname 11, len 2: Got unexpected value 0xdead0001, expected 0xdeadbe01."
+   },
+   {
+    "file": "sock.c",
+    "line": 1713,
+    "text": "i 17, level 0, optname 11, len 2: Got unexpected size 2, expected 1."
+   },
+   {
+    "file": "sock.c",
+    "line": 1704,
+    "text": "i 18, level 0, optname 10, len 2: Unexpected setsockopt result -1."
+   },
+   {
+    "file": "sock.c",
+    "line": 1705,
+    "text": "i 18, level 0, optname 10, len 2: Unexpected WSAGetLastError() 10022."
+   },
+   {
+    "file": "sock.c",
+    "line": 1712,
+    "text": "i 18, level 0, optname 10, len 2: Got unexpected value 0xdead0001, expected 0xdeadbe01."
+   },
+   {
+    "file": "sock.c",
+    "line": 1713,
+    "text": "i 18, level 0, optname 10, len 2: Got unexpected size 2, expected 1."
+   },
+   {
+    "file": "sock.c",
+    "line": 1704,
+    "text": "i 22, level 0, optname 3, len 1: Unexpected setsockopt result -1."
+   },
+   {
+    "file": "sock.c",
+    "line": 1705,
+    "text": "i 22, level 0, optname 3, len 1: Unexpected WSAGetLastError() 10022."
+   },
+   {
+    "file": "sock.c",
+    "line": 1704,
+    "text": "i 22, level 0, optname 3, len 2: Unexpected setsockopt result -1."
+   },
+   {
+    "file": "sock.c",
+    "line": 1705,
+    "text": "i 22, level 0, optname 3, len 2: Unexpected WSAGetLastError() 10022."
+   },
+   {
+    "file": "sock.c",
+    "line": 1712,
+    "text": "i 22, level 0, optname 3, len 2: Got unexpected value 0xdead0001, expected 0xdeadbe01."
+   },
+   {
+    "file": "sock.c",
+    "line": 1713,
+    "text": "i 22, level 0, optname 3, len 2: Got unexpected size 2, expected 1."
+   },
+   {
+    "file": "sock.c",
+    "line": 1656,
+    "text": "i 23, level 0, optname 4: Unexpected setsockopt result 0."
+   },
+   {
+    "file": "sock.c",
+    "line": 1657,
+    "text": "i 23, level 0, optname 4: Unexpected WSAGetLastError() 0."
+   },
+   {
+    "file": "sock.c",
+    "line": 1704,
+    "text": "i 23, level 0, optname 4, len 1: Unexpected setsockopt result -1."
+   },
+   {
+    "file": "sock.c",
+    "line": 1705,
+    "text": "i 23, level 0, optname 4, len 1: Unexpected WSAGetLastError() 10022."
+   },
+   {
+    "file": "sock.c",
+    "line": 1712,
+    "text": "i 23, level 0, optname 4, len 1: Got unexpected value 0xdeadbe00, expected 0xdeadbe01."
+   },
+   {
+    "file": "sock.c",
+    "line": 1704,
+    "text": "i 23, level 0, optname 4, len 2: Unexpected setsockopt result -1."
+   },
+   {
+    "file": "sock.c",
+    "line": 1705,
+    "text": "i 23, level 0, optname 4, len 2: Unexpected WSAGetLastError() 10022."
+   },
+   {
+    "file": "sock.c",
+    "line": 1712,
+    "text": "i 23, level 0, optname 4, len 2: Got unexpected value 0xdead0000, expected 0xdeadbe01."
+   },
+   {
+    "file": "sock.c",
+    "line": 1713,
+    "text": "i 23, level 0, optname 4, len 2: Got unexpected size 2, expected 1."
+   },
+   {
+    "file": "sock.c",
+    "line": 1668,
+    "text": "i 24, level 41, optname 14: Got unexpected value 0, expected 0x1."
+   },
+   {
+    "file": "sock.c",
+    "line": 1712,
+    "text": "i 24, level 41, optname 14, len 1: Got unexpected value 0xdeadbe00, expected 0xdeadbe01."
+   },
+   {
+    "file": "sock.c",
+    "line": 1712,
+    "text": "i 24, level 41, optname 14, len 2: Got unexpected value 0xdeadbe00, expected 0xdeadbe01."
+   },
+   {
+    "file": "sock.c",
+    "line": 1712,
+    "text": "i 24, level 41, optname 14, len 4: Got unexpected value 0, expected 0x1."
+   },
+   {
+    "file": "sock.c",
+    "line": 1573,
+    "text": "i 25, level 41, optname 21: Unexpected setsockopt result -1."
+   },
+   {
+    "file": "sock.c",
+    "line": 1574,
+    "text": "i 25, level 41, optname 21: Unexpected WSAGetLastError() 10022."
+   },
+   {
+    "file": "sock.c",
+    "line": 1573,
+    "text": "i 28, level 41, optname 19: Unexpected setsockopt result -1."
+   },
+   {
+    "file": "sock.c",
+    "line": 1574,
+    "text": "i 28, level 41, optname 19: Unexpected WSAGetLastError() 10022."
+   },
+   {
+    "file": "sock.c",
+    "line": 1573,
+    "text": "i 29, level 41, optname 40: Unexpected setsockopt result -1."
+   },
+   {
+    "file": "sock.c",
+    "line": 1574,
+    "text": "i 29, level 41, optname 40: Unexpected WSAGetLastError() 10022."
+   },
+   {
+    "file": "sock.c",
+    "line": 1747,
+    "text": "Test [1] Expected 0, got -1"
+   },
+   {
+    "file": "sock.c",
+    "line": 1751,
+    "text": "Test [1] Expected 0xb, got 0xa"
+   },
+   {
+    "file": "sock.c",
+    "line": 1747,
+    "text": "Test [2] Expected 0, got -1"
+   },
+   {
+    "file": "sock.c",
+    "line": 1751,
+    "text": "Test [2] Expected 0xc, got 0xa"
+   },
+   {
+    "file": "sock.c",
+    "line": 2074,
+    "text": "Expected 1, got 0"
+   },
+   {
+    "file": "sock.c",
+    "line": 2341,
+    "text": "test 0: got error 10013."
+   },
+   {
+    "file": "sock.c",
+    "line": 2475,
+    "text": "test 0: got error 10013."
+   },
+   {
+    "file": "sock.c",
+    "line": 2514,
+    "text": "test 0: got error 10013."
+   },
+   {
+    "file": "sock.c",
+    "line": 2533,
+    "text": "test 0: got error 10022."
+   },
+   {
+    "file": "sock.c",
+    "line": 2538,
+    "text": "test 0: got error 10061."
+   },
+   {
+    "file": "sock.c",
+    "line": 2543,
+    "text": "test 0: got error 10022."
+   },
+   {
+    "file": "sock.c",
+    "line": 2341,
+    "text": "test 1: got error 10013."
+   },
+   {
+    "file": "sock.c",
+    "line": 2475,
+    "text": "test 1: got error 10013."
+   },
+   {
+    "file": "sock.c",
+    "line": 2514,
+    "text": "test 1: got error 10013."
+   },
+   {
+    "file": "sock.c",
+    "line": 2533,
+    "text": "test 1: got error 10022."
+   },
+   {
+    "file": "sock.c",
+    "line": 2538,
+    "text": "test 1: got error 10061."
+   },
+   {
+    "file": "sock.c",
+    "line": 2543,
+    "text": "test 1: got error 10022."
+   },
+   {
+    "file": "sock.c",
+    "line": 2611,
+    "text": "test 11: got error 10048."
+   },
+   {
+    "file": "sock.c",
+    "line": 2611,
+    "text": "test 14: got error 10048."
+   },
+   {
+    "file": "sock.c",
+    "line": 2873,
+    "text": "expected IP_TTL, got 0"
+   },
+   {
+    "file": "sock.c",
+    "line": 2875,
+    "text": "expected length 20, got 0"
+   },
+   {
+    "file": "sock.c",
+    "line": 2877,
+    "text": "expected at least 32, got 0"
+   },
+   {
+    "file": "sock.c",
+    "line": 2918,
+    "text": "expected IP_TOS, got 0"
+   },
+   {
+    "file": "sock.c",
+    "line": 2920,
+    "text": "expected length 20, got 0"
+   },
+   {
+    "file": "sock.c",
+    "line": 13615,
+    "text": "IPv4 TCP option 31: expected getsockopt to return 0, got -1"
+   },
+   {
+    "file": "sock.c",
+    "line": 13618,
+    "text": "IPv4 TCP option 31: expected getsockopt to set error 0, got 10045"
+   },
+   {
+    "file": "sock.c",
+    "line": 13631,
+    "text": "IPv4 TCP option 31: expected setsockopt to return 0, got -1"
+   },
+   {
+    "file": "sock.c",
+    "line": 13634,
+    "text": "IPv4 TCP option 31: expected setsockopt to set error 0, got 10045"
+   },
+   {
+    "file": "sock.c",
+    "line": 13615,
+    "text": "IPv4 UDP option 31: expected getsockopt to return 0, got -1"
+   },
+   {
+    "file": "sock.c",
+    "line": 13618,
+    "text": "IPv4 UDP option 31: expected getsockopt to set error 0, got 10045"
+   },
+   {
+    "file": "sock.c",
+    "line": 13631,
+    "text": "IPv4 UDP option 31: expected setsockopt to return 0, got -1"
+   },
+   {
+    "file": "sock.c",
+    "line": 13634,
+    "text": "IPv4 UDP option 31: expected setsockopt to set error 0, got 10045"
+   },
+   {
+    "file": "sock.c",
+    "line": 13615,
+    "text": "IPv4 raw option 31: expected getsockopt to return 0, got -1"
+   },
+   {
+    "file": "sock.c",
+    "line": 13618,
+    "text": "IPv4 raw option 31: expected getsockopt to set error 0, got 10045"
+   },
+   {
+    "file": "sock.c",
+    "line": 13631,
+    "text": "IPv4 raw option 31: expected setsockopt to return 0, got -1"
+   },
+   {
+    "file": "sock.c",
+    "line": 13634,
+    "text": "IPv4 raw option 31: expected setsockopt to set error 0, got 10045"
+   },
+   {
+    "file": "sock.c",
+    "line": 13615,
+    "text": "IPv6 TCP option 31: expected getsockopt to return 0, got -1"
+   },
+   {
+    "file": "sock.c",
+    "line": 13618,
+    "text": "IPv6 TCP option 31: expected getsockopt to set error 0, got 10045"
+   },
+   {
+    "file": "sock.c",
+    "line": 13631,
+    "text": "IPv6 TCP option 31: expected setsockopt to return 0, got -1"
+   },
+   {
+    "file": "sock.c",
+    "line": 13634,
+    "text": "IPv6 TCP option 31: expected setsockopt to set error 0, got 10045"
+   },
+   {
+    "file": "sock.c",
+    "line": 13615,
+    "text": "IPv6 UDP option 31: expected getsockopt to return 0, got -1"
+   },
+   {
+    "file": "sock.c",
+    "line": 13618,
+    "text": "IPv6 UDP option 31: expected getsockopt to set error 0, got 10045"
+   },
+   {
+    "file": "sock.c",
+    "line": 13631,
+    "text": "IPv6 UDP option 31: expected setsockopt to return 0, got -1"
+   },
+   {
+    "file": "sock.c",
+    "line": 13634,
+    "text": "IPv6 UDP option 31: expected setsockopt to set error 0, got 10045"
+   },
+   {
+    "file": "sock.c",
+    "line": 13615,
+    "text": "IPv6 raw option 31: expected getsockopt to return 0, got -1"
+   },
+   {
+    "file": "sock.c",
+    "line": 13618,
+    "text": "IPv6 raw option 31: expected getsockopt to set error 0, got 10045"
+   },
+   {
+    "file": "sock.c",
+    "line": 13631,
+    "text": "IPv6 raw option 31: expected setsockopt to return 0, got -1"
+   },
+   {
+    "file": "sock.c",
+    "line": 13634,
+    "text": "IPv6 raw option 31: expected setsockopt to set error 0, got 10045"
+   },
+   {
+    "file": "sock.c",
+    "line": 3389,
+    "text": "Test 2: got wrong error 10043"
+   },
+   {
+    "file": "sock.c",
+    "line": 3389,
+    "text": "Test 3: got wrong error 10043"
+   },
+   {
+    "file": "sock.c",
+    "line": 3389,
+    "text": "Test 12: got wrong error 10041"
+   },
+   {
+    "file": "sock.c",
+    "line": 3389,
+    "text": "Test 21: got wrong error 10047"
+   },
+   {
+    "file": "sock.c",
+    "line": 3957,
+    "text": "WSAConnectByNameA should have succeeded, error 10109"
+   },
+   {
+    "file": "sock.c",
+    "line": 3961,
+    "text": "getsockname should have succeeded, error 10022"
+   },
+   {
+    "file": "sock.c",
+    "line": 3963,
+    "text": "getpeername should have succeeded, error 10057"
+   },
+   {
+    "file": "sock.c",
+    "line": 3983,
+    "text": "WSAConnectByNameA should have succeeded, error 10109"
+   },
+   {
+    "file": "sock.c",
+    "line": 3987,
+    "text": "getsockname should have succeeded, error 10022"
+   },
+   {
+    "file": "sock.c",
+    "line": 3989,
+    "text": "getpeername should have succeeded, error 10057"
+   },
+   {
+    "file": "sock.c",
+    "line": 4013,
+    "text": "WSAConnectByNameA should have succeeded, error 10109"
+   },
+   {
+    "file": "sock.c",
+    "line": 4021,
+    "text": "WSAConnectByNameA should have succeeded, error 10109"
+   },
+   {
+    "file": "sock.c",
+    "line": 4035,
+    "text": "expected error 10014 (WSAEFAULT), got 10109"
+   },
+   {
+    "file": "sock.c",
+    "line": 4045,
+    "text": "WSAConnectByNameA should have succeeded, error 10109"
+   },
+   {
+    "file": "sock.c",
+    "line": 4046,
+    "text": "local_len should have been 16, got 50"
+   },
+   {
+    "file": "sock.c",
+    "line": 4048,
+    "text": "remote_len should have been 16, got 50"
+   },
+   {
+    "file": "sock.c",
+    "line": 4066,
+    "text": "expected error 10022 (WSAEINVAL) or 10014 (WSAEFAULT) or 10045 (WSAEOPNOTSUPP), got 10109"
+   }
+  ],
+  "guarded": null,
+  "hung": "still running after 60 s; the program ended itself",
+  "last_line": "winetest-batch: timeout sock 60",
+  "seconds": 65.4,
+  "skipped_lines": [
+   "sock.c:3665: Tests skipped: IPX is not supported",
+   "sock.c:3729: Tests skipped: Bluetooth is not supported"
+  ],
+  "status": "timeout",
+  "summary": null,
+  "todo_lines": 193
+ }
+}

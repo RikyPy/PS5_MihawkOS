@@ -1,0 +1,306 @@
+{
+ "afd": {
+  "exit_code": 17,
+  "failure_count": 17,
+  "failures": [
+   {
+    "file": "afd.c",
+    "line": 48,
+    "text": "got 8."
+   },
+   {
+    "file": "afd.c",
+    "line": 50,
+    "text": "got 6."
+   },
+   {
+    "file": "afd.c",
+    "line": 2878,
+    "text": "other_process 1, i 0: failed, error 6."
+   },
+   {
+    "file": "afd.c",
+    "line": 2884,
+    "text": "other_process 1, i 0: got 0"
+   },
+   {
+    "file": "afd.c",
+    "line": 2903,
+    "text": "other_process 1, i 0: got 0."
+   },
+   {
+    "file": "afd.c",
+    "line": 2909,
+    "text": "other_process 1, i 0: failed, error 6."
+   },
+   {
+    "file": "afd.c",
+    "line": 2878,
+    "text": "other_process 1, i 1: failed, error 6."
+   },
+   {
+    "file": "afd.c",
+    "line": 2884,
+    "text": "other_process 1, i 1: got 0"
+   },
+   {
+    "file": "afd.c",
+    "line": 2909,
+    "text": "other_process 1, i 1: failed, error 6."
+   },
+   {
+    "file": "afd.c",
+    "line": 2878,
+    "text": "other_process 1, i 4: failed, error 6."
+   },
+   {
+    "file": "afd.c",
+    "line": 2884,
+    "text": "other_process 1, i 4: got 0"
+   },
+   {
+    "file": "afd.c",
+    "line": 2899,
+    "text": "other_process 1, i 4: got 0"
+   },
+   {
+    "file": "afd.c",
+    "line": 2903,
+    "text": "other_process 1, i 4: got 0."
+   },
+   {
+    "file": "afd.c",
+    "line": 2909,
+    "text": "other_process 1, i 4: failed, error 6."
+   },
+   {
+    "file": "afd.c",
+    "line": 2878,
+    "text": "other_process 1, i 5: failed, error 6."
+   },
+   {
+    "file": "afd.c",
+    "line": 2895,
+    "text": "other_process 1, i 5: got 0"
+   },
+   {
+    "file": "afd.c",
+    "line": 2909,
+    "text": "other_process 1, i 5: failed, error 6."
+   }
+  ],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 2.2,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 17,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 1327,
+   "todo": 31
+  },
+  "todo_lines": 31
+ },
+ "protocol": {
+  "exit_code": 124,
+  "failure_count": 1,
+  "failures": [
+   {
+    "file": "protocol.c",
+    "line": 564,
+    "text": "failed to create window"
+   }
+  ],
+  "guarded": null,
+  "last_line": "winetest-batch: timeout protocol 80",
+  "seconds": 80.1,
+  "skipped_lines": [
+   "protocol.c:2441: Tests skipped: getaddrinfo does not support IPV6"
+  ],
+  "status": "timeout",
+  "summary": null,
+  "todo_lines": 85
+ },
+ "sock": {
+  "exit_code": 33,
+  "failure_count": 31,
+  "failures": [
+   {
+    "file": "sock.c",
+    "line": 14479,
+    "text": "got -1, error 10051."
+   },
+   {
+    "file": "sock.c",
+    "line": 12417,
+    "text": "CreateWindowEx failed"
+   },
+   {
+    "file": "sock.c",
+    "line": 12429,
+    "text": "got 0"
+   },
+   {
+    "file": "sock.c",
+    "line": 12431,
+    "text": "got 0000"
+   },
+   {
+    "file": "sock.c",
+    "line": 12432,
+    "text": "got 00000000"
+   },
+   {
+    "file": "sock.c",
+    "line": 12433,
+    "text": "got 00000000"
+   },
+   {
+    "file": "sock.c",
+    "line": 12035,
+    "text": "CreateWindowEx failed"
+   },
+   {
+    "file": "sock.c",
+    "line": 12043,
+    "text": "got 0"
+   },
+   {
+    "file": "sock.c",
+    "line": 12045,
+    "text": "got 0000"
+   },
+   {
+    "file": "sock.c",
+    "line": 12046,
+    "text": "got 00000000"
+   },
+   {
+    "file": "sock.c",
+    "line": 12047,
+    "text": "got 00000000"
+   },
+   {
+    "file": "sock.c",
+    "line": 12035,
+    "text": "CreateWindowEx failed"
+   },
+   {
+    "file": "sock.c",
+    "line": 12043,
+    "text": "got 0"
+   },
+   {
+    "file": "sock.c",
+    "line": 12045,
+    "text": "got 0000"
+   },
+   {
+    "file": "sock.c",
+    "line": 12046,
+    "text": "got 00000000"
+   },
+   {
+    "file": "sock.c",
+    "line": 12047,
+    "text": "got 00000000"
+   },
+   {
+    "file": "sock.c",
+    "line": 12035,
+    "text": "CreateWindowEx failed"
+   },
+   {
+    "file": "sock.c",
+    "line": 12043,
+    "text": "got 0"
+   },
+   {
+    "file": "sock.c",
+    "line": 12045,
+    "text": "got 0000"
+   },
+   {
+    "file": "sock.c",
+    "line": 12046,
+    "text": "got 00000000"
+   },
+   {
+    "file": "sock.c",
+    "line": 12047,
+    "text": "got 00000000"
+   },
+   {
+    "file": "sock.c",
+    "line": 12174,
+    "text": "CreateWindowEx failed"
+   },
+   {
+    "file": "sock.c",
+    "line": 12182,
+    "text": "got 0"
+   },
+   {
+    "file": "sock.c",
+    "line": 12184,
+    "text": "got 0000"
+   },
+   {
+    "file": "sock.c",
+    "line": 12185,
+    "text": "got 00000000"
+   },
+   {
+    "file": "sock.c",
+    "line": 12186,
+    "text": "got 00000000"
+   },
+   {
+    "file": "sock.c",
+    "line": 12289,
+    "text": "CreateWindowEx failed"
+   },
+   {
+    "file": "sock.c",
+    "line": 12301,
+    "text": "got 0"
+   },
+   {
+    "file": "sock.c",
+    "line": 12303,
+    "text": "got 0000"
+   },
+   {
+    "file": "sock.c",
+    "line": 12304,
+    "text": "got 00000000"
+   },
+   {
+    "file": "sock.c",
+    "line": 12305,
+    "text": "got 00000000"
+   }
+  ],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 75.6,
+  "skipped_lines": [
+   "sock.c:13877: Tests skipped: Raw IPv4 sockets are not available",
+   "sock.c:13899: Tests skipped: Raw IPv6 sockets are not available",
+   "sock.c:3652: Tests skipped: SOCK_RAW is not available",
+   "sock.c:3665: Tests skipped: IPX is not supported",
+   "sock.c:10544: Tests skipped: Cannot test SIO_ADDRESS_LIST_CHANGE, interactive tests must be enabled"
+  ],
+  "status": "complete",
+  "summary": {
+   "failures": 33,
+   "flaky": 0,
+   "skipped": 5,
+   "tests": 2672514,
+   "todo": 378
+  },
+  "todo_lines": 378
+ }
+}

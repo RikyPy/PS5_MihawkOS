@@ -1,0 +1,139 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Sat, 3 Oct 2026 21:30:00 -0400
+Subject: [PATCH] ntdll: wait for a thread alert without a descriptor on the PS5
+
+NtWaitForAlertByThreadId (under every critical section, SRW lock, condition variable and WaitOnAddress)
+held a kqueue per thread id for the life of the process. A PS5 process can hold about 256 files and
+kqueues together, whatever getrlimit says (ps5platform/fdv.h): Direct3D's tests ran out of kqueues at the
+264th thread id (every thread-id slot that ever waited kept one, and a thread's slot is not reused for
+long), and a Java program that needs its files had fewer of the 256 to open them with. The entry is now a
+mutex, a condition variable and a flag, which cost no descriptor; the zeroed blocks they live in are the
+static initializers on this libc.
+---
+  dlls/ntdll/unix/sync.c | 68 +++++++++++++++++++++++++++++++++++++++++++++-----
+  1 file changed, 62 insertions(+), 6 deletions(-)
+
+diff --git a/dlls/ntdll/unix/sync.c b/dlls/ntdll/unix/sync.c
+index bcb0524..9a91a3a 100644
+--- a/dlls/ntdll/unix/sync.c
++++ b/dlls/ntdll/unix/sync.c
+@@ -29,6 +29,7 @@
+ 
+ #include <assert.h>
+ #include <errno.h>
++#include <pthread.h>
+ #include <fcntl.h>
+ #include <inttypes.h>
+ #include <limits.h>
+@@ -3485,7 +3486,15 @@ NTSTATUS WINAPI NtQueryInformationAtom( RTL_ATOM atom, ATOM_INFORMATION_CLASS cl
+ 
+ union tid_alert_entry
+ {
+-#ifdef USE_FUTEX
++#ifdef __PROSPERO__
++    /* A kqueue per thread id, held for the life of the process, spent the console's descriptors: a process
++     * can hold about 256 files and kqueues together (ps5platform/fdv.h), every thread id that ever waited
++     * kept one, and Direct3D's tests ran out of them at the 264th thread id (the thread's kevent failed with
++     * EMFILE), as did Java's files for lack of the slots. A mutex, a condition variable and a flag cost
++     * no descriptor, and the zeroed blocks they live in are what PTHREAD_MUTEX_INITIALIZER and
++     * PTHREAD_COND_INITIALIZER are on this libc. */
++    struct { pthread_mutex_t lock; pthread_cond_t cond; LONG alerted; } p;
++#elif defined(USE_FUTEX)
+     LONG futex;
+ #elif defined(HAVE_KQUEUE)
+     int kq;
+@@ -3525,7 +3534,7 @@ static union tid_alert_entry *get_tid_alert_entry( HANDLE tid )
+ 
+     if (!tid_alert_blocks[block_idx])
+     {
+-        static const size_t size = TID_ALERT_BLOCK_SIZE * sizeof(union tid_alert_entry);
++        static const size_t size = 65536;  /* a whole number of host pages, whatever the size of an entry */
+         void *ptr = anon_mmap_alloc( size, PROT_READ | PROT_WRITE );
+         if (ptr == MAP_FAILED) return NULL;
+         if (InterlockedCompareExchangePointer( (void **)&tid_alert_blocks[block_idx], ptr, NULL ))
+@@ -3534,7 +3543,7 @@ static union tid_alert_entry *get_tid_alert_entry( HANDLE tid )
+ 
+     entry = &tid_alert_blocks[block_idx][idx % TID_ALERT_BLOCK_SIZE];
+ 
+-#ifdef USE_FUTEX
++#if defined(__PROSPERO__) || defined(USE_FUTEX)
+     return entry;
+ #elif defined(HAVE_KQUEUE)
+     if (!entry->kq)
+@@ -3612,7 +3621,13 @@ NTSTATUS WINAPI NtAlertThreadByThreadId( HANDLE tid )
+ 
+     if (!entry) return STATUS_INVALID_CID;
+ 
+-#ifdef USE_FUTEX
++#ifdef __PROSPERO__
++    pthread_mutex_lock( &entry->p.lock );
++    entry->p.alerted = 1;
++    pthread_cond_signal( &entry->p.cond );
++    pthread_mutex_unlock( &entry->p.lock );
++    return STATUS_SUCCESS;
++#elif defined(USE_FUTEX)
+     {
+         LONG *futex = &entry->futex;
+         if (!InterlockedExchange( futex, 1 ))
+@@ -3640,7 +3655,7 @@ NTSTATUS WINAPI NtAlertThreadByThreadId( HANDLE tid )
+ }
+ 
+ 
+-#if defined(USE_FUTEX) || defined(HAVE_KQUEUE)
++#if defined(__PROSPERO__) || defined(USE_FUTEX) || defined(HAVE_KQUEUE)
+ static LONGLONG get_absolute_timeout( const LARGE_INTEGER *timeout )
+ {
+     LARGE_INTEGER now;
+@@ -3675,7 +3690,48 @@ NTSTATUS WINAPI NtWaitForAlertByThreadId( const void *address, const LARGE_INTEG
+ 
+     if (!entry) return STATUS_INVALID_CID;
+ 
+-#ifdef USE_FUTEX
++#ifdef __PROSPERO__
++    {
++        ULONGLONG end = 0;
++        NTSTATUS status = STATUS_ALERTED;
++
++        if (timeout)
++        {
++            if (timeout->QuadPart == TIMEOUT_INFINITE)
++                timeout = NULL;
++            else
++                end = get_absolute_timeout( timeout );
++        }
++
++        pthread_mutex_lock( &entry->p.lock );
++        while (!entry->p.alerted)
++        {
++            int ret;
++
++            if (timeout)
++            {
++                LONGLONG timeleft = update_timeout( end );
++                struct timespec when;
++
++                if (timeleft <= 0)
++                {
++                    status = STATUS_TIMEOUT;
++                    break;
++                }
++                clock_gettime( CLOCK_REALTIME, &when );
++                when.tv_sec += timeleft / (ULONGLONG)TICKSPERSEC;
++                when.tv_nsec += (timeleft % TICKSPERSEC) * 100;
++                if (when.tv_nsec >= 1000000000) { when.tv_sec++; when.tv_nsec -= 1000000000; }
++                ret = pthread_cond_timedwait( &entry->p.cond, &entry->p.lock, &when );
++                if (ret == ETIMEDOUT && !entry->p.alerted) { status = STATUS_TIMEOUT; break; }
++            }
++            else pthread_cond_wait( &entry->p.cond, &entry->p.lock );
++        }
++        if (status == STATUS_ALERTED) entry->p.alerted = 0;
++        pthread_mutex_unlock( &entry->p.lock );
++        return status;
++    }
++#elif defined(USE_FUTEX)
+     {
+         LONG *futex = &entry->futex;
+         ULONGLONG end;
+-- 
+2.43.0

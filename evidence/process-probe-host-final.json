@@ -1,0 +1,48 @@
+{
+  "probe_sha256": "17796fdc7c6f4f0841ba5cd4163d5dd3805a6cf6eb6c4173e36d0dd211591635",
+  "wine_revision": "a518d643873ff733bafb31595dfd01ab8bbdf790",
+  "cases": [
+    {
+      "case": "basic",
+      "exit_code": 1,
+      "seconds": 0.77,
+      "verdict": "FAIL",
+      "child_survived_parent": null,
+      "failure_stage": "first-use handle balance"
+    },
+    {
+      "case": "suspended",
+      "exit_code": 1,
+      "seconds": 0.16,
+      "verdict": "FAIL",
+      "child_survived_parent": null,
+      "failure_stage": "first-use handle balance"
+    },
+    {
+      "case": "terminate",
+      "exit_code": 1,
+      "seconds": 0.06,
+      "verdict": "FAIL",
+      "child_survived_parent": null,
+      "failure_stage": "first-use handle balance"
+    },
+    {
+      "case": "repeat",
+      "exit_code": 1,
+      "seconds": 0.12,
+      "verdict": "FAIL",
+      "child_survived_parent": null,
+      "failure_stage": "first-use handle balance"
+    },
+    {
+      "case": "parent-exit",
+      "exit_code": 0,
+      "seconds": 0.06,
+      "verdict": "PASS",
+      "child_survived_parent": true
+    }
+  ],
+  "passed": false,
+  "revision_correction": "Read the actual host build revision; previous value identified the separate PS5 Unix-side base.",
+  "followup": "process-probe-host-verified.json records the corrected first-use baseline and all five passing cases."
+}

@@ -1,0 +1,44 @@
+From 807051ad5811fbc616a29f8ff8ac02b43d56deca Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Fri, 2 Oct 2026 19:41:29 -0400
+Subject: [PATCH] Complete ntdll portability for the PS5 linker
+
+Provide the non-Linux performance-core fallback and use strcspn instead of glibc strchrnul. The preceding PS5 build compiled all Unix targets; these two symbols remained unresolved. Console validation pending. SPDX-License-Identifier: LGPL-2.1-or-later
+---
+ dlls/ntdll/unix/system.c  | 3 ++-
+ dlls/ntdll/unix/virtual.c | 2 +-
+ 2 files changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/dlls/ntdll/unix/system.c b/dlls/ntdll/unix/system.c
+index 6c9431e..04cf67e 100644
+--- a/dlls/ntdll/unix/system.c
++++ b/dlls/ntdll/unix/system.c
+@@ -766,10 +766,11 @@ void init_shared_data_cpuinfo( KUSER_SHARED_DATA *data )
+ 
+ #endif /* End architecture specific feature detection for CPUs */
+ 
+-static void fill_performance_core_info(void);
+ #ifdef __linux__
++static void fill_performance_core_info(void);
+ static BOOL sysfs_parse_bitmap(const char *filename, ULONG_PTR *mask);
+ #else
++static void fill_performance_core_info(void) {}
+ static BOOL sysfs_parse_bitmap(const char *filename, ULONG_PTR *mask) { return FALSE; }
+ #endif
+ 
+diff --git a/dlls/ntdll/unix/virtual.c b/dlls/ntdll/unix/virtual.c
+index 2a70d46..e84a95a 100644
+--- a/dlls/ntdll/unix/virtual.c
++++ b/dlls/ntdll/unix/virtual.c
+@@ -1255,7 +1255,7 @@ static void load_steam_overlay(const char *unix_lib_path)
+     p = preload;
+     while (*(preload = p))
+     {
+-        p = strchrnul( preload, ':' );
++        p = preload + strcspn( preload, ":" );
+         len = p - preload;
+         if (*p) ++p;
+         if (len + 1 > sizeof(path)) continue;
+-- 
+2.55.0
+

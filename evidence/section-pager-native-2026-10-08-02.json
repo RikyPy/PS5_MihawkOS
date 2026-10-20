@@ -1,0 +1,26 @@
+{
+ "run": "section-pager-native-2026-10-08-02",
+ "payload": true,
+ "kernel_reads": false,
+ "kernel_writes": false,
+ "no_overwrite": true,
+ "sdk_revision": "611893fc25ef3e138f5bc2c90d829d8b58174cd2",
+ "inputs": {
+  "native/proton_section_probe.c": "189c6de29c71e6daaf16c9c24fbc1dd9f5db0354542359af403b0cd886bead72",
+  "wine/ps5/pw_wine_section.c": "b4c662c4c0895210f6cb66d51429a6d8d1bfda6d222aa584435b3857fe963410",
+  "src/pw_memory_file.c": "0acbaea7ad24dfaeff64b07922d498b0e2bdb22ce886bdb3d0e2d560ba32376f",
+  "wine/ps5/pw_wine_section.h": "31410997e054223ce0aa5e48707ecb4262297463baf722eca3a0a4899995e85f",
+  "src/pw_memory_file.h": "59f3ac9b7854a411d0bb735fe7de4f4e3fee786db1b6d014526a09ee081f8f33",
+  "tools/run-section-native.py": "1573c2fd7b4f057520c814cf1054c49ee40a995c1b61b65ff713e497b026e16f"
+ },
+ "elf_sha256": "15da9d641064fc11b62c87bbbeb02741444e3569413adf6f2f1c5e293ead050f",
+ "passed": true,
+ "completed": true,
+ "wine_integration_qualified": false,
+ "error": null,
+ "lines": [
+  "SECTION_NATIVE threads=8 errors=0",
+  "SECTION_NATIVE backing_lease=PASS queued=1 surviving_alias=1 collected=1",
+  "SECTION_NATIVE PASS aliases=2 virtual_bytes=14495514624 threads=8 cache_pages=4 faults=389 evictions=389 cleanup=1 stage=0 failures=0"
+ ]
+}

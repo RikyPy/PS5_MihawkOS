@@ -1,0 +1,85 @@
+{
+  "title": "PPSA99170",
+  "identity": "091b8d1ddf4840b1803c4ca2041ea326",
+  "kind": "service-native",
+  "build": {
+    "revision": "b03e6a3c887fa39034b59ebb42c234cfff4ceb8b",
+    "kind": "service-native",
+    "elevate_gpu_helper": true,
+    "sdk_revision": "611893fc25ef3e138f5bc2c90d829d8b58174cd2",
+    "source_sha256": {
+      "ps5/src/main.cpp": "f1eb468f9603425c6543f0b02d8cf91e3e85a6919d7248dec85a24fd2f5aa457",
+      "ps5/CMakeLists.txt": "f7af78e0e2836e5cfbf06bf5723a85e90589db17c7b23c66d07d22f2d68c389c",
+      "native/proton_service_preflight.h": "3a8a7611112a1b454b8844fc7d8a5aec695d6fc9b706c714f72568787e68773b",
+      "native/proton_service_preflight.cpp": "d837e02b42bf1ff1a2760462d0ef055d67f064dda7d6e20d405bd0b9c7d16d07",
+      "native/proton_service_helper.c": "05a80730652fc3fec6573d3da3531ca75df1baee826eff1761e582e73ed706b4",
+      "native/proton_gpu_broker_probe.h": "661abb9d96c03562fa623328a969e0db221d673f393d779bd90a6dd15ceb95bc",
+      "native/proton_gpu_broker_probe.cpp": "e567c61dc1f26ce703722cd7756577d4a5a5ccf5fa42dca3d0fbb489b225b79a"
+    },
+    "radv_recipe_sha256": "e2844f49e4af12a9718d5b8b6055ace83e7eaa1d68870de2a79d39d1c92fa674",
+    "radv_platform_header_sha256": "24e770da15304fe95a4e0191271bc33f545dc8f964e186408c7996f5bce2aa97",
+    "radv_archive_sha256": "0ffa39311881236b4872ec77a56bca417ce56c71cefca5954224b9ea8f3a1bf5",
+    "helper_tool_sha256": "614377a0e37006e1454c67f228fc370a2f785c060205cb9f0264f27af04b5f18",
+    "helper_tool_revision": "ab37acd506305ba3e575435e3ae9a351cfaf7cf4",
+    "helper_patch_sha256": "defd28005f7c15664658f8d61928886864f00e4e3df586396460b4d27057275c",
+    "helper_layout_sha256": "fbc52518761b58b703a2225c847c5f44a81523cd0e751755adf890ae0f0dd74c",
+    "helper_symbols_sha256": "470ce72a27a7be8e35dd7a25b485faa733d61570bdaf24d3c75bb4e3e3c63cf7",
+    "helper_preload_mask": "0x8000000000000002",
+    "helper_recipe_sha256": "d547a4fa05d93492b39370012b9aa182ef6b295d3d3f7f2fa245ec0f8ae3ab87",
+    "helper_sha256": "90d649affdec1b598201732a45932d017eaca5af712d764f4a7f69a607e95eb8",
+    "helper_needed": [
+      "libkernel.sprx",
+      "libSceLibcInternal.sprx"
+    ],
+    "identity": "61320f8c919a32cd5b6a1e20e6fefb5a86b90f65f9327a5715eee0a27f0820fc",
+    "eboot_sha256": "8facab199304ada8f7b7d3238976bc416f5ab5ef43f1e85ce08bd945eccde28e"
+  },
+  "capture": "klog/graphics-child-gpu-broker-native-02",
+  "expected_missing_image": false,
+  "mode": "gpu-broker",
+  "passed": false,
+  "status": "complete",
+  "production_sha256": "8f63bbc57bd9203520653d9e3eb765798a434b737ac6c1f79b106437542761c3",
+  "production_restored": true,
+  "root_reference_balance_verified": false,
+  "forced_title_close": false,
+  "installed_readback_sha256": "d3d7cb497833ebb57876fe4465257217608ac9765f9a360a3ca0e658b845f325",
+  "production_executable_sha256": "bc5c7a75f249a59e7bce80218c6e749b9ea2f426e9bec4c96939ce7f75ceb17d",
+  "probe_readback_sha256": "55ad063a7bff3efcceb9050e4011473b5063fcdde55c76996d44e1013edcce54",
+  "probe_executable_sha256": "dbf374aad63322ed64232ff1aa28d3c7403d9324b7a811c1fd88e47069962e60",
+  "helper_uploaded": true,
+  "helper_executable_verified": true,
+  "shell_idle_after_run": true,
+  "post_launch_fault_records": 0,
+  "parent_shell_exit_seen": true,
+  "observations": [
+    "service-native identity=091b8d1ddf4840b1803c4ca2041ea326 revision=3 parent=1010 elevated=1",
+    "gpu-broker owner=1010 initialized=1 available_before=12866027520",
+    "gpu-broker client=0 hello=1 elevation=0 euid=0",
+    "gpu-broker client=0 service=503416785 pid=1013 cpu_alias=0 map_status=0x8002000d elevation=0 euid=0 map_stage=2",
+    "gpu-broker client=0 closed=0 absent=1",
+    "gpu-broker descriptors before=12 after=12 available_before=12866027520 available_after=12866027520",
+    "result=FAIL"
+  ],
+  "fresh_identity_seen": true,
+  "shared_gpu_clients": [
+    {
+      "client": 0,
+      "service_id": 503416785,
+      "pid": 1013,
+      "cpu_alias": 0,
+      "map_status": 2147614733
+    }
+  ],
+  "gpu_completion_checks": [],
+  "gpu_mapping_credentials": [
+    {
+      "client": 0,
+      "elevation": 0,
+      "euid": 0,
+      "map_stage": 2
+    }
+  ],
+  "restored_readback_sha256": "d3d7cb497833ebb57876fe4465257217608ac9765f9a360a3ca0e658b845f325",
+  "helper_removed": true
+}

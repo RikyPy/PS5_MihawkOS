@@ -1,0 +1,27 @@
+{
+ "run": "m0-2026-10-07-10",
+ "elf_sha256": "f8a6fb4dbd4d6cd93e19130702f09d13f1b52bdb5a7495f63cba9049ece2e7f2",
+ "process": "payload through websrv/elfldr, no title running",
+ "modes": {
+  "rawsig": {
+   "lines": [
+    "M0 start mode=rawsig",
+    "M0 low_page at=10000000",
+    "M0 rawsig registering through system call 416",
+    "M0 rawsig registered=0 errno=0",
+    "M0 rawsig entering with the guest FS",
+    "M0 rawsig handler signal=11 address=0",
+    "M0 rawsig uc+000 1000 0 0 0 0 0 0 0",
+    "M0 rawsig uc+064 0 10000020 10008000 0 10000156 0 0 10009000",
+    "M0 rawsig uc+128 10009000 7eeffbc90 515ca11 206 8000a4520 10000161 200018960 800251a48",
+    "M0 rawsig uc+192 1b00130000000c 0 3b003b00000005 4 10000161 33 10246 10008000",
+    "M0 rawsig uc+256 3b 480 10002 20001 82291b2fe 82290c450 40e 0",
+    "M0 rawsig uc+320 37f 0 0 2ffff00009fc0 0 ffff 0 ffff",
+    "M0 rawsig uc+384 0 ffff 0 ffff 0 ffff 0 ffff",
+    "M0 rawsig uc+448 0 ffff 0 ffff 697377617220304d 697265746e652067 206874697720676e 7365756720656874",
+    "M0 rawsig looping: stopping"
+   ],
+   "ended": false
+  }
+ }
+}

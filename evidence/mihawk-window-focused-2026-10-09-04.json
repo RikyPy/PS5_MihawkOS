@@ -1,0 +1,62 @@
+{
+  "battery": "mihawk-window-focused-2026-10-09-04",
+  "expected_cases": [
+    "window-snapshot32",
+    "window-snapshot64"
+  ],
+  "revision": "a4b93be6fab4609d8fec19963412e4a5d605e94e",
+  "dirty": true,
+  "cases": [
+    {
+      "case": "window-snapshot32",
+      "run": "mihawk-window-focused-2026-10-09-04-window-snapshot32",
+      "runner_status": 1,
+      "seconds": 15.6,
+      "result": "finished",
+      "probe_verdict": null,
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": false,
+      "run_seconds": 15.0,
+      "launch_readiness": {
+        "ready": true,
+        "seconds": 0.178,
+        "settle_seconds": 0.0,
+        "census_seconds": 0.16,
+        "previous_cleanup_verified": true
+      },
+      "runner_overhead_seconds": 0.6,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 8,
+      "protocol_errors": 0
+    },
+    {
+      "case": "window-snapshot64",
+      "run": "mihawk-window-focused-2026-10-09-04-window-snapshot64",
+      "runner_status": 1,
+      "seconds": 19.3,
+      "result": "finished",
+      "probe_verdict": null,
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": false,
+      "run_seconds": 10.7,
+      "launch_readiness": {
+        "ready": true,
+        "seconds": 8.131,
+        "settle_seconds": 7.913,
+        "census_seconds": 0.198,
+        "previous_cleanup_verified": false
+      },
+      "runner_overhead_seconds": 8.6,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 8,
+      "protocol_errors": 0
+    }
+  ],
+  "complete": true,
+  "seconds": 34.9,
+  "passed": false
+}

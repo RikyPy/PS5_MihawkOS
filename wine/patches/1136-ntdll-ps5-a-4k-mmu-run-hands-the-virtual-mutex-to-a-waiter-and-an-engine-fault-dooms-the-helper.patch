@@ -1,0 +1,108 @@
+From: PS5_Proton <local>
+Subject: [PATCH] ntdll: PS5: a 4 KiB MMU run hands the virtual mutex to a waiter, and an engine fault dooms the helper
+
+A 2026-10-15 run (record removed from the tree; in git history) froze the console with the helper's census stuck on Wine's virtual mutex for more than 160 s
+("telemetry phase=image-stats begin" at 20037.1, no end). A 4 KiB MMU run (patch 1134) holds that mutex, and every 256
+instructions it unlocked and at once relocked it on the same thread: the mutex is not fair, and the host measured 0
+hand-offs in 50 (wine/ps5/pw_wine_mmu4k.h), so the "yield" handed nothing over; it only emptied the run's page table,
+re-classifying every written host page (an alias lookup, the direct-memory engine's spin lock, a section's fstat) under
+the mutex, about 89,600 times per 10 s at that run's 22,954,087 instructions in its 20-30 s census window.
+
+Three changes to patch 1134's glue, the rest in wine/ps5:
+- ps5_mmu4k_ops gives the engine &pw_wine_perf_vlock_waiters, the count of threads blocked on virtual_mutex that patch
+  1135's owner record keeps (wine/ps5/pw_wine_perf.h). A run now holds the mutex from its start to its exit and every
+  256 instructions reads that count; when a thread waits, the run ends with the new exit "yield" (it has made progress,
+  so the program resumes natively), else it runs on to its budget of 8,192. A waiter that was ended while it blocked
+  stays counted: that only makes runs hand over more often. The run ends within 256 instructions of a waiter; who
+  takes the mutex then is the mutex's and the scheduler's choice: the program's next such store comes back through
+  the exit trap and a native fault (about 80 us by the engine's estimates) to virtual_handle_fault's trylock, which
+  can still beat the woken waiter. On the host a blocked thread took the mutex first 49-50 times in 50 when its
+  holder relocked 80 us later, 0 in 50 when it relocked at once; the console's rate is not measured.
+  The census line has a ninth exit, yield (native/proton_wine_child.c).
+- ps5_mmu4k_wanted starts no run once process_exiting is set: mutex_lock and mutex_unlock do nothing from then on
+  (unix_private.h), so the exiting thread changes views without the mutex, and a thread ended while it held the mutex
+  never gives it back. A run that asked just before the flag still takes its lock after it, so ps5_mmu4k_lock and
+  ps5_mmu4k_unlock call pthread_mutex_lock and pthread_mutex_unlock once the flag is set (pw_wine_perf_vlock_lock and
+  pw_wine_perf_vlock_unlock before it, as mutex_lock would): runs keep excluding each other from the engine's slots
+  and plans, and a run's unlock releases what its lock took, so a run blocked on it wakes.
+- ps5_mmu4k_signal's NOT_OURS branch (a fault in the engine's own code or its ops, which leaves the run's lock of the
+  virtual mutex held for good) stamps pw_ps5_child_doomed(PW_CHILD_DOOM_ENGINE) beside its one-time ERR, so the
+  helper's loader ends the process 5 s later (patch 1135's backstop) instead of every thread waiting on the mutex.
+And wine/ps5/pw_wine_dmem_ps5.c's heap_map and heap_unmap now block SIGUSR1, SIGQUIT and SIGINT around their kernel
+calls, as pw_wine_pages.c's pages_enter does: they hold the direct-memory engine's spin lock, and a thread suspended or
+ended there would leave every fault that reaches the engine spinning under the virtual mutex.
+
+Host: tests/test_pw_wine_mmu4k.c (M8: one lock per run, none mid-run; M8-yield: with a waiter, every run of the 20,001
+instruction loop hands over at exactly 256 instructions, 78 runs and a last one at the program's exit, and the results
+equal native 4 KiB pages; M5 and M6 make their protection change and alias forget at the hand-over),
+tests/test_crash_replays.c (the heap's direct-memory calls run with the three signals blocked; the case fails with the
+mask taken out), tests/test_pw_wine_perf.c (the hand-over rates above, printed, 5 runs on a 12-core host),
+tests/test_module_wiring.py. Console: the engine as patch 1134 left it ran
+in gate-hang-a-2026-10-15-01, 1,250 runs in 542 census lines (19,254 instructions; exits protected 1,152, straddle 89,
+idle 9) with no fault in the engine; this patch has not run on the console.
+---
+diff --git a/dlls/ntdll/unix/signal_x86_64.c b/dlls/ntdll/unix/signal_x86_64.c
+index ea15d80..a4becd6 100644
+--- a/dlls/ntdll/unix/signal_x86_64.c
++++ b/dlls/ntdll/unix/signal_x86_64.c
+@@ -2999,8 +2999,11 @@ static BOOL ps5_mmu4k_signal( int signal, siginfo_t *siginfo, ucontext_t *uconte
+     if (action == PW_WINE_MMU4K_NOT_OURS)
+     {
+         static int logged;
++        /* the run's lock of the virtual mutex is never released: the helper's loader ends it (pw_wine_process.h) */
++        extern void pw_ps5_child_doomed( unsigned int reason );
+         if (!logged++) ERR_(seh)( "mmu4k: fault in the engine: signal %d at %p, address %p\n", signal,
+                                   (void *)RIP_sig(ucontext), siginfo->si_addr );
++        pw_ps5_child_doomed( 3 /* PW_CHILD_DOOM_ENGINE */ );
+         return FALSE;
+     }
+     ps5_regs_set( ucontext, &regs );
+diff --git a/dlls/ntdll/unix/virtual.c b/dlls/ntdll/unix/virtual.c
+index f92476f..46cb890 100644
+--- a/dlls/ntdll/unix/virtual.c
++++ b/dlls/ntdll/unix/virtual.c
+@@ -4825,29 +4825,38 @@ static int ps5_mmu4k_classify( void *context, uintptr_t host_page, PwWineMmu4kPa
+     return 0;
+ }
+ 
++/* A run's hold stays real once the process exits, where mutex_lock does nothing: a run that started before the flag
++ * still excludes the others from the engine's slots, and its unlock balances its lock. */
+ static void ps5_mmu4k_lock( void *context )
+ {
+     signal_ps5_fs_repair();
+-    mutex_lock( &virtual_mutex );
++    if (process_exiting) pthread_mutex_lock( &virtual_mutex );
++    else pw_wine_perf_vlock_lock( &virtual_mutex, __builtin_return_address( 0 ) );
+ }
+ 
+ static void ps5_mmu4k_unlock( void *context )
+ {
+     signal_ps5_fs_repair();
+-    mutex_unlock( &virtual_mutex );
++    if (process_exiting) pthread_mutex_unlock( &virtual_mutex );
++    else pw_wine_perf_vlock_unlock( &virtual_mutex );
+ }
+ 
+-static const PwWineMmu4kOps ps5_mmu4k_ops = { NULL, ps5_mmu4k_classify, ps5_mmu4k_lock, ps5_mmu4k_unlock };
++/* wine/ps5/pw_wine_perf.h: the threads waiting on virtual_mutex; a run hands it over when one does */
++extern uint64_t pw_wine_perf_vlock_waiters;
++static const PwWineMmu4kOps ps5_mmu4k_ops = { NULL, ps5_mmu4k_classify, ps5_mmu4k_lock, ps5_mmu4k_unlock,
++                                              &pw_wine_perf_vlock_waiters };
+ 
+ /* Under the virtual mutex, for a write a 4 KiB page allows in a host page held read-only for its neighbours (patch
+  * 1122's branch of virtual_handle_fault): TRUE with a run stack taken and the thread told to start a run there
+- * (segv_handler's ps5_fault_resolved, docs/MMU4K.md section 4.5); FALSE leaves 1122's step. */
++ * (segv_handler's ps5_fault_resolved, docs/MMU4K.md section 4.5); FALSE leaves 1122's step. None once the process
++ * exits: the exiting thread then changes views without the mutex (mutex_lock does nothing), and a thread ended
++ * while it held the mutex never gives it back. */
+ static BOOL ps5_mmu4k_wanted( struct ntdll_thread_data *data, char *page, void *addr )
+ {
+     int stack;
+ 
+-    if (!pw_wine_mmu4k_ready() || !data->ps5_fault_own || data->ps5_step_page[0] || data->ps5_mmu4k_run ||
+-        !pw_wine_alias_get( (uintptr_t)page ) || (stack = pw_wine_mmu4k_stack_take()) < 0)
++    if (process_exiting || !pw_wine_mmu4k_ready() || !data->ps5_fault_own || data->ps5_step_page[0] ||
++        data->ps5_mmu4k_run || !pw_wine_alias_get( (uintptr_t)page ) || (stack = pw_wine_mmu4k_stack_take()) < 0)
+         return FALSE;
+     data->ps5_mmu4k_page = page;
+     data->ps5_mmu4k_addr = addr;

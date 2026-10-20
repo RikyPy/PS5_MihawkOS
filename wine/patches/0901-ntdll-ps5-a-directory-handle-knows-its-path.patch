@@ -1,0 +1,88 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Sat, 3 Oct 2026 17:30:00 -0400
+Subject: [PATCH] ntdll: a directory handle knows its path on the PS5
+
+A title has no *at() system calls, so this module resolves a directory
+descriptor by the path it was opened by. A directory the in-process server
+opened and sent here has no such record in ntdll's table, and every name
+opened relative to a directory handle (NtOpenFile and NtCreateFile with a
+RootDirectory) failed with STATUS_INVALID_HANDLE: Wine's ntdll path test
+fails every case that gives a root directory. When a directory descriptor is
+received, the server is asked for the name it opened the directory with and
+the descriptor is recorded under it.
+---
+  dlls/ntdll/unix/server.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
+  1 file changed, 44 insertions(+)
+
+diff --git a/dlls/ntdll/unix/server.c b/dlls/ntdll/unix/server.c
+index 41ab77e..2b8f635 100644
+--- a/dlls/ntdll/unix/server.c
++++ b/dlls/ntdll/unix/server.c
+@@ -1195,6 +1195,42 @@ static BOOL add_fd_to_cache( HANDLE handle, int fd, enum server_fd_type type,
+ }
+ 
+ 
++#ifdef __PROSPERO__
++/* A title has no *at() system calls: this module resolves a directory descriptor by the path
++ * it was opened by (pw_wine_cwd.c). A directory the server opened and sent here has no such
++ * path in this module's table, so every name opened relative to its handle failed with
++ * STATUS_INVALID_HANDLE. The server knows the name it opened the directory with. */
++int pw_cwd_fd_path( int fd, char *out, size_t size );
++void pw_cwd_track( int fd, const char *absolute );
++
++static void track_directory_fd( HANDLE handle, int fd )
++{
++    char known[16], *name;
++    data_size_t size = 1024;
++    unsigned int ret;
++
++    if (!pw_cwd_fd_path( fd, known, sizeof(known) )) return;
++    for (;;)
++    {
++        if (!(name = malloc( size + 1 ))) return;
++        SERVER_START_REQ( get_handle_unix_name )
++        {
++            req->handle = wine_server_obj_handle( handle );
++            wine_server_set_reply( req, name, size );
++            ret = wine_server_call( req );
++            size = reply->name_len;
++        }
++        SERVER_END_REQ;
++        if (!ret) break;
++        free( name );
++        if (ret != STATUS_BUFFER_OVERFLOW) return;
++    }
++    name[size] = 0;
++    if (name[0] == '/') pw_cwd_track( fd, name );
++    free( name );
++}
++#endif
++
+ /***********************************************************************
+  *           get_cached_fd
+  */
+@@ -1251,6 +1287,11 @@ int server_get_unix_fd( HANDLE handle, unsigned int wanted_access, int *unix_fd,
+     obj_handle_t fd_handle;
+     int ret, fd = -1;
+     unsigned int access = 0;
++#ifdef __PROSPERO__
++    enum server_fd_type fd_type = FD_TYPE_INVALID;
++
++    if (!type) type = &fd_type;
++#endif
+ 
+     *unix_fd = -1;
+     *needs_close = 0;
+@@ -1295,6 +1336,9 @@ done:
+         ret = STATUS_ACCESS_DENIED;
+         if (*needs_close) close( fd );
+     }
++#ifdef __PROSPERO__
++    if (!ret && *type == FD_TYPE_DIR) track_directory_fd( handle, fd );
++#endif
+     if (!ret) *unix_fd = fd;
+     return ret;
+ }
+-- 
+2.43.0

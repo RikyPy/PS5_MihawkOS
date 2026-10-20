@@ -1,0 +1,18 @@
+{
+ "passed": true,
+ "suite_count": 41,
+ "sanitizers": [
+  "address",
+  "undefined"
+ ],
+ "log": "klog/mihawk-host-2026-10-09-08.log",
+ "prior_attempt": {
+  "log": "klog/mihawk-host-2026-10-09-07.log",
+  "passed": false,
+  "test": "test_pw_ntsync",
+  "assertion": "deferred > 0 && raised > 0 && raised <= deferred",
+  "isolated_repeat_passed": true,
+  "note": "Random signal-delivery coverage is scheduling-sensitive; no assertion or test was disabled."
+ },
+ "console_qualification": false
+}

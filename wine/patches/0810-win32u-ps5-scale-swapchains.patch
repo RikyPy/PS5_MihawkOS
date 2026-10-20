@@ -1,0 +1,58 @@
+From 5cb133618f3eabfe25bcf7fe54c3a2b0c00ed228 Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Fri, 2 Oct 2026 20:35:17 -0400
+Subject: [PATCH] Scale PS5 guest swapchains to the display plane
+
+Swapchain capture showed the D3D11 triangle in the top-left of the fixed 3840x2160 scanout. Use the existing Proton blitter even at matching DPI, preserve aspect ratio with black borders, and select an RGBA view for RGBA guest images. Console validation pending. SPDX-License-Identifier: LGPL-2.1-or-later
+---
+ dlls/win32u/vulkan.c | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+
+diff --git a/dlls/win32u/vulkan.c b/dlls/win32u/vulkan.c
+index 2cbd02c..f289362 100644
+--- a/dlls/win32u/vulkan.c
++++ b/dlls/win32u/vulkan.c
+@@ -3038,6 +3038,10 @@ static VkResult init_fs_hack_images( struct vulkan_device *device, struct swapch
+         viewInfo.image = swapchain->fs_hack_images[i].user_image;
+         viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+         viewInfo.format = VK_FORMAT_B8G8R8A8_SRGB;
++#ifdef __PROSPERO__
++        if (createinfo->imageFormat == VK_FORMAT_R8G8B8A8_UNORM || createinfo->imageFormat == VK_FORMAT_R8G8B8A8_SRGB)
++            viewInfo.format = VK_FORMAT_R8G8B8A8_SRGB;
++#endif
+         viewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+         viewInfo.subresourceRange.baseMipLevel = 0;
+         viewInfo.subresourceRange.levelCount = 1;
+@@ -3067,6 +3071,11 @@ fail:
+ static BOOL surface_get_fshack_dpi( struct surface *surface )
+ {
+     UINT dpi = NtUserGetDpiForWindow( surface->hwnd ), raw = NtUserGetWinMonitorDpi( surface->hwnd, MDT_RAW_DPI );
++#ifdef __PROSPERO__
++    /* VideoOut has one fixed scanout extent, even when Windows DPI matches.
++     * Render at the guest extent and use Proton's existing presentation blit. */
++    return raw ? raw : USER_DEFAULT_SCREEN_DPI;
++#endif
+     return fshack_enabled && dpi != raw ? raw : 0;
+ }
+ 
+@@ -3411,6 +3420,17 @@ static VkResult record_compute_cmd( struct vulkan_device *device, struct swapcha
+     /* vec2: blit dst extents in real coords */
+     constants[2] = swapchain->host_extents.width;
+     constants[3] = swapchain->host_extents.height;
++#ifdef __PROSPERO__
++    /* Fit the game without stretching; the sampler supplies black borders. */
++    {
++        float scale = min( (float)swapchain->host_extents.width / swapchain->extents.width,
++                           (float)swapchain->host_extents.height / swapchain->extents.height );
++        constants[2] = swapchain->extents.width * scale;
++        constants[3] = swapchain->extents.height * scale;
++        constants[0] = (swapchain->host_extents.width - constants[2]) * 0.5f - 0.5f * scale;
++        constants[1] = (swapchain->host_extents.height - constants[3]) * 0.5f - 0.5f * scale;
++    }
++#endif
+     device->p_vkCmdPushConstants( hack->cmd, swapchain->pipeline_layout,
+                                   VK_SHADER_STAGE_COMPUTE_BIT, 0, sizeof(constants), constants );
+ 
+-- 
+2.55.0
+

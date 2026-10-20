@@ -1,0 +1,22 @@
+{
+ "run": "mem-05",
+ "what": "mem-probe.exe",
+ "env": [
+  "MEM_PROBE_MODE=frag",
+  "MEM_PROBE_COUNT=20000"
+ ],
+ "result": "finished",
+ "seconds": 3.9,
+ "probe_verdict": "PASS",
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": false,
+ "passed": true,
+ "bench": {},
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [],
+  "top": []
+ }
+}

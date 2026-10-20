@@ -1,0 +1,31 @@
+{
+ "run": "m4s3-render-2026-10-07-01-gl-vertex32",
+ "what": "gl-vertex32-probe.exe",
+ "env": [
+  "PROTON_LAYOUT=launcher"
+ ],
+ "result": "finished",
+ "seconds": 10.4,
+ "probe_verdict": null,
+ "clean_owner_restart": false,
+ "launcher_end_status": 0,
+ "initial_status": 1,
+ "closed_on_request": false,
+ "child_logs": [
+  "klog/m4s3-render-2026-10-07-01-gl-vertex32-wine-child-2410.log",
+  "klog/m4s3-render-2026-10-07-01-gl-vertex32-wine-child-2411.log",
+  "klog/m4s3-render-2026-10-07-01-gl-vertex32-wine-child-2412.log",
+  "klog/m4s3-render-2026-10-07-01-gl-vertex32-wine-child-2413.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": false,
+ "bench": {},
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [],
+  "top": []
+ }
+}

@@ -1,0 +1,45 @@
+From e1613b46e91d17181df0dd0185f3c5951df6395e Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Sat, 3 Oct 2026 10:05:06 -0400
+Subject: [PATCH] ps5drv: say which threads register for the title's input
+
+The title's inputs (the pad turned into mouse and keys, and a request to close
+or end the game) reach a program only through a thread that created a window,
+registered the input fd with its queue here, and then calls a message function.
+A Java game left the close and terminate requests undelivered (mouse 0/2 of
+posted) and nothing in the log said which threads, if any, were registered.
+Each registration now prints its thread and the server's status.
+---
+ dlls/win32u/ps5drv.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/dlls/win32u/ps5drv.c b/dlls/win32u/ps5drv.c
+index 352771c..6c8da1b 100644
+--- a/dlls/win32u/ps5drv.c
++++ b/dlls/win32u/ps5drv.c
+@@ -340,6 +340,7 @@ static BOOL ps5_CreateWindowSurface( HWND hwnd, BOOL layered, const RECT *surfac
+ static void register_input_fd(void)
+ {
+     DWORD tid = GetCurrentThreadId();
++    NTSTATUS status;
+     HANDLE handle;
+     UINT i;
+     int fd;
+@@ -359,10 +360,13 @@ static void register_input_fd(void)
+     SERVER_START_REQ( set_queue_fd )
+     {
+         req->handle = wine_server_obj_handle( handle );
+-        wine_server_call( req );
++        status = wine_server_call( req );
+     }
+     SERVER_END_REQ;
+     NtClose( handle );
++    /* The title's inputs (a stop request among them) reach the game only from a
++     * thread that registered here and then pumps its messages: say which ones did. */
++    fprintf( stderr, "wine-ps5: title input registered for thread %04x: %#x\n", (UINT)tid, (UINT)status );
+ }
+ 
+ static BOOL ps5_CreateWindow( HWND hwnd )
+-- 
+2.56.0
+

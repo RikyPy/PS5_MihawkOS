@@ -1,0 +1,68 @@
+{
+  "reference": "Pinned Linux Wine; kernel32 CreateProcessW wrapper supplies an explicit UTF-16 Windows environment. This qualifies expected Windows values and inheritance, not the PS5 root transport.",
+  "wine_revision": "7e893751d256bfe062fd1d159375f024dedfa696",
+  "cases": [
+    {
+      "bits": 32,
+      "returncode": 0,
+      "seconds": 1.32,
+      "verdicts": [
+        {
+          "verdict": "PASS",
+          "checks": 7,
+          "failures": 0
+        },
+        {
+          "verdict": "PASS",
+          "checks": 10,
+          "failures": 0
+        },
+        {
+          "verdict": "PASS",
+          "checks": 3,
+          "failures": 0
+        },
+        {
+          "verdict": "PASS",
+          "checks": 19,
+          "failures": 0
+        }
+      ],
+      "probe_sha256": "92642c4433d7e6f14b38dd62397e3ef6bf3fc2a593876c3d182906933c438df4",
+      "passed": true
+    },
+    {
+      "bits": 64,
+      "returncode": 0,
+      "seconds": 0.07,
+      "verdicts": [
+        {
+          "verdict": "PASS",
+          "checks": 7,
+          "failures": 0
+        },
+        {
+          "verdict": "PASS",
+          "checks": 10,
+          "failures": 0
+        },
+        {
+          "verdict": "PASS",
+          "checks": 3,
+          "failures": 0
+        },
+        {
+          "verdict": "PASS",
+          "checks": 19,
+          "failures": 0
+        }
+      ],
+      "probe_sha256": "39b3453af36885c448ed1418d61c33ef0a02115a09d007fcb382b1c45feead3b",
+      "passed": true
+    }
+  ],
+  "passed": true,
+  "wrapper_source": "#define UNICODE\n#include <windows.h>\nvoid mainCRTStartup(void)\n{\n    static WCHAR environment[]=L\"MIHAWK_ENV_ROOT=launch selected\\0MIHAWK_ENV_UTF8=caf\\x00e9 \\x03a9\\0MIHAWK_ENV_EMPTY=\\0MIHAWK_ENV_CASE=last wins\\0PATH=C:\\\\Selected Tools;C:\\\\windows\\\\system32\\0\\0\";\n    WCHAR command[2048];const WCHAR *p=GetCommandLineW();while(*p && *p!=' ')++p;while(*p==' ')++p;lstrcpyW(command,p);\n    STARTUPINFOW startup={0};PROCESS_INFORMATION process={0};startup.cb=sizeof(startup);\n    if(!CreateProcessW(NULL,command,NULL,NULL,FALSE,CREATE_UNICODE_ENVIRONMENT,environment,NULL,&startup,&process))ExitProcess(2);\n    DWORD wait=WaitForSingleObject(process.hProcess,60000),code=~0u;\n    if(wait!=WAIT_OBJECT_0) {TerminateProcess(process.hProcess,3);ExitProcess(3);}\n    GetExitCodeProcess(process.hProcess,&code);CloseHandle(process.hThread);CloseHandle(process.hProcess);ExitProcess(code);\n}\n",
+  "wrapper_sha256": "910ce1442af2bf0d776e2f8cf71965b3a41a7c1107e8511dff73a750ec84cf5c",
+  "probe_source_sha256": "74c98832ab423dd38fd1f6370c4daaa15606d9a358f099534b58b9824755bfa8"
+}

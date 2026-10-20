@@ -1,0 +1,607 @@
+{
+  "launch_readiness": {
+    "ready": true,
+    "seconds": 0.166,
+    "settle_seconds": 0.0,
+    "census_seconds": 0.147,
+    "previous_cleanup_verified": true
+  },
+  "run": "mihawk-gate-2026-10-09-01-prefix-fresh64",
+  "what": "profile proton-baseline-test",
+  "env": [
+    "PROTON_LAYOUT=launcher"
+  ],
+  "result": "finished",
+  "seconds": 155.1,
+  "probe_verdict": "PASS",
+  "clean_owner_restart": true,
+  "launcher_end_status": 0,
+  "initial_status": 0,
+  "closed_on_request": false,
+  "child_logs": [
+    "klog/mihawk-gate-2026-10-09-01-prefix-fresh64-wine-child-1793.log",
+    "klog/mihawk-gate-2026-10-09-01-prefix-fresh64-wine-child-1794.log",
+    "klog/mihawk-gate-2026-10-09-01-prefix-fresh64-wine-child-1795.log",
+    "klog/mihawk-gate-2026-10-09-01-prefix-fresh64-wine-child-1796.log",
+    "klog/mihawk-gate-2026-10-09-01-prefix-fresh64-wine-child-1797.log",
+    "klog/mihawk-gate-2026-10-09-01-prefix-fresh64-wine-child-1798.log",
+    "klog/mihawk-gate-2026-10-09-01-prefix-fresh64-wine-child-1799.log",
+    "klog/mihawk-gate-2026-10-09-01-prefix-fresh64-wine-child-1800.log",
+    "klog/mihawk-gate-2026-10-09-01-prefix-fresh64-wine-child-1801.log",
+    "klog/mihawk-gate-2026-10-09-01-prefix-fresh64-wine-child-1802.log",
+    "klog/mihawk-gate-2026-10-09-01-prefix-fresh64-wine-child-1803.log",
+    "klog/mihawk-gate-2026-10-09-01-prefix-fresh64-wine-child-1804.log",
+    "klog/mihawk-gate-2026-10-09-01-prefix-fresh64-wine-child-1805.log",
+    "klog/mihawk-gate-2026-10-09-01-prefix-fresh64-wine-child-1806.log",
+    "klog/mihawk-gate-2026-10-09-01-prefix-fresh64-wine-child-1807.log",
+    "klog/mihawk-gate-2026-10-09-01-prefix-fresh64-wine-child-1808.log",
+    "klog/mihawk-gate-2026-10-09-01-prefix-fresh64-wine-child-1809.log",
+    "klog/mihawk-gate-2026-10-09-01-prefix-fresh64-wine-child-1810.log",
+    "klog/mihawk-gate-2026-10-09-01-prefix-fresh64-wine-child-1811.log",
+    "klog/mihawk-gate-2026-10-09-01-prefix-fresh64-wine-child-1812.log"
+  ],
+  "exit_stall": false,
+  "stop_requested": null,
+  "returned_to_launcher": true,
+  "passed": true,
+  "bench": {},
+  "steady": {
+    "server": {
+      "calls": 0.0,
+      "per_s": 0.0,
+      "avg_us": 0.0,
+      "selects": 0.0,
+      "blocked": 0.0,
+      "block_avg_us": 0.0,
+      "waits": 0.0,
+      "handles_avg": 0.0,
+      "wait_all": 0.0,
+      "polled": 0.0,
+      "delays": 0.0,
+      "yields": 0.0,
+      "intervals": 28
+    }
+  },
+  "intervals": {
+    "frames": [],
+    "server": [
+      {
+        "calls": 0.0,
+        "per_s": 0.0,
+        "avg_us": 0.0,
+        "selects": 0.0,
+        "blocked": 0.0,
+        "block_avg_us": 0.0,
+        "waits": 0.0,
+        "handles_avg": 0.0,
+        "wait_all": 0.0,
+        "polled": 0.0,
+        "delays": 0.0,
+        "yields": 0.0
+      },
+      {
+        "calls": 0.0,
+        "per_s": 0.0,
+        "avg_us": 0.0,
+        "selects": 0.0,
+        "blocked": 0.0,
+        "block_avg_us": 0.0,
+        "waits": 0.0,
+        "handles_avg": 0.0,
+        "wait_all": 0.0,
+        "polled": 0.0,
+        "delays": 0.0,
+        "yields": 0.0
+      },
+      {
+        "calls": 0.0,
+        "per_s": 0.0,
+        "avg_us": 0.0,
+        "selects": 0.0,
+        "blocked": 0.0,
+        "block_avg_us": 0.0,
+        "waits": 0.0,
+        "handles_avg": 0.0,
+        "wait_all": 0.0,
+        "polled": 0.0,
+        "delays": 0.0,
+        "yields": 0.0
+      },
+      {
+        "calls": 0.0,
+        "per_s": 0.0,
+        "avg_us": 0.0,
+        "selects": 0.0,
+        "blocked": 0.0,
+        "block_avg_us": 0.0,
+        "waits": 0.0,
+        "handles_avg": 0.0,
+        "wait_all": 0.0,
+        "polled": 0.0,
+        "delays": 0.0,
+        "yields": 0.0
+      },
+      {
+        "calls": 0.0,
+        "per_s": 0.0,
+        "avg_us": 0.0,
+        "selects": 0.0,
+        "blocked": 0.0,
+        "block_avg_us": 0.0,
+        "waits": 0.0,
+        "handles_avg": 0.0,
+        "wait_all": 0.0,
+        "polled": 0.0,
+        "delays": 0.0,
+        "yields": 0.0
+      },
+      {
+        "calls": 0.0,
+        "per_s": 0.0,
+        "avg_us": 0.0,
+        "selects": 0.0,
+        "blocked": 0.0,
+        "block_avg_us": 0.0,
+        "waits": 0.0,
+        "handles_avg": 0.0,
+        "wait_all": 0.0,
+        "polled": 0.0,
+        "delays": 0.0,
+        "yields": 0.0
+      },
+      {
+        "calls": 0.0,
+        "per_s": 0.0,
+        "avg_us": 0.0,
+        "selects": 0.0,
+        "blocked": 0.0,
+        "block_avg_us": 0.0,
+        "waits": 0.0,
+        "handles_avg": 0.0,
+        "wait_all": 0.0,
+        "polled": 0.0,
+        "delays": 0.0,
+        "yields": 0.0
+      },
+      {
+        "calls": 0.0,
+        "per_s": 0.0,
+        "avg_us": 0.0,
+        "selects": 0.0,
+        "blocked": 0.0,
+        "block_avg_us": 0.0,
+        "waits": 0.0,
+        "handles_avg": 0.0,
+        "wait_all": 0.0,
+        "polled": 0.0,
+        "delays": 0.0,
+        "yields": 0.0
+      },
+      {
+        "calls": 0.0,
+        "per_s": 0.0,
+        "avg_us": 0.0,
+        "selects": 0.0,
+        "blocked": 0.0,
+        "block_avg_us": 0.0,
+        "waits": 0.0,
+        "handles_avg": 0.0,
+        "wait_all": 0.0,
+        "polled": 0.0,
+        "delays": 0.0,
+        "yields": 0.0
+      },
+      {
+        "calls": 0.0,
+        "per_s": 0.0,
+        "avg_us": 0.0,
+        "selects": 0.0,
+        "blocked": 0.0,
+        "block_avg_us": 0.0,
+        "waits": 0.0,
+        "handles_avg": 0.0,
+        "wait_all": 0.0,
+        "polled": 0.0,
+        "delays": 0.0,
+        "yields": 0.0
+      },
+      {
+        "calls": 0.0,
+        "per_s": 0.0,
+        "avg_us": 0.0,
+        "selects": 0.0,
+        "blocked": 0.0,
+        "block_avg_us": 0.0,
+        "waits": 0.0,
+        "handles_avg": 0.0,
+        "wait_all": 0.0,
+        "polled": 0.0,
+        "delays": 0.0,
+        "yields": 0.0
+      },
+      {
+        "calls": 0.0,
+        "per_s": 0.0,
+        "avg_us": 0.0,
+        "selects": 0.0,
+        "blocked": 0.0,
+        "block_avg_us": 0.0,
+        "waits": 0.0,
+        "handles_avg": 0.0,
+        "wait_all": 0.0,
+        "polled": 0.0,
+        "delays": 0.0,
+        "yields": 0.0
+      },
+      {
+        "calls": 0.0,
+        "per_s": 0.0,
+        "avg_us": 0.0,
+        "selects": 0.0,
+        "blocked": 0.0,
+        "block_avg_us": 0.0,
+        "waits": 0.0,
+        "handles_avg": 0.0,
+        "wait_all": 0.0,
+        "polled": 0.0,
+        "delays": 0.0,
+        "yields": 0.0
+      },
+      {
+        "calls": 0.0,
+        "per_s": 0.0,
+        "avg_us": 0.0,
+        "selects": 0.0,
+        "blocked": 0.0,
+        "block_avg_us": 0.0,
+        "waits": 0.0,
+        "handles_avg": 0.0,
+        "wait_all": 0.0,
+        "polled": 0.0,
+        "delays": 0.0,
+        "yields": 0.0
+      },
+      {
+        "calls": 0.0,
+        "per_s": 0.0,
+        "avg_us": 0.0,
+        "selects": 0.0,
+        "blocked": 0.0,
+        "block_avg_us": 0.0,
+        "waits": 0.0,
+        "handles_avg": 0.0,
+        "wait_all": 0.0,
+        "polled": 0.0,
+        "delays": 0.0,
+        "yields": 0.0
+      },
+      {
+        "calls": 0.0,
+        "per_s": 0.0,
+        "avg_us": 0.0,
+        "selects": 0.0,
+        "blocked": 0.0,
+        "block_avg_us": 0.0,
+        "waits": 0.0,
+        "handles_avg": 0.0,
+        "wait_all": 0.0,
+        "polled": 0.0,
+        "delays": 0.0,
+        "yields": 0.0
+      },
+      {
+        "calls": 0.0,
+        "per_s": 0.0,
+        "avg_us": 0.0,
+        "selects": 0.0,
+        "blocked": 0.0,
+        "block_avg_us": 0.0,
+        "waits": 0.0,
+        "handles_avg": 0.0,
+        "wait_all": 0.0,
+        "polled": 0.0,
+        "delays": 0.0,
+        "yields": 0.0
+      },
+      {
+        "calls": 0.0,
+        "per_s": 0.0,
+        "avg_us": 0.0,
+        "selects": 0.0,
+        "blocked": 0.0,
+        "block_avg_us": 0.0,
+        "waits": 0.0,
+        "handles_avg": 0.0,
+        "wait_all": 0.0,
+        "polled": 0.0,
+        "delays": 0.0,
+        "yields": 0.0
+      },
+      {
+        "calls": 0.0,
+        "per_s": 0.0,
+        "avg_us": 0.0,
+        "selects": 0.0,
+        "blocked": 0.0,
+        "block_avg_us": 0.0,
+        "waits": 0.0,
+        "handles_avg": 0.0,
+        "wait_all": 0.0,
+        "polled": 0.0,
+        "delays": 0.0,
+        "yields": 0.0
+      },
+      {
+        "calls": 0.0,
+        "per_s": 0.0,
+        "avg_us": 0.0,
+        "selects": 0.0,
+        "blocked": 0.0,
+        "block_avg_us": 0.0,
+        "waits": 0.0,
+        "handles_avg": 0.0,
+        "wait_all": 0.0,
+        "polled": 0.0,
+        "delays": 0.0,
+        "yields": 0.0
+      },
+      {
+        "calls": 0.0,
+        "per_s": 0.0,
+        "avg_us": 0.0,
+        "selects": 0.0,
+        "blocked": 0.0,
+        "block_avg_us": 0.0,
+        "waits": 0.0,
+        "handles_avg": 0.0,
+        "wait_all": 0.0,
+        "polled": 0.0,
+        "delays": 0.0,
+        "yields": 0.0
+      },
+      {
+        "calls": 0.0,
+        "per_s": 0.0,
+        "avg_us": 0.0,
+        "selects": 0.0,
+        "blocked": 0.0,
+        "block_avg_us": 0.0,
+        "waits": 0.0,
+        "handles_avg": 0.0,
+        "wait_all": 0.0,
+        "polled": 0.0,
+        "delays": 0.0,
+        "yields": 0.0
+      },
+      {
+        "calls": 0.0,
+        "per_s": 0.0,
+        "avg_us": 0.0,
+        "selects": 0.0,
+        "blocked": 0.0,
+        "block_avg_us": 0.0,
+        "waits": 0.0,
+        "handles_avg": 0.0,
+        "wait_all": 0.0,
+        "polled": 0.0,
+        "delays": 0.0,
+        "yields": 0.0
+      },
+      {
+        "calls": 0.0,
+        "per_s": 0.0,
+        "avg_us": 0.0,
+        "selects": 0.0,
+        "blocked": 0.0,
+        "block_avg_us": 0.0,
+        "waits": 0.0,
+        "handles_avg": 0.0,
+        "wait_all": 0.0,
+        "polled": 0.0,
+        "delays": 0.0,
+        "yields": 0.0
+      },
+      {
+        "calls": 0.0,
+        "per_s": 0.0,
+        "avg_us": 0.0,
+        "selects": 0.0,
+        "blocked": 0.0,
+        "block_avg_us": 0.0,
+        "waits": 0.0,
+        "handles_avg": 0.0,
+        "wait_all": 0.0,
+        "polled": 0.0,
+        "delays": 0.0,
+        "yields": 0.0
+      },
+      {
+        "calls": 0.0,
+        "per_s": 0.0,
+        "avg_us": 0.0,
+        "selects": 0.0,
+        "blocked": 0.0,
+        "block_avg_us": 0.0,
+        "waits": 0.0,
+        "handles_avg": 0.0,
+        "wait_all": 0.0,
+        "polled": 0.0,
+        "delays": 0.0,
+        "yields": 0.0
+      },
+      {
+        "calls": 0.0,
+        "per_s": 0.0,
+        "avg_us": 0.0,
+        "selects": 0.0,
+        "blocked": 0.0,
+        "block_avg_us": 0.0,
+        "waits": 0.0,
+        "handles_avg": 0.0,
+        "wait_all": 0.0,
+        "polled": 0.0,
+        "delays": 0.0,
+        "yields": 0.0
+      },
+      {
+        "calls": 0.0,
+        "per_s": 0.0,
+        "avg_us": 0.0,
+        "selects": 0.0,
+        "blocked": 0.0,
+        "block_avg_us": 0.0,
+        "waits": 0.0,
+        "handles_avg": 0.0,
+        "wait_all": 0.0,
+        "polled": 0.0,
+        "delays": 0.0,
+        "yields": 0.0
+      },
+      {
+        "calls": 0.0,
+        "per_s": 0.0,
+        "avg_us": 0.0,
+        "selects": 0.0,
+        "blocked": 0.0,
+        "block_avg_us": 0.0,
+        "waits": 0.0,
+        "handles_avg": 0.0,
+        "wait_all": 0.0,
+        "polled": 0.0,
+        "delays": 0.0,
+        "yields": 0.0
+      }
+    ],
+    "top": []
+  },
+  "shown": {
+    "frames": 11,
+    "per_10s": [
+      11
+    ],
+    "longest_gap_ms": 1126
+  },
+  "broker": {
+    "local_offer": 8589934592,
+    "host_limit": 1073741824,
+    "refused": [],
+    "refused_count": 0,
+    "clients": [
+      {
+        "pid": 1797,
+        "frames": 0,
+        "submissions": 0
+      },
+      {
+        "pid": -1,
+        "frames": 0,
+        "submissions": 0
+      },
+      {
+        "pid": 1802,
+        "frames": 0,
+        "submissions": 0
+      },
+      {
+        "pid": 1803,
+        "frames": 0,
+        "submissions": 0
+      },
+      {
+        "pid": 1804,
+        "frames": 0,
+        "submissions": 0
+      },
+      {
+        "pid": 1801,
+        "frames": 0,
+        "submissions": 0
+      },
+      {
+        "pid": 1800,
+        "frames": 0,
+        "submissions": 0
+      },
+      {
+        "pid": 1805,
+        "frames": 0,
+        "submissions": 0
+      },
+      {
+        "pid": 1799,
+        "frames": 0,
+        "submissions": 0
+      },
+      {
+        "pid": 1810,
+        "frames": 0,
+        "submissions": 0
+      },
+      {
+        "pid": 1809,
+        "frames": 0,
+        "submissions": 0
+      },
+      {
+        "pid": -1,
+        "frames": 0,
+        "submissions": 0
+      },
+      {
+        "pid": -1,
+        "frames": 0,
+        "submissions": 0
+      },
+      {
+        "pid": 1795,
+        "frames": 0,
+        "submissions": 0
+      },
+      {
+        "pid": 1794,
+        "frames": 0,
+        "submissions": 0
+      },
+      {
+        "pid": -1,
+        "frames": 0,
+        "submissions": 0
+      },
+      {
+        "pid": -1,
+        "frames": 0,
+        "submissions": 0
+      },
+      {
+        "pid": -1,
+        "frames": 0,
+        "submissions": 0
+      },
+      {
+        "pid": -1,
+        "frames": 0,
+        "submissions": 0
+      }
+    ],
+    "wedged": false,
+    "failure_reasons": [],
+    "host_peak": 8454144,
+    "local_peak": 0
+  },
+  "pad_script": [
+    "# Capture the probe's actual presented text, after its bitmap/glyph checks.",
+    "anchor frame",
+    "1 capture",
+    "3 capture"
+  ],
+  "captures": [
+    "klog/mihawk-gate-2026-10-09-01-prefix-fresh64-capture-01.png",
+    "klog/mihawk-gate-2026-10-09-01-prefix-fresh64-capture-02.png"
+  ],
+  "cleanup_verified": true,
+  "hooks_removed": true,
+  "fresh_prefix": true,
+  "architecture": "64",
+  "probe_sha256": "e0d52ae2aca47884b26d382b870de0eff9c3d069d4c2c31d41e0ef5b7558b7d9",
+  "test_data_removed": true
+}

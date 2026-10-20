@@ -1,0 +1,61 @@
+From: PS5_Proton <local>
+Subject: [PATCH] server: private system backdrops for the shell's flyouts
+
+The approved Windows 11 prototype draws Start and Search on its acrylic-base and Quick Settings, the notification
+centre and the hidden icons on its acrylic, each a .surface-flyout: the 1 px SurfaceStrokeColorFlyout (black at 5.9%,
+20% in dark) over the untinted backdrop and --shadow-28. DWMWA_SYSTEMBACKDROP_TYPE accepts two more values past
+Windows' own, PS5_DWMSBT_FLYOUT_BASE (6) and PS5_DWMSBT_FLYOUT (7), which the snapshot reports as
+PW_BACKDROP_FLYOUT_BASE and PW_BACKDROP_FLYOUT with PW_SHADOW_FLYOUT and the stroke for PS5_Proton's compositor
+(src/pw_window_effects.h). A border colour the window sets itself still wins.
+---
+--- a/server/window.c
++++ b/server/window.c
+@@ -213,8 +213,10 @@
+ enum { PS5_DWMWCP_DEFAULT, PS5_DWMWCP_DONOTROUND, PS5_DWMWCP_ROUND, PS5_DWMWCP_ROUNDSMALL };
+ /* PS5_DWMSBT_TASKBAR is this project's own, past Windows' values: the shell's taskbar asks for the approved
+  * prototype's taskbar acrylic with it (PW_BACKDROP_TASKBAR, src/pw_window_effects.h). */
++/* PS5_DWMSBT_FLYOUT_BASE and PS5_DWMSBT_FLYOUT are its flyouts' acrylic-base (Start, Search) and acrylic (Quick
++ * Settings, notifications, hidden icons): with them a window gets the prototype's flyout stroke and shadow. */
+ enum { PS5_DWMSBT_AUTO, PS5_DWMSBT_NONE, PS5_DWMSBT_MAINWINDOW, PS5_DWMSBT_TRANSIENTWINDOW, PS5_DWMSBT_TABBEDWINDOW,
+-       PS5_DWMSBT_TASKBAR };
++       PS5_DWMSBT_TASKBAR, PS5_DWMSBT_FLYOUT_BASE, PS5_DWMSBT_FLYOUT };
+ static int32_t ps5_clamp32(int64_t value)
+ {
+     return value < INT32_MIN ? INT32_MIN : value > INT32_MAX ? INT32_MAX : (int32_t)value;
+@@ -222,7 +224,8 @@
+ static void ps5_snapshot_dwm(PwWindowRow *row, const struct window *win)
+ {
+     static const unsigned char kinds[] = {PW_BACKDROP_NONE, PW_BACKDROP_NONE, PW_BACKDROP_MICA,
+-                                          PW_BACKDROP_ACRYLIC, PW_BACKDROP_MICA_ALT, PW_BACKDROP_TASKBAR};
++                                          PW_BACKDROP_ACRYLIC, PW_BACKDROP_MICA_ALT, PW_BACKDROP_TASKBAR,
++                                          PW_BACKDROP_FLYOUT_BASE, PW_BACKDROP_FLYOUT};
+     const int framed = (win->style & WS_CAPTION) == WS_CAPTION || (win->style & WS_THICKFRAME);
+     const int plain = !(win->style & WS_MAXIMIZE) && !win->win_region && !(win->ex_style & WS_EX_LAYERED);
+     const int dropshadow = win->class && (get_class_style( win->class ) & CS_DROPSHADOW);
+@@ -255,6 +258,17 @@
+         row->flags |= PW_WINDOW_GLASS;
+         row->backdrop = kinds[win->ps5_backdrop];
+         row->material = win->ps5_dark ? PW_MATERIAL_DARK : PW_MATERIAL_LIGHT;
++        if (row->backdrop == PW_BACKDROP_FLYOUT_BASE || row->backdrop == PW_BACKDROP_FLYOUT)
++        {
++            /* .surface-flyout: --shadow-28 and SurfaceStrokeColorFlyout, black at 5.9% (20% in dark), unless the
++             * window chose its own border colour. */
++            if (plain) row->shadow = PW_SHADOW_FLYOUT;
++            if (!win->ps5_border_mode)
++            {
++                row->flags |= PW_WINDOW_BORDER;
++                row->border = (win->ps5_dark ? 51u : 15u) << 24;
++            }
++        }
+         if (margins->left < 0 || margins->top < 0 || margins->right < 0 || margins->bottom < 0)
+         {
+             /* "Sheet of glass": the whole client area. */
+@@ -3813,7 +3827,7 @@
+         else break;
+         return;
+     case 3:
+-        if (req->value > PS5_DWMSBT_TASKBAR) break;
++        if (req->value > PS5_DWMSBT_FLYOUT) break;
+         win->ps5_backdrop = req->value;
+         return;
+     case 4:

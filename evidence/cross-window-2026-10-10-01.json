@@ -1,0 +1,30 @@
+{
+  "battery": "cross-window-2026-10-10-01",
+  "expected_cases": [
+    "gpu-window32",
+    "gpu-window64",
+    "dxvk-window32",
+    "dxvk-window64"
+  ],
+  "revision": "652f6ed59852549ce73bc2d8c7b619ecfadb4381",
+  "dirty": true,
+  "cases": [
+    {
+      "case": "gpu-window32",
+      "run": "cross-window-2026-10-10-01-gpu-window32",
+      "runner_status": 1,
+      "seconds": 90.3,
+      "result": "runner_error",
+      "probe_verdict": null,
+      "returned_to_launcher": null,
+      "exit_stall": null,
+      "passed": false,
+      "run_seconds": null,
+      "launch_readiness": null
+    }
+  ],
+  "stopped_after": "gpu-window32",
+  "complete": false,
+  "seconds": 90.3,
+  "passed": false
+}

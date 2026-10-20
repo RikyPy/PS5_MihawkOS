@@ -1,0 +1,55 @@
+{
+ "run": "memservice-gate-2026-10-06-launcher-render",
+ "what": "process-probe.exe",
+ "env": [
+  "PROTON_LAYOUT=launcher"
+ ],
+ "result": "finished",
+ "seconds": 11.8,
+ "probe_verdict": "FAIL",
+ "clean_owner_restart": false,
+ "launcher_end_status": 0,
+ "initial_status": 1,
+ "closed_on_request": false,
+ "child_logs": [
+  "klog/memservice-gate-2026-10-06-launcher-render-wine-child-189.log",
+  "klog/memservice-gate-2026-10-06-launcher-render-wine-child-190.log",
+  "klog/memservice-gate-2026-10-06-launcher-render-wine-child-191.log",
+  "klog/memservice-gate-2026-10-06-launcher-render-wine-child-192.log",
+  "klog/memservice-gate-2026-10-06-launcher-render-wine-child-193.log",
+  "klog/memservice-gate-2026-10-06-launcher-render-wine-child-194.log",
+  "klog/memservice-gate-2026-10-06-launcher-render-wine-child-195.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": false,
+ "bench": {
+  "frames": 8.0,
+  "draws": 1.0,
+  "vsync": 1.0,
+  "total_ms": 378.0,
+  "frame_us": 47357.0
+ },
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   }
+  ],
+  "top": []
+ }
+}

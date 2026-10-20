@@ -1,0 +1,30 @@
+{
+  "run": "syscall-trace-host-observe-2026-10-10-02",
+  "mode": "observe",
+  "build": {
+    "sdk_revision": "611893fc25ef3e138f5bc2c90d829d8b58174cd2",
+    "source_sha256": "9c370f4aff4707d2c4195779291e127b0bcf05d24bec12b4d1282d8d866a103b",
+    "elf_sha256": "503192db7982dc5ff1f910beef3e22d9d436c055e97857835de0ef39a2c4e963",
+    "host_sha256": "46f58d065554fac01de723cf1a0e23f79db9ba3fe0566d920bf066c2f47d7498"
+  },
+  "runner_sha256": "4d6b844f8cb6df515ca9120d48bc909b259afd48e747f412fd501e9f2e243196",
+  "question": "Can an owned payload stop native syscall entry, prevent the original pipe write and resume an owned dispatcher on the stopped thread?",
+  "production_changed": false,
+  "wine_integrated": false,
+  "title_launched": false,
+  "host_only": true,
+  "passed": false,
+  "host": {
+    "passed": false,
+    "tracee": [
+      "TRACE_READY pid=674191"
+    ],
+    "tracer": [
+      "TRACE_ERROR role=tracer phase=registers errno=14 attached=1 stopped=1",
+      "TRACE_TRACER FAIL mode=observe stops=0 entries=0 exits=0 replaced=0 ms=2"
+    ],
+    "error": null
+  },
+  "error": "Linux oracle failed; console launch refused",
+  "seconds": 0.005
+}

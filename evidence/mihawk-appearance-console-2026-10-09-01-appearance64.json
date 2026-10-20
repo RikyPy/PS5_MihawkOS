@@ -1,0 +1,123 @@
+{
+ "launch_readiness": {
+  "ready": true,
+  "seconds": 7.998,
+  "settle_seconds": 7.833,
+  "census_seconds": 0.15,
+  "previous_cleanup_verified": false
+ },
+ "run": "mihawk-appearance-console-2026-10-09-01-appearance64",
+ "what": "appearance64-probe.exe",
+ "env": [],
+ "result": "finished",
+ "seconds": 10.4,
+ "probe_verdict": null,
+ "clean_owner_restart": false,
+ "launcher_end_status": 0,
+ "initial_status": 1,
+ "closed_on_request": false,
+ "child_logs": [
+  "klog/mihawk-appearance-console-2026-10-09-01-appearance64-wine-child-1085.log",
+  "klog/mihawk-appearance-console-2026-10-09-01-appearance64-wine-child-1086.log",
+  "klog/mihawk-appearance-console-2026-10-09-01-appearance64-wine-child-1087.log",
+  "klog/mihawk-appearance-console-2026-10-09-01-appearance64-wine-child-1088.log",
+  "klog/mihawk-appearance-console-2026-10-09-01-appearance64-wine-child-1089.log",
+  "klog/mihawk-appearance-console-2026-10-09-01-appearance64-wine-child-1090.log",
+  "klog/mihawk-appearance-console-2026-10-09-01-appearance64-wine-child-1091.log",
+  "klog/mihawk-appearance-console-2026-10-09-01-appearance64-wine-child-1092.log",
+  "klog/mihawk-appearance-console-2026-10-09-01-appearance64-wine-child-1093.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": false,
+ "bench": {},
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [],
+  "top": []
+ },
+ "shown": {
+  "frames": 0,
+  "per_10s": [],
+  "longest_gap_ms": 0
+ },
+ "broker": {
+  "local_offer": 8589934592,
+  "host_limit": 1073741824,
+  "refused": [],
+  "refused_count": 0,
+  "clients": [
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   }
+  ],
+  "wedged": false,
+  "failure_reasons": [],
+  "host_peak": 0,
+  "local_peak": 0
+ },
+ "pad_script": [
+  "anchor frame",
+  "3 capture",
+  "3.2 touch 0 0 0.2",
+  "3.4 touch 400 200 0.2",
+  "10 capture",
+  "10.2 touch 400 200 0.2",
+  "10.4 touch 800 400 0.2"
+ ],
+ "captures": [],
+ "cleanup_verified": false,
+ "hooks_removed": true,
+ "api_passed": false,
+ "appearance_pixels": [
+  {
+   "variant": "light",
+   "passed": false,
+   "error": "missing capture or measured client origin"
+  },
+  {
+   "variant": "dark",
+   "passed": false,
+   "error": "missing capture or measured client origin"
+  }
+ ]
+}

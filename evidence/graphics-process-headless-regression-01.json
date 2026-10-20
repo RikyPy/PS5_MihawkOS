@@ -1,0 +1,154 @@
+{
+  "probe_sha256": "3e97bbaaea32a076c952e380a19f9e4e4cd96a0fd040f901d82df809b648b81a",
+  "wine_revision": "a518d643873ff733bafb31595dfd01ab8bbdf790",
+  "cases": [
+    {
+      "case": "basic",
+      "exit_code": 0,
+      "seconds": 1.32,
+      "verdict": "PASS",
+      "handles": [
+        {
+          "before": 13,
+          "after": 15
+        },
+        {
+          "before": 15,
+          "after": 15
+        }
+      ],
+      "passed": true
+    },
+    {
+      "case": "suspended",
+      "exit_code": 0,
+      "seconds": 0.16,
+      "verdict": "PASS",
+      "handles": [
+        {
+          "before": 13,
+          "after": 15
+        },
+        {
+          "before": 15,
+          "after": 15
+        }
+      ],
+      "passed": true
+    },
+    {
+      "case": "terminate",
+      "exit_code": 0,
+      "seconds": 0.06,
+      "verdict": "PASS",
+      "handles": [
+        {
+          "before": 13,
+          "after": 15
+        },
+        {
+          "before": 15,
+          "after": 15
+        }
+      ],
+      "passed": true
+    },
+    {
+      "case": "repeat",
+      "exit_code": 0,
+      "seconds": 0.36,
+      "verdict": "PASS",
+      "handles": [
+        {
+          "before": 13,
+          "after": 15
+        },
+        {
+          "before": 15,
+          "after": 15
+        },
+        {
+          "before": 15,
+          "after": 15
+        },
+        {
+          "before": 15,
+          "after": 15
+        },
+        {
+          "before": 15,
+          "after": 15
+        }
+      ],
+      "passed": true
+    },
+    {
+      "case": "parent-exit",
+      "exit_code": 0,
+      "seconds": 0.06,
+      "verdict": "PASS",
+      "handles": [],
+      "survived_parent": true,
+      "passed": true
+    },
+    {
+      "case": "descendants",
+      "exit_code": 0,
+      "seconds": 0.07,
+      "verdict": "PASS",
+      "handles": [
+        {
+          "before": 13,
+          "after": 13
+        }
+      ],
+      "descendant_nodes": 3,
+      "expected_nodes": 3,
+      "passed": true
+    },
+    {
+      "case": "descendants-repeat",
+      "exit_code": 0,
+      "seconds": 0.16,
+      "verdict": "PASS",
+      "handles": [
+        {
+          "before": 13,
+          "after": 13
+        },
+        {
+          "before": 15,
+          "after": 15
+        },
+        {
+          "before": 15,
+          "after": 15
+        },
+        {
+          "before": 15,
+          "after": 15
+        }
+      ],
+      "descendant_nodes": 12,
+      "expected_nodes": 12,
+      "passed": true
+    },
+    {
+      "case": "descendants-parent-exit",
+      "exit_code": 0,
+      "seconds": 0.06,
+      "verdict": "PASS",
+      "handles": [
+        {
+          "before": 13,
+          "after": 13
+        }
+      ],
+      "descendant_nodes": 3,
+      "expected_nodes": 3,
+      "survived_parent": true,
+      "passed": true
+    }
+  ],
+  "passed": true
+}

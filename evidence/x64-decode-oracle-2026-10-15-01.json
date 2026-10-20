@@ -1,0 +1,128 @@
+{
+ "run": "x64-decode-oracle-2026-10-15-01",
+ "where": "host PC (no console run)",
+ "what": "MMU4K step 1 (docs/MMU4K.md, section 4.1): the x86 decoder's long mode, VEX forms, pw_ia32_access and the table's memory, stack and control-flow attributes, checked against LLVM's disassembler and MC layer (tools/ia32-decode-oracle.sh --64, tools/x86_llvm_semantics.cpp); 32-bit mode checked unchanged",
+ "llvm_oracle_64": {
+  "mode": 64,
+  "verdict": "PASS",
+  "encodings": 58645650,
+  "agree_text": 8755235,
+  "agree_invalid": 47787310,
+  "vex_evex_xop_length_agree": 315748,
+  "groups": 27114,
+  "unexplained_groups": 0,
+  "vex_memory_agree": 3357233,
+  "semantics_agree": 8286303,
+  "semantics_skipped": 468932,
+  "LENGTH": {
+   "encodings": 6756,
+   "unexplained_groups": 0
+  },
+  "TEXT": {
+   "encodings": 69954,
+   "unexplained_groups": 0
+  },
+  "OURS_ONLY": {
+   "encodings": 187690,
+   "unexplained_groups": 0
+  },
+  "LLVM_ONLY": {
+   "encodings": 3435,
+   "unexplained_groups": 0
+  },
+  "NOFORM": {
+   "encodings": 1501480,
+   "unexplained_groups": 0
+  },
+  "MEMORY": {
+   "encodings": 0,
+   "unexplained_groups": 0
+  },
+  "STORE_MISSED": {
+   "encodings": 17610,
+   "unexplained_groups": 0
+  },
+  "STORE_EXTRA": {
+   "encodings": 0,
+   "unexplained_groups": 0
+  },
+  "FLOW": {
+   "encodings": 0,
+   "unexplained_groups": 0
+  },
+  "STACK": {
+   "encodings": 432,
+   "unexplained_groups": 0
+  },
+  "forms": 1110,
+  "llvm": "23.1.1"
+ },
+ "llvm_oracle_32": {
+  "verdict": "PASS",
+  "encodings": 12486072,
+  "agree_text": 2497796,
+  "agree_invalid": 8372826,
+  "vex_evex_xop_length_agree": 976132,
+  "groups": 11196,
+  "unexplained_groups": 0,
+  "LENGTH": {
+   "encodings": 3016,
+   "unexplained_groups": 0
+  },
+  "TEXT": {
+   "encodings": 53430,
+   "unexplained_groups": 0
+  },
+  "OURS_ONLY": {
+   "encodings": 85726,
+   "unexplained_groups": 0
+  },
+  "LLVM_ONLY": {
+   "encodings": 1308,
+   "unexplained_groups": 0
+  },
+  "NOFORM": {
+   "encodings": 495838,
+   "unexplained_groups": 0
+  },
+  "forms": 1110,
+  "llvm": "23.1.1",
+  "groups_file": "byte-identical to the run before this change (11,196 groups)"
+ },
+ "differential_32": {
+  "what": "every PwIa32Inst field that existed before (result, length, row, prefixes, sizes, ModRM, SIB, displacement, immediates) from pw_ia32_decode at HEAD f3aa632 and after this change, over 16 prefix and escape-byte sets x 4 opcode maps x every opcode x every ModRM x 3 tails x up to 8 truncated lengths, and 3,000,000 random byte strings",
+  "encodings": 106415808,
+  "checksum_before": "fef52349ebd3ba8f",
+  "checksum_after": "fef52349ebd3ba8f",
+  "verdict": "identical"
+ },
+ "mutation_checks": {
+  "what": "each oracle check made to fail once on purpose, then the change undone",
+  "Mt_size_10_to_8": {
+   "MEMORY": {
+    "encodings": 10200,
+    "unexplained_groups": 100
+   }
+  },
+  "cmp_Ev_Gv_without_MRO": {
+   "STORE_EXTRA": {
+    "encodings": 18768,
+    "unexplained_groups": 184
+   }
+  },
+  "pop_Zv_without_STACK": {
+   "STACK": {
+    "encodings": 800,
+    "unexplained_groups": 184
+   }
+  },
+  "push_Zv_without_STACK": "reported as STORE_MISSED (the checks stop at the first disagreement)"
+ },
+ "bugs_the_oracle_found": [
+  "VEX2 (C5) payload read after the opcode byte overwrote the escape: R/X/B, L and pp wrong for every C5 encoding",
+  "F6/F7 TEST's imm8/imm32 dropped under REX.R (reg 8-9 is still /0-/1): wrong length",
+  "VPSLLW/D/Q-VPSRAW/D-VPSRLW/D/Q's shift count sized 32 bytes at L = 1 (it is 128 bits): operand changed to Wdq",
+  "the SIB address with no base and no index prints [disp] in long mode (no riz)"
+ ],
+ "not_checked_here": "the CPU oracle (tools/ia32-cpu-decode-check.sh) has no long mode yet, and this PC's CPU is Intel, not the console's Zen 2: the AMD-specific readings in tests/x64-llvm-differences.txt (66 before CALL rel, SSE4a) are the SDM's and AMD's documentation, unconfirmed on the console"
+}

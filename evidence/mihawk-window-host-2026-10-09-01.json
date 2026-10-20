@@ -1,0 +1,27 @@
+{
+  "scope": "Window metadata prerequisite, not displayed composition",
+  "host_suites": 42,
+  "host_log": "klog/mihawk-window-host-2026-10-09-01.log",
+  "image_verdict_tests": 7,
+  "battery_tests": 5,
+  "desktop_session_runner_tests": 4,
+  "patches_replayed": 143,
+  "patch_log": "klog/mihawk-window-patch-replay-2026-10-09-02.log",
+  "probe_compile": {
+    "pe32": true,
+    "pe64": true,
+    "log": "klog/mihawk-window-probe-build-2026-10-09-02.log"
+  },
+  "probe_source_sha256": "bbef0ede5eb47f22e9d8dbe2cf00936de4112f5d47265c8e7b605fd39fa901ba",
+  "console_qualified": false,
+  "build01": "Stopped before deployment to preserve both global and request-specific Wine error state; no console test.",
+  "build03": "Wine modules and broker built; title compilation failed because the snapshot header include was missing. Nothing deployed. Fixed for build04.",
+  "build_target_selection": "evidence/mihawk-build-target-selection-2026-10-09.json",
+  "first_console_batch": {
+    "evidence": "evidence/mihawk-window-focused-2026-10-09-04.json",
+    "passed_cases": 0,
+    "completed_cases": 2,
+    "cause": "Harness requested C:\\mihawk.exe; managed starter is C:\\windows\\system32\\mihawk.exe. Both initial payloads exited with c0000135 before probes.",
+    "metadata_qualified": false
+  }
+}

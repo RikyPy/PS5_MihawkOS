@@ -1,0 +1,77 @@
+From 1edcbc8e0546b2213385ac68372d718952eabf24 Mon Sep 17 00:00:00 2001
+From: Manuel Pereira <manuelpereiralds@gmail.com>
+Date: Mon, 28 Sep 2026 18:56:59 +0200
+Subject: [PATCH] winevulkan: Let a host driver use VK_KHR_display.
+
+The PS5 user driver presents a win32 surface through the host's display
+plane, so the host instance needs VK_KHR_display and its instance
+functions. The extension stays unexposed: applications see only
+VK_KHR_win32_surface, its functions stay stubs in the client DLLs, and
+the extensions built on it stay unsupported. Only the Unix side's
+instance extension and function lists change; no thunk is added.
+
+Rebased onto the pin for PS5_Proton (see wine/patches/README.md).
+---
+ dlls/winevulkan/make_vulkan | 18 +++++++++++++++---
+ 1 file changed, 15 insertions(+), 3 deletions(-)
+
+diff --git a/dlls/winevulkan/make_vulkan b/dlls/winevulkan/make_vulkan
+index 3395f22..e9823c6 100755
+--- a/dlls/winevulkan/make_vulkan
++++ b/dlls/winevulkan/make_vulkan
+@@ -88,7 +88,6 @@ EXT_BLOCK_SIZE = 1000
+ 
+ UNSUPPORTED_EXTENSIONS = [
+     # Instance extensions
+-    "VK_KHR_display", # Needs WSI work.
+     "VK_KHR_surface_protected_capabilities",
+     "VK_LUNARG_direct_driver_loading", # Implemented in the Vulkan loader
+ 
+@@ -105,6 +104,16 @@ UNSUPPORTED_EXTENSIONS = [
+     "VK_NV_external_memory_rdma", # Needs shared resources work.
+     "VK_NV_external_compute_queue", # Has a new dispatchable handle
+ 
++    # Built on VK_KHR_display, which only a host driver uses (below).
++    "VK_EXT_acquire_drm_display",
++    "VK_EXT_direct_mode_display",
++    "VK_EXT_display_control",
++    "VK_EXT_display_surface_counter",
++    "VK_KHR_display_swapchain",
++    "VK_KHR_get_display_properties2",
++    "VK_NV_acquire_winrt_display",
++    "VK_NV_display_stereo",
++
+     # Extensions for other platforms
+     "VK_EXT_metal_objects",
+     "VK_EXT_physical_device_drm",
+@@ -125,6 +134,9 @@ UNSUPPORTED_EXTENSIONS = [
+ UNEXPOSED_EXTENSIONS = {
+     "VK_EXT_map_memory_placed",
+     "VK_EXT_headless_surface",
++    # A host driver may present win32 surfaces through the display plane
++    # (the PS5's); applications still see only VK_KHR_win32_surface.
++    "VK_KHR_display",
+     # Extensions for other platforms
+     "VK_EXT_external_memory_dma_buf",
+     "VK_EXT_image_drm_format_modifier",
+@@ -2931,7 +2943,7 @@ class VkGenerator(object):
+ 
+             # We support all Core functions except for VK_KHR_display* APIs.
+             # Create stubs for unsupported Core functions.
+-            if func.is_required():
++            if func.is_required() and func.needs_exposing():
+                 f.write(func.spec())
+             else:
+                 f.write("@ stub {0}\n".format(func.name))
+@@ -2949,7 +2961,7 @@ class VkGenerator(object):
+ 
+             # We support all Core functions except for VK_KHR_display* APIs.
+             # Create stubs for unsupported Core functions.
+-            if func.is_required():
++            if func.is_required() and func.needs_exposing():
+                 f.write(func.spec(symbol="winevulkan." + func.name))
+             else:
+                 f.write("@ stub {0}\n".format(func.name))
+-- 
+2.55.0
+

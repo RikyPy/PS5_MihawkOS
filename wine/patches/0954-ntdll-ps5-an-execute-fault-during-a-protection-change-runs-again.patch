@@ -1,0 +1,66 @@
+From addce6e6aa9302b4382495b9026c30d281da513a Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Wed, 7 Oct 2026 20:59:39 -0400
+Subject: [PATCH] ntdll: PS5: an execute fault during a protection change runs
+ again.
+
+On the console executable protection takes two calls (PS5_Proton's
+wine/ps5/pw_wine_dmem_ps5.c): an ordinary mprotect without execute,
+which splits the kernel's map entry, then the payload SDK's write of the
+entry's protection with it. Between them the pages cannot be executed,
+and a thread running code there faulted: a 32-bit game's hooks
+(PAGE_EXECUTE_READWRITE over 5-byte patches, then back) were placed in a
+module another thread was running, and that thread died on an execute
+fault in win32u (PS5_Proton, 2026-10-07; record removed from the tree; in git history).
+
+virtual_handle_fault now asks whether such a change was under way, or
+has finished since the thread's last retry; it waits for it and runs the
+instruction again. A page that stays unexecutable faults a second time
+with nothing newer finished, and the fault is raised as before.
+---
+ dlls/ntdll/unix/unix_private.h | 1 +
+ dlls/ntdll/unix/virtual.c      | 9 +++++++++
+ 2 files changed, 10 insertions(+)
+
+diff --git a/dlls/ntdll/unix/unix_private.h b/dlls/ntdll/unix/unix_private.h
+index 4f42bfc..46e63bc 100644
+--- a/dlls/ntdll/unix/unix_private.h
++++ b/dlls/ntdll/unix/unix_private.h
+@@ -119,6 +119,7 @@ struct ntdll_thread_data
+     int                      *fsync_apc_futex;
+ #ifdef __PROSPERO__
+     int                       ps5_terminating; /* 03e0 killed inside the Unix side: end at the boundary */
++    unsigned int              ps5_exec_seen;   /* executable protection changes finished at this thread's last retry */
+ #endif
+ };
+ 
+diff --git a/dlls/ntdll/unix/virtual.c b/dlls/ntdll/unix/virtual.c
+index 97cdf62..9c9685c 100644
+--- a/dlls/ntdll/unix/virtual.c
++++ b/dlls/ntdll/unix/virtual.c
+@@ -197,6 +197,7 @@ static BOOL host_prot_unchanged( const void *addr, size_t len, int prot )
+  * reserved areas comes from the console's direct memory instead of its
+  * ~440 MiB of flexible memory; every other call passes through. */
+ extern void *__wine_ps5_mmap( void *addr, size_t len, int prot, int flags, int fd, off_t off );
++extern int __wine_ps5_exec_fault_retry( unsigned int *seen );
+ extern int __wine_ps5_munmap( void *addr, size_t len );
+ extern int __wine_ps5_mprotect( void *addr, size_t len, int prot );
+ extern int __wine_ps5_dmem_region( void *base, size_t size );
+@@ -5411,6 +5412,14 @@ NTSTATUS virtual_handle_fault( EXCEPTION_RECORD *rec, void *stack )
+     char *page = ROUND_ADDR( addr, host_page_mask );
+     BYTE vprot;
+ 
++#ifdef __PROSPERO__
++    /* Executable protection is set in two calls on the console, between which the pages cannot be executed
++     * (wine/ps5/pw_wine_dmem_ps5.c): a thread running code there waits for the change and runs the instruction
++     * again. Before the lock, which the changing thread holds. */
++    if (err == EXCEPTION_EXECUTE_FAULT &&
++        __wine_ps5_exec_fault_retry( &ntdll_get_thread_data()->ps5_exec_seen ))
++        return STATUS_SUCCESS;
++#endif
+     mutex_lock( &virtual_mutex );  /* no need for signal masking inside signal handler */
+     vprot = get_host_page_vprot( page );
+     vm_stat_add( VM_STAT_FAULTS, 1 );
+-- 
+2.56.0
+

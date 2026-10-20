@@ -1,0 +1,38 @@
+{
+ "reviewed_battery": "mihawk-alpha-gate-2026-10-09-05",
+ "original_verdict_preserved": true,
+ "review": "Apply the new close-timeout verdict parser to saved logs; no new console launch.",
+ "cases_with_native_close_failures": [
+  {
+   "case": "network-adapters32",
+   "native_close_failures": [
+    {
+     "pid": 8001,
+     "status": 4294967295
+    }
+   ]
+  }
+ ],
+ "read_only_census": {
+  "surviving_helpers": 1,
+  "pid": 8001,
+  "threads": 4,
+  "first_thread_wait": "umtxn",
+  "outage_guard_reset": false,
+  "helper_force_killed": false
+ },
+ "diagnosis": {
+  "observed": "Control agent reports owner EOF; loader last emits census before calling image statistics; no terminal/return marker.",
+  "hypothesis": "Loader may be blocked in image statistics while waiting for the Wine virtual mutex.",
+  "stack_captured": false
+ },
+ "offline_candidate": {
+  "change": "Move optional telemetry to a detached native worker; supervisor retains control polling. Reject native close timeouts in the originating run.",
+  "host_verdict_test": "tests/test_wine_conformance.py PASS",
+  "payload_build_sha256": "5e5ff37fbc880236b8ba28fbde73434f57caacff290f35c20943a7050c202411",
+  "console_qualified": false,
+  "production_build_passed": true,
+  "production_fingerprint": "ac2e5f43ad1407a92e774f7cced4cd6837c6c59b8d06a69d3346a5babea41113",
+  "deployed": false
+ }
+}

@@ -1,0 +1,50 @@
+From: PS5_Proton <local>
+Subject: [PATCH] shell32: a program opened from a folder starts in that folder
+
+A Direct3D 12 game opened from a File Explorer window stayed on a black window while loading: it started in Explorer's
+folder, so vkd3d-proton found no "vkd3d-proton.cache" beside the game ("Failed to map read-only cache") and built
+every pipeline again, where the same game started in its folder reached its title screen (two runs of 2026-10-18,
+record removed from the tree; in git history). Windows starts a program opened from a folder in that folder. The shell view gave
+ShellExecuteEx the folder only when the folder, asked the attributes of its own absolute ID list, said it was in the
+file system; and the item menu's verbs gave none. Both now give the folder's path whenever it has one.
+---
+diff --git a/dlls/shell32/shlview.c b/dlls/shell32/shlview.c
+--- a/dlls/shell32/shlview.c
++++ b/dlls/shell32/shlview.c
+@@ -1436,9 +1436,9 @@
+ 	pIDList = GlobalLock(stgm.hGlobal);
+ 
+ 	parent_pidl = (LPCITEMIDLIST) ((LPBYTE)pIDList+pIDList->aoffset[0]);
+-	hr = IShellFolder_GetAttributesOf(This->pSFParent, 1, &parent_pidl, &attribs);
+-	if (SUCCEEDED(hr) && (attribs & SFGAO_FILESYSTEM) &&
+-	    SHGetPathFromIDListW(parent_pidl, parent_path))
++	/* The opened program starts in this folder, as on Windows. parent_pidl is absolute, which the folder itself cannot
++	 * be asked the attributes of; a folder outside the file system has no path. */
++	if (SHGetPathFromIDListW(parent_pidl, parent_path))
+ 	{
+ 	  parent_dir = parent_path;
+ 	}
+diff --git a/dlls/shell32/shlview_cmenu.c b/dlls/shell32/shlview_cmenu.c
+--- a/dlls/shell32/shlview_cmenu.c
++++ b/dlls/shell32/shlview_cmenu.c
+@@ -293,6 +293,10 @@
+ 
+ static void execute_verb(ContextMenu *menu, HWND hwnd, const WCHAR *verb)
+ {
++    WCHAR folder[MAX_PATH];
++    /* A program opened from a folder starts in that folder, as on Windows; without a directory it took the caller's. */
++    BOOL in_folder = menu->pidl && SHGetPathFromIDListW(menu->pidl, folder);
++
+     for (unsigned int i = 0; i < menu->cidl; ++i)
+     {
+         LPITEMIDLIST abs_pidl = ILCombine(menu->pidl, menu->apidl[i]);
+@@ -305,6 +309,7 @@
+         info.hwnd = hwnd;
+         info.nShow = SW_SHOWNORMAL;
+         info.lpVerb = verb;
++        if (in_folder) info.lpDirectory = folder;
+         ShellExecuteExW(&info);
+         ILFree(abs_pidl);
+     }
+-- 
+2.56.0

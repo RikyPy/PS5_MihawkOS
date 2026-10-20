@@ -1,0 +1,119 @@
+From: PS5_Proton <local>
+Subject: [PATCH] ntdll: a thread suspended in a system call's return reports the call's context
+
+__wine_syscall_dispatcher's return points %rsp into the frame (leaq 0x70(%rcx),%rsp) and then restores the program's
+registers from it. From there to its iretq or its switch to the user stack, is_inside_syscall says no, so usr1_handler
+saved the interrupted Unix registers as the thread's context: %rip in ntdll.so, %rsp the frame + 0x70 in the kernel
+stack. Upstream has the same window. CEF 150's stack sampler (base::StackCopierSuspend) suspends the main thread ten
+times a second and copies its stack from that %rsp up to StackBase. On the PS5 the kernel stack sits right below the
+main thread's Windows stack, so the copy ran into the no-access page at the bottom of the Windows stack and the browser
+died (2026-10-16, record removed from the tree; in git history: a read of 0x1000110000, %rsp 0x100010fc70, the frame at 0x100010fc00); on
+Linux the kernel stack lies above StackBase and the sampler only drops the sample. A GC or a crash reporter that scans
+from a suspended thread's %rsp, or reads its registers, is misled the same way.
+A suspend that lands there now starts the return again from the frame: %rsp back to the frame, %r13 to the TEB, the
+return value in %rax, %rip at __wine_syscall_dispatcher_return. The thread then suspends as one inside the call does:
+the frame's context is reported and a context set meanwhile applies. Three things live outside the frame in the window,
+each found by a label: the return value (in %r11 around xrstor), %r15 (the iretq tails push over its slot) and the
+return address (the instrumentation tail swaps it into %r10).
+Host, the pinned Wine with only this file rebuilt, tests/stack-probe.exe: a sampler suspends the main thread for 5 s,
+takes its context, reads its stack from %rsp to StackBase, sets the same context back every other time and resumes,
+while the main thread calls NtQueryPerformanceCounter keeping nine values in nonvolatile registers. Without the change
+4405 of 144952 contexts had %rsp outside the stack; with it 0 of 151117 and 0 of 147189, no value or return lost. With
+trace+seh, 174 restarts at 27 places of the return, 15 of them in the xrstor window and 3 at the CONTEXT_CONTROL tail's
+iretq after its push, all passing; the CONTEXT_INTEGER and instrumentation tails were not reached.
+Console: not run.
+---
+diff --git a/dlls/ntdll/unix/signal_x86_64.c b/dlls/ntdll/unix/signal_x86_64.c
+index 92d5bc8..f721bfc 100644
+--- a/dlls/ntdll/unix/signal_x86_64.c
++++ b/dlls/ntdll/unix/signal_x86_64.c
+@@ -3357,6 +3357,39 @@ static void quit_handler( int signal, siginfo_t *siginfo, void *sigcontext )
+ }
+ 
+ 
++/***********************************************************************
++ *           rewind_syscall_return
++ *
++ * From "leaq 0x70(%rcx),%rsp" on, __wine_syscall_dispatcher's return runs with %rsp inside the frame, so
++ * is_inside_syscall says no while the registers are half the frame's and half the Unix side's. A suspend taken
++ * there reported the Unix registers (CEF's stack sampler then read the main thread's stack from an %rsp in the
++ * kernel stack and faulted at the no-access page under its Windows stack). The return starts again from the frame
++ * instead, so the thread suspends as one inside the call: the frame's context is reported and changes apply.
++ * What lives outside the frame at that point: the return value (in %r11 around xrstor), %r15 (the tails push
++ * over its slot) and the return address (the instrumentation tail swaps it into %r10).
++ */
++static void rewind_syscall_return( ucontext_t *ucontext )
++{
++    extern const void *__wine_syscall_dispatcher_return_rax_in_r11_ptr, *__wine_syscall_dispatcher_return_rax_back_ptr;
++    extern const void *__wine_syscall_dispatcher_return_r15_loaded_ptr, *__wine_syscall_dispatcher_return_rip_in_r10_ptr;
++    struct syscall_frame *frame = get_syscall_frame();
++    ULONG_PTR rip = RIP_sig(ucontext), above = RSP_sig(ucontext) - (ULONG_PTR)frame;
++
++    if (rip < (ULONG_PTR)__wine_syscall_dispatcher || rip >= (ULONG_PTR)__wine_syscall_dispatcher_return) return;
++    if (above != 0x70 && above != 0x68) return;  /* 0x68: a tail pushed the flags */
++    if (rip >= (ULONG_PTR)__wine_syscall_dispatcher_return_rax_in_r11_ptr &&
++        rip < (ULONG_PTR)__wine_syscall_dispatcher_return_rax_back_ptr)
++        RAX_sig(ucontext) = R11_sig(ucontext);
++    if (rip >= (ULONG_PTR)__wine_syscall_dispatcher_return_r15_loaded_ptr) frame->r15 = R15_sig(ucontext);
++    if (rip >= (ULONG_PTR)__wine_syscall_dispatcher_return_rip_in_r10_ptr) frame->rip = R10_sig(ucontext);
++    TRACE_(seh)( "suspended at %p in a system call's return, %#lx above its frame\n", (void *)rip, above );
++    EFL_sig(ucontext) &= ~0x40500;  /* AC, DF and TF a tail's popfq may have taken from the program */
++    R13_sig(ucontext) = (ULONG_PTR)NtCurrentTeb();
++    RSP_sig(ucontext) = (ULONG_PTR)frame;
++    RIP_sig(ucontext) = (ULONG_PTR)__wine_syscall_dispatcher_return;
++}
++
++
+ /**********************************************************************
+  *		usr1_handler
+  *
+@@ -3374,6 +3407,7 @@ static void usr1_handler( int signal, siginfo_t *siginfo, void *sigcontext )
+     }
+ #endif
+ 
++    rewind_syscall_return( ucontext );
+     if (is_inside_syscall( RSP_sig(ucontext) ))
+     {
+         struct syscall_frame *frame = get_syscall_frame();
+@@ -4182,15 +4216,18 @@ __ASM_GLOBAL_FUNC( __wine_syscall_dispatcher,
+                    "2:\tcmpb $0,0x7ffe0285\n\t"    /* user_shared_data->ProcessorFeatures[PF_XSAVE_ENABLED] */
+                    "jz 3f\n\t"
+                    "movq %rax,%r11\n\t"
++                   __ASM_LOCAL_LABEL("__wine_syscall_dispatcher_return_rax_in_r11") ":\n\t"
+                    "movl 0x7ffe03d8,%eax\n\t"      /* user_shared_data->XState.EnabledFeatures */
+                    "movl 0x7ffe03dc,%edx\n\t"
+                    "xrstor64 0xc0(%rcx)\n\t"
+                    "movq %r11,%rax\n\t"
++                   __ASM_LOCAL_LABEL("__wine_syscall_dispatcher_return_rax_back") ":\n\t"
+                    "movl 0xb4(%rcx),%edx\n\t"      /* frame->restore_flags */
+                    "jmp 4f\n"
+                    "3:\tfxrstor64 0xc0(%rcx)\n"
+                    "4:\tmovq 0x98(%rcx),%rbp\n\t"
+                    "movq 0x68(%rcx),%r15\n\t"
++                   __ASM_LOCAL_LABEL("__wine_syscall_dispatcher_return_r15_loaded") ":\n\t"
+                    "movq 0x60(%rcx),%r14\n\t"
+                    "movq 0x58(%rcx),%r13\n\t"
+                    "movq 0x50(%rcx),%r12\n\t"
+@@ -4258,6 +4295,7 @@ __ASM_GLOBAL_FUNC( __wine_syscall_dispatcher,
+                    "testl $0x2,%edx\n\t"          /* CONTEXT_INTEGER */
+                    "jnz 1b\n\t"
+                    "xchgq %r10,(%rsp)\n\t"
++                   __ASM_LOCAL_LABEL("__wine_syscall_dispatcher_return_rip_in_r10") ":\n\t"
+                    "pushq %r11\n\t"
+                    /* make sure that if trap flag is set the trap happens on the first instruction after iret */
+                    "andq $~0x4000,(%rsp)\n\t" /* make sure NT flag is not set, or iretq will fault */
+@@ -4487,6 +4525,14 @@ __ASM_GLOBAL_FUNC( __wine_unix_call_dispatcher,
+                    __ASM_LOCAL_LABEL("__wine_unix_call_dispatcher_end") ":\n\t"
+                    "ret" )
+ 
++__ASM_GLOBAL_POINTER( __ASM_NAME("__wine_syscall_dispatcher_return_rax_in_r11_ptr"),
++                      __ASM_LOCAL_LABEL("__wine_syscall_dispatcher_return_rax_in_r11") )
++__ASM_GLOBAL_POINTER( __ASM_NAME("__wine_syscall_dispatcher_return_rax_back_ptr"),
++                      __ASM_LOCAL_LABEL("__wine_syscall_dispatcher_return_rax_back") )
++__ASM_GLOBAL_POINTER( __ASM_NAME("__wine_syscall_dispatcher_return_r15_loaded_ptr"),
++                      __ASM_LOCAL_LABEL("__wine_syscall_dispatcher_return_r15_loaded") )
++__ASM_GLOBAL_POINTER( __ASM_NAME("__wine_syscall_dispatcher_return_rip_in_r10_ptr"),
++                      __ASM_LOCAL_LABEL("__wine_syscall_dispatcher_return_rip_in_r10") )
+ __ASM_GLOBAL_POINTER( __ASM_NAME("__wine_syscall_dispatcher_prolog_end_ptr"),
+                       __ASM_LOCAL_LABEL("__wine_syscall_dispatcher_prolog_end") )
+ __ASM_GLOBAL_POINTER( __ASM_NAME("__wine_syscall_dispatcher_gs_load_ptr"),

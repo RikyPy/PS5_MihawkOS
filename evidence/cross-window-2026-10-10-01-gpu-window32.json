@@ -1,0 +1,18 @@
+{
+ "run": "cross-window-2026-10-10-01-gpu-window32",
+ "what": "C:\\windows\\system32\\mihawk.exe",
+ "env": [
+  "PROTON_LAYOUT=launcher",
+  "WINE_PS5_WINDOW_SURFACES=1"
+ ],
+ "passed": false,
+ "result": "runner_error",
+ "error": "ps5vkctl: <console>:9111 did not answer ([Errno 111] Connection refused); load build/ps5vkctl/ps5vkctl.elf on the console first",
+ "loaded": false,
+ "probe_verdict": null,
+ "stop_requested": null,
+ "cleanup_verified": false,
+ "hooks_removed": false,
+ "semantics_passed": false,
+ "window_pixels": []
+}

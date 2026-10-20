@@ -1,0 +1,27 @@
+{
+ "run": "m0-2026-10-07-02",
+ "elf_sha256": "c7d57c0c02641cdf6527d29af151bc408a5d5594307cc489c9e7373f9f5cc7c4",
+ "process": "payload through websrv/elfldr, no title running",
+ "modes": {
+  "switch": {
+   "lines": [
+    "M0 start mode=switch",
+    "M0 low_page at=10000000",
+    "M0 switch entering",
+    "M0 switch returned cs32=0x33 ss32=0x3b computed=42 (want 42)",
+    "M0 switch round_trip_ns=36.3 rounds=100000",
+    "M0 end"
+   ],
+   "ended": true
+  },
+  "fs": {
+   "lines": [
+    "M0 start mode=fs",
+    "M0 low_page at=10000000",
+    "M0 fs get_ns=948.9 set_pair_ns=2722.8 failures=0 restored=1",
+    "M0 end"
+   ],
+   "ended": true
+  }
+ }
+}

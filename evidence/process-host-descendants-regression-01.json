@@ -1,0 +1,79 @@
+{
+  "probe_sha256": "13081f2a8de2a665b95386131807abc5a36e27a141b682023ca7911000cde52c",
+  "wine_revision": "a518d643873ff733bafb31595dfd01ab8bbdf790",
+  "cases": [
+    {
+      "case": "basic",
+      "exit_code": 1,
+      "seconds": 0.02,
+      "verdict": "FAIL",
+      "handles": [],
+      "passed": false
+    },
+    {
+      "case": "suspended",
+      "exit_code": 1,
+      "seconds": 0.01,
+      "verdict": "FAIL",
+      "handles": [],
+      "passed": false
+    },
+    {
+      "case": "terminate",
+      "exit_code": 1,
+      "seconds": 0.01,
+      "verdict": "FAIL",
+      "handles": [],
+      "passed": false
+    },
+    {
+      "case": "repeat",
+      "exit_code": 1,
+      "seconds": 0.01,
+      "verdict": "FAIL",
+      "handles": [],
+      "passed": false
+    },
+    {
+      "case": "parent-exit",
+      "exit_code": 1,
+      "seconds": 0.01,
+      "verdict": "FAIL",
+      "handles": [],
+      "survived_parent": false,
+      "passed": false
+    },
+    {
+      "case": "descendants",
+      "exit_code": 1,
+      "seconds": 0.01,
+      "verdict": "FAIL",
+      "handles": [],
+      "descendant_nodes": 0,
+      "expected_nodes": 3,
+      "passed": false
+    },
+    {
+      "case": "descendants-repeat",
+      "exit_code": 1,
+      "seconds": 0.01,
+      "verdict": "FAIL",
+      "handles": [],
+      "descendant_nodes": 0,
+      "expected_nodes": 12,
+      "passed": false
+    },
+    {
+      "case": "descendants-parent-exit",
+      "exit_code": 1,
+      "seconds": 0.01,
+      "verdict": "FAIL",
+      "handles": [],
+      "descendant_nodes": 0,
+      "expected_nodes": 3,
+      "survived_parent": false,
+      "passed": false
+    }
+  ],
+  "passed": false
+}

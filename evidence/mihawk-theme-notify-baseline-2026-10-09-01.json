@@ -1,0 +1,72 @@
+{
+ "battery": "mihawk-theme-notify-baseline-2026-10-09-01",
+ "expected_cases": [
+  "theme-notify32",
+  "theme-notify64"
+ ],
+ "revision": "7a08458309ce66b92990956802f2874733f5373f",
+ "dirty": true,
+ "cases": [
+  {
+   "case": "theme-notify32",
+   "run": "mihawk-theme-notify-baseline-2026-10-09-01-theme-notify32",
+   "runner_status": 1,
+   "seconds": 13.5,
+   "result": "finished",
+   "probe_verdict": "FAIL",
+   "returned_to_launcher": true,
+   "exit_stall": false,
+   "passed": false,
+   "run_seconds": 12.7,
+   "launch_readiness": {
+    "ready": true,
+    "seconds": 0.173,
+    "settle_seconds": 0.0,
+    "census_seconds": 0.156,
+    "previous_cleanup_verified": true
+   },
+   "runner_overhead_seconds": 0.8,
+   "layout": "launcher",
+   "fault_records": 0,
+   "helpers": 9,
+   "protocol_errors": 0
+  },
+  {
+   "case": "theme-notify64",
+   "run": "mihawk-theme-notify-baseline-2026-10-09-01-theme-notify64",
+   "runner_status": 1,
+   "seconds": 20.3,
+   "result": "finished",
+   "probe_verdict": "FAIL",
+   "returned_to_launcher": true,
+   "exit_stall": false,
+   "passed": false,
+   "run_seconds": 11.6,
+   "launch_readiness": {
+    "ready": true,
+    "seconds": 8.09,
+    "settle_seconds": 7.906,
+    "census_seconds": 0.159,
+    "previous_cleanup_verified": false
+   },
+   "runner_overhead_seconds": 8.7,
+   "layout": "launcher",
+   "fault_records": 0,
+   "helpers": 9,
+   "protocol_errors": 0
+  }
+ ],
+ "complete": true,
+ "seconds": 33.7,
+ "passed": false,
+ "runtime_checkpoint": "b00444a",
+ "runtime_fingerprint": "dc021394024cd0186060e3c8e67d396e7ed9efd014691df7f705697e8bd2d36f",
+ "diagnostic_only_upload": true,
+ "probe_checks_per_architecture": 11,
+ "probe_failures_per_architecture": 3,
+ "failure": "Both existing processes receive one WM_THEMECHANGED but retain Blue theme name, white pane and light caption text in a newly opened theme handle.",
+ "probe_sha256": {
+  "32": "5062a9665ef3282365d951525e71a6080bc01c998bbb1f693fd4db508e70f894",
+  "64": "59d8ebeebe8d397fe62333763bb40c6eec3bbd5c3a9b205ed210e0c56c40aa1b"
+ }
+}

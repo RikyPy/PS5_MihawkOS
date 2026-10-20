@@ -1,0 +1,45 @@
+{
+  "route": "pldmgr",
+  "build": {
+    "mib": 30,
+    "blob_fnv": "135edea031c185f6",
+    "elf_bytes": 31567656,
+    "elf_sha256": "40cc7c417edd8c38c4749549c8b6627134762b65a36a94700902b5029af1fd1a",
+    "sdk_revision": "611893fc25ef3e138f5bc2c90d829d8b58174cd2",
+    "source_sha256": "4e8c1f9c926523dc6be9d781f7300e14414d0fd938badfe38123113d505dca3c"
+  },
+  "started": "2026-10-18T22:06:08Z",
+  "passed": true,
+  "pldmgr_version": "0.5.2",
+  "pldmgr": {
+    "sources_before": [
+      "Official Repository"
+    ],
+    "ours_already_listed": false,
+    "files_before": 20,
+    "add": "{\"ok\":true,\"name\":\"<address>\"}",
+    "install": "{\"ok\":true,\"message\":\"Installed big-elf-probe.elf\"}",
+    "load": "OK",
+    "remove": "{\"ok\":true,\"message\":\"OK\"}",
+    "sources_after": [
+      "Official Repository"
+    ],
+    "sources_restored": true,
+    "files_after": 21,
+    "files_left_by_run": [
+      "/data/pldmgr/sources.json"
+    ],
+    "files_restored": true,
+    "after_cleanup": "/data/pldmgr/sources.json, which this run made and which held only the built-in default source, was removed by hand afterwards: 20 files under /data/pldmgr as before, sources_list = [Official Repository]. Not compared: the contents of pldmgr files that existed before (its install history may list the probe)."
+  },
+  "served": [
+    "\"GET /payloads.json HTTP/1.1\" 200 -",
+    "\"GET /payloads.json HTTP/1.1\" 200 -",
+    "\"GET /big-elf-probe.elf HTTP/1.1\" 200 -"
+  ],
+  "klog_line": "mihawkos-big-elf: bytes=31457280 fnv=135edea031c185f6 expect=135edea031c185f6 route=-",
+  "seconds_to_line": 3.3,
+  "intact": true,
+  "capture": "klog/probe-big-elf-pldmgr-30-2026-10-18-04.log",
+  "note": "Driven from the PC through pldmgr 0.5.2 web API on 8084, as the owner chose (\"Let the session drive it\"). Served on port 1749: this PC's firewall dropped the console's request on 8771 (runs -02, -03: \"URL unreachable or download failed\")."
+}

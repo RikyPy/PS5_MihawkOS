@@ -1,0 +1,206 @@
+{
+  "console_evidence": [
+    "graphics-child-gpu-broker-present-03",
+    "graphics-child-gpu-broker-dxvk-descendants-06",
+    "graphics-child-gpu-broker-wine-descendants-04",
+    "graphics-child-gpu-broker-restored-production-05"
+  ],
+  "all_console_runs_passed": true,
+  "windows_launcher_handles": [
+    {
+      "before": 14,
+      "after": 14
+    }
+  ],
+  "renderers": [
+    {
+      "cookie": 2,
+      "pid": -1,
+      "frames": 0,
+      "submissions": 0,
+      "backing_released": 0
+    },
+    {
+      "cookie": 5,
+      "pid": 352,
+      "frames": 8,
+      "submissions": 24,
+      "backing_released": 2113536
+    },
+    {
+      "cookie": 6,
+      "pid": 355,
+      "frames": 8,
+      "submissions": 24,
+      "backing_released": 2113536
+    },
+    {
+      "cookie": 3,
+      "pid": 346,
+      "frames": 8,
+      "submissions": 24,
+      "backing_released": 2113536
+    },
+    {
+      "cookie": 4,
+      "pid": 349,
+      "frames": 8,
+      "submissions": 24,
+      "backing_released": 2113536
+    },
+    {
+      "cookie": 1,
+      "pid": -1,
+      "frames": 0,
+      "submissions": 0,
+      "backing_released": 0
+    }
+  ],
+  "confirmed_flips": 32,
+  "display_captures_passed": true,
+  "guest_readbacks_passed": true,
+  "tested_source_audit": {
+    "native/proton_wine_child.c": {
+      "sha256": "c02b42933c97d20a143ce738af8f5aa1d512f3aa08879416085c4bc0a7f203b8",
+      "matches_tested_build": true
+    },
+    "src/pw_wine_start.c": {
+      "sha256": "52bdf039228ca13e9931fc7f7097b196ece76868990b6ea44588990714bf22e2",
+      "matches_tested_build": true
+    },
+    "wine/ps5/pw_wine_prx.c": {
+      "sha256": "67b8393fca62a72a7aaf53a409c9a34684dd7704037bf194066e5173808c16a2",
+      "matches_tested_build": true
+    },
+    "wine/ps5/pw_wine_process_io.c": {
+      "sha256": "dd3ccac3b63058aaf743146fbf5791217ec9b6451ad0dc4c61dcbbad7abbd6c5",
+      "matches_tested_build": true
+    },
+    "wine/ps5/pw_wine_process.h": {
+      "sha256": "8dfcebec46ad948b2b0b9975b2ade680f01d6c93e2ed37c4e961a45f0cac7eab",
+      "matches_tested_build": true
+    },
+    "wine/ps5/pw_wine_process_io.h": {
+      "sha256": "c375a67872391d47ef20cb7bc0001b66655aa29c44c446af31102c0fe5f937a7",
+      "matches_tested_build": true
+    },
+    "src/pw_wine_start.h": {
+      "sha256": "f450215176a5bf7b898728ab0a84cbd6b8a3bfd497a4996ee4f590aab95c6ed7",
+      "matches_tested_build": true
+    },
+    "wine/ps5/pw_wine_prx.h": {
+      "sha256": "82e4cf6b56377bb3ca9e007bd78a3302633fa8675e77d5b507823829959f9bb0",
+      "matches_tested_build": true
+    },
+    "native/proton_gpu_identity.h": {
+      "sha256": "9dea30f7e9e109050efb992844bfdb4101afddb1021d11b6da3b09a4ad4dce31",
+      "matches_tested_build": true
+    },
+    "ps5/src/main.cpp": {
+      "sha256": "f1eb468f9603425c6543f0b02d8cf91e3e85a6919d7248dec85a24fd2f5aa457",
+      "matches_tested_build": true
+    },
+    "ps5/CMakeLists.txt": {
+      "sha256": "53f78a754a930c28de6ca2f7865d9622d8a161b965ba0dc938f95f56ba963682",
+      "matches_tested_build": true
+    },
+    "native/proton_wine.cpp": {
+      "sha256": "20d3460a7fdf7b6a9086c04bfc60107493306df98f69509abd498dc72143b0d9",
+      "matches_tested_build": true
+    },
+    "native/proton_service_helper.c": {
+      "sha256": "b13701554eed40889789323508827e40e42c7626f213ac297fe6a62fc268f55e",
+      "matches_tested_build": true
+    },
+    "native/proton_gpu_broker_probe.h": {
+      "sha256": "d2078d8d69671d709dd96694fb09b60171534be1a397b147b081a1a316540132",
+      "matches_tested_build": true
+    },
+    "native/proton_gpu_broker_probe.cpp": {
+      "sha256": "9452f23403ba3fce4899ce3f6e7944bf95af35f77bc238f6086477f60bd87817",
+      "matches_tested_build": true
+    },
+    "native/proton_gpu_server_probe.cpp": {
+      "sha256": "ea310f9241373a966b305976f3624c408a9e77527eebef9a342482396bc216d5",
+      "matches_tested_build": true
+    },
+    "native/proton_gpu_display.cpp": {
+      "sha256": "27e04095d61bb7906534fda8a390ae81027f28b18b929fb448fa2c64c94efc82",
+      "matches_tested_build": true
+    },
+    "native/proton_gpu_display.h": {
+      "sha256": "dfacadd01093f3fb05f0353d1a577678af1ce5c780942cab262c896494e23a35",
+      "matches_tested_build": true
+    },
+    "native/proton_gpu_server.h": {
+      "sha256": "f43e2cfb4f4a355e099aea21eda898c7f7f55640e94cc7a9e7ae841914b3102f",
+      "matches_tested_build": true
+    },
+    "src/pw_gpu_broker.h": {
+      "sha256": "c79d4e63bc365e87b278844310f1c0a5b7e1140287103ac97026bc08d26dff8d",
+      "matches_tested_build": true
+    },
+    "native/proton_gpu_client.c": {
+      "sha256": "334470d9b3893a6facfb4156130783784266c0addb470a902695fcbccc6aadce",
+      "matches_tested_build": true
+    },
+    "native/proton_gpu_vulkan_probe.c": {
+      "sha256": "22c4ea3803de328e268ebca8d526dff039ada9360dd8923d898ffcc70dc2e542",
+      "matches_tested_build": true
+    },
+    "native/proton_gpu_headless_wsi.c": {
+      "sha256": "38c3fcae128403c592f77c5eb9f56bdc33fb52121a5fc18d1a51c89f4967f0e8",
+      "matches_tested_build": true
+    },
+    "native/proton_gpu_vulkan_exports.c": {
+      "sha256": "59f6c34baba38666da55d2e94fe47832de793b52fe0728502ad77eba3756a3d4",
+      "matches_tested_build": true
+    },
+    "tools/link_gpu_client.sh": {
+      "sha256": "128554da4ea5166e526681fafe90e6c15c5bbfeeb1d4b231175780e5d24fe02a",
+      "matches_tested_build": true
+    },
+    "tools/patches/radv-gpu-broker-features.patch": {
+      "sha256": "3672d8035f45c808ddfb8c588daf387d19fcbccb254103ef0645af3075b5f1a6",
+      "matches_tested_build": true
+    },
+    "tools/patches/radv-gpu-broker-wsi.patch": {
+      "sha256": "69c4efbc526941309a58cb67db4ad7e4421cf17f7075a268d56c3f0d8fd9b6db",
+      "matches_tested_build": true
+    },
+    "native/proton_gpu_probe_spv.h": {
+      "sha256": "99b42cc15257777a91efd4f8b7212a6f254ce0b5d680362400146551b254e4fd",
+      "matches_tested_build": true
+    },
+    "tools/gen_prx_descriptor.py": {
+      "sha256": "3be71c5df76a6695a0e4f7ec0fe28257c6c98596c93bac30d32e771ea8f34cd5",
+      "matches_tested_build": true
+    },
+    "wine/ps5/prx_eh_frame.ld": {
+      "sha256": "ebf4f2bc7c4f49e85a895053c8f2162c5bcef323cdb99563bb45439c10f34264",
+      "matches_tested_build": true
+    }
+  },
+  "production_restored": true,
+  "limitations": [
+    "Synchronous CPU copy/scaling",
+    "Shared GPU backing uses finite flexible memory",
+    "640x360 synthetic DXVK coverage",
+    "Input/audio routing and game-scale allocations unproved",
+    "OpenGL/VKD3D children unproved",
+    "No HDMI capture or performance claim"
+  ],
+  "probe_source_sha256": {
+    "tests/process-probe.c": "e46bff4bbbcc4c9ea7f6c15351d5144420e3c5b21e3bfe149546e01016904e11",
+    "tests/d3d11-probe.c": "7abccfb6cdbdd3392ba94eec6e910f9f90b7823537f1702c5bde64e44b43cd4d",
+    "tests/shaders/d3d11-triangle.h": "44bbf2f8b31d4ed4c76d7d4553af067944246a56ae0349b9ad2294dae36f2dff",
+    "tests/shaders/d3d11-triangle.hlsl": "97714cdf9cc4e7d03a0407c470ac98440fe324954d77c171a0dbcd72d2fd0750",
+    "tools/generate-d3d-probe-shaders.py": "1de8e906ded5d00a3a7188bad593599abe4044e287bf4ec9486ca90e463b9ab8",
+    "tools/build-graphics-process-probe.sh": "8c6b13768dab2239860d2627378a4691d690a67d943ad3331659fb7d010c712e",
+    "tools/run-process-probe.py": "7ad21b6aa5f73a5f78d6b6f9562ab00bf409860b6e3bf0189285101934cac42f"
+  },
+  "pe_matches_console": {
+    "process-probe.exe": true,
+    "graphics-render-probe.exe": true
+  }
+}

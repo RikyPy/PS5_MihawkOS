@@ -1,0 +1,51 @@
+{
+  "battery": "iso-2026-10-18-gmdx-on-01",
+  "expected_cases": [
+    "game-mode-dxvk64"
+  ],
+  "revision": "c09e63107c662758e2734a9bb86e00f35d427d29",
+  "dirty": true,
+  "cases": [
+    {
+      "case": "game-mode-dxvk64",
+      "run": "iso-2026-10-18-gmdx-on-01-game-mode-dxvk64",
+      "runner_status": 0,
+      "seconds": 27.6,
+      "result": "finished",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "run_seconds": 26.2,
+      "launch_readiness": {
+        "ready": true,
+        "seconds": 0.156,
+        "settle_seconds": 0.0,
+        "census_seconds": 0.145,
+        "previous_cleanup_verified": true
+      },
+      "stages": {
+        "launched": 0.98,
+        "title_started": 1.49,
+        "elevated": 1.5,
+        "wine_loaded": 1.65,
+        "wineboot_started": 4.73,
+        "program_started": 10.68,
+        "wineboot_ended": 10.69,
+        "marker": 21.24,
+        "wine_ended": 23.8,
+        "launcher_started": 25.39,
+        "launcher_ended": 25.64,
+        "closed": 26.15
+      },
+      "runner_overhead_seconds": 1.4,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 11,
+      "protocol_errors": 0
+    }
+  ],
+  "complete": true,
+  "seconds": 27.6,
+  "passed": true
+}

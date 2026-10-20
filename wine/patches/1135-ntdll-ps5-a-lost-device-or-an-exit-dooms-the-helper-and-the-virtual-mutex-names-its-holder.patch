@@ -1,0 +1,121 @@
+From: PS5_Proton <local>
+Subject: [PATCH] ntdll: PS5: a lost device or an exit dooms the helper, and the virtual mutex names its holder
+
+A 2026-10-15 run (record removed from the tree; in git history) froze the console. The GPU had finished all its work (fences 6881/6881), but the broker client
+gave up after 15 s and the earlier emulator experiment (removed) printed "vkQueueSubmit failed: ErrorDeviceLost"; the helper's census thread entered
+__wine_virtual_image_stats at 20037.1 and never came back (no "image-stats end" in more than 160 s), so some thread
+held Wine's virtual mutex, and nothing recorded which one or what it was doing; the exit never reached the server's
+thread kills. The helper loader's control thread stayed alive throughout (its flight row read wait=select every second)
+and takes no Wine lock. The two control builds hit the same stall and recovered only because their helper exited 1-2 s
+after the give-up. An emulator session before salvage-20261015-092043 held the broker's client lock from t=75 to its last
+flight row at t=328.7 (broker=busy:252, fences 21073/21073), and the console was salvaged after it too.
+
+So the helper's loader ends a helper Wine can no longer end once one of two facts is stamped
+(wine/ps5/pw_wine_process.h, pw_ps5_child_doomed: the first CLOCK_MONOTONIC millisecond of each reason, one
+compare-exchange, no lock):
+- GPU: the GPU broker's client gives the broker up for good (no answer in 15 s, the connection gone, a malformed
+  reply), stamped by the client itself (graphics patch 0017) through the lookup wine/ps5/pw_wine_dl.c hands it as it
+  loads. Not at a Vulkan result: this patch first stamped any VK_ERROR_DEVICE_LOST of win32u's host vkQueueSubmit,
+  vkQueueSubmit2 or present, and in gate-hang-a-2026-10-15-01 (72 of 75 passed) gpu-window32 and gpu-window64 each
+  logged "payload doom seen reason=gpu" when the broker answered the first three (32-bit) and two (64-bit) window
+  presents with status 70 (ESTALE); both programs presented on (40 and 39 frames) and their helpers ended by
+  themselves about 2 s later. A refusal the broker answers is not a lost broker, and a game that rebuilds its window or
+  swapchain, or recreates its device after DXGI_ERROR_DEVICE_REMOVED, would have been ended 5 s after one;
+- EXIT: NtTerminateProcess of this process, here, before wb_flush_all, the first step of an exit that can wait on a
+  lock a stuck thread holds.
+The loader ends the process 5 s after a GPU stamp, 20 s after an EXIT stamp, unless the title closed it first
+(src/pw_control_watch.h, native/proton_wine_child.c).
+
+And the virtual mutex records its holder (wine/ps5/pw_wine_perf.h): unix_private.h's mutex_lock and mutex_unlock send
+the one mutex pw_wine_perf_vlock_mutex names, which virtual_init sets to virtual_mutex, to a lock-free owner record
+(holder's thread id, since when, the caller's return address, waiters, acquisitions, owner changes, the longest hold);
+every other mutex pays one compare, and nothing changes once process_exiting is set. virtual_handle_fault tags its hold
+"fault"; wine/ps5 tags the alias ops, the pager's map and its ask of the title. The helper's log thread prints a stall
+line once the mutex or the direct-memory engine's lock has been held 2 s, and the census skips image_stats while one
+owner has held the mutex 1 s.
+
+Host: tests/test_pw_wine_perf.c (recursion, contention, a stranger's tag ignored, the longest hold, 4 writers x 100,000
+acquisitions with a reader that never sees an impossible record), tests/test_pw_control_watch.c (the grace table, the
+earliest deadline wins, a later reason never moves it; the stamps' record keeps each reason's first),
+tests/test_module_wiring.py (this patch's hooks, none in win32u; 0017's stamp). Console: the first version ran in
+gate-hang-a-2026-10-15-01 (above; dnsapi32, dnsapi64 and window-effects64 failed, cause not yet read); this one has
+not run.
+---
+diff --git a/dlls/ntdll/unix/process.c b/dlls/ntdll/unix/process.c
+index a471f9e..df9e4fe 100644
+--- a/dlls/ntdll/unix/process.c
++++ b/dlls/ntdll/unix/process.c
+@@ -1075,6 +1075,9 @@ LONG terminate_process_exit_code;
+ NTSTATUS WINAPI NtTerminateProcess( HANDLE handle, LONG exit_code )
+ {
+ #ifdef __PROSPERO__
++    /* a helper's loader ends the process if its exit stalls (wine/ps5/pw_wine_process.h) */
++    extern void pw_ps5_child_doomed( unsigned int reason );
++    if (!handle || handle == GetCurrentProcess()) pw_ps5_child_doomed( 2 /* PW_CHILD_DOOM_EXIT */ );
+     wb_flush_all();
+ #endif
+     unsigned int ret;
+diff --git a/dlls/ntdll/unix/unix_private.h b/dlls/ntdll/unix/unix_private.h
+index 76b0d12..3f12b72 100644
+--- a/dlls/ntdll/unix/unix_private.h
++++ b/dlls/ntdll/unix/unix_private.h
+@@ -511,13 +511,35 @@ static inline BOOL is_inside_syscall( ULONG_PTR sp )
+             (char *)sp <= (char *)get_syscall_frame());
+ }
+ 
++#ifdef __PROSPERO__
++/* the watched mutex (virtual_mutex) records its holder (wine/ps5/pw_wine_perf.h) */
++extern pthread_mutex_t *pw_wine_perf_vlock_mutex;
++extern void pw_wine_perf_vlock_lock( pthread_mutex_t *mutex, const void *site );
++extern void pw_wine_perf_vlock_unlock( pthread_mutex_t *mutex );
++extern const char *pw_wine_perf_vlock_doing( const char *tag );
++#endif
++
+ static inline void mutex_lock( pthread_mutex_t *mutex )
+ {
++#ifdef __PROSPERO__
++    if (!process_exiting && mutex == pw_wine_perf_vlock_mutex)
++    {
++        pw_wine_perf_vlock_lock( mutex, __builtin_return_address( 0 ) );
++        return;
++    }
++#endif
+     if (!process_exiting) pthread_mutex_lock( mutex );
+ }
+ 
+ static inline void mutex_unlock( pthread_mutex_t *mutex )
+ {
++#ifdef __PROSPERO__
++    if (!process_exiting && mutex == pw_wine_perf_vlock_mutex)
++    {
++        pw_wine_perf_vlock_unlock( mutex );
++        return;
++    }
++#endif
+     if (!process_exiting) pthread_mutex_unlock( mutex );
+ }
+ 
+diff --git a/dlls/ntdll/unix/virtual.c b/dlls/ntdll/unix/virtual.c
+index 19473f7..f92476f 100644
+--- a/dlls/ntdll/unix/virtual.c
++++ b/dlls/ntdll/unix/virtual.c
+@@ -4874,6 +4874,9 @@ void virtual_init(void)
+     pthread_mutexattr_settype( &attr, PTHREAD_MUTEX_RECURSIVE );
+     pthread_mutex_init( &virtual_mutex, &attr );
+     pthread_mutexattr_destroy( &attr );
++#ifdef __PROSPERO__
++    pw_wine_perf_vlock_mutex = &virtual_mutex;
++#endif
+ 
+ #if defined(__aarch64__) || defined(__PROSPERO__)
+     host_page_size = sysconf( _SC_PAGESIZE );
+@@ -6033,6 +6036,9 @@ NTSTATUS virtual_handle_fault( EXCEPTION_RECORD *rec, void *stack )
+     BYTE vprot;
+ 
+     mutex_lock( &virtual_mutex );  /* no need for signal masking inside signal handler */
++#ifdef __PROSPERO__
++    pw_wine_perf_vlock_doing( "fault" );
++#endif
+     vprot = get_host_page_vprot( page );
+     vm_stat_add( VM_STAT_FAULTS, 1 );
+ #ifdef __PROSPERO__

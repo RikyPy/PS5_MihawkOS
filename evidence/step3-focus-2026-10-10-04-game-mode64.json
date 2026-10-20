@@ -1,0 +1,256 @@
+{
+ "telemetry_hold": null,
+ "launch_readiness": {
+  "ready": true,
+  "seconds": 0.148,
+  "settle_seconds": 0.0,
+  "census_seconds": 0.134,
+  "previous_cleanup_verified": true
+ },
+ "native_close_failures": [],
+ "run": "step3-focus-2026-10-10-04-game-mode64",
+ "what": "C:\\windows\\system32\\mihawk.exe",
+ "env": [
+  "PROTON_LAYOUT=launcher",
+  "WINE_PS5_WINDOW_SURFACES=1",
+  "MIHAWK_DESKTOP=1"
+ ],
+ "result": "finished",
+ "seconds": 22.0,
+ "probe_verdict": "PASS",
+ "clean_owner_restart": true,
+ "launcher_end_status": 0,
+ "initial_status": 0,
+ "closed_on_request": false,
+ "child_logs": [
+  "klog/step3-focus-2026-10-10-04-game-mode64-wine-child-239.log",
+  "klog/step3-focus-2026-10-10-04-game-mode64-wine-child-240.log",
+  "klog/step3-focus-2026-10-10-04-game-mode64-wine-child-241.log",
+  "klog/step3-focus-2026-10-10-04-game-mode64-wine-child-242.log",
+  "klog/step3-focus-2026-10-10-04-game-mode64-wine-child-243.log",
+  "klog/step3-focus-2026-10-10-04-game-mode64-wine-child-244.log",
+  "klog/step3-focus-2026-10-10-04-game-mode64-wine-child-245.log",
+  "klog/step3-focus-2026-10-10-04-game-mode64-wine-child-246.log",
+  "klog/step3-focus-2026-10-10-04-game-mode64-wine-child-247.log",
+  "klog/step3-focus-2026-10-10-04-game-mode64-wine-child-248.log",
+  "klog/step3-focus-2026-10-10-04-game-mode64-wine-child-249.log",
+  "klog/step3-focus-2026-10-10-04-game-mode64-wine-child-250.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": true,
+ "bench": {
+  "unload_ms": 2288.0,
+  "restore_ms": 3356.0,
+  "adopt_ms": 19.0
+ },
+ "steady": {
+  "server": {
+   "calls": 0.0,
+   "per_s": 0.0,
+   "avg_us": 0.0,
+   "selects": 0.0,
+   "blocked": 0.0,
+   "block_avg_us": 0.0,
+   "waits": 0.0,
+   "handles_avg": 0.0,
+   "wait_all": 0.0,
+   "polled": 0.0,
+   "delays": 0.0,
+   "yields": 0.0,
+   "intervals": 1
+  }
+ },
+ "intervals": {
+  "frames": [],
+  "server": [
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   }
+  ],
+  "top": []
+ },
+ "shown": {
+  "frames": 310,
+  "per_10s": [
+   1,
+   309
+  ],
+  "longest_gap_ms": 2210
+ },
+ "broker": {
+  "local_offer": 8589934592,
+  "host_limit": 1073741824,
+  "windows": {
+   "presents": 64,
+   "effect_bytes": 388800,
+   "mica_builds": 4,
+   "thumbnail_builds": 0,
+   "compositions": 64,
+   "compose_avg_us": 1756,
+   "compose_max_us": 8231
+  },
+  "refused": [],
+  "refused_count": 0,
+  "clients": [
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": 240,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": 250,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": 248,
+    "frames": 272,
+    "submissions": 557
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   }
+  ],
+  "wedged": false,
+  "failure_reasons": [],
+  "host_peak": 26198016,
+  "local_peak": 117981184
+ },
+ "pacing": {
+  "windows": [
+   {
+    "cookie": 9,
+    "pid": 248,
+    "route": "independent",
+    "final": true,
+    "refused": "none",
+    "direct": 272.0,
+    "composed": 0.0,
+    "seconds": 9.3,
+    "frames": 272.0,
+    "hidden": 0.0,
+    "fps": 29.1,
+    "mean": 20.85,
+    "p50": 16.75,
+    "p95": 24.75,
+    "p99": 33.0,
+    "max": 1017.75,
+    "over20": 22.0,
+    "over34": 2.0,
+    "present_avg": 16.24,
+    "present_max": 632.95
+   }
+  ],
+  "clients": {
+   "9": {
+    "pid": 248,
+    "route": "independent",
+    "routes": {
+     "independent": 272
+    },
+    "windows": 1,
+    "seconds": 9.3,
+    "frames": 272,
+    "hidden": 0,
+    "direct": 272,
+    "composed": 0,
+    "refused": [],
+    "fps": 29.2,
+    "p50_median_ms": 16.75,
+    "p95_worst_ms": 24.75,
+    "p99_worst_ms": 33.0,
+    "max_ms": 1017.75,
+    "over20": 22,
+    "over34": 2,
+    "present_avg_ms": 16.24,
+    "present_max_ms": 632.95
+   }
+  }
+ },
+ "captures": [
+  "klog/step3-focus-2026-10-10-04-game-mode64-capture-01.png"
+ ],
+ "cleanup_verified": true,
+ "hooks_removed": true,
+ "api": "opengl",
+ "game_mode": {
+  "direct_entries": 1,
+  "unloads": [
+   315
+  ],
+  "restores": [
+   {
+    "status": 0,
+    "ms": 600
+   }
+  ],
+  "kept": 0,
+  "could_not_start": 0,
+  "session_root": true
+ },
+ "probe_passed": true
+}

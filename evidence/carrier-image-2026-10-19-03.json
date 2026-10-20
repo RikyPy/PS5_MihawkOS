@@ -1,0 +1,99 @@
+{
+ "run": "carrier-image-2026-10-19-03",
+ "elf_sha256": "e5d17aaf793e8c5736cafcd46d5fdbc717d21dc973cb0428e2547f0022e4cac6",
+ "source_sha256": "b76acf4c0e32f5163d670413f31ac8b32215647a9dee0124dc8389930d089594",
+ "process": "payload through websrv/elfldr in the NPXS40112 carrier, no title running",
+ "passed": true,
+ "stopped_by": null,
+ "modes": {
+  "list": {
+   "passed": true,
+   "ended": true,
+   "carrier_found": true,
+   "after": [
+    "CARRIER thread status=0 value=42",
+    "CARRIER signal status=0 delivered=1",
+    "CARRIER load handle_ok=1 status=0"
+   ],
+   "lines": [
+    "CARRIER start mode=list pid=575 text=200008860",
+    "CARRIER map before low start=0x400000 end=0x454000 prot=0x4 type=0 flags=0x1 name=executable",
+    "CARRIER map before low start=0x454000 end=0x470000 prot=0x1 type=0 flags=0x1 name=executable",
+    "CARRIER map before low start=0x470000 end=0x474000 prot=0x1 type=0 flags=0x1 name=executable",
+    "CARRIER map before low start=0x474000 end=0x478000 prot=0x3 type=0 flags=0x1 name=executable",
+    "CARRIER map before low start=0x478000 end=0x584000 prot=0x3 type=0 flags=0x1 name=executable",
+    "CARRIER map before above start=0x200000000 end=0x20000c000 prot=0x3 type=0 flags=0x1 name=(NoName)SceSpZeroConfMain",
+    "CARRIER modules before status=0 count=1",
+    "CARRIER module before handle=0 name=eboot.bin seg=0x400000+0x54000/0x4 seg=0x454000+0x1c000/0x1 seg=0x470000+0x4000/0x1 seg=0x474000+0x110000/0x3",
+    "CARRIER carrier before module=0",
+    "CARRIER thread start",
+    "CARRIER thread status=0 value=42",
+    "CARRIER signal start",
+    "CARRIER signal status=0 delivered=1",
+    "CARRIER load start path=/data/ps5proton/runtime/ge11-7/lib/wine/x86_64-unix/ntdll.prx",
+    "CARRIER load handle_ok=1 status=0",
+    "CARRIER modules after status=0 count=1",
+    "CARRIER module after handle=0 name=eboot.bin seg=0x400000+0x54000/0x4 seg=0x454000+0x1c000/0x1 seg=0x470000+0x4000/0x1 seg=0x474000+0x110000/0x3",
+    "CARRIER carrier after module=0",
+    "CARRIER end mode=list"
+   ],
+   "klog_fatal": [],
+   "klog_error": null
+  },
+  "release": {
+   "passed": true,
+   "ended": true,
+   "carrier_found": true,
+   "released": true,
+   "unmapped": [
+    "CARRIER unmapped seg=0x400000 status=0 errno=0",
+    "CARRIER unmapped seg=0x454000 status=0 errno=0",
+    "CARRIER unmapped seg=0x470000 status=0 errno=0",
+    "CARRIER unmapped seg=0x474000 status=0 errno=0"
+   ],
+   "after": [
+    "CARRIER thread status=0 value=42",
+    "CARRIER signal status=0 delivered=1",
+    "CARRIER load handle_ok=1 status=0"
+   ],
+   "after_matches_list": true,
+   "lines": [
+    "CARRIER start mode=release pid=576 text=200008860",
+    "CARRIER map before low start=0x400000 end=0x454000 prot=0x4 type=0 flags=0x1 name=executable",
+    "CARRIER map before low start=0x454000 end=0x470000 prot=0x1 type=0 flags=0x1 name=executable",
+    "CARRIER map before low start=0x470000 end=0x474000 prot=0x1 type=0 flags=0x1 name=executable",
+    "CARRIER map before low start=0x474000 end=0x478000 prot=0x3 type=0 flags=0x1 name=executable",
+    "CARRIER map before low start=0x478000 end=0x584000 prot=0x3 type=0 flags=0x1 name=executable",
+    "CARRIER map before above start=0x200000000 end=0x20000c000 prot=0x3 type=0 flags=0x1 name=(NoName)SceSpZeroConfMain",
+    "CARRIER modules before status=0 count=1",
+    "CARRIER module before handle=0 name=eboot.bin seg=0x400000+0x54000/0x4 seg=0x454000+0x1c000/0x1 seg=0x470000+0x4000/0x1 seg=0x474000+0x110000/0x3",
+    "CARRIER carrier before module=0",
+    "CARRIER unmap seg=0x400000-0x454000",
+    "CARRIER unmapped seg=0x400000 status=0 errno=0",
+    "CARRIER unmap seg=0x454000-0x470000",
+    "CARRIER unmapped seg=0x454000 status=0 errno=0",
+    "CARRIER unmap seg=0x470000-0x474000",
+    "CARRIER unmapped seg=0x470000 status=0 errno=0",
+    "CARRIER unmap seg=0x474000-0x584000",
+    "CARRIER unmapped seg=0x474000 status=0 errno=0",
+    "CARRIER map released above start=0x200000000 end=0x20000c000 prot=0x3 type=0 flags=0x1 name=(NoName)SceSpZeroConfMain",
+    "CARRIER map-at 0x400000 bytes=0x184000",
+    "CARRIER mapped-at want=0x400000 got=400000 errno=0",
+    "CARRIER readback bytes=0x184000 wrong=0",
+    "CARRIER released ok=1",
+    "CARRIER thread start",
+    "CARRIER thread status=0 value=42",
+    "CARRIER signal start",
+    "CARRIER signal status=0 delivered=1",
+    "CARRIER load start path=/data/ps5proton/runtime/ge11-7/lib/wine/x86_64-unix/ntdll.prx",
+    "CARRIER load handle_ok=1 status=0",
+    "CARRIER modules after status=0 count=1",
+    "CARRIER module after handle=0 name=eboot.bin seg=0x400000+0x54000/0x4 seg=0x454000+0x1c000/0x1 seg=0x470000+0x4000/0x1 seg=0x474000+0x110000/0x3",
+    "CARRIER carrier after module=0",
+    "CARRIER end mode=release"
+   ],
+   "klog_fatal": [],
+   "klog_error": null
+  }
+ }
+}

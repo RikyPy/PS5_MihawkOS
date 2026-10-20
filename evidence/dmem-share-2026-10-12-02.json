@@ -1,0 +1,30 @@
+{
+ "run": "dmem-share-2026-10-12-02",
+ "mib": 64,
+ "elf_sha256": "6d3f34f97ff6a79a34a8da25e3f6078815a95030021ca23f23392aad69db628d",
+ "passed": false,
+ "lines": [
+  "--- hold",
+  "dmem-share hold-before pid=3002 status=0 resident_kib=3504 mapped_kib=16864",
+  "dmem-share hold allocation=0 map=0 offset=429719552 bytes=67108864",
+  "dmem-share hold-written pid=3002 status=0 resident_kib=3504 mapped_kib=16864",
+  "dmem-share hold: other side finished, its mark NOT seen here",
+  "dmem-share hold-after pid=3002 status=0 resident_kib=3552 mapped_kib=16992",
+  "PS5_PROTON_DMEM_SHARE FAIL side=hold mark=0 unmap=0 release=0",
+  "",
+  "--- map",
+  "dmem-share map-before pid=3003 status=0 resident_kib=3552 mapped_kib=16992",
+  "dmem-share map status=0x8002000d offset=429719552 bytes=67108864",
+  "dmem-share map variant read-only: 0x8002000d",
+  "dmem-share map variant MapDirectMemory2 type=0: 0x8002002d",
+  "dmem-share map variant MapDirectMemory2 type=1: 0x8002002d",
+  "dmem-share map variant MapDirectMemory2 type=2: 0x8002002d",
+  "dmem-share map variant MapDirectMemory2 type=3: 0x8002002d",
+  "dmem-share map variant MapDirectMemory2 type=10: 0x8002002d",
+  "dmem-share map variant mmap /dev/dmem0 at 429719552: failed errno 13",
+  "dmem-share map variant mmap /dev/dmem1 at 429719552: failed errno 13",
+  "dmem-share map variant mmap /dev/dmem2 at 429719552: failed errno 13",
+  "PS5_PROTON_DMEM_SHARE FAIL side=map status=0x8002000d contents=0 unmap=0xffffffff",
+  ""
+ ]
+}

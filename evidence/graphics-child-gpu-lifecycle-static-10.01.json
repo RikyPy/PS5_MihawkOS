@@ -1,0 +1,108 @@
+{
+  "kind": "static_analysis_reference",
+  "firmware_directory_label": "10.01",
+  "runtime_child_gpu_proven": false,
+  "modules": [
+    {
+      "path": "common/lib/libkernel.sprx",
+      "sha256": "8074564a92f227069774ff4fb3ddce6a4a9b68ef51e5027566e7ab279baa70b8",
+      "exports": {
+        "sceKernelGetAppInfo": "0x21670",
+        "sceKernelSetAppInfo": "0x21790",
+        "sceKernelGetProcessType": "0x29d20",
+        "sceKernelGetProcessAbiType": "0x28e50",
+        "sceKernelAddProcessToCanvasMap": "0x21ba0",
+        "sceKernelSetVmContainer": "0x18b10",
+        "sceKernelSetProcessProperty": "0x29420"
+      },
+      "export_libraries": {
+        "sceKernelGetAppInfo": "libkernel",
+        "sceKernelSetAppInfo": "libkernel",
+        "sceKernelGetProcessType": "libkernel",
+        "sceKernelGetProcessAbiType": "libkernel",
+        "sceKernelAddProcessToCanvasMap": "libkernel",
+        "sceKernelSetVmContainer": "libkernel",
+        "sceKernelSetProcessProperty": "libkernel_psmkit"
+      },
+      "calls": [
+        {
+          "site_rva": "0x29d24",
+          "target": "0x2100",
+          "target_kind": "internal"
+        }
+      ]
+    },
+    {
+      "path": "sys/SceSysCore.elf",
+      "sha256": "b80d3d2be13145aae5eaaf803e0dfc3781e10d901e681d7400466eb2d3cbe70f",
+      "exports": {},
+      "export_libraries": {},
+      "calls": [
+        {
+          "site_rva": "0x18557",
+          "target": "sceKernelSetAppInfo",
+          "target_kind": "import"
+        },
+        {
+          "site_rva": "0x18807",
+          "target": "sceKernelSetAppInfo",
+          "target_kind": "import"
+        },
+        {
+          "site_rva": "0x18646",
+          "target": "sceKernelAddProcessToCanvasMap",
+          "target_kind": "import"
+        },
+        {
+          "site_rva": "0x188eb",
+          "target": "sceKernelAddProcessToCanvasMap",
+          "target_kind": "import"
+        }
+      ]
+    },
+    {
+      "path": "common/lib/libSceAgcDriver.sprx",
+      "sha256": "7aa8b6ebf6cc981bc850ebe58e17b7cb95e16a3d98814d75b8409a717ae03cdf",
+      "exports": {},
+      "export_libraries": {},
+      "calls": [
+        {
+          "site_rva": "0x8727",
+          "target": "open",
+          "target_kind": "import"
+        },
+        {
+          "site_rva": "0x874b",
+          "target": "ioctl",
+          "target_kind": "import"
+        },
+        {
+          "site_rva": "0x8784",
+          "target": "mmap",
+          "target_kind": "import"
+        },
+        {
+          "site_rva": "0xb746",
+          "target": "sceKernelGetAppInfo",
+          "target_kind": "import"
+        },
+        {
+          "site_rva": "0x88a4",
+          "target": "sceKernelSetProcessProperty",
+          "target_kind": "import"
+        }
+      ]
+    }
+  ],
+  "manually_traced_abi_notes": {
+    "get_app_info_output_bytes": 88,
+    "set_app_info_input_bytes": 144,
+    "get_output_is_not_a_setter_snapshot": true,
+    "canvas_registration": {
+      "main_call_fourth_argument": 1,
+      "local_call_fourth_argument": 0,
+      "gpu_meaning_unproved": true
+    },
+    "unknown_gpu_permission_setter": true
+  }
+}

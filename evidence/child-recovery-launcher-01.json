@@ -1,0 +1,35 @@
+{
+  "title": "PPSA99170",
+  "identity": "cfb441180123407ab711633658ac041d",
+  "frames_requested": 120,
+  "eboot_sha256": "8f63bbc57bd9203520653d9e3eb765798a434b737ac6c1f79b106437542761c3",
+  "fresh_identity_seen": true,
+  "shell_idle_after_run": true,
+  "title_finished_successfully": true,
+  "picture_and_log_check_passed": true,
+  "post_launch_fault_records": 0,
+  "post_launch_driver_errors": 0,
+  "elevation": [
+    "timeout (sandbox only)"
+  ],
+  "sample": [
+    "starts",
+    "ok, 120 frames in 3.48 s, 119.9 fps after the first half"
+  ],
+  "library": [
+    "0 game(s); Library unavailable: /data not granted (timeout). searched: /app0/games (not there); /mnt/sandbox/PPSA99170_000/app0/games (not there)"
+  ],
+  "startup_seconds": {
+    "exec": 0.0,
+    "starts": 3.04,
+    "elevation": 3.04,
+    "library": 3.09,
+    "ui": 5.23
+  },
+  "probe": null,
+  "probe_passed": null,
+  "probe_records": [],
+  "passed": true,
+  "capture": "klog/child-recovery-launcher-01",
+  "forced_close": false
+}

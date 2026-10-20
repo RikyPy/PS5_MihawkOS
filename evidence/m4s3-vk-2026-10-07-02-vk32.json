@@ -1,0 +1,31 @@
+{
+ "run": "m4s3-vk-2026-10-07-02-vk32",
+ "what": "vk32-probe.exe",
+ "env": [
+  "PROTON_LAYOUT=launcher",
+  "WINEDEBUG=+timestamp,+debugstr,+vulkan,+loaddll"
+ ],
+ "result": "finished",
+ "seconds": 6.6,
+ "probe_verdict": "FAIL",
+ "clean_owner_restart": false,
+ "launcher_end_status": 0,
+ "initial_status": 1,
+ "closed_on_request": false,
+ "child_logs": [
+  "klog/m4s3-vk-2026-10-07-02-vk32-wine-child-2399.log",
+  "klog/m4s3-vk-2026-10-07-02-vk32-wine-child-2400.log",
+  "klog/m4s3-vk-2026-10-07-02-vk32-wine-child-2401.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": false,
+ "bench": {},
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [],
+  "top": []
+ }
+}

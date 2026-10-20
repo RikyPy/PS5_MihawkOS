@@ -1,0 +1,19 @@
+{
+ "run": "m0-fsalias-2026-10-07-02",
+ "elf_sha256": "86558b51a35e50b6f90272497e1fb7e5035888ae21abefb39c8c2bf424f3402c",
+ "process": "payload through websrv/elfldr, no title running",
+ "modes": {
+  "fsalias": {
+   "lines": [
+    "M0 start mode=fsalias",
+    "M0 low_page at=10000000",
+    "M0 fsalias host=0x8ff800080 alias=0xff800080 mapped=ff800000 fs_self=0",
+    "M0 fsalias no_reload=0xa11a5018 (alias)",
+    "M0 fsalias round_trip_ns=55.1 rounds=100000 read=0xa11a5018",
+    "M0 fsalias reload=0xa11a5000 (alias) fs_self_after_reload=0xa11a5000 fixed=0 fs_self_after_fix=0 fsbase_kept=1",
+    "M0 end"
+   ],
+   "ended": true
+  }
+ }
+}

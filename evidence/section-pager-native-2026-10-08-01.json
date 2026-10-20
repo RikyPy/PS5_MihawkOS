@@ -1,0 +1,28 @@
+{
+ "run": "section-pager-native-2026-10-08-01",
+ "read_only": false,
+ "temporary_direct_backing_bytes": 0,
+ "kernel_reads": false,
+ "kernel_writes": false,
+ "no_overwrite": true,
+ "payload": true,
+ "elf_sha256": "061f48e960759dbfcfdd9492270ed1d7a0f8597971e3c8613b4004260cb34df2",
+ "source_sha256": "f74ea1120f9b68d409064d9544027c38cc32c60c1110c4c4ff7dff82bff22ff0",
+ "inputs": {
+  "wine/ps5/pw_wine_section.h": "cee45b08a1837c64ac13afd377ab82f24b0d4005ef1be259139b71022795bb12",
+  "wine/ps5/pw_wine_section.c": "d45bdfd2871ca4db7f98937d2614e74ffeb90ef6fa5f9d89ea1b3f45f88cee08",
+  "src/pw_memory_file.c": "9356c20a20db4aed3897949ab147c16b7836d1080071f6fb183073ac5434c45e",
+  "src/pw_memory_file.h": "59f3ac9b7854a411d0bb735fe7de4f4e3fee786db1b6d014526a09ee081f8f33",
+  "native/proton_section_probe.c": "f74ea1120f9b68d409064d9544027c38cc32c60c1110c4c4ff7dff82bff22ff0"
+ },
+ "completed": true,
+ "full_contiguous_view_supported": false,
+ "bounded_native_cache_contract_passed": true,
+ "passed": true,
+ "purpose": "two 13.5 GiB virtual aliases, eight threads, four mapped shared pages, eviction and cleanup; not Wine integration",
+ "lines": [
+  "SECTION_NATIVE threads=8 errors=0",
+  "SECTION_NATIVE backing_lease=PASS queued=1 surviving_alias=1 collected=1",
+  "SECTION_NATIVE PASS aliases=2 virtual_bytes=14495514624 threads=8 cache_pages=4 faults=389 evictions=389 cleanup=1 stage=0 failures=0"
+ ]
+}

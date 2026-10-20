@@ -1,0 +1,56 @@
+{
+  "run": "syscall-trace-pro-observe-2026-10-10-02",
+  "mode": "observe",
+  "build": {
+    "sdk_revision": "611893fc25ef3e138f5bc2c90d829d8b58174cd2",
+    "source_sha256": "c9d2529f3e12f5d76d666963a8cb9d844716d2b1acb9d7ba9587d82bfc2ae85f",
+    "elf_sha256": "72610a3e63ae8d2fa57f0b1af5d44d96cd18b8228183ebb7a0d004295b104351",
+    "host_sha256": "21da315b55c19898a4173b480dc9dfced2ffeac497430f70c1c5f02a3eef2e5e"
+  },
+  "runner_sha256": "4d6b844f8cb6df515ca9120d48bc909b259afd48e747f412fd501e9f2e243196",
+  "question": "Can an owned payload stop native syscall entry, prevent the original pipe write and resume an owned dispatcher on the stopped thread?",
+  "production_changed": false,
+  "wine_integrated": false,
+  "title_launched": false,
+  "host_only": false,
+  "passed": true,
+  "host": {
+    "passed": true,
+    "tracee": [
+      "TRACE_READY pid=675416",
+      "TRACE_RESULT mode=observe result=1 dispatched=0 pipe_bytes=1 empty=0 native_ok=1",
+      "TRACE_TRACEE PASS"
+    ],
+    "tracer": [
+      "TRACE_CAPABILITY attached=1 registers=1 register_bytes=216",
+      "TRACE_ENTRY owned=1 code=1 tid=675416",
+      "TRACE_TRACER PASS mode=observe stops=5 entries=3 exits=2 replaced=0 ms=7"
+    ],
+    "error": null
+  },
+  "readiness": {
+    "ready": true,
+    "seconds": 0.133,
+    "settle_seconds": 0.0,
+    "census_seconds": 0.121,
+    "previous_cleanup_verified": true
+  },
+  "tracee_pid": 2042,
+  "native": {
+    "tracee": [
+      "TRACE_READY pid=2042",
+      "TRACE_RESULT mode=observe result=1 dispatched=0 pipe_bytes=1 empty=0 native_ok=1",
+      "TRACE_TRACEE PASS"
+    ],
+    "tracer": [
+      "TRACE_CAPABILITY attached=1 registers=1 register_bytes=176",
+      "TRACE_ENTRY owned=1 code=4 tid=102122",
+      "TRACE_TRACER PASS mode=observe stops=4 entries=4 exits=0 replaced=0 ms=2"
+    ],
+    "passed": true
+  },
+  "post_control": "ok procs app=4294967295 title= count=0 pids=",
+  "leftover_helpers": [],
+  "clean": true,
+  "seconds": 0.438
+}

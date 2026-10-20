@@ -1,0 +1,31 @@
+{
+  "workload": "gl-upload-probe.c, six concurrent 4096x4096 RGBA8 textures, two rounds",
+  "runs": [
+    "conformance-upload-2026-10-07-01-gl-upload32",
+    "conformance-upload-2026-10-07-01-gl-upload64"
+  ],
+  "pe32": {
+    "run_seconds": 221.3,
+    "pixel_checks": 120,
+    "swap_calls": 120,
+    "upload_max_ms": 41,
+    "swap_max_ms": 27,
+    "displayed_frames": 106,
+    "longest_display_gap_ms": 35756,
+    "unknown_message_type_0_lines": 183204,
+    "watchdog_stop_requested": true,
+    "qualifies_autonomous_completion": false
+  },
+  "pe64": {
+    "run_seconds": 9.4,
+    "pixel_checks": 120,
+    "swap_calls": 120,
+    "upload_max_ms": 33,
+    "swap_max_ms": 27,
+    "watchdog_stop_requested": false,
+    "qualifies_autonomous_completion": true,
+    "display_counter_note": "No complete 10-second sample; zero recorded is not evidence of no display."
+  },
+  "conclusion": "Initial upload/readback succeeded. PE32 message processing stalls and resumes after stop changes input. Historical runner accepted the late PASS; the new verdict rejects requested-stop probes.",
+  "unproved": "Exact cause of message type 0; playable real games; full graphics conformance."
+}

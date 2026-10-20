@@ -1,0 +1,121 @@
+{
+ "launch_readiness": {
+  "ready": true,
+  "seconds": 8.09,
+  "settle_seconds": 7.906,
+  "census_seconds": 0.159,
+  "previous_cleanup_verified": false
+ },
+ "run": "mihawk-theme-notify-baseline-2026-10-09-01-theme-notify64",
+ "what": "theme-notify64-probe.exe",
+ "env": [],
+ "result": "finished",
+ "seconds": 11.6,
+ "probe_verdict": "FAIL",
+ "clean_owner_restart": false,
+ "launcher_end_status": 0,
+ "initial_status": 1,
+ "closed_on_request": false,
+ "child_logs": [
+  "klog/mihawk-theme-notify-baseline-2026-10-09-01-theme-notify64-wine-child-2210.log",
+  "klog/mihawk-theme-notify-baseline-2026-10-09-01-theme-notify64-wine-child-2211.log",
+  "klog/mihawk-theme-notify-baseline-2026-10-09-01-theme-notify64-wine-child-2212.log",
+  "klog/mihawk-theme-notify-baseline-2026-10-09-01-theme-notify64-wine-child-2213.log",
+  "klog/mihawk-theme-notify-baseline-2026-10-09-01-theme-notify64-wine-child-2214.log",
+  "klog/mihawk-theme-notify-baseline-2026-10-09-01-theme-notify64-wine-child-2215.log",
+  "klog/mihawk-theme-notify-baseline-2026-10-09-01-theme-notify64-wine-child-2216.log",
+  "klog/mihawk-theme-notify-baseline-2026-10-09-01-theme-notify64-wine-child-2217.log",
+  "klog/mihawk-theme-notify-baseline-2026-10-09-01-theme-notify64-wine-child-2218.log",
+  "klog/mihawk-theme-notify-baseline-2026-10-09-01-theme-notify64-wine-child-2219.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": false,
+ "bench": {},
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   }
+  ],
+  "top": []
+ },
+ "shown": {
+  "frames": 0,
+  "per_10s": [],
+  "longest_gap_ms": 0
+ },
+ "broker": {
+  "local_offer": 8589934592,
+  "host_limit": 1073741824,
+  "refused": [],
+  "refused_count": 0,
+  "clients": [
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": 2219,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": 2211,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   }
+  ],
+  "wedged": false,
+  "failure_reasons": [],
+  "host_peak": 4227072,
+  "local_peak": 0
+ },
+ "cleanup_verified": false,
+ "hooks_removed": true
+}

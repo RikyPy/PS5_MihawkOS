@@ -1,0 +1,47 @@
+{
+  "run": "prefix-06",
+  "layout": "title",
+  "entry": "proton-prefix-test",
+  "package_sha256": "ec6af1ea0367d16dde6639a89a080a524cebc4d4bedfe00ed0cac4b865a918d8",
+  "probe_sha256": "4249116917eb8cd2c3555bbae1a0f65b5fded89d3408e93936c610797f28bea1",
+  "passed": false,
+  "deployed": true,
+  "runner_status": 1,
+  "result": "timed out",
+  "probe_verdict": "FAIL",
+  "seconds": 691.7,
+  "returned_to_launcher": true,
+  "probe_lines": [
+    "OpenSCManager failed (error 1722)",
+    "msiexec exit code 4294967295",
+    "msiexec installed the package: NO",
+    "services are not started in this layout; not required",
+    "services listed 0",
+    "system32 has its modules: yes",
+    "the installed program exit code 0",
+    "the installed program ran: yes",
+    "the package's program is in Program Files: yes",
+    "the registry names a Windows version: yes",
+    "the user's application data folder exists: yes"
+  ],
+  "probe_passed": false,
+  "helpers": [
+    "C:\\\\Program Files\\\\7-Zip\\\\7z.exe",
+    "C:\\\\windows\\\\system32\\\\conhost.exe",
+    "C:\\\\windows\\\\system32\\\\msiexec.exe",
+    "C:\\\\windows\\\\system32\\\\ntoskrnl.exe",
+    "C:\\\\windows\\\\system32\\\\wineboot.exe",
+    "Z:\\\\data\\\\ps5proton\\\\games\\\\proton-prefix-test\\\\prefix-probe.exe"
+  ],
+  "prefix": {
+    "files": 3973,
+    "bytes": 573374084
+  },
+  "prefix_registry": [
+    "system.reg",
+    "user.reg",
+    "userdef.reg"
+  ],
+  "console_idle_before_removal": false,
+  "removed": "left in place: the title was still running"
+}

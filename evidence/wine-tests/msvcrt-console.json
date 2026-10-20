@@ -1,0 +1,518 @@
+{
+ "cpp": {
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: end cpp 0",
+  "seconds": 14.7,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 624,
+   "todo": 2
+  },
+  "todo_lines": 2
+ },
+ "data": {
+  "failure_count": 1,
+  "failures": [
+   {
+    "file": "data.c",
+    "line": 220,
+    "text": "No child process handle (CreateProcess failed?)"
+   }
+  ],
+  "guarded": null,
+  "last_line": "winetest-batch: end data 1",
+  "seconds": 14.7,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 1,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 16,
+   "todo": 0
+  },
+  "todo_lines": 0
+ },
+ "dir": {
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: end dir 0",
+  "seconds": 14.7,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 367,
+   "todo": 0
+  },
+  "todo_lines": 0
+ },
+ "environ": {
+  "failure_count": 3,
+  "failures": [
+   {
+    "file": "environ.c",
+    "line": 417,
+    "text": "Couldn't create child process C:\\msvcrt_test.exe environ, create"
+   },
+   {
+    "file": "environ.c",
+    "line": 417,
+    "text": "No child process handle (CreateProcess failed?)"
+   },
+   {
+    "file": "environ.c",
+    "line": 84,
+    "text": "Expected system to return 0, got -1"
+   }
+  ],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 60.0,
+  "skipped_lines": [
+   "environ.c:146: Tests skipped: __p___initenv() is not available",
+   "environ.c:200: Tests skipped: __p___winitenv() is not available"
+  ],
+  "status": "complete",
+  "summary": {
+   "failures": 3,
+   "flaky": 0,
+   "skipped": 2,
+   "tests": 102,
+   "todo": 0
+  },
+  "todo_lines": 0
+ },
+ "file": {
+  "failure_count": 53,
+  "failures": [
+   {
+    "file": "file.c",
+    "line": 1812,
+    "text": "_spawnvp returned -1, errno 22"
+   },
+   {
+    "file": "file.c",
+    "line": 1813,
+    "text": "bad position 0 expecting 8"
+   },
+   {
+    "file": "file.c",
+    "line": 1815,
+    "text": "Couldn't read back the data"
+   },
+   {
+    "file": "file.c",
+    "line": 1829,
+    "text": "_spawnvp returned -1, errno 22"
+   },
+   {
+    "file": "file.c",
+    "line": 1839,
+    "text": "_spawnvp returned -1, errno 22"
+   },
+   {
+    "file": "file.c",
+    "line": 1856,
+    "text": "_spawnvp returned -1, errno 22"
+   },
+   {
+    "file": "file.c",
+    "line": 1858,
+    "text": "bad position 0 expecting 8"
+   },
+   {
+    "file": "file.c",
+    "line": 1860,
+    "text": "Couldn't read back the data"
+   },
+   {
+    "file": "file.c",
+    "line": 1757,
+    "text": "No child process handle (CreateProcess failed?)"
+   },
+   {
+    "file": "file.c",
+    "line": 1763,
+    "text": "empty block: Wrong error data ()"
+   },
+   {
+    "file": "file.c",
+    "line": 1757,
+    "text": "No child process handle (CreateProcess failed?)"
+   },
+   {
+    "file": "file.c",
+    "line": 1769,
+    "text": "valid block: Wrong stdout data (\"\")"
+   },
+   {
+    "file": "file.c",
+    "line": 1757,
+    "text": "No child process handle (CreateProcess failed?)"
+   },
+   {
+    "file": "file.c",
+    "line": 1763,
+    "text": "zero count block: Wrong error data ()"
+   },
+   {
+    "file": "file.c",
+    "line": 1757,
+    "text": "No child process handle (CreateProcess failed?)"
+   },
+   {
+    "file": "file.c",
+    "line": 1769,
+    "text": "small size block: Wrong stdout data (\"\")"
+   },
+   {
+    "file": "file.c",
+    "line": 1757,
+    "text": "No child process handle (CreateProcess failed?)"
+   },
+   {
+    "file": "file.c",
+    "line": 1763,
+    "text": "smaller size block: Wrong error data ()"
+   },
+   {
+    "file": "file.c",
+    "line": 1757,
+    "text": "No child process handle (CreateProcess failed?)"
+   },
+   {
+    "file": "file.c",
+    "line": 1769,
+    "text": "large size block: Wrong stdout data (\"\")"
+   },
+   {
+    "file": "file.c",
+    "line": 1757,
+    "text": "No child process handle (CreateProcess failed?)"
+   },
+   {
+    "file": "file.c",
+    "line": 1763,
+    "text": "INVALID_HANDLE_VALUE stdout handle: Wrong error data ()"
+   },
+   {
+    "file": "file.c",
+    "line": 1757,
+    "text": "No child process handle (CreateProcess failed?)"
+   },
+   {
+    "file": "file.c",
+    "line": 1763,
+    "text": "NULL stdout handle: Wrong error data ()"
+   },
+   {
+    "file": "file.c",
+    "line": 1757,
+    "text": "No child process handle (CreateProcess failed?)"
+   },
+   {
+    "file": "file.c",
+    "line": 1763,
+    "text": "invalid stdout handle: Wrong error data ()"
+   },
+   {
+    "file": "file.c",
+    "line": 1757,
+    "text": "wxflags 0x3: No child process handle (CreateProcess failed?)"
+   },
+   {
+    "file": "file.c",
+    "line": 1769,
+    "text": "wxflags 0x3: stdout mode: Wrong stdout data (\"\")"
+   },
+   {
+    "file": "file.c",
+    "line": 1757,
+    "text": "wxflags 0x5: No child process handle (CreateProcess failed?)"
+   },
+   {
+    "file": "file.c",
+    "line": 1769,
+    "text": "wxflags 0x5: stdout mode: Wrong stdout data (\"\")"
+   },
+   {
+    "file": "file.c",
+    "line": 1757,
+    "text": "wxflags 0x9: No child process handle (CreateProcess failed?)"
+   },
+   {
+    "file": "file.c",
+    "line": 1769,
+    "text": "wxflags 0x9: stdout mode: Wrong stdout data (\"\")"
+   },
+   {
+    "file": "file.c",
+    "line": 1757,
+    "text": "wxflags 0x11: No child process handle (CreateProcess failed?)"
+   },
+   {
+    "file": "file.c",
+    "line": 1769,
+    "text": "wxflags 0x11: stdout mode: Wrong stdout data (\"\")"
+   },
+   {
+    "file": "file.c",
+    "line": 1757,
+    "text": "wxflags 0x21: No child process handle (CreateProcess failed?)"
+   },
+   {
+    "file": "file.c",
+    "line": 1769,
+    "text": "wxflags 0x21: stdout mode: Wrong stdout data (\"\")"
+   },
+   {
+    "file": "file.c",
+    "line": 1757,
+    "text": "wxflags 0x41: No child process handle (CreateProcess failed?)"
+   },
+   {
+    "file": "file.c",
+    "line": 1769,
+    "text": "wxflags 0x41: stdout mode: Wrong stdout data (\"\")"
+   },
+   {
+    "file": "file.c",
+    "line": 1757,
+    "text": "wxflags 0x81: No child process handle (CreateProcess failed?)"
+   },
+   {
+    "file": "file.c",
+    "line": 1769,
+    "text": "wxflags 0x81: stdout mode: Wrong stdout data (\"\")"
+   },
+   {
+    "file": "file.c",
+    "line": 1757,
+    "text": "No child process handle (CreateProcess failed?)"
+   },
+   {
+    "file": "file.c",
+    "line": 1769,
+    "text": "non-std handle: Wrong stdout data (\"\")"
+   },
+   {
+    "file": "file.c",
+    "line": 1757,
+    "text": "No child process handle (CreateProcess failed?)"
+   },
+   {
+    "file": "file.c",
+    "line": 1769,
+    "text": "valid CRT, invalid kernelbase: Wrong stdout data (\"\")"
+   },
+   {
+    "file": "file.c",
+    "line": 2085,
+    "text": "No child process handle (CreateProcess failed?)"
+   },
+   {
+    "file": "file.c",
+    "line": 2618,
+    "text": "i 0, got 0"
+   },
+   {
+    "file": "file.c",
+    "line": 2621,
+    "text": "expected to read 'Hello world', got 't_get_osfhanle'"
+   },
+   {
+    "file": "file.c",
+    "line": 2618,
+    "text": "i 1, got 0"
+   },
+   {
+    "file": "file.c",
+    "line": 2621,
+    "text": "expected to read 'Hello world', got 't_get_osfhanle'"
+   },
+   {
+    "file": "file.c",
+    "line": 2618,
+    "text": "i 2, got 0"
+   },
+   {
+    "file": "file.c",
+    "line": 2621,
+    "text": "expected to read 'Hello world', got 't_get_osfhanle'"
+   },
+   {
+    "file": "file.c",
+    "line": 2654,
+    "text": "fread() returned 0: ferror=0"
+   },
+   {
+    "file": "file.c",
+    "line": 2657,
+    "text": "got 't_get_osfhanle' expected 'Hello worldHello worldHello world'"
+   }
+  ],
+  "guarded": null,
+  "last_line": "winetest-batch: end file 53",
+  "seconds": 14.7,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 53,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 1145,
+   "todo": 1
+  },
+  "todo_lines": 1
+ },
+ "heap": {
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: end heap 0",
+  "seconds": 14.7,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 635,
+   "todo": 0
+  },
+  "todo_lines": 0
+ },
+ "locale": {
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: end locale 0",
+  "seconds": 14.7,
+  "skipped_lines": [
+   "locale.c:791: Tests skipped: Skipping __p___mb_cur_max tests"
+  ],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 1,
+   "tests": 450,
+   "todo": 0
+  },
+  "todo_lines": 0
+ },
+ "misc": {
+  "failure_count": 1,
+  "failures": [
+   {
+    "file": "misc.c",
+    "line": 373,
+    "text": "_popen failed with error: 22"
+   }
+  ],
+  "guarded": null,
+  "last_line": "misc.c:373: Test failed: _popen failed with error: 22",
+  "seconds": 14.7,
+  "skipped_lines": [],
+  "status": "incomplete",
+  "summary": null,
+  "todo_lines": 11
+ },
+ "printf": {
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: end printf 0",
+  "seconds": 5.0,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 994,
+   "todo": 2
+  },
+  "todo_lines": 2
+ },
+ "scanf": {
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: end scanf 0",
+  "seconds": 5.0,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 151,
+   "todo": 0
+  },
+  "todo_lines": 0
+ },
+ "signal": {
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: end signal 0",
+  "seconds": 5.0,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 15,
+   "todo": 0
+  },
+  "todo_lines": 0
+ },
+ "string": {
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 4.7,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 410075,
+   "todo": 4
+  },
+  "todo_lines": 4
+ },
+ "time": {
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 5.0,
+  "skipped_lines": [
+   "time.c:226: Tests skipped: Old gmtime64 limits, skipping tests."
+  ],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 1,
+   "tests": 306,
+   "todo": 0
+  },
+  "todo_lines": 0
+ }
+}

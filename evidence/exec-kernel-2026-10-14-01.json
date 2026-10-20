@@ -1,0 +1,18 @@
+{
+ "run": "exec-kernel-2026-10-14-01",
+ "elf_sha256": "5ece6cad5768f6957a86f63725ba82a43a071011d064454a668a4be6928d5641",
+ "passed": false,
+ "lines": [
+  "--- exec2",
+  "PS5_PROTON_EXEC_GRANT type=k1-map fd=229 map=0 errno=2",
+  "PS5_PROTON_EXEC_GRANT type=k1-rwx protection=7 rc=0 query=0 prot=0x7",
+  "PS5_PROTON_EXEC_GRANT type=k1-rwx used=ok",
+  "PS5_PROTON_EXEC_GRANT type=k1-rewrite value=43",
+  "PS5_PROTON_EXEC_GRANT type=k2 after_close=0 toggles=1000 wrong=0 us_per_toggle=32.1 value=43",
+  "PS5_PROTON_EXEC_GRANT type=k2 after_close=1 toggles=1000 wrong=0 us_per_toggle=31.2 value=43",
+  "PS5_PROTON_EXEC_GRANT type=k3 ro=0 fd=754 copied=-1 same_address=1 release=0 intact=0",
+  "PS5_PROTON_EXEC_GRANT type=k3-rx protection=5 rc=0 query=0 prot=0x5",
+  "PS5_PROTON_EXEC_GRANT type=k3-rx used=fault",
+  ""
+ ]
+}

@@ -1,0 +1,18 @@
+{
+  "run": "helperhost-04",
+  "step": "dmem",
+  "elf_sha256": "36111aee2098a25ac623b714bd966916cda54b0c0691c11a34c803b15ab61952",
+  "started": "2026-10-05T22:58:36",
+  "lines": [
+    "helperhostprobe pid=4426 uid=1 euid=0 gid=1 argc=1",
+    "  argv[0]=dmem",
+    "memory: direct 0 MiB in all; flexible available 8159 MiB (status 0)",
+    "runtime: stat ntdll.prx -> 0 errno=0 size=899519",
+    "runtime: open -> 12 errno=0, first bytes 54 14 f5 ee (4 read)",
+    "dmem: about to allocate 256 MiB of direct memory",
+    "dmem: allocate -> 0x80020023",
+    "helperhostprobe done"
+  ],
+  "finished": true,
+  "console_after": "answers"
+}

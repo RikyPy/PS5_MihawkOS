@@ -1,0 +1,197 @@
+#!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+"""Gate orchestration with fake case runners: completeness, failures and safe stop."""
+import contextlib
+import importlib.util
+import io
+import json
+import sys
+import tempfile
+import unittest
+from pathlib import Path
+from types import SimpleNamespace
+from unittest.mock import patch
+
+spec = importlib.util.spec_from_file_location('battery', Path(__file__).resolve().parents[1] / 'tools/run-battery.py')
+battery = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(battery)
+
+
+class BatteryTests(unittest.TestCase):
+    def run_fake(self, *, fail=None, runner_fail=None, stop=False, extra=(), gate=True):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for folder in ('evidence', 'klog', '.deps'): (root / folder).mkdir()
+            calls = []
+            def run(command, **kwargs):
+                name = command[command.index('--name') + 1]
+                case = name.removeprefix('host-test-')
+                calls.append(case)
+                if '--sequence' in command:
+                    fake_sequence(root, name, Path(command[command.index('--sequence') + 1]), fail)
+                okay = case != fail
+                record = {'passed': okay, 'result': 'finished', 'returned_to_launcher': True,
+                          'seconds': 1, 'launch_readiness': {'ready': True, 'seconds': 0.2}}
+                (root / 'evidence' / (name + '.json')).write_text(json.dumps(record))
+                if stop: (root / '.deps/host-test.stop').touch()
+                return SimpleNamespace(returncode=0 if okay and case != runner_fail else 1)
+            output = io.StringIO()
+            with patch.object(battery, 'ROOT', root), \
+                 patch.object(sys, 'argv', ['run-battery.py', '--name', 'host-test', *(['--gate'] if gate else []), *extra]), \
+                 patch.object(battery.subprocess, 'check_output', return_value='host-revision'), \
+                 patch.object(battery.subprocess, 'run', side_effect=run), \
+                 contextlib.redirect_stdout(output), contextlib.redirect_stderr(io.StringIO()):
+                status = battery.main()
+            self.output = output.getvalue()
+            return status, calls, json.loads((root / 'evidence/host-test.json').read_text())
+
+    def test_gate_runs_every_required_case_and_keeps_timing(self):
+        status, calls, record = self.run_fake()
+        self.assertEqual(status, 0)
+        self.assertEqual(len(calls), len(battery.GATE_CASES))
+        self.assertEqual(set(calls), set(battery.GATE_CASES))
+        self.assertTrue(record['complete'])
+        self.assertTrue(record['passed'])
+        self.assertTrue(all(c['launch_readiness']['ready'] for c in record['cases']))
+        self.assertTrue(all('runner_overhead_seconds' in c for c in record['cases']))
+        count = len(battery.GATE_CASES)
+        self.assertIn(f'Test 1/{count}: {calls[0]}', self.output)
+        self.assertIn(f'Test {count}/{count}:', self.output)
+        self.assertIn(f'{count}/{count} completed, {count} passed, 0 failed', self.output)
+
+    def test_runner_failure_overrides_partial_passing_evidence(self):
+        status, calls, record = self.run_fake(runner_fail='shell32')
+        self.assertNotEqual(status, 0)
+        self.assertTrue(record['complete'])
+        self.assertFalse(record['passed'])
+        case = next(case for case in record['cases'] if case['case'] == 'shell32')
+        self.assertEqual(case['runner_status'], 1)
+        self.assertFalse(case['passed'])
+
+    def test_subset_progress_uses_selected_count(self):
+        status, calls, record = self.run_fake(gate=False, extra=('--only', 'proton-ui32', 'proton-ui64'))
+        self.assertEqual(status, 0)
+        self.assertEqual(calls, ['proton-ui32', 'proton-ui64'])
+        self.assertIn('Test 1/2: proton-ui32', self.output)
+        self.assertIn('Test 2/2: proton-ui64 PASS', self.output)
+        self.assertIn('2/2 completed, 2 passed, 0 failed', self.output)
+
+    def test_one_failure_cannot_pass_but_other_idle_cases_still_run(self):
+        status, calls, record = self.run_fake(fail='memory-classes')
+        self.assertEqual(status, 1)
+        self.assertEqual(set(calls), set(battery.GATE_CASES))
+        self.assertTrue(record['complete'])
+        self.assertFalse(record['passed'])
+        failed = [c['case'] for c in record['cases'] if not c['passed']]
+        self.assertEqual(failed, ['memory-classes'])
+
+    def test_stop_finishes_current_case_and_never_qualifies_partial_gate(self):
+        status, calls, record = self.run_fake(stop=True)
+        self.assertEqual(status, 1)
+        self.assertEqual(calls, [battery.GATE_CASES[0]])
+        self.assertTrue(record['cases'][0]['passed'])
+        self.assertFalse(record['complete'])
+        self.assertFalse(record['passed'])
+        self.assertEqual(record['stop_reason'], 'requested at a case boundary')
+        self.assertIn(f'1/{len(battery.GATE_CASES)} completed, 1 passed, 0 failed', self.output)
+
+    def test_plain_run_leaves_out_on_request_cases(self):
+        status, calls, record = self.run_fake(gate=False)
+        self.assertEqual(status, 0)
+        self.assertTrue(calls)
+        self.assertFalse(battery.ON_REQUEST.intersection(calls))
+        self.assertFalse(battery.ON_REQUEST.intersection(battery.GATE_CASES))
+        status, calls, record = self.run_fake(gate=False, extra=('--only', 'memory-stall'))
+        self.assertEqual(calls, ['memory-stall'])
+
+    def test_one_on_request_case_per_run(self):
+        with self.assertRaises(SystemExit) as caught:
+            self.run_fake(gate=False, extra=('--only', 'memory-stall', 'breaker64'))
+        self.assertEqual(caught.exception.code, 2)
+
+    def test_groups_hold_only_cases_that_can_share_a_launch(self):
+        cases = dict(battery.CASES)
+        grouped = [name for names in battery.GROUPS.values() for name in names]
+        self.assertEqual(len(grouped), len(set(grouped)))
+        self.assertFalse(set(battery.GROUPS) & set(cases))
+        self.assertTrue(set(grouped) <= set(battery.GATE_CASES))
+        for name in grouped:
+            command, marker, budget = battery.sequence_entry(name, cases[name])
+            self.assertTrue(command.startswith('C:\\') and marker.startswith('PS5_PROTON_') and budget >= 90, name)
+        self.assertEqual(battery.sequence_entry('descendants', cases['descendants']),
+                         ('C:\\process-probe.exe --descendants', 'PS5_PROTON_PROCESS_PROBE', 125))
+        self.assertEqual(battery.sequence_entry('payload-eight', cases['payload-eight'])[2], 275)
+        for name in ('initial-env32', 'manual-stdout', 'native-signals', 'large-shared-section', 'memory-guard',
+                     'doom-backstop', 'telemetry-teardown', 'shell32', 'prefix-fresh64'):
+            with self.assertRaises(ValueError, msg=name):
+                battery.sequence_entry(name, cases[name])
+
+    def test_grouped_gate_runs_each_group_in_one_launch_with_its_own_verdicts(self):
+        status, calls, record = self.run_fake(extra=('--grouped',), fail='dnsapi32')
+        grouped = {name for names in battery.GROUPS.values() for name in names}
+        self.assertEqual(sorted(calls), sorted(set(battery.GATE_CASES) - grouped | set(battery.GROUPS)))
+        self.assertEqual(status, 1)
+        self.assertTrue(record['complete'])
+        self.assertEqual(sorted(c['case'] for c in record['cases']), sorted(battery.GATE_CASES))
+        self.assertEqual([c['case'] for c in record['cases'] if not c['passed']], ['dnsapi32'])
+        dns = next(c for c in record['cases'] if c['case'] == 'dnsapi32')
+        self.assertEqual((dns['group'], dns['run'], dns['status'], dns['probe_verdict']),
+                         ('probes', 'host-test-probes', '1', 'FAIL'))
+        self.assertTrue(dns['launch_passed'])
+        owner = next(c for c in record['cases'] if c['case'] == 'payload-vm')
+        self.assertEqual((owner['probe_verdict'], owner['passed'], len(owner['helpers'])), ('PASS', True, 1))
+        self.assertIn('== Test 9/', self.output)
+        self.assertIn('probes, one launch (host-test-probes)', self.output)
+
+    def test_sequence_outcomes_read_each_window(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / 'klog').mkdir()
+            sequencer = ''.join(f'{t:.3f}:0020:0024:warn:debugstr:OutputDebugStringA "PS5_PROTON_GATE_SEQUENCE {line}\\n"\n'
+                                for t, line in ((10, 'begin case=a'), (11, 'end case=a status=0'),
+                                                (11, 'begin case=b'), (40, 'end case=b status=0'),
+                                                (40, 'begin case=c'), (41, 'end case=c status=3221225477'),
+                                                (41, 'begin case=d')))
+            probe = '{:.3f}:0030:0034:warn:debugstr:OutputDebugStringA "PS5_PROTON_X {}\\n"\n'
+            for pid, text in ((5, sequencer), (6, 'wine-child: entry\n' + probe.format(10.5, 'PASS')),
+                              (7, probe.format(12, 'PASS: early') + probe.format(13, 'FAIL: later')),
+                              (8, probe.format(40.5, 'PASS'))):
+                (root / 'klog' / f'run-wine-child-{pid}.log').write_text(text)
+            with patch.object(battery, 'ROOT', root):
+                own = battery.sequence_outcomes('run', [('a', 'PS5_PROTON_X'), ('b', 'PS5_PROTON_X'),
+                                                        ('c', 'PS5_PROTON_X'), ('d', 'PS5_PROTON_X'),
+                                                        ('e', battery.OWNER)])
+        self.assertEqual(own['a'], {'status': '0', 'probe_verdict': 'PASS', 'exit_stall': False, 'seconds': 1.0,
+                                    'helpers': [5, 6], 'probe_passed': True})
+        # b's verdict is its first line; it took 28 s more to end: an exit stall.
+        self.assertEqual((own['b']['probe_verdict'], own['b']['exit_stall'], own['b']['probe_passed']), ('PASS', True, False))
+        # c printed PASS and crashed: its status decides.
+        self.assertEqual((own['c']['probe_verdict'], own['c']['probe_passed']), ('PASS', False))
+        # d never ended and e never began.
+        for name in 'de':
+            self.assertEqual((own[name]['status'], own[name]['probe_verdict'], own[name]['probe_passed']), (None, None, False))
+
+    def test_gate_cannot_skip_cases(self):
+        with self.assertRaises(SystemExit) as caught:
+            self.run_fake(extra=('--skip', 'memory-classes'))
+        self.assertEqual(caught.exception.code, 2)
+
+
+def fake_sequence(root, name, sequence, fail):
+    """What a grouped launch's helpers would log: the sequence's lines, and each probe's verdict 0.5 s into its 1 s
+    window in a helper of its own; the failing case prints FAIL and exits 1."""
+    cases = dict(battery.CASES)
+    lines, at = [], 100.0
+    for pid, row in enumerate(sequence.read_text().splitlines(), 101):
+        case = row.split('\t')[0]
+        marker = battery.sequence_entry(case, cases[case])[1]
+        ok = case != fail
+        lines += [(at, f'begin case={case}'), (at + 1, f'end case={case} status={0 if ok else 1}')]
+        (root / 'klog' / f'{name}-wine-child-{pid}.log').write_text(
+            f'{at + 0.5:.3f}:0030:0034:warn:debugstr:OutputDebugStringA "{marker} {"PASS" if ok else "FAIL"}\\n"\n')
+        at += 1
+    (root / 'klog' / f'{name}-wine-child-100.log').write_text(''.join(
+        f'{t:.3f}:0020:0024:warn:debugstr:OutputDebugStringA "PS5_PROTON_GATE_SEQUENCE {line}\\n"\n' for t, line in lines))
+
+
+if __name__ == '__main__': unittest.main()

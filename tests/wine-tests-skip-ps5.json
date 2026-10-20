@@ -1,0 +1,9 @@
+{
+ "kernel32": {
+  "debugger": "Needs isolated qualification of debugger attachment and debug-register restrictions; historical child-process failure is no longer sufficient.",
+  "fiber": "ends the title with an unhandled exception in every run (its earlier result stands)"
+ },
+ "ntdll": {
+  "threadpool": "freezes the whole title (no klog heartbeat, its stop request ignored) and has to be killed; to be reduced to a reproducer before it runs again"
+ }
+}

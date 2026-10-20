@@ -1,0 +1,333 @@
+From: PS5_Proton <local>
+Subject: [PATCH] ntdll: PS5: a released range stays reserved, and a kernel mapping inside Wine's space gets a view
+
+The console hung in a helper releasing a bare 28 GiB reservation: "[wine-ps5] unmap 900000000 +0x700000000", then
+"unwire timeout at 0xc80000000 of pid 1098" (late-library 2026-10-15, after RADV had started in that helper).
+The freezes of the earlier emulator experiment (removed) on 2026-10-13/14 had the same signature at the same address. What was wired there is not known.
+
+unmap_area: a range wholly inside one region of the direct-memory engine is no longer unmapped. It becomes a
+reservation again (anon_mmap_fixed PROT_NONE, which tears down only the engine's runs) and a reserved area, as space
+above the user limit already did, so Windows reuses it through the reserved-area paths. Before that,
+__wine_ps5_dmem_keep asks the kernel about the range's bare parts and records every entry that is not a bare
+reservation, and logs a range of 1 GiB or more with its entries to klog. The address pool still unmaps the chunks it
+gives back: they are space for the system's own mappings.
+
+map_view, its retry after clear_native_views, and VirtualQuery first turn each such recorded entry into a system view
+(VPROT_SYSTEM, not native, so clear_native_views keeps it): it leaves the free ranges, VirtualQuery says MEM_RESERVE,
+and delete_view never unmaps it. VirtualQuery's walk between views takes the guard's signature (__wine_ps5_vm_gap): an
+entry inside Wine's reserved areas that is not a bare reservation reads as occupied before the engine has met it. A
+reservation inside a reserved area (map_fixed_area, alloc_free_area_in_range: a replace with protection 0 asks the
+kernel nothing) asks the engine about the range first and is refused over such an entry (STATUS_CONFLICTING_ADDRESSES,
+or the search goes on), as a commit is.
+
+A commit or protection change the engine refuses (errno EEXIST) fails: STATUS_CONFLICTING_ADDRESSES from a reservation
+with commit or from MEM_REPLACE_PLACEHOLDER (which returned success over pages never committed and used up the
+placeholder; the placeholder is free again), STATUS_ACCESS_DENIED from a commit of reserved pages or VirtualProtect.
+set_vprot then puts the range's page bytes back as they were, so pages committed before the call stay committed, and
+re-applies them to any piece an earlier call already changed (more than 64 runs of bytes: VPROT_COMMITTED is cleared
+over the range). A private file view that is read in (map_file_into_view's fallback) fails where its mprotect is
+refused instead of reading into the mapping. alloc_free_area_in_range returned MAP_FAILED as an address when
+anon_mmap_fixed failed inside a reserved area (create_view refused it, then unmap_area asserted); it returns NULL and
+the search goes on.
+
+Host: tests/test_pw_wine_dmem_ps5.c models the crash (a foreign entry inside a released span): no kernel unmap
+overlaps it, it is recorded once, refused for commits, and offered to Wine as a hole. tests/test_wine_virtual_guard.c
+runs this patch's virtual.c code extracted from the applied tree: the kept release, holes made views, a refused commit
+undone page by page, the refused placeholder commit, the reservation asked first. Console: not run with this patch.
+---
+diff --git a/dlls/ntdll/unix/virtual.c b/dlls/ntdll/unix/virtual.c
+index 900d4a3..0987a7a 100644
+--- a/dlls/ntdll/unix/virtual.c
++++ b/dlls/ntdll/unix/virtual.c
+@@ -220,8 +220,11 @@ extern void __wine_ps5_exec_refused( const void *address );
+ extern int __wine_ps5_munmap( void *addr, size_t len );
+ extern int __wine_ps5_mprotect( void *addr, size_t len, int prot );
+ extern int __wine_ps5_dmem_region( void *base, size_t size );
++extern int __wine_ps5_dmem_keep( void *base, size_t size );
++extern int __wine_ps5_native_hole( void **base, size_t *size );
++extern int __wine_ps5_dmem_check( void *base, size_t size );
+ typedef int (*pw_wine_vm_owned_query)( const void *, void **, void ** );
+-extern int pw_wine_vm_gap( const void *, const void *, pw_wine_vm_owned_query, void **, void ** );
++extern int __wine_ps5_vm_gap( const void *, const void *, pw_wine_vm_owned_query, void **, void ** );
+ extern int pw_wine_vm_step_slot( void *const slots[2], const void *page );
+ #define host_mmap __wine_ps5_mmap
+ #define host_munmap __wine_ps5_munmap
+@@ -2175,6 +2178,11 @@ static void remove_reserved_area( void *addr, size_t size )
+ }
+ 
+ 
++#ifdef __PROSPERO__
++/* Set while the address pool gives a chunk back: that one is unmapped, for the system's own mappings. */
++static BOOL ps5_release_to_system;
++#endif
++
+ /***********************************************************************
+  *           unmap_area
+  *
+@@ -2196,6 +2204,18 @@ static void unmap_area( void *start, size_t size )
+ 
+     if (!(size = unmap_area_above_user_limit( start, size ))) return;
+ 
++#ifdef __PROSPERO__
++    /* A released range of the direct-memory engine stays reserved and becomes a reserved area, as space above the
++     * user limit does: the console hung in a munmap of a bare 28 GiB span once the helper's GPU had started ("unwire
++     * timeout at 0xc80000000", late-library 2026-10-15; an emulator 2026-10-13/14), whatever lay inside. The engine first
++     * records any mapping in it that is not Wine's, which becomes a view of its own (ps5_claim_native_holes). */
++    if (!ps5_release_to_system && !__wine_ps5_dmem_keep( start, size ))
++    {
++        anon_mmap_fixed( start, size, PROT_NONE, MAP_NORESERVE );
++        mmap_add_reserved_area( start, size );
++        return;
++    }
++#endif
+     end = (char *)start + size;
+ 
+     LIST_FOR_EACH_ENTRY( area, &reserved_areas, struct reserved_area, entry )
+@@ -2559,6 +2579,29 @@ static int mprotect_range( void *base, size_t size, BYTE set, BYTE clear )
+ }
+ 
+ 
++#ifdef __PROSPERO__
++/* The page bytes of the range set_vprot changes, as runs of one byte, so a change the direct-memory engine refuses is
++ * undone: on Windows a failed commit or protection change leaves every page as it was, those committed before
++ * included. 0 when the range holds more runs than fit. virtual_mutex must be held by caller. */
++static struct { char *base; size_t size; BYTE vprot; } ps5_saved_vprot[64];
++static unsigned int ps5_save_vprot( char *base, size_t size )
++{
++    unsigned int count = 0;
++    BYTE vprot;
++
++    while (size && count < ARRAY_SIZE(ps5_saved_vprot))
++    {
++        size_t run = get_vprot_range_size( base, size, 0xff, &vprot );
++        ps5_saved_vprot[count].base = base;
++        ps5_saved_vprot[count].size = run;
++        ps5_saved_vprot[count++].vprot = vprot;
++        base += run;
++        size -= run;
++    }
++    return size ? 0 : count;
++}
++#endif
++
+ /***********************************************************************
+  *           set_vprot
+  *
+@@ -2566,6 +2609,10 @@ static int mprotect_range( void *base, size_t size, BYTE set, BYTE clear )
+  */
+ static BOOL set_vprot( struct file_view *view, void *base, size_t size, BYTE vprot )
+ {
++#ifdef __PROSPERO__
++    unsigned int i, saved = ps5_save_vprot( base, size );
++
++#endif
+     if (!use_kernel_writewatch && view->protect & VPROT_WRITEWATCH)
+     {
+         /* each page may need different protections depending on write watch flag */
+@@ -2577,7 +2624,25 @@ static BOOL set_vprot( struct file_view *view, void *base, size_t size, BYTE vpr
+         else if (use_kernel_writewatch && view->protect & VPROT_WRITEWATCH) vprot &= ~VPROT_WRITEWATCH;
+         set_page_vprot( base, size, vprot );
+     }
++#ifdef __PROSPERO__
++    if (mprotect_range( base, size, 0, 0 ))
++    {
++        /* A change the direct-memory engine refused over a mapping that is not Wine's: the pages are as they were, so
++         * nothing is committed over memory another owner holds, and a piece an earlier call already changed follows
++         * them. shortcut: a range of more than 64 runs only loses VPROT_COMMITTED, those committed before included;
++         * keep more runs if a refusal ever meets one. */
++        if (errno != EEXIST) return FALSE;
++        if (!saved) set_page_vprot_bits( base, size, 0, VPROT_COMMITTED );
++        for (i = 0; i < saved; i++)
++            set_page_vprot( ps5_saved_vprot[i].base, ps5_saved_vprot[i].size, ps5_saved_vprot[i].vprot );
++        mprotect_range( base, size, 0, 0 );
++        errno = EEXIST;
++        return FALSE;
++    }
++    return TRUE;
++#else
+     return !mprotect_range( base, size, 0, 0 );
++#endif
+ }
+ 
+ 
+@@ -2691,6 +2756,19 @@ static void *try_map_free_area_range( struct alloc_area *area, char *start, char
+     return try_map_free_area( area, start, end, alloc_start );
+ }
+ 
++#ifdef __PROSPERO__
++/* Space Wine released stays reserved (patch 1128), and a reservation there is a replace with protection 0 that asks the
++ * kernel nothing: a mapping that is not Wine's inside is asked about first and refused (errno EEXIST), as a commit is,
++ * and becomes a view at the next map_view. */
++static void *reserved_area_mmap( void *start, size_t size, int prot )
++{
++    if (!prot && __wine_ps5_dmem_check( start, size )) return MAP_FAILED;
++    return anon_mmap_fixed( start, size, prot, 0 );
++}
++#else
++#define reserved_area_mmap( start, size, prot ) anon_mmap_fixed( start, size, prot, 0 )
++#endif
++
+ static void *alloc_free_area_in_range( struct alloc_area *area, char *base, char *end )
+ {
+     UINT_PTR align_mask = area->align_mask;
+@@ -2726,10 +2804,10 @@ static void *alloc_free_area_in_range( struct alloc_area *area, char *base, char
+                 alloc_start = ROUND_ADDR( intersect_end - area->size, align_mask );
+                 if (alloc_start >= intersect_start)
+                 {
+-                    if ((result = anon_mmap_fixed( alloc_start, area->size, area->unix_prot, 0 )) != alloc_start)
++                    if ((result = reserved_area_mmap( alloc_start, area->size, area->unix_prot )) != alloc_start)
+                         ERR("Could not map in reserved area, alloc_start %p, size %p.\n",
+                                 alloc_start, (void *)area->size);
+-                    return result;
++                    return result == alloc_start ? result : NULL;
+                 }
+             }
+ 
+@@ -2762,9 +2840,9 @@ static void *alloc_free_area_in_range( struct alloc_area *area, char *base, char
+             alloc_start = ROUND_ADDR( intersect_start + align_mask, align_mask );
+             if (alloc_start + area->size <= intersect_end)
+             {
+-                if ((result = anon_mmap_fixed( alloc_start, area->size, area->unix_prot, 0 )) != alloc_start)
++                if ((result = reserved_area_mmap( alloc_start, area->size, area->unix_prot )) != alloc_start)
+                     ERR("Could not map in reserved area, alloc_start %p, size %p.\n", alloc_start, (void *)area->size);
+-                return result;
++                return result == alloc_start ? result : NULL;
+             }
+         }
+         base = intersect_end;
+@@ -2922,10 +3000,10 @@ static NTSTATUS map_fixed_area( void *base, size_t size, int unix_prot )
+         }
+         if (area_end >= end)
+         {
+-            if (anon_mmap_fixed( start, end - start, unix_prot, 0 ) == MAP_FAILED) goto failed;
++            if (reserved_area_mmap( start, end - start, unix_prot ) == MAP_FAILED) goto failed;
+             return STATUS_SUCCESS;
+         }
+-        if (anon_mmap_fixed( start, area_end - start, unix_prot, 0 ) == MAP_FAILED) goto failed;
++        if (reserved_area_mmap( start, area_end - start, unix_prot ) == MAP_FAILED) goto failed;
+         start = area_end;
+     }
+ 
+@@ -3065,7 +3143,9 @@ static void ps5_pool_create(void)
+     }
+     if (create_view( &view, ptr, PS5_ADDRESS_POOL_SIZE, VPROT_PLACEHOLDER | VPROT_FREE_PLACEHOLDER ))
+     {
++        ps5_release_to_system = TRUE;
+         unmap_area( ptr, PS5_ADDRESS_POOL_SIZE );
++        ps5_release_to_system = FALSE;
+         return;
+     }
+     ps5_pool_base = ptr;
+@@ -3092,6 +3172,7 @@ static BOOL ps5_pool_release( const void *start, const void *end, size_t size, s
+     if (reports++ < 16)
+         fprintf( stderr, "wine-ps5: address pool gives %#lx bytes at %p for a %#lx byte allocation (%#lx bytes left)\n",
+                  (unsigned long)chunk, view->base, (unsigned long)size, (unsigned long)(view->size - chunk) );
++    ps5_release_to_system = TRUE;
+     if (chunk == view->size) delete_view( view );
+     else
+     {
+@@ -3099,8 +3180,38 @@ static BOOL ps5_pool_release( const void *start, const void *end, size_t size, s
+         set_page_vprot( view->base, chunk, 0 );
+         remove_pages_from_view( view, view->base, chunk );
+     }
++    ps5_release_to_system = FALSE;
+     return TRUE;
+ }
++
++/* Each mapping the direct-memory engine found inside Wine's space that is not Wine's (a refused commit, a release
++ * that went around it) becomes a system view: kept out of the free ranges, MEM_RESERVE to VirtualQuery, never
++ * unmapped by delete_view, and not native, so clear_native_views keeps it. One still inside a live view is left to
++ * that view; the engine offers it again at its next refusal there. Called only where no free-range walk is under way.
++ * virtual_mutex must be held by caller. */
++static void ps5_claim_native_holes(void)
++{
++    struct file_view *view;
++    void *base;
++    size_t size;
++
++    while (__wine_ps5_native_hole( &base, &size ))
++        if (!find_view_range( base, size ) && create_view( &view, base, size, VPROT_SYSTEM ))
++            ERR( "no view for the foreign mapping at %p-%p\n", base, (char *)base + size );
++}
++
++/* A commit into a free placeholder that set_vprot could not make (errno EEXIST: the engine refused it over a mapping
++ * that is not Wine's) fails, instead of a success over pages never committed, and the placeholder is free again for a
++ * retry. Protection 0 tears down only the engine's runs an earlier piece backed. virtual_mutex must be held by caller. */
++static NTSTATUS ps5_placeholder_refused( struct file_view *view )
++{
++    NTSTATUS status = errno == EEXIST ? STATUS_CONFLICTING_ADDRESSES : STATUS_NO_MEMORY;
++
++    view->protect = VPROT_PLACEHOLDER | VPROT_FREE_PLACEHOLDER;
++    set_page_vprot( view->base, view->size, 0 );
++    anon_mmap_fixed( view->base, ROUND_SIZE( 0, view->size, host_page_mask ), PROT_NONE, 0 );
++    return status;
++}
+ #endif
+ 
+ 
+@@ -3125,6 +3236,9 @@ static NTSTATUS map_view( struct file_view **view_ret, void *base, size_t size,
+ 
+     if (!align_mask) align_mask = granularity_mask;
+     assert( align_mask >= host_page_mask );
++#ifdef __PROSPERO__
++    ps5_claim_native_holes();
++#endif
+ 
+     if (alloc_type & MEM_REPLACE_PLACEHOLDER)
+     {
+@@ -3137,7 +3251,11 @@ static NTSTATUS map_view( struct file_view **view_ret, void *base, size_t size,
+         TRACE( "found view %p, size %p, protect %#x.\n", view->base, (void *)view->size, view->protect );
+ 
+         view->protect = vprot | VPROT_PLACEHOLDER;
++#ifdef __PROSPERO__
++        if (!set_vprot( view, base, size, vprot )) return ps5_placeholder_refused( view );
++#else
+         set_vprot( view, base, size, vprot );
++#endif
+         if (vprot & VPROT_WRITEWATCH)
+         {
+             kernel_writewatch_register_range( view, base, size );
+@@ -3202,7 +3320,9 @@ static NTSTATUS map_view( struct file_view **view_ret, void *base, size_t size,
+             if (!is_win64) increase_try_map_step = FALSE;
+ #ifdef __PROSPERO__
+             /* Native views are only metadata. Removing them does not extend
+-             * the measured host aperture or change its page granularity. */
++             * the measured host aperture or change its page granularity. A
++             * foreign mapping the first search ran into is a view now. */
++            ps5_claim_native_holes();
+             ptr = alloc_free_area( start, end, host_size, top_down, unix_prot, align_mask );
+ #else
+             ptr = alloc_free_area( (void *)limit_low, (void *)limit_high, size, top_down, unix_prot, align_mask );
+@@ -3300,7 +3420,13 @@ static NTSTATUS map_file_into_view( struct file_view *view, int fd, size_t start
+         return STATUS_INVALID_PARAMETER;
+     }
+ 
++#ifdef __PROSPERO__
++    /* Read in only where the engine could commit: never into a mapping that is not Wine's (patch 1128). */
++    if (mprotect( map_addr, map_size, PROT_READ | PROT_WRITE ))
++        return errno == EEXIST ? STATUS_CONFLICTING_ADDRESSES : STATUS_NO_MEMORY;
++#else
+     mprotect( map_addr, map_size, PROT_READ | PROT_WRITE );
++#endif
+     pread( fd, map_addr, size, offset );
+     vm_stat_add( VM_STAT_FILE_READ, size );
+     return STATUS_SUCCESS;
+@@ -7081,7 +7207,7 @@ static struct file_view *get_memory_region_size( char *base, char **region_start
+             return NULL;
+         }
+         *region_end = min( *region_end, (char *)host_addr_space_limit );
+-        status = pw_wine_vm_gap( base, *region_end, query_wine_reserved_area, &start, &end );
++        status = __wine_ps5_vm_gap( base, *region_end, query_wine_reserved_area, &start, &end );
+ 
+         if (status < 0) WARN( "cannot query native mapping at %p\n", base );
+         else
+@@ -7151,6 +7277,9 @@ static unsigned int fill_basic_memory_info( const void *addr, MEMORY_BASIC_INFOR
+     /* Find the view containing the address */
+ 
+     server_enter_uninterrupted_section( &virtual_mutex, &sigset );
++#ifdef __PROSPERO__
++    ps5_claim_native_holes();
++#endif
+     view = get_memory_region_size( base, &alloc_base, &alloc_end, &fake_reserved );
+ 
+     /* Fill the info structure */

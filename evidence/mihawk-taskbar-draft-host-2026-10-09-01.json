@@ -1,0 +1,67 @@
+{
+ "scope": "Isolated native taskbar draft on named Linux Wine desktop, not production or PS5 qualification",
+ "oracle": "Installed GUI-capable Linux Wine 11.18; fixed Windows 11 reference unavailable",
+ "passed": true,
+ "checks": 12,
+ "failures": 0,
+ "console_qualified": false,
+ "windows_equivalence_verified": false,
+ "captures_qualified": false,
+ "host_adapter": "Only the unused GE-Proton EXPLORER_LD_PRELOAD bridge is omitted: host environment has no preload entry and host Wine lacks its private ntdll exports. Taskbar code is identical to the native draft. Host uses named TaskbarHost to avoid the existing Default desktop owner.",
+ "results": [
+  "real shell tray and named desktop",
+  "full-width bottom taskbar, 48 pixels at 96 DPI",
+  "real application window",
+  "accessible Start button and live clock/date",
+  "real-window taskbar entry",
+  "40-pixel buttons and 4-pixel gap",
+  "centered real buttons",
+  "normal minimize",
+  "taskbar restores real window",
+  "destroyed window entry removed"
+ ],
+ "prior_attempts": [
+  {
+   "result": "unqualified",
+   "reason": "Unmodified PS5-built Explorer stops before UI at unavailable host ntdll preload export"
+  },
+  {
+   "checks": 7,
+   "failures": 4,
+   "reason": "Default already owned by host Explorer; its legacy tray was observed instead of draft"
+  },
+  {
+   "checks": 12,
+   "failures": 1,
+   "reason": "Diagnostic class comparison was case-sensitive; native class is Static, not STATIC"
+  }
+ ],
+ "limitations": [
+  "temporary draft outside frozen production source",
+  "classic Start remains; approved Start panel not implemented",
+  "opaque material fallback only",
+  "no displayed-pixel, hardware-input, frame-pacing or fullscreen qualification"
+ ],
+ "source_sha256": {
+  "systray.c": "506ea4d54055f3b15d96c51c67e62e6143d60bb6862faa7db1424839ebf8b1ca",
+  "taskbar-helper.c": "bef8367cf6b687f5021322281abaae98131cee8c54c76e9592a667d28f6e22f0",
+  "desktop-host.c": "eaf432b7a127894cdcd6e93c1ee9f4c69e83d4fb6346fec868ad907487f00e43",
+  "taskbar-host-probe.c": "b9968ea4fb97af52a5bcf53917bc2a0cab6fbbd4ba672469ec9d4b997a3c8b2f"
+ },
+ "verdict_lines": [
+  "taskbar-host: PASS real-shell-tray",
+  "taskbar-host: PASS real-named-host-desktop",
+  "taskbar-host: PASS full-width-bottom-48",
+  "taskbar-host: PASS real-application-window",
+  "taskbar-host: static control length=17 newline=1",
+  "taskbar-host: PASS accessible-start-button",
+  "taskbar-host: PASS live-accessible-clock-date",
+  "taskbar-host: PASS real-window-taskbar-entry",
+  "taskbar-host: PASS item-size-spacing",
+  "taskbar-host: PASS centered-real-buttons",
+  "taskbar-host: PASS normal-minimize",
+  "taskbar-host: PASS taskbar-restores-real-window",
+  "taskbar-host: PASS destroyed-window-entry-removed",
+  "taskbar-host: RESULT checks=12 failures=0"
+ ]
+}

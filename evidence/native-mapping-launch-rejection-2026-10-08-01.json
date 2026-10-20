@@ -1,0 +1,10 @@
+{
+ "run": "native-mapping-launch-rejection-2026-10-08-01",
+ "source_run": "native-mapping-console-2026-10-08-01-virtual-query32",
+ "passed": false,
+ "result": "launch_rejected",
+ "shell_error": "0x80940033",
+ "runtime_started": false,
+ "probe_verdict": null,
+ "note": "The title launch was rejected before runtime startup. Retrieved Wine and broker logs belong to an earlier launch and are not evidence for this attempt; the earlier returned_to_launcher field must not be interpreted as this launch returning. The batch was interrupted before later probes. User reloaded ShadowMount before the next batch."
+}

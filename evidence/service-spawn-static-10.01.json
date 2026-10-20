@@ -1,0 +1,220 @@
+{
+  "kind": "static_analysis_reference",
+  "firmware_directory_label": "10.01",
+  "runtime_child_proven": false,
+  "modules": [
+    {
+      "path": "common/lib/libkernel.sprx",
+      "sha256": "8074564a92f227069774ff4fb3ddce6a4a9b68ef51e5027566e7ab279baa70b8",
+      "exports": {
+        "execve": "0x7e0",
+        "rfork_thread": "0x1a0"
+      },
+      "calls": [],
+      "absent_exports": [
+        "sceKernelSpawn",
+        "sceKernelCreateBudget",
+        "sceKernelDeleteBudget",
+        "sceKernelGetBudget",
+        "sceKernelSetBudget"
+      ]
+    },
+    {
+      "path": "common/lib/libkernel_sys.sprx",
+      "sha256": "a30e1973f86492c911e37fcbba725a271e886a27f66481c9c7f743899b32b6d0",
+      "exports": {
+        "execve": "0x950",
+        "rfork_thread": "0x1f0",
+        "sceKernelCreateBudget": "0x44840",
+        "sceKernelDeleteBudget": "0x44900",
+        "sceKernelGetBudget": "0x44ab0",
+        "sceKernelGetResourceLimit": "0x44990",
+        "sceKernelSetBudget": "0x44930",
+        "sceKernelSpawn": "0x42fb0"
+      },
+      "calls": []
+    },
+    {
+      "path": "common/lib/libSceSystemService.sprx",
+      "sha256": "88b19224a5dc2717b20f748e65eab3fbcf1e793ddee73218ef3f4ff593ec5966",
+      "exports": {
+        "sceSystemServiceAddLocalProcessForJvm": "0x1590",
+        "sceLncUtilInitialize": "0x6390",
+        "sceSystemServiceGetAppStatus": "0x5040",
+        "sceSystemServiceAddLocalProcess": "0x54c0",
+        "sceSystemServiceKillLocalProcess": "0x55d0",
+        "sceSystemServiceGetLocalProcessStatusList": "0x5690",
+        "sceSystemServiceGetParentSocket": "0x57a0",
+        "sceLncUtilTerminate": "0x63a0",
+        "sceSystemServiceKillLocalProcessForJvm": "0x1720"
+      },
+      "calls": [
+        {
+          "site_rva": "0x5577",
+          "target": "sceLncUtilAddLocalProcess",
+          "target_kind": "export"
+        },
+        {
+          "site_rva": "0x7fa1",
+          "target": "0xdb00",
+          "target_kind": "internal"
+        },
+        {
+          "site_rva": "0x7fd3",
+          "target": "0xdbc0",
+          "target_kind": "internal"
+        }
+      ],
+      "export_libraries": {
+        "sceSystemServiceAddLocalProcessForJvm": "libSceSystemService_jvm",
+        "sceSystemServiceKillLocalProcessForJvm": "libSceSystemService_jvm",
+        "sceSystemServiceAddLocalProcess": "libSceSystemService",
+        "sceSystemServiceKillLocalProcess": "libSceSystemService"
+      }
+    },
+    {
+      "path": "common/lib/libSceSysCore.sprx",
+      "sha256": "3d599673c17d913ca21b2fe198a7e484d5ae656c6a454a72c273acd1689d3998",
+      "exports": {
+        "sceApplicationAddProcess2": "0xb20"
+      },
+      "calls": []
+    },
+    {
+      "path": "sys/SceSysCore.elf",
+      "sha256": "b80d3d2be13145aae5eaaf803e0dfc3781e10d901e681d7400466eb2d3cbe70f",
+      "exports": {},
+      "calls": [
+        {
+          "site_rva": "0x2e62",
+          "target": "rfork_thread",
+          "target_kind": "import"
+        },
+        {
+          "site_rva": "0x340b",
+          "target": "sceKernelGetBudget",
+          "target_kind": "import"
+        },
+        {
+          "site_rva": "0x3425",
+          "target": "sceKernelSetBudget",
+          "target_kind": "import"
+        },
+        {
+          "site_rva": "0x345a",
+          "target": "sceKernelBeginAppMount",
+          "target_kind": "import"
+        },
+        {
+          "site_rva": "0x348b",
+          "target": "sceKernelSetAppInfo",
+          "target_kind": "import"
+        },
+        {
+          "site_rva": "0x34cb",
+          "target": "__sys_rdup",
+          "target_kind": "import"
+        },
+        {
+          "site_rva": "0x3504",
+          "target": "sceKernelDeleteBudget",
+          "target_kind": "import"
+        },
+        {
+          "site_rva": "0x3511",
+          "target": "sceKernelSetBudget",
+          "target_kind": "import"
+        },
+        {
+          "site_rva": "0x3524",
+          "target": "execve",
+          "target_kind": "import"
+        },
+        {
+          "site_rva": "0x3586",
+          "target": "sceKernelEndAppMount2",
+          "target_kind": "import"
+        },
+        {
+          "site_rva": "0xc627",
+          "target": "sceKernelCreateBudget",
+          "target_kind": "import"
+        },
+        {
+          "site_rva": "0xcbdd",
+          "target": "sceKernelDeleteBudget",
+          "target_kind": "import"
+        },
+        {
+          "site_rva": "0x30035",
+          "target": "sceKernelGetResourceLimit",
+          "target_kind": "import"
+        },
+        {
+          "site_rva": "0x31ca4",
+          "target": "sceKernelCreateBudget",
+          "target_kind": "import"
+        },
+        {
+          "site_rva": "0x3243e",
+          "target": "sceKernelDeleteBudget",
+          "target_kind": "import"
+        },
+        {
+          "site_rva": "0x17e88",
+          "target": "rfork_thread",
+          "target_kind": "import"
+        },
+        {
+          "site_rva": "0x18eab",
+          "target": "sceKernelRdup",
+          "target_kind": "import"
+        },
+        {
+          "site_rva": "0x18fa6",
+          "target": "sceKernelSetBudget",
+          "target_kind": "import"
+        },
+        {
+          "site_rva": "0x18f92",
+          "target": "execve",
+          "target_kind": "import"
+        }
+      ]
+    },
+    {
+      "path": "vsh/SceShellCore.elf",
+      "sha256": "d8f7d7360fed8e348d7f65e583b5f3e1a0b14689ca828d04d9d031b65d21dd49",
+      "exports": {},
+      "calls": [
+        {
+          "site_rva": "0x5d0608",
+          "target": "sceApplicationAddProcess2",
+          "target_kind": "import"
+        }
+      ]
+    },
+    {
+      "path": "common/lib/libSceSysmodule.sprx",
+      "sha256": "727a2d26b7a5bc9d5902d9ef45e2ea9c31276ecd7f600124ed51821dbbeab5ba",
+      "exports": {},
+      "calls": [
+        {
+          "site_rva": "0x5b2f",
+          "target": "0x4690",
+          "target_kind": "internal"
+        },
+        {
+          "site_rva": "0x5b92",
+          "target": "0x1240",
+          "target_kind": "internal"
+        },
+        {
+          "site_rva": "0x5f8f",
+          "target": "0x4690",
+          "target_kind": "internal"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,59 @@
+From: PS5_Proton <local>
+Subject: [PATCH] shell32: a 96 px image list for the desktop's large icons
+
+The approved Windows 11 prototype's desktop has three icon sizes, 32, 48 and 96 px (patch 1102). Windows draws its large desktop icons
+from the 256 px jumbo list scaled down; Wine's image lists cannot scale (ILD_SCALE is unimplemented) and the shell keeps no 96 px list.
+The icon cache now keeps a sixth list, three times the icon size (96 px at 96 DPI), filled index for index with the other five (each
+icon loaded at that size from its source, a shortcut's arrow laid on it as on the others), which shell32's desktop view takes for large
+icons (shell_desktop_large_icons; SHGetImageList still answers Windows' five). It costs a 96 x 96 image per cached icon, beside the
+256 x 256 the jumbo list already keeps.
+---
+diff --git a/dlls/shell32/iconcache.c b/dlls/shell32/iconcache.c
+--- a/dlls/shell32/iconcache.c
++++ b/dlls/shell32/iconcache.c
+@@ -54,7 +54,10 @@ typedef struct
+ 
+ static HDPA sic_hdpa;
+ static INIT_ONCE sic_init_once = INIT_ONCE_STATIC_INIT;
+-static HIMAGELIST shell_imagelists[SHIL_LAST+1];
++/* Windows' five lists, then the desktop's large icons (the Mihawk desktop's "Large icons", three times the icon size: 96 px at
++ * 96 DPI), which Windows draws from the jumbo list scaled and Wine's image lists cannot scale (ILD_SCALE). */
++#define SHIL_DESKTOP_LARGE (SHIL_LAST + 1)
++static HIMAGELIST shell_imagelists[SHIL_DESKTOP_LARGE + 1];
+ 
+ static CRITICAL_SECTION SHELL32_SicCS;
+ static CRITICAL_SECTION_DEBUG critsect_debug =
+@@ -471,6 +474,8 @@ static BOOL WINAPI SIC_Initialize( INIT_ONCE *once, void *param, void **context
+     sizes[SHIL_SYSSMALL].cx = GetSystemMetrics( SM_CXSMICON );
+     sizes[SHIL_SYSSMALL].cy = GetSystemMetrics( SM_CYSMICON );
+     sizes[SHIL_JUMBO].cx = sizes[SHIL_JUMBO].cy = 256;
++    sizes[SHIL_DESKTOP_LARGE].cx = GetSystemMetrics( SM_CXICON ) * 3;
++    sizes[SHIL_DESKTOP_LARGE].cy = GetSystemMetrics( SM_CYICON ) * 3;
+ 
+     TRACE("large %ldx%ld small %ldx%ld\n", sizes[SHIL_LARGE].cx, sizes[SHIL_LARGE].cy, sizes[SHIL_SMALL].cx, sizes[SHIL_SMALL].cy);
+ 
+@@ -1095,6 +1100,13 @@ HRESULT WINAPI SHGetStockIconInfo(SHSTOCKICONID id, UINT flags, SHSTOCKICONINFO
+     return S_OK;
+ }
+ 
++/* The desktop's large icons: the same images as the other lists, index for index (shell32's own, not SHGetImageList's). */
++HIMAGELIST shell_desktop_large_icons(void)
++{
++    InitOnceExecuteOnce( &sic_init_once, SIC_Initialize, NULL, NULL );
++    return shell_imagelists[SHIL_DESKTOP_LARGE];
++}
++
+ /*************************************************************************
+  *              SHGetImageList (SHELL32.727)
+  *
+diff --git a/dlls/shell32/shell32_main.h b/dlls/shell32/shell32_main.h
+--- a/dlls/shell32/shell32_main.h
++++ b/dlls/shell32/shell32_main.h
+@@ -48,6 +48,7 @@ extern CLSID CLSID_ShellImageDataFactory;
+ /* Iconcache */
+ #define INVALID_INDEX -1
+ void SIC_Destroy(void);
++HIMAGELIST shell_desktop_large_icons(void);
+ BOOL PidlToSicIndex (IShellFolder * sh, LPCITEMIDLIST pidl, BOOL bBigIcon, UINT uFlags, int * pIndex);
+ INT SIC_GetIconIndex (LPCWSTR sSourceFile, INT dwSourceIndex, DWORD dwFlags );
+ HRESULT SIC_get_location( int list_idx, WCHAR *file, DWORD *size, int *res_idx );

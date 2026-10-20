@@ -1,0 +1,377 @@
+From: PS5_Proton <local>
+Subject: [PATCH] shell32: a shortcut keeps its icon's picture, and wears Windows 11's badge
+
+The shortcut arrow was put on an icon by ANDing and XORing masks and colours, which does not work for an icon with an alpha channel (a PNG icon in a
+program: two game launchers, the Appearance icons): the whole picture became transparent and the desktop showed the arrow alone
+(desktop-view-2026-10-12-24: the drawn icon covered only the 16 x 16 arrow, x 0..15, y 16..31). Both are now taken as ARGB (drawn on black and
+on white, which gives the colour and the transparency whatever the icon carries) and composed. The badge is drawn in code, Windows 11's: a white
+rounded square with a thin grey edge and a blue arrow, at five sixteenths of the icon's width, in its bottom-left corner.
+---
+diff --git a/dlls/shell32/iconcache.c b/dlls/shell32/iconcache.c
+--- a/dlls/shell32/iconcache.c
++++ b/dlls/shell32/iconcache.c
+@@ -136,153 +136,174 @@
+     return hr;
+ }
+ 
+-/* declare SIC_LoadOverlayIcon() */
+-static int SIC_LoadOverlayIcon(int icon_idx);
++/* An icon's picture and transparency as 32-bit non-premultiplied ARGB, whether the icon carries an alpha channel or a mask:
++ * drawn on black and again on white, the difference of the two is what the icon lets through. */
++static BOOL SIC_IconToArgb(HICON icon, int width, int height, DWORD *argb)
++{
++    BITMAPINFO info = { { sizeof(BITMAPINFOHEADER), width, -height, 1, 32, BI_RGB } };
++    DWORD *on_black = NULL, *on_white = NULL;
++    HBITMAP black_bitmap, white_bitmap, old;
++    HDC dc = CreateCompatibleDC(NULL);
++    BOOL ok = FALSE;
++    int i;
++
++    if (!dc) return FALSE;
++    black_bitmap = CreateDIBSection(dc, &info, DIB_RGB_COLORS, (void **)&on_black, NULL, 0);
++    white_bitmap = CreateDIBSection(dc, &info, DIB_RGB_COLORS, (void **)&on_white, NULL, 0);
++    if (black_bitmap && white_bitmap)
++    {
++        memset(on_black, 0x00, width * height * 4);
++        memset(on_white, 0xff, width * height * 4);
++        old = SelectObject(dc, black_bitmap);
++        DrawIconEx(dc, 0, 0, icon, width, height, 0, NULL, DI_NORMAL);
++        SelectObject(dc, white_bitmap);
++        DrawIconEx(dc, 0, 0, icon, width, height, 0, NULL, DI_NORMAL);
++        SelectObject(dc, old);
++        for (i = 0; i < width * height; i++)
++        {
++            int blue = on_white[i] & 0xff, green = (on_white[i] >> 8) & 0xff, red = (on_white[i] >> 16) & 0xff;
++            int black_blue = on_black[i] & 0xff, black_green = (on_black[i] >> 8) & 0xff, black_red = (on_black[i] >> 16) & 0xff;
++            int alpha = 255 - ((blue - black_blue) + (green - black_green) + (red - black_red)) / 3;
++
++            if (alpha <= 0) { argb[i] = 0; continue; }
++            if (alpha > 255) alpha = 255;
++            black_blue = min(255, black_blue * 255 / alpha);
++            black_green = min(255, black_green * 255 / alpha);
++            black_red = min(255, black_red * 255 / alpha);
++            argb[i] = (alpha << 24) | (black_red << 16) | (black_green << 8) | black_blue;
++        }
++        ok = TRUE;
++    }
++    if (black_bitmap) DeleteObject(black_bitmap);
++    if (white_bitmap) DeleteObject(white_bitmap);
++    DeleteDC(dc);
++    return ok;
++}
++
++/* The shortcut badge of Windows 11: a white rounded square with a thin grey edge and a blue arrow rising to the right, as ARGB,
++ * drawn at four by four samples a pixel. Its corners and strokes are fractions of the badge, so it is the same at any size. */
++static DWORD SIC_BadgeSample(float u, float v)
++{
++    float dx = max(__builtin_fabsf(u - 0.5f) - 0.34f, 0.0f), dy = max(__builtin_fabsf(v - 0.5f) - 0.34f, 0.0f), inside = __builtin_sqrtf(dx * dx + dy * dy) - 0.12f;
++    float ax = 0.30f, ay = 0.70f, bx = 0.62f, by = 0.38f, px = u - ax, py = v - ay, ex = bx - ax, ey = by - ay;
++    float along = (px * ex + py * ey) / (ex * ex + ey * ey), cx, cy, distance;
++    float tx[3] = { 0.50f, 0.76f, 0.76f }, ty[3] = { 0.22f, 0.22f, 0.48f };
++    int sign, in_head = 1, i;
++
++    if (inside > 0.0f) return 0;
++    along = along < 0.0f ? 0.0f : along > 1.0f ? 1.0f : along;
++    cx = ax + along * ex - u;
++    cy = ay + along * ey - v;
++    distance = __builtin_sqrtf(cx * cx + cy * cy);
++    for (i = 0, sign = 0; i < 3; i++)
++    {
++        int j = (i + 1) % 3;
++        float cross = (tx[j] - tx[i]) * (v - ty[i]) - (ty[j] - ty[i]) * (u - tx[i]);
++        int side = cross < 0.0f ? -1 : 1;
++        if (!sign) sign = side; else if (side != sign) in_head = 0;
++    }
++    if (distance <= 0.075f || in_head) return 0xff1b6ec2;
++    return inside > -0.07f ? 0xffb4b4b4 : 0xffffffff;
++}
++
++static void SIC_BadgeArgb(DWORD *argb, int size)
++{
++    int x, y, sx, sy;
++
++    for (y = 0; y < size; y++)
++        for (x = 0; x < size; x++)
++        {
++            unsigned alpha = 0, red = 0, green = 0, blue = 0;
++
++            for (sy = 0; sy < 4; sy++)
++                for (sx = 0; sx < 4; sx++)
++                {
++                    DWORD sample = SIC_BadgeSample((x + (sx + 0.5f) / 4) / size, (y + (sy + 0.5f) / 4) / size);
++                    unsigned a = sample >> 24;
++                    alpha += a;
++                    red += ((sample >> 16) & 0xff) * a;
++                    green += ((sample >> 8) & 0xff) * a;
++                    blue += (sample & 0xff) * a;
++                }
++            argb[y * size + x] = alpha ? (((alpha + 8) / 16) << 24) | ((red / alpha) << 16) | ((green / alpha) << 8) | (blue / alpha) : 0;
++        }
++}
+ 
+ /*****************************************************************************
+  * SIC_OverlayShortcutImage			[internal]
+  *
+  * NOTES
+- *  Creates a new icon as a copy of the passed-in icon, overlaid with a
+- *  shortcut image. 
++ *  Creates a new icon as a copy of the passed-in icon, with the shortcut badge
++ *  composed over its bottom-left corner. Both are taken as ARGB, so an icon with an
++ *  alpha channel (a PNG icon in a program) keeps its picture: the mask-only
++ *  composition this replaces left an alpha icon with the arrow alone.
+  */
+ static HICON SIC_OverlayShortcutImage(HICON SourceIcon, int type)
+ {
+-    ICONINFO SourceIconInfo, ShortcutIconInfo, TargetIconInfo;
+-	HICON ShortcutIcon, TargetIcon;
+-	BITMAP SourceBitmapInfo, ShortcutBitmapInfo;
+-	HDC SourceDC = NULL,
+-	  ShortcutDC = NULL,
+-	  TargetDC = NULL,
+-	  ScreenDC = NULL;
+-	HBITMAP OldSourceBitmap = NULL,
+-	  OldShortcutBitmap = NULL,
+-	  OldTargetBitmap = NULL;
+-
+-	static int s_imgListIdx = -1;
+-
+-	/* Get information about the source icon and shortcut overlay */
+-	if (! GetIconInfo(SourceIcon, &SourceIconInfo)
+-	    || 0 == GetObjectW(SourceIconInfo.hbmColor, sizeof(BITMAP), &SourceBitmapInfo))
+-	{
+-	  return NULL;
+-	}
+-
+-	/* search for the shortcut icon only once */
+-	if (s_imgListIdx == -1)
+-	    s_imgListIdx = SIC_LoadOverlayIcon(- IDI_SHELL_SHORTCUT);
+-                           /* FIXME should use icon index 29 instead of the
+-                              resource id, but not all icons are present yet
+-                              so we can't use icon indices */
+-
+-    if (s_imgListIdx != -1)
+-        ShortcutIcon = ImageList_GetIcon(shell_imagelists[type], s_imgListIdx, ILD_TRANSPARENT);
+-    else
+-        ShortcutIcon = NULL;
+-
+-    if (NULL == ShortcutIcon || ! GetIconInfo(ShortcutIcon, &ShortcutIconInfo)
+-            || 0 == GetObjectW(ShortcutIconInfo.hbmColor, sizeof(BITMAP), &ShortcutBitmapInfo))
+-    {
+-        return NULL;
+-    }
+-
+-	TargetIconInfo = SourceIconInfo;
+-	TargetIconInfo.hbmMask = NULL;
+-	TargetIconInfo.hbmColor = NULL;
+-
+-	/* Setup the source, shortcut and target masks */
+-	SourceDC = CreateCompatibleDC(NULL);
+-	if (NULL == SourceDC) goto fail;
+-	OldSourceBitmap = SelectObject(SourceDC, SourceIconInfo.hbmMask);
+-	if (NULL == OldSourceBitmap) goto fail;
+-
+-	ShortcutDC = CreateCompatibleDC(NULL);
+-	if (NULL == ShortcutDC) goto fail;
+-	OldShortcutBitmap = SelectObject(ShortcutDC, ShortcutIconInfo.hbmMask);
+-	if (NULL == OldShortcutBitmap) goto fail;
+-
+-	TargetDC = CreateCompatibleDC(NULL);
+-	if (NULL == TargetDC) goto fail;
+-	TargetIconInfo.hbmMask = CreateCompatibleBitmap(TargetDC, SourceBitmapInfo.bmWidth,
+-	                                                SourceBitmapInfo.bmHeight);
+-	if (NULL == TargetIconInfo.hbmMask) goto fail;
+-	ScreenDC = GetDC(NULL);
+-	if (NULL == ScreenDC) goto fail;
+-	TargetIconInfo.hbmColor = CreateCompatibleBitmap(ScreenDC, SourceBitmapInfo.bmWidth,
+-	                                                 SourceBitmapInfo.bmHeight);
+-	ReleaseDC(NULL, ScreenDC);
+-	if (NULL == TargetIconInfo.hbmColor) goto fail;
+-	OldTargetBitmap = SelectObject(TargetDC, TargetIconInfo.hbmMask);
+-	if (NULL == OldTargetBitmap) goto fail;
+-
+-	/* Create the target mask by ANDing the source and shortcut masks */
+-	if (! BitBlt(TargetDC, 0, 0, SourceBitmapInfo.bmWidth, SourceBitmapInfo.bmHeight,
+-	             SourceDC, 0, 0, SRCCOPY) ||
+-	    ! BitBlt(TargetDC, 0, SourceBitmapInfo.bmHeight - ShortcutBitmapInfo.bmHeight,
+-	             ShortcutBitmapInfo.bmWidth, ShortcutBitmapInfo.bmHeight,
+-	             ShortcutDC, 0, 0, SRCAND))
+-	{
+-	  goto fail;
+-	}
+-
+-	/* Setup the source and target xor bitmap */
+-	if (NULL == SelectObject(SourceDC, SourceIconInfo.hbmColor) ||
+-	    NULL == SelectObject(TargetDC, TargetIconInfo.hbmColor))
+-	{
+-	  goto fail;
+-	}
++    ICONINFO source_info, target_info;
++    BITMAP source_bitmap;
++    HICON result = NULL;
++    DWORD *picture = NULL, *arrow_pixels = NULL, *target_pixels = NULL;
++    BITMAPINFO info;
++    HDC dc;
++    int width, height, arrow_size, x, y;
++
++    if (!GetIconInfo(SourceIcon, &source_info)) return NULL;
++    GetObjectW(source_info.hbmColor, sizeof(BITMAP), &source_bitmap);
++    DeleteObject(source_info.hbmColor);
++    DeleteObject(source_info.hbmMask);
++    width = source_bitmap.bmWidth;
++    height = source_bitmap.bmHeight;
++    if (width <= 0 || height <= 0) return NULL;
++
++    arrow_size = max(8, (width * 5 + 8) / 16);
++    picture = malloc(width * height * 4);
++    arrow_pixels = malloc(arrow_size * arrow_size * 4);
++    if (!picture || !arrow_pixels || !SIC_IconToArgb(SourceIcon, width, height, picture)) goto done;
++    SIC_BadgeArgb(arrow_pixels, arrow_size);
+ 
+-	/* Copy the source xor bitmap to the target and clear out part of it by using
+-	   the shortcut mask */
+-	if (! BitBlt(TargetDC, 0, 0, SourceBitmapInfo.bmWidth, SourceBitmapInfo.bmHeight,
+-	             SourceDC, 0, 0, SRCCOPY) ||
+-	    ! BitBlt(TargetDC, 0, SourceBitmapInfo.bmHeight - ShortcutBitmapInfo.bmHeight,
+-	             ShortcutBitmapInfo.bmWidth, ShortcutBitmapInfo.bmHeight,
+-	             ShortcutDC, 0, 0, SRCAND))
+-	{
+-	  goto fail;
+-	}
+-
+-	if (NULL == SelectObject(ShortcutDC, ShortcutIconInfo.hbmColor)) goto fail;
+-
+-	/* Now put in the shortcut xor mask */
+-	if (! BitBlt(TargetDC, 0, SourceBitmapInfo.bmHeight - ShortcutBitmapInfo.bmHeight,
+-	             ShortcutBitmapInfo.bmWidth, ShortcutBitmapInfo.bmHeight,
+-	             ShortcutDC, 0, 0, SRCINVERT))
+-	{
+-	  goto fail;
+-	}
+-
+-	/* Clean up, we're not goto'ing to 'fail' after this so we can be lazy and not set
+-	   handles to NULL */
+-	SelectObject(TargetDC, OldTargetBitmap);
+-	DeleteObject(TargetDC);
+-	SelectObject(ShortcutDC, OldShortcutBitmap);
+-	DeleteObject(ShortcutDC);
+-	SelectObject(SourceDC, OldSourceBitmap);
+-	DeleteObject(SourceDC);
+-
+-	/* Create the icon using the bitmaps prepared earlier */
+-	TargetIcon = CreateIconIndirect(&TargetIconInfo);
+-
+-	/* CreateIconIndirect copies the bitmaps, so we can release our bitmaps now */
+-	DeleteObject(TargetIconInfo.hbmColor);
+-	DeleteObject(TargetIconInfo.hbmMask);
+-
+-	return TargetIcon;
+-
+-fail:
+-	/* Clean up scratch resources we created */
+-	if (NULL != OldTargetBitmap) SelectObject(TargetDC, OldTargetBitmap);
+-	if (NULL != TargetIconInfo.hbmColor) DeleteObject(TargetIconInfo.hbmColor);
+-	if (NULL != TargetIconInfo.hbmMask) DeleteObject(TargetIconInfo.hbmMask);
+-	if (NULL != TargetDC) DeleteObject(TargetDC);
+-	if (NULL != OldShortcutBitmap) SelectObject(ShortcutDC, OldShortcutBitmap);
+-	if (NULL != ShortcutDC) DeleteObject(ShortcutDC);
+-	if (NULL != OldSourceBitmap) SelectObject(SourceDC, OldSourceBitmap);
+-	if (NULL != SourceDC) DeleteObject(SourceDC);
++    for (y = 0; y < arrow_size; y++)
++        for (x = 0; x < arrow_size; x++)
++        {
++            DWORD over = arrow_pixels[y * arrow_size + x], *under = &picture[(height - arrow_size + y) * width + x];
++            int over_alpha = over >> 24, under_alpha = *under >> 24, alpha, shift;
++            DWORD out = 0;
++
++            if (!over_alpha) continue;
++            alpha = over_alpha + under_alpha * (255 - over_alpha) / 255;
++            for (shift = 0; shift <= 16; shift += 8)
++            {
++                int over_channel = (over >> shift) & 0xff, under_channel = (*under >> shift) & 0xff;
++                int channel = (over_channel * over_alpha + under_channel * under_alpha * (255 - over_alpha) / 255) / alpha;
++                out |= min(255, channel) << shift;
++            }
++            *under = out | (alpha << 24);
++        }
+ 
+-	return NULL;
++    memset(&info, 0, sizeof(info));
++    info.bmiHeader.biSize = sizeof(info.bmiHeader);
++    info.bmiHeader.biWidth = width;
++    info.bmiHeader.biHeight = -height;
++    info.bmiHeader.biPlanes = 1;
++    info.bmiHeader.biBitCount = 32;
++    dc = GetDC(NULL);
++    target_info.fIcon = TRUE;
++    target_info.xHotspot = target_info.yHotspot = 0;
++    target_info.hbmColor = CreateDIBSection(dc, &info, DIB_RGB_COLORS, (void **)&target_pixels, NULL, 0);
++    target_info.hbmMask = CreateBitmap(width, height, 1, 1, NULL);
++    ReleaseDC(NULL, dc);
++    if (target_info.hbmColor && target_info.hbmMask)
++    {
++        memcpy(target_pixels, picture, width * height * 4);
++        result = CreateIconIndirect(&target_info);
++    }
++    if (target_info.hbmColor) DeleteObject(target_info.hbmColor);
++    if (target_info.hbmMask) DeleteObject(target_info.hbmMask);
++
++done:
++    free(picture);
++    free(arrow_pixels);
++    return result;
+ }
+ 
+ /*****************************************************************************
+@@ -564,52 +585,6 @@
+ 	return ret;
+ }
+ 
+-/*****************************************************************************
+- * SIC_LoadOverlayIcon			[internal]
+- *
+- * Load a shell overlay icon and return its icon cache index.
+- */
+-static int SIC_LoadOverlayIcon(int icon_idx)
+-{
+-	WCHAR buffer[1024], wszIdx[12];
+-	HKEY hKeyShellIcons;
+-	LPCWSTR iconPath;
+-	int iconIdx;
+-
+-	iconPath = swShell32Name;	/* default: load icon from shell32.dll */
+-	iconIdx = icon_idx;
+-
+-	if (RegOpenKeyExW(HKEY_LOCAL_MACHINE, L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Icons",
+-                          0, KEY_READ, &hKeyShellIcons) == ERROR_SUCCESS)
+-	{
+-	    DWORD count = sizeof(buffer);
+-
+-	    swprintf(wszIdx, ARRAY_SIZE(wszIdx), L"%d", icon_idx);
+-
+-	    /* read icon path and index */
+-	    if (RegQueryValueExW(hKeyShellIcons, wszIdx, NULL, NULL, (LPBYTE)buffer, &count) == ERROR_SUCCESS)
+-	    {
+-		LPWSTR p = wcschr(buffer, ',');
+-
+-		if (!p)
+-		{
+-		    ERR("Icon index in Shell Icons/%s corrupted, no comma.\n", debugstr_w(wszIdx));
+-		    RegCloseKey(hKeyShellIcons);
+-		    return -1;
+-		}
+-		*p++ = 0;
+-		iconPath = buffer;
+-		iconIdx = wcstol(p, NULL, 10);
+-	    }
+-
+-	    RegCloseKey(hKeyShellIcons);
+-	}
+-
+-        InitOnceExecuteOnce( &sic_init_once, SIC_Initialize, NULL, NULL );
+-
+-	return SIC_LoadIcon(iconPath, iconIdx, 0);
+-}
+-
+ /*************************************************************************
+  * Shell_GetImageLists			[SHELL32.71]
+  *

@@ -1,0 +1,43 @@
+{
+  "run": "syscall-trace-host-handled-gate-2026-10-10-01",
+  "mode": "redirect-handled",
+  "build": {
+    "sdk_revision": "611893fc25ef3e138f5bc2c90d829d8b58174cd2",
+    "source_sha256": "405df2ecdb077ba221edaa2a7ca2a987d264e54498ff1290ebb7e87af6c86ce3",
+    "ptrace_adapter_sha256": "0fbe8fb997be42088ff87082cd0072042f9eba7302064cb0a210edf156bcd22e",
+    "signal_trampoline_sha256": "f57299922d1158fdc3823f44363b6aad9508ed6e733255eaee8c0a6fb2cc15be",
+    "elf_sha256": "99c6426f9c94eb5f1dc41c14731a615a5073a468ccc934be45f81bee492db690",
+    "host_sha256": "d1020eba292238e51c20664071a3f395f553dc852ff905827ebb1d98e91efbf8"
+  },
+  "runner_sha256": "19c4e066ab6edaafd6c96e309e3a76b711c1c127487129d41401fcb6939dba68",
+  "question": "Can an owned payload stop native syscall entry, prevent the original pipe write and resume an owned dispatcher on the stopped thread?",
+  "production_changed": false,
+  "wine_integrated": false,
+  "title_launched": false,
+  "host_only": true,
+  "passed": true,
+  "host": {
+    "passed": true,
+    "tracee": [
+      "TRACE_READY pid=834163",
+      "TRACE_HANDLER installed=1 threads=0 hits=0",
+      "TRACE_RESULT mode=redirect result=1349735538 dispatched=1 pipe_bytes=-1 empty=1 native_ok=1",
+      "TRACE_TRACEE PASS"
+    ],
+    "tracer": [
+      "TRACE_CAPABILITY attached=1 registers=1 register_bytes=216",
+      "TRACE_EVENT status=857f flags=1 tid=834163 signal=0 kind=1",
+      "TRACE_EVENT status=857f flags=2 tid=834163 signal=0 kind=2",
+      "TRACE_EVENT status=857f flags=1 tid=834163 signal=0 kind=1",
+      "TRACE_EVENT status=857f flags=2 tid=834163 signal=0 kind=2",
+      "TRACE_EVENT status=857f flags=1 tid=834163 signal=0 kind=1",
+      "TRACE_ENTRY owned=1 code=1 tid=834163",
+      "TRACE_EVENT status=57f flags=0 tid=834163 signal=5 kind=0",
+      "TRACE_STOP flags=0 kind=2 tid=834163 at_owned=0 result_matches=1",
+      "TRACE_EXIT replacement=getpid result_matches=1 method=owned-return-gate",
+      "TRACE_TRACER PASS mode=redirect stops=6 entries=3 exits=3 replaced=1 ms=7"
+    ],
+    "error": null
+  },
+  "seconds": 0.01
+}

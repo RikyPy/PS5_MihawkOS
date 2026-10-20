@@ -1,0 +1,110 @@
+{
+ "reference": "Installed host Wine 11.18 with its GUI driver; secondary Win32 behavior reference, not the pinned production version or a Windows 11 oracle",
+ "pinned_host_limitation": "Pinned Wine 11.0 build has --without-x and --without-wayland; all four attempted GUI runs had no marker and are not passes",
+ "question": "Does repeating WM_PAINT without WM_ERASEBKGND preserve the appearance selector alpha pixels?",
+ "oracle_scope": "Actual appearance selector and paint handler; only console-specific capture rendezvous replaced with immediate owned theme restoration and window closure",
+ "before": [
+  {
+   "version": "broken",
+   "architecture": 32,
+   "status": 0,
+   "marker": [
+    "FAIL",
+    "9",
+    "2"
+   ],
+   "matches": [
+    [
+     "light",
+     "368"
+    ],
+    [
+     "dark",
+     "484"
+    ]
+   ]
+  },
+  {
+   "version": "broken",
+   "architecture": 64,
+   "status": 0,
+   "marker": [
+    "FAIL",
+    "9",
+    "2"
+   ],
+   "matches": [
+    [
+     "light",
+     "368"
+    ],
+    [
+     "dark",
+     "484"
+    ]
+   ]
+  }
+ ],
+ "after": [
+  {
+   "version": "fixed",
+   "architecture": 32,
+   "status": 0,
+   "marker": [
+    "PASS",
+    "9",
+    "0"
+   ],
+   "matches": [
+    [
+     "light",
+     "576"
+    ],
+    [
+     "dark",
+     "576"
+    ]
+   ]
+  },
+  {
+   "version": "fixed",
+   "architecture": 64,
+   "status": 0,
+   "marker": [
+    "PASS",
+    "9",
+    "0"
+   ],
+   "matches": [
+    [
+     "light",
+     "576"
+    ],
+    [
+     "dark",
+     "576"
+    ]
+   ]
+  }
+ ],
+ "displayed_failure": {
+  "run": "mihawk-pro-only-gate-2026-10-09-03-appearance32",
+  "variant": "light",
+  "icon": "search",
+  "one_blend_mean_rgb_error": 6.8802,
+  "two_blends_mean_rgb_error": 0.033,
+  "unchanged_capture_tolerance": 2.0
+ },
+ "source_sha256": {
+  "broken-oracle.c": "6edf7204f6af5000f8a2405584d36b05b5ee3daa4923bbc0c661a0fb8d1cdacb",
+  "fixed-oracle.c": "16294cd3479fcf8ec00e21cb78267feb898eaa8f5b26f5f375b13fd238343ce6",
+  "fixed.c": "fa491ddaa7d848db6ab7d1a842868d025b299d58f3618846b968239710f3053a"
+ },
+ "executable_sha256": {
+  "fixed32.exe": "5957500e301389827ce301c6bdd5bf4bc85c58afa5b8253b16e53281252153a4",
+  "fixed64.exe": "a699011e9463d9b0ea1ed3e7f53a42965cdae60d8d67090a02f88d83d796d919"
+ },
+ "passed": true,
+ "console_qualified": false,
+ "windows_equivalence_verified": false
+}

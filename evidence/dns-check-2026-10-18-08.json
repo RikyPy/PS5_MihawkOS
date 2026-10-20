@@ -1,0 +1,92 @@
+{
+  "battery": "dns-check-2026-10-18-08",
+  "expected_cases": [
+    "dnsapi32",
+    "dnsapi64"
+  ],
+  "revision": "abd47ea57b468dbe58993633ccdf327f7272aac9",
+  "dirty": true,
+  "cases": [
+    {
+      "case": "dnsapi32",
+      "run": "dns-check-2026-10-18-08-dnsapi32",
+      "runner_status": 0,
+      "seconds": 75.1,
+      "result": "finished",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "run_seconds": 27.2,
+      "launch_readiness": {
+        "ready": true,
+        "seconds": 0.435,
+        "settle_seconds": 0.0,
+        "census_seconds": 0.308,
+        "previous_cleanup_verified": true
+      },
+      "stages": {
+        "launched": 1.29,
+        "title_started": 1.76,
+        "elevated": 1.76,
+        "wine_loaded": 1.98,
+        "wineboot_started": 4.99,
+        "wineboot_ended": 11.22,
+        "program_started": 21.56,
+        "marker": 22.21,
+        "program_ended": 22.24,
+        "wine_ended": 24.71,
+        "launcher_started": 26.32,
+        "launcher_ended": 26.6,
+        "closed": 27.19
+      },
+      "runner_overhead_seconds": 47.9,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 8,
+      "protocol_errors": 0
+    },
+    {
+      "case": "dnsapi64",
+      "run": "dns-check-2026-10-18-08-dnsapi64",
+      "runner_status": 0,
+      "seconds": 21.9,
+      "result": "finished",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "run_seconds": 16.0,
+      "launch_readiness": {
+        "ready": true,
+        "seconds": 0.437,
+        "settle_seconds": 0.0,
+        "census_seconds": 0.379,
+        "previous_cleanup_verified": true
+      },
+      "stages": {
+        "launched": 1.24,
+        "title_started": 1.74,
+        "elevated": 1.74,
+        "wine_loaded": 1.87,
+        "wineboot_started": 4.86,
+        "wineboot_ended": 10.77,
+        "program_started": 10.79,
+        "marker": 11.31,
+        "program_ended": 11.34,
+        "wine_ended": 13.72,
+        "launcher_started": 15.24,
+        "launcher_ended": 15.44,
+        "closed": 15.99
+      },
+      "runner_overhead_seconds": 5.9,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 8,
+      "protocol_errors": 0
+    }
+  ],
+  "complete": true,
+  "seconds": 97.1,
+  "passed": true
+}

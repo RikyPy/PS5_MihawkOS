@@ -1,0 +1,69 @@
+{
+ "launch_readiness": {
+  "ready": true,
+  "seconds": 0.184,
+  "settle_seconds": 0.0,
+  "census_seconds": 0.158,
+  "previous_cleanup_verified": true
+ },
+ "run": "mihawk-composition-gate-2026-10-09-03-appearance64",
+ "what": "appearance64-probe.exe",
+ "env": [],
+ "result": "finished",
+ "seconds": 5.1,
+ "probe_verdict": null,
+ "clean_owner_restart": false,
+ "launcher_end_status": 0,
+ "initial_status": 1,
+ "closed_on_request": false,
+ "child_logs": [
+  "klog/mihawk-composition-gate-2026-10-09-03-appearance64-wine-child-5409.log",
+  "klog/mihawk-composition-gate-2026-10-09-03-appearance64-wine-child-5410.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": false,
+ "bench": {},
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [],
+  "top": []
+ },
+ "shown": {
+  "frames": 0,
+  "per_10s": [],
+  "longest_gap_ms": 0
+ },
+ "broker": {
+  "local_offer": null,
+  "host_limit": null,
+  "refused": [],
+  "refused_count": 0,
+  "clients": [],
+  "wedged": false,
+  "failure_reasons": [],
+  "host_peak": null,
+  "local_peak": null
+ },
+ "captures": [],
+ "pad_script": [
+  "# Appearance requests each capture after painting and holds the variant until saved."
+ ],
+ "cleanup_verified": false,
+ "hooks_removed": true,
+ "api_passed": false,
+ "appearance_pixels": [
+  {
+   "variant": "light",
+   "passed": false,
+   "error": "missing capture or measured client origin"
+  },
+  {
+   "variant": "dark",
+   "passed": false,
+   "error": "missing capture or measured client origin"
+  }
+ ]
+}

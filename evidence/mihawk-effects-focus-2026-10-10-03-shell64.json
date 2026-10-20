@@ -1,0 +1,625 @@
+{
+ "telemetry_hold": null,
+ "launch_readiness": {
+  "ready": true,
+  "seconds": 0.184,
+  "settle_seconds": 0.0,
+  "census_seconds": 0.168,
+  "previous_cleanup_verified": true
+ },
+ "native_close_failures": [],
+ "run": "mihawk-effects-focus-2026-10-10-03-shell64",
+ "what": "C:\\windows\\system32\\mihawk.exe",
+ "env": [
+  "PROTON_LAYOUT=launcher",
+  "WINE_PS5_WINDOW_SURFACES=1",
+  "MIHAWK_DESKTOP=1",
+  "MIHAWK_SHELL_CAPTURE=1",
+  "PROTON_WINDOW_SNAPSHOT_PROBE=1"
+ ],
+ "result": "finished",
+ "seconds": 31.4,
+ "probe_verdict": "PASS",
+ "clean_owner_restart": true,
+ "launcher_end_status": 0,
+ "initial_status": 0,
+ "closed_on_request": false,
+ "child_logs": [
+  "klog/mihawk-effects-focus-2026-10-10-03-shell64-wine-child-5622.log",
+  "klog/mihawk-effects-focus-2026-10-10-03-shell64-wine-child-5623.log",
+  "klog/mihawk-effects-focus-2026-10-10-03-shell64-wine-child-5624.log",
+  "klog/mihawk-effects-focus-2026-10-10-03-shell64-wine-child-5625.log",
+  "klog/mihawk-effects-focus-2026-10-10-03-shell64-wine-child-5626.log",
+  "klog/mihawk-effects-focus-2026-10-10-03-shell64-wine-child-5627.log",
+  "klog/mihawk-effects-focus-2026-10-10-03-shell64-wine-child-5628.log",
+  "klog/mihawk-effects-focus-2026-10-10-03-shell64-wine-child-5629.log",
+  "klog/mihawk-effects-focus-2026-10-10-03-shell64-wine-child-5630.log",
+  "klog/mihawk-effects-focus-2026-10-10-03-shell64-wine-child-5631.log",
+  "klog/mihawk-effects-focus-2026-10-10-03-shell64-wine-child-5632.log",
+  "klog/mihawk-effects-focus-2026-10-10-03-shell64-wine-child-5633.log",
+  "klog/mihawk-effects-focus-2026-10-10-03-shell64-wine-child-5634.log",
+  "klog/mihawk-effects-focus-2026-10-10-03-shell64-wine-child-5635.log",
+  "klog/mihawk-effects-focus-2026-10-10-03-shell64-wine-child-5636.log",
+  "klog/mihawk-effects-focus-2026-10-10-03-shell64-wine-child-5637.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": true,
+ "bench": {},
+ "steady": {
+  "server": {
+   "calls": 0.0,
+   "per_s": 0.0,
+   "avg_us": 0.0,
+   "selects": 0.0,
+   "blocked": 0.0,
+   "block_avg_us": 0.0,
+   "waits": 0.0,
+   "handles_avg": 0.0,
+   "wait_all": 0.0,
+   "polled": 0.0,
+   "delays": 0.0,
+   "yields": 0.0,
+   "intervals": 2
+  }
+ },
+ "intervals": {
+  "frames": [],
+  "server": [
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   }
+  ],
+  "top": []
+ },
+ "shown": {
+  "frames": 100,
+  "per_10s": [
+   1,
+   99
+  ],
+  "longest_gap_ms": 2220
+ },
+ "broker": {
+  "local_offer": null,
+  "host_limit": null,
+  "windows": null,
+  "refused": [],
+  "refused_count": 0,
+  "clients": [],
+  "wedged": false,
+  "failure_reasons": [],
+  "host_peak": null,
+  "local_peak": null
+ },
+ "captures": [
+  "klog/mihawk-effects-focus-2026-10-10-03-shell64-capture-01.png",
+  "klog/mihawk-effects-focus-2026-10-10-03-shell64-capture-02.png",
+  "klog/mihawk-effects-focus-2026-10-10-03-shell64-capture-03.png",
+  "klog/mihawk-effects-focus-2026-10-10-03-shell64-capture-04.png",
+  "klog/mihawk-effects-focus-2026-10-10-03-shell64-capture-05.png",
+  "klog/mihawk-effects-focus-2026-10-10-03-shell64-capture-06.png"
+ ],
+ "cleanup_verified": true,
+ "hooks_removed": true,
+ "semantics_passed": true,
+ "shell_pixels": [
+  {
+   "capture": "klog/mihawk-effects-focus-2026-10-10-03-shell64-capture-01.png",
+   "number": 1,
+   "phase": "desktop-light",
+   "point": [
+    10,
+    1042
+   ],
+   "samples": [],
+   "regions": [],
+   "passed": true
+  },
+  {
+   "capture": "klog/mihawk-effects-focus-2026-10-10-03-shell64-capture-02.png",
+   "number": 2,
+   "phase": "start-light",
+   "point": [
+    670,
+    464
+   ],
+   "samples": [
+    {
+     "role": "start-glass",
+     "point": [
+      670,
+      464
+     ],
+     "expected": [
+      194,
+      226,
+      252
+     ],
+     "actual": [
+      194,
+      226,
+      252
+     ],
+     "passed": true
+    },
+    {
+     "role": "start-corner",
+     "point": [
+      660,
+      454
+     ],
+     "expected": [
+      62,
+      172,
+      226
+     ],
+     "actual": [
+      62,
+      172,
+      226
+     ],
+     "passed": true
+    },
+    {
+     "role": "start-border",
+     "point": [
+      960,
+      454
+     ],
+     "expected": [
+      214,
+      217,
+      223
+     ],
+     "actual": [
+      214,
+      217,
+      223
+     ],
+     "passed": true
+    }
+   ],
+   "regions": [
+    {
+     "role": "search-accent",
+     "rect": [
+      692,
+      515,
+      1228,
+      517
+     ],
+     "expected": [
+      0,
+      103,
+      192
+     ],
+     "pixels": 1072,
+     "minimum": 1000,
+     "comparison": "equal",
+     "passed": true
+    }
+   ],
+   "passed": true
+  },
+  {
+   "capture": "klog/mihawk-effects-focus-2026-10-10-03-shell64-capture-03.png",
+   "number": 3,
+   "phase": "start-dark",
+   "point": [
+    670,
+    464
+   ],
+   "samples": [
+    {
+     "role": "start-glass",
+     "point": [
+      670,
+      464
+     ],
+     "expected": [
+      45,
+      78,
+      107
+     ],
+     "actual": [
+      45,
+      78,
+      107
+     ],
+     "passed": true
+    },
+    {
+     "role": "start-corner",
+     "point": [
+      660,
+      454
+     ],
+     "expected": [
+      62,
+      172,
+      226
+     ],
+     "actual": [
+      62,
+      172,
+      226
+     ],
+     "passed": true
+    },
+    {
+     "role": "start-border",
+     "point": [
+      960,
+      454
+     ],
+     "expected": [
+      69,
+      72,
+      76
+     ],
+     "actual": [
+      69,
+      72,
+      76
+     ],
+     "passed": true
+    }
+   ],
+   "regions": [
+    {
+     "role": "search-accent",
+     "rect": [
+      692,
+      515,
+      1228,
+      517
+     ],
+     "expected": [
+      96,
+      205,
+      255
+     ],
+     "pixels": 1072,
+     "minimum": 1000,
+     "comparison": "equal",
+     "passed": true
+    }
+   ],
+   "passed": true
+  },
+  {
+   "capture": "klog/mihawk-effects-focus-2026-10-10-03-shell64-capture-04.png",
+   "number": 4,
+   "phase": "preview",
+   "point": [
+    884,
+    844
+   ],
+   "samples": [
+    {
+     "role": "thumbnail",
+     "point": [
+      982,
+      941
+     ],
+     "expected": [
+      200,
+      60,
+      140
+     ],
+     "actual": [
+      200,
+      60,
+      140
+     ],
+     "passed": true
+    }
+   ],
+   "regions": [],
+   "passed": true
+  },
+  {
+   "capture": "klog/mihawk-effects-focus-2026-10-10-03-shell64-capture-05.png",
+   "number": 5,
+   "phase": "explorer-light",
+   "point": [
+    14,
+    49
+   ],
+   "expected": [
+    238,
+    242,
+    248
+   ],
+   "actual": [
+    238,
+    242,
+    248
+   ],
+   "samples": [],
+   "regions": [
+    {
+     "role": "caption-buttons",
+     "rect": [
+      962,
+      0,
+      1100,
+      34
+     ],
+     "expected": [
+      243,
+      243,
+      243
+     ],
+     "pixels": 3590,
+     "minimum": 200,
+     "comparison": "equal",
+     "passed": true
+    },
+    {
+     "role": "disabled-back",
+     "rect": [
+      23,
+      54,
+      43,
+      74
+     ],
+     "expected": [
+      238,
+      242,
+      248
+     ],
+     "pixels": 134,
+     "minimum": 18,
+     "comparison": "different",
+     "passed": true
+    },
+    {
+     "role": "disabled-forward",
+     "rect": [
+      59,
+      54,
+      79,
+      74
+     ],
+     "expected": [
+      238,
+      242,
+      248
+     ],
+     "pixels": 134,
+     "minimum": 18,
+     "comparison": "different",
+     "passed": true
+    },
+    {
+     "role": "file-pane",
+     "rect": [
+      174,
+      176,
+      1075,
+      675
+     ],
+     "expected": [
+      255,
+      255,
+      255
+     ],
+     "pixels": 449599,
+     "minimum": 10000,
+     "comparison": "equal",
+     "passed": true
+    },
+    {
+     "role": "file-text",
+     "rect": [
+      175,
+      156,
+      325,
+      180
+     ],
+     "expected": [
+      27,
+      27,
+      27
+     ],
+     "pixels": 23,
+     "minimum": 15,
+     "comparison": "equal",
+     "passed": true
+    },
+    {
+     "role": "header-text",
+     "rect": [
+      170,
+      136,
+      1095,
+      156
+     ],
+     "expected": [
+      27,
+      27,
+      27
+     ],
+     "pixels": 60,
+     "minimum": 15,
+     "comparison": "equal",
+     "passed": true
+    }
+   ],
+   "passed": true
+  },
+  {
+   "capture": "klog/mihawk-effects-focus-2026-10-10-03-shell64-capture-06.png",
+   "number": 6,
+   "phase": "explorer-dark",
+   "point": [
+    14,
+    49
+   ],
+   "expected": [
+    34,
+    38,
+    45
+   ],
+   "actual": [
+    34,
+    38,
+    45
+   ],
+   "samples": [],
+   "regions": [
+    {
+     "role": "caption-buttons",
+     "rect": [
+      962,
+      0,
+      1100,
+      34
+     ],
+     "expected": [
+      53,
+      53,
+      53
+     ],
+     "pixels": 3590,
+     "minimum": 200,
+     "comparison": "equal",
+     "passed": true
+    },
+    {
+     "role": "disabled-back",
+     "rect": [
+      23,
+      54,
+      43,
+      74
+     ],
+     "expected": [
+      34,
+      38,
+      45
+     ],
+     "pixels": 134,
+     "minimum": 18,
+     "comparison": "different",
+     "passed": true
+    },
+    {
+     "role": "disabled-forward",
+     "rect": [
+      59,
+      54,
+      79,
+      74
+     ],
+     "expected": [
+      34,
+      38,
+      45
+     ],
+     "pixels": 134,
+     "minimum": 18,
+     "comparison": "different",
+     "passed": true
+    },
+    {
+     "role": "file-pane",
+     "rect": [
+      174,
+      176,
+      1075,
+      675
+     ],
+     "expected": [
+      32,
+      32,
+      32
+     ],
+     "pixels": 449599,
+     "minimum": 10000,
+     "comparison": "equal",
+     "passed": true
+    },
+    {
+     "role": "file-text",
+     "rect": [
+      175,
+      156,
+      325,
+      180
+     ],
+     "expected": [
+      247,
+      247,
+      247
+     ],
+     "pixels": 23,
+     "minimum": 15,
+     "comparison": "equal",
+     "passed": true
+    },
+    {
+     "role": "header-text",
+     "rect": [
+      170,
+      136,
+      1095,
+      156
+     ],
+     "expected": [
+      247,
+      247,
+      247
+     ],
+     "pixels": 60,
+     "minimum": 15,
+     "comparison": "equal",
+     "passed": true
+    }
+   ],
+   "passed": true
+  }
+ ]
+}

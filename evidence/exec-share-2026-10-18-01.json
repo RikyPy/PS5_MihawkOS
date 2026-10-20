@@ -1,0 +1,157 @@
+{
+ "run": "exec-share-2026-10-18-01",
+ "elf_sha256": "d77b20f3c2071eba3a6836903195200794f05cf573de5ff3b6b55ef9cf3e139b",
+ "passed": true,
+ "k": {
+  "share-object": {
+   "create": "0",
+   "map": "0",
+   "errno": "0"
+  },
+  "share-own-rwx": {
+   "protection": "7",
+   "rc": "0",
+   "query": "0",
+   "prot": "0x7",
+   "used": "ok"
+  },
+  "share-listen": {
+   "bound": "1",
+   "note": "1"
+  },
+  "k11-send": {
+   "what": "object",
+   "sent": "1",
+   "errno": "0"
+  },
+  "k16-coherent": {
+   "heard": "1",
+   "marked": "1",
+   "seen": "1"
+  },
+  "k11-receive": {
+   "received": "1",
+   "kind": "1",
+   "fd": "1",
+   "errno": "0"
+  },
+  "k12-map": {
+   "map": "0",
+   "errno": "0",
+   "wrong": "0",
+   "code": "1"
+  },
+  "k12-rx": {
+   "protection": "5",
+   "rc": "0",
+   "query": "0",
+   "prot": "0x5",
+   "used": "ok"
+  },
+  "k13-fixed": {
+   "reserve": "0",
+   "map": "0",
+   "errno": "0",
+   "at_reserve": "1"
+  },
+  "k13-rx": {
+   "protection": "5",
+   "rc": "0",
+   "query": "0",
+   "prot": "0x5",
+   "used": "ok"
+  },
+  "k16-rwx": {
+   "protection": "7",
+   "rc": "0",
+   "query": "0",
+   "prot": "0x7"
+  },
+  "k15-after-exit": {
+   "serve_ended": "1",
+   "value": "42"
+  },
+  "k17-named": {
+   "create": "0",
+   "same": "0"
+  }
+ },
+ "census_kib": {
+  "serve-start": {
+   "serve": 3616
+  },
+  "serve-touched": {
+   "serve": 20000
+  },
+  "serve-after-take": {
+   "serve": 20048
+  },
+  "take-start": {
+   "take": 3616
+  },
+  "take-received": {
+   "serve": 20048
+  },
+  "take-mapped": {
+   "take": 20048,
+   "serve": 20048
+  },
+  "take-alone": {
+   "take": 36432,
+   "serve": 0
+  },
+  "take-unmapped": {
+   "take": 3664
+  }
+ },
+ "flexible_kib": {
+  "serve-start": 8268800,
+  "serve-touched": 8268800,
+  "serve-after-take": 8268800,
+  "take-start": 8268800,
+  "take-mapped": 8268800,
+  "take-alone": 8268800,
+  "take-unmapped": 8268800
+ },
+ "lines": [
+  "--- serve",
+  "PS5_PROTON_EXEC_GRANT type=census phase=serve-start who=serve status=0 resident_kib=3616 mapped_kib=16976",
+  "PS5_PROTON_EXEC_GRANT type=pools phase=serve-start flexible_kib=8268800 (0) direct_largest_kib=0 (0x8002000c)",
+  "PS5_PROTON_EXEC_GRANT type=share-object create=0 map=0 errno=0",
+  "PS5_PROTON_EXEC_GRANT type=census phase=serve-touched who=serve status=0 resident_kib=20000 mapped_kib=33360",
+  "PS5_PROTON_EXEC_GRANT type=pools phase=serve-touched flexible_kib=8268800 (0) direct_largest_kib=0 (0x8002000c)",
+  "PS5_PROTON_EXEC_GRANT type=share-own-rwx protection=7 rc=0 query=0 prot=0x7",
+  "PS5_PROTON_EXEC_GRANT type=share-own-rwx used=ok",
+  "PS5_PROTON_EXEC_GRANT type=share-listen bound=1 note=1",
+  "PS5_PROTON_EXEC_GRANT type=k11-send what=object sent=1 errno=0",
+  "PS5_PROTON_EXEC_GRANT type=k16-coherent heard=1 marked=1 seen=1",
+  "PS5_PROTON_EXEC_GRANT type=census phase=serve-after-take who=serve status=0 resident_kib=20048 mapped_kib=33488",
+  "PS5_PROTON_EXEC_GRANT type=pools phase=serve-after-take flexible_kib=8268800 (0) direct_largest_kib=0 (0x8002000c)",
+  "PS5_PROTON_EXEC_GRANT DONE share-serve sdk_writes=0",
+  "",
+  "--- take",
+  "PS5_PROTON_EXEC_GRANT type=census phase=take-start who=take status=0 resident_kib=3616 mapped_kib=16976",
+  "PS5_PROTON_EXEC_GRANT type=pools phase=take-start flexible_kib=8268800 (0) direct_largest_kib=0 (0x8002000c)",
+  "PS5_PROTON_EXEC_GRANT type=k11-receive received=1 kind=1 fd=1 errno=0",
+  "PS5_PROTON_EXEC_GRANT type=census phase=take-received who=serve status=0 resident_kib=20048 mapped_kib=33488",
+  "PS5_PROTON_EXEC_GRANT type=k12-map map=0 errno=0 wrong=0 code=1",
+  "PS5_PROTON_EXEC_GRANT type=census phase=take-mapped who=take status=0 resident_kib=20048 mapped_kib=33488",
+  "PS5_PROTON_EXEC_GRANT type=census phase=take-mapped who=serve status=0 resident_kib=20048 mapped_kib=33488",
+  "PS5_PROTON_EXEC_GRANT type=pools phase=take-mapped flexible_kib=8268800 (0) direct_largest_kib=0 (0x8002000c)",
+  "PS5_PROTON_EXEC_GRANT type=k12-rx protection=5 rc=0 query=0 prot=0x5",
+  "PS5_PROTON_EXEC_GRANT type=k12-rx used=ok",
+  "PS5_PROTON_EXEC_GRANT type=k13-fixed reserve=0 map=0 errno=0 at_reserve=1",
+  "PS5_PROTON_EXEC_GRANT type=k13-rx protection=5 rc=0 query=0 prot=0x5",
+  "PS5_PROTON_EXEC_GRANT type=k13-rx used=ok",
+  "PS5_PROTON_EXEC_GRANT type=k16-rwx protection=7 rc=0 query=0 prot=0x7",
+  "PS5_PROTON_EXEC_GRANT type=k15-after-exit serve_ended=1 value=42",
+  "PS5_PROTON_EXEC_GRANT type=census phase=take-alone who=take status=0 resident_kib=36432 mapped_kib=49872",
+  "PS5_PROTON_EXEC_GRANT type=census phase=take-alone who=serve status=0x80020003 resident_kib=0 mapped_kib=0",
+  "PS5_PROTON_EXEC_GRANT type=pools phase=take-alone flexible_kib=8268800 (0) direct_largest_kib=0 (0x8002000c)",
+  "PS5_PROTON_EXEC_GRANT type=census phase=take-unmapped who=take status=0 resident_kib=3664 mapped_kib=17104",
+  "PS5_PROTON_EXEC_GRANT type=pools phase=take-unmapped flexible_kib=8268800 (0) direct_largest_kib=0 (0x8002000c)",
+  "PS5_PROTON_EXEC_GRANT type=k17-named create=0 same=0",
+  "PS5_PROTON_EXEC_GRANT DONE share-take sdk_writes=0",
+  ""
+ ]
+}

@@ -1,0 +1,112 @@
+{
+ "run": "payload-production-eight-01",
+ "what": "process-probe.exe",
+ "env": [
+  "WINE_PS5_HID=0",
+  "PROTON_LOADING_SCREEN=0"
+ ],
+ "result": "finished",
+ "seconds": 13.1,
+ "probe_verdict": "PASS",
+ "clean_owner_restart": true,
+ "child_logs": [
+  "klog/payload-production-eight-01-wine-child-4822.log",
+  "klog/payload-production-eight-01-wine-child-4823.log",
+  "klog/payload-production-eight-01-wine-child-4824.log",
+  "klog/payload-production-eight-01-wine-child-4825.log",
+  "klog/payload-production-eight-01-wine-child-4826.log",
+  "klog/payload-production-eight-01-wine-child-4827.log",
+  "klog/payload-production-eight-01-wine-child-4828.log",
+  "klog/payload-production-eight-01-wine-child-4829.log",
+  "klog/payload-production-eight-01-wine-child-4830.log",
+  "klog/payload-production-eight-01-wine-child-4831.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": true,
+ "bench": {},
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   }
+  ],
+  "top": []
+ },
+ "native_payloads_absent": [
+  {
+   "pid": 4822,
+   "status": -1,
+   "errno": 3,
+   "absent": 1
+  },
+  {
+   "pid": 4823,
+   "status": -1,
+   "errno": 3,
+   "absent": 1
+  },
+  {
+   "pid": 4824,
+   "status": -1,
+   "errno": 3,
+   "absent": 1
+  },
+  {
+   "pid": 4825,
+   "status": -1,
+   "errno": 3,
+   "absent": 1
+  },
+  {
+   "pid": 4826,
+   "status": -1,
+   "errno": 3,
+   "absent": 1
+  },
+  {
+   "pid": 4827,
+   "status": -1,
+   "errno": 3,
+   "absent": 1
+  },
+  {
+   "pid": 4828,
+   "status": -1,
+   "errno": 3,
+   "absent": 1
+  },
+  {
+   "pid": 4829,
+   "status": -1,
+   "errno": 3,
+   "absent": 1
+  },
+  {
+   "pid": 4830,
+   "status": -1,
+   "errno": 3,
+   "absent": 1
+  },
+  {
+   "pid": 4831,
+   "status": -1,
+   "errno": 3,
+   "absent": 1
+  }
+ ]
+}

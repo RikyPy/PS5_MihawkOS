@@ -1,0 +1,1033 @@
+/*
+ * MihawkOS - the first-launch guided setup (docs/GUIDED_SETUP.md): Welcome, Language, how to install, the install,
+ * the first Mihawk OS session, Done. Its rules (when it shows, where each step goes, its text) are src/pw_setup.h;
+ * this file draws it with the kit in the Gloss theme over a Frutiger Aero sky (shaders/glsl/ps5proton/aero.*),
+ * plays the glass sounds, takes the pad and the touchpad's pointer, and drives the install engine (SetupEngine).
+ * ps5proton.cpp includes it, so it is compiled in the launcher's namespace (ps5/src/wrap.cpp.in).
+ * Copyright (C) 2026 Mihawk
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+#pragma once
+
+#include "stb_image.h"
+
+#include <sys/stat.h>
+#include <unistd.h>
+
+// ---- The install engine, as the tour sees it ----------------------------------------------------------------------
+// The installer's ps5/src/proton_install.h (SELF_INSTALL phase 5) fills this; until it lands, FakeSetupEngine does,
+// for host renders and for a simulated first run on the console (the setup-first-run marker). Every problem is typed,
+// so the tour says it in the chosen language with a way out.
+struct SetupInstall {
+	enum Phase { unavailable, ready, checking, running, done, failed } phase{ unavailable };
+	enum Problem { none, no_manifest, no_stick, no_folder, partial, no_space, read_failed, damaged, storage_full,
+		write_failed, cancelled } problem{ none };
+	uint64_t total{ 0 };                    // bytes the runtime holds (ready)
+	uint64_t needed{ 0 }, available{ 0 };   // no_space
+	size_t have{ 0 }, pieces{ 0 };          // partial
+	uint64_t written{ 0 }, to_write{ 0 };   // checking, running, done
+	double seconds{ 0.0 };                  // since start
+};
+
+class SetupEngine
+{
+public:
+	virtual ~SetupEngine() = default;
+	// Look for the pieces on a USB drive and for the free space; not while an install runs
+	virtual SetupInstall find() = 0;
+	// Start the install find() found ready; returns at once
+	virtual void start() = 0;
+	// Stop between pieces; what is installed stays (phase failed, problem cancelled)
+	virtual void cancel() = 0;
+	virtual SetupInstall state() = 0;
+};
+
+// Plays an install without touching the disk: "ok" (1.19 GB at about 180 MB/s), or a problem by its name
+// ("no-stick", "partial", "damaged", ...), the first time the drive is checked or the install runs.
+class FakeSetupEngine : public SetupEngine
+{
+public:
+	explicit FakeSetupEngine(std::string scenario) : scenario_(std::move(scenario)) {}
+	SetupInstall find() override
+	{
+		state_ = {};
+		state_.total = 1189920691ull;
+		const auto problem = named();
+		if (problem == SetupInstall::no_stick || problem == SetupInstall::no_folder || problem == SetupInstall::partial ||
+			problem == SetupInstall::no_space || problem == SetupInstall::no_manifest) {
+			state_.phase = SetupInstall::unavailable;
+			state_.problem = problem;
+			state_.have = 41, state_.pieces = 52;
+			state_.needed = 2700000000ull, state_.available = 1300000000ull;
+			scenario_ = "ok"; // Try again finds it
+		} else {
+			state_.phase = SetupInstall::ready;
+		}
+		return state_;
+	}
+	void start() override
+	{
+		if (state_.phase != SetupInstall::ready && state_.phase != SetupInstall::failed) return;
+		state_.phase = SetupInstall::checking;
+		state_.to_write = state_.total;
+		started_ = clock_;
+	}
+	void cancel() override
+	{
+		if (state_.phase == SetupInstall::checking || state_.phase == SetupInstall::running) fail(SetupInstall::cancelled);
+	}
+	SetupInstall state() override
+	{
+		if (state_.phase == SetupInstall::checking || state_.phase == SetupInstall::running) {
+			state_.seconds = clock_ - started_;
+			state_.phase = state_.seconds < 0.6 ? SetupInstall::checking : SetupInstall::running;
+			const double share = std::clamp((state_.seconds - 0.6) / 6.6, 0.0, 1.0);
+			state_.written = (uint64_t)(share * (double)state_.to_write);
+			if (share > 0.45 && named() != SetupInstall::none) {
+				fail(named());
+				scenario_ = "ok";
+			} else if (share >= 1.0) {
+				state_.phase = SetupInstall::done;
+			}
+		}
+		return state_;
+	}
+	void tick(double dt) { clock_ += dt; }
+	// A test run holds the install at this share, for a picture of it under way
+	void hold(double share) { started_ = clock_ - 0.6 - share * 6.6; held_ = true; }
+	bool held() const { return held_; }
+
+private:
+	SetupInstall::Problem named() const
+	{
+		static const char *const names[] = { "", "no-manifest", "no-stick", "no-folder", "partial", "no-space", "read-failed",
+			"damaged", "storage-full", "write-failed", "cancelled" };
+		for (int i = 1; i < (int)(sizeof(names) / sizeof(names[0])); ++i)
+			if (scenario_ == names[i]) return (SetupInstall::Problem)i;
+		return SetupInstall::none;
+	}
+	void fail(SetupInstall::Problem problem)
+	{
+		state_.phase = SetupInstall::failed;
+		state_.problem = problem;
+	}
+	std::string scenario_;
+	SetupInstall state_;
+	double clock_{ 0.0 }, started_{ 0.0 };
+	bool held_{ false };
+};
+
+// The installer's engine (ps5/src/proton_install.h, SELF_INSTALL phase 5), read from the USB sticks alone: the step
+// says "drive". Its phases and problems are the tour's, in the same order.
+class InstallSetupEngine : public SetupEngine
+{
+public:
+	SetupInstall find() override { return convert(proton_install_find("usb")); }
+	void start() override { proton_install_start(); }
+	void cancel() override { proton_install_cancel(); }
+	SetupInstall state() override { return convert(proton_install_state()); }
+
+private:
+	static_assert((int)ProtonInstall::failed == (int)SetupInstall::failed && (int)ProtonInstall::cancelled == (int)SetupInstall::cancelled);
+	static SetupInstall convert(const ProtonInstall &from)
+	{
+		SetupInstall to;
+		to.phase = (SetupInstall::Phase)from.phase;
+		// A download's problems cannot come from a drive (the tour's Internet route waits for a release)
+		to.problem = from.problem <= ProtonInstall::cancelled ? (SetupInstall::Problem)from.problem : SetupInstall::read_failed;
+		to.needed = from.needed, to.available = from.available, to.have = from.have, to.pieces = from.total;
+		to.written = from.progress.written, to.to_write = from.progress.to_write, to.seconds = from.seconds;
+		to.total = from.bytes;   // the manifest's size: "The drive holds 1.19 GB to install"
+		return to;
+	}
+};
+
+// ---- The sky: one fragment shader under the kit's layers, and its GPU time ----------------------------------------
+class SetupSky
+{
+public:
+	float gpu_ms{ -1.0f }; // the last average; negative until measured
+
+	bool init(VkDevice device, VkPhysicalDevice physical, uint32_t queueFamily, VkRenderPass pass, VkPipelineCache cache,
+		const VkPipelineShaderStageCreateInfo stages[2], uint32_t slots)
+	{
+		device_ = device;
+		VkPushConstantRange range{ VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(Push) };
+		VkPipelineLayoutCreateInfo layoutInfo = vks::initializers::pipelineLayoutCreateInfo(nullptr, 0);
+		layoutInfo.pushConstantRangeCount = 1;
+		layoutInfo.pPushConstantRanges = &range;
+		if (vkCreatePipelineLayout(device, &layoutInfo, nullptr, &layout_) != VK_SUCCESS) return false;
+		VkPipelineVertexInputStateCreateInfo vertices = vks::initializers::pipelineVertexInputStateCreateInfo();
+		auto assembly = vks::initializers::pipelineInputAssemblyStateCreateInfo(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, 0, VK_FALSE);
+		auto raster = vks::initializers::pipelineRasterizationStateCreateInfo(VK_POLYGON_MODE_FILL, VK_CULL_MODE_NONE,
+			VK_FRONT_FACE_COUNTER_CLOCKWISE, 0);
+		auto blendAttachment = vks::initializers::pipelineColorBlendAttachmentState(0xf, VK_FALSE);
+		auto blend = vks::initializers::pipelineColorBlendStateCreateInfo(1, &blendAttachment);
+		auto depth = vks::initializers::pipelineDepthStencilStateCreateInfo(VK_FALSE, VK_FALSE, VK_COMPARE_OP_ALWAYS);
+		auto viewport = vks::initializers::pipelineViewportStateCreateInfo(1, 1, 0);
+		auto multisample = vks::initializers::pipelineMultisampleStateCreateInfo(VK_SAMPLE_COUNT_1_BIT, 0);
+		const VkDynamicState dynamics[] = { VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR };
+		auto dynamic = vks::initializers::pipelineDynamicStateCreateInfo(dynamics, 2, 0);
+		VkGraphicsPipelineCreateInfo info = vks::initializers::pipelineCreateInfo(layout_, pass, 0);
+		info.pVertexInputState = &vertices;
+		info.pInputAssemblyState = &assembly;
+		info.pRasterizationState = &raster;
+		info.pColorBlendState = &blend;
+		info.pDepthStencilState = &depth;
+		info.pViewportState = &viewport;
+		info.pMultisampleState = &multisample;
+		info.pDynamicState = &dynamic;
+		info.stageCount = 2;
+		info.pStages = stages;
+		if (vkCreateGraphicsPipelines(device, cache, 1, &info, nullptr, &pipeline_) != VK_SUCCESS) return false;
+		// The timer, where the queue keeps time stamps
+		VkPhysicalDeviceProperties properties;
+		vkGetPhysicalDeviceProperties(physical, &properties);
+		uint32_t familyCount = 0;
+		vkGetPhysicalDeviceQueueFamilyProperties(physical, &familyCount, nullptr);
+		std::vector<VkQueueFamilyProperties> families(familyCount);
+		vkGetPhysicalDeviceQueueFamilyProperties(physical, &familyCount, families.data());
+		if (queueFamily < familyCount && families[queueFamily].timestampValidBits && properties.limits.timestampPeriod > 0) {
+			period_ = properties.limits.timestampPeriod;
+			VkQueryPoolCreateInfo queries{ VK_STRUCTURE_TYPE_QUERY_POOL_CREATE_INFO };
+			queries.queryType = VK_QUERY_TYPE_TIMESTAMP;
+			queries.queryCount = slots * 2;
+			if (vkCreateQueryPool(device, &queries, nullptr, &queries_) == VK_SUCCESS) written_.assign(slots, false);
+		}
+		return true;
+	}
+
+	// Outside the pass, once the slot's last frame is done: read its time, then reset its two stamps
+	void reset(VkCommandBuffer cmd, uint32_t slot)
+	{
+		if (!queries_ || slot >= written_.size()) return;
+		uint64_t stamps[2];
+		if (written_[slot] && vkGetQueryPoolResults(device_, queries_, slot * 2, 2, sizeof(stamps), stamps, sizeof(uint64_t),
+				VK_QUERY_RESULT_64_BIT) == VK_SUCCESS && stamps[1] >= stamps[0]) {
+			total_ += (double)(stamps[1] - stamps[0]) * period_ * 1e-6;
+			if (++frames_ == 240) {
+				gpu_ms = (float)(total_ / frames_);
+				proton_say("setup sky: %.3f ms GPU a frame (average of %u frames)", gpu_ms, frames_);
+				total_ = 0.0;
+				frames_ = 0;
+			}
+		}
+		vkCmdResetQueryPool(cmd, queries_, slot * 2, 2);
+		written_[slot] = false;
+		slot_ = slot;
+	}
+
+	void draw(VkCommandBuffer cmd, uint32_t width, uint32_t height, float time, float calm)
+	{
+		if (!pipeline_) return;
+		const bool timed = queries_ && slot_ < written_.size();
+		if (timed) vkCmdWriteTimestamp(cmd, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, queries_, slot_ * 2);
+		VkViewport viewport{ 0, 0, (float)width, (float)height, 0, 1 };
+		VkRect2D scissor{ { 0, 0 }, { width, height } };
+		vkCmdSetViewport(cmd, 0, 1, &viewport);
+		vkCmdSetScissor(cmd, 0, 1, &scissor);
+		vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_);
+		const Push push{ { (float)width, (float)height }, time, calm };
+		vkCmdPushConstants(cmd, layout_, VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(push), &push);
+		vkCmdDraw(cmd, 3, 1, 0, 0);
+		if (timed) {
+			vkCmdWriteTimestamp(cmd, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, queries_, slot_ * 2 + 1);
+			written_[slot_] = true;
+		}
+	}
+
+	bool ready() const { return pipeline_ != VK_NULL_HANDLE; }
+
+	void release()
+	{
+		if (!device_) return;
+		if (queries_) vkDestroyQueryPool(device_, queries_, nullptr);
+		if (pipeline_) vkDestroyPipeline(device_, pipeline_, nullptr);
+		if (layout_) vkDestroyPipelineLayout(device_, layout_, nullptr);
+		queries_ = VK_NULL_HANDLE, pipeline_ = VK_NULL_HANDLE, layout_ = VK_NULL_HANDLE;
+		device_ = VK_NULL_HANDLE;
+	}
+
+private:
+	struct Push { float size[2]; float time; float calm; };
+	VkDevice device_{ VK_NULL_HANDLE };
+	VkPipelineLayout layout_{ VK_NULL_HANDLE };
+	VkPipeline pipeline_{ VK_NULL_HANDLE };
+	VkQueryPool queries_{ VK_NULL_HANDLE };
+	std::vector<bool> written_;
+	uint32_t slot_{ 0 }, frames_{ 0 };
+	float period_{ 0.0f };
+	double total_{ 0.0 };
+};
+
+// ---- The tour ------------------------------------------------------------------------------------------------------
+class SetupTour
+{
+public:
+	enum class Outcome { none, library, enter, prepare };
+
+	SetupSky sky;
+	Outcome outcome{ Outcome::none };
+
+	// Where the record and the markers are (/data/ps5proton), and the title's assets folder (the flags, the QR code)
+	static constexpr const char *recordPath = PROTON_DATA_ROOT "/setup.txt";
+	static constexpr const char *firstRunMarker = PROTON_DATA_ROOT "/setup-first-run";
+	static constexpr const char *preparingMarker = PROTON_DATA_ROOT "/setup-preparing";
+
+	// What the console has now. The first-run marker plays a first run on a set-up console: the tour shows the runtime
+	// and the prefix as missing, and installs with the fake engine, so nothing of the owner's is replaced.
+	static PwSetupFacts facts(bool data, bool asked, bool *simulated)
+	{
+		PwSetupFacts facts{};
+		facts.data = data;
+		facts.asked = asked;
+		if (!data) return facts;
+		PwSetupRecord record;
+		pw_setup_record_load(&record, recordPath);
+		facts.done = record.done;
+		facts.runtime = access(PROTON_DATA_ROOT "/runtime/ge11-7/lib/wine/x86_64-unix/ntdll.prx", R_OK) == 0;
+		facts.prefix = access(PROTON_DATA_ROOT "/prefixes/mihawk/system.reg", R_OK) == 0;
+		facts.returning = access(preparingMarker, F_OK) == 0;
+		*simulated = access(firstRunMarker, F_OK) == 0;
+		if (*simulated) {
+			facts.asked = 1;
+			if (!facts.returning) facts.runtime = facts.prefix = 0;
+		}
+		return facts;
+	}
+
+	// test: a test run's preview (nothing is saved); scenario: the fake engine's, when one is used
+	void begin(ps5ui::Kit &kit, const std::string &assets, const PwSetupFacts &facts, PwSetupStep step, bool simulated,
+		bool test, std::unique_ptr<SetupEngine> engine)
+	{
+		kit_ = &kit;
+		facts_ = facts;
+		simulated_ = simulated;
+		test_ = test;
+		engine_ = std::move(engine);
+		PwSetupRecord record;
+		pw_setup_record_load(&record, recordPath);
+		language_ = pw_setup_language(record.language) ? pw_setup_language(record.language) : pw_setup_default_language();
+		size_t count = 0;
+		const PwSetupLanguage *all = pw_setup_languages(&count);
+		for (size_t i = 0; i < count; ++i) {
+			if (!all[i].text) continue;
+			shown_.push_back(&all[i]);
+			std::string png;
+			hui::save::read_file(assets + "setup/flags/" + all[i].flag + ".png", &png, 1 << 20);
+			int w = 0, h = 0, channels = 0;
+			stbi_uc *rgba = png.empty() ? nullptr :
+				stbi_load_from_memory((const stbi_uc *)png.data(), (int)png.size(), &w, &h, &channels, 4);
+			flags_.push_back(rgba ? kit.renderer.create_texture(w, h, rgba) : 0);
+			if (rgba) stbi_image_free(rgba);
+			else proton_say("setup: no flag for %s (%s)", all[i].tag, all[i].flag);
+		}
+		// Chinese and Japanese draw with faces of their own: every role of the kit's set points at it (one weight)
+		for (const auto *language : shown_) {
+			if (!language->font || faceRefs_.count(language->font)) continue;
+			std::string data;
+			faces_.emplace_back();
+			hui::gfx::Font &face = faces_.back();
+			if (!hui::save::read_file(assets + "setup/fonts/" + language->font + ".huifont", &data) || !face.load(data)) {
+				proton_say("setup: no face %s; %s keeps the launcher's", language->font, language->tag);
+				faces_.pop_back();
+				continue;
+			}
+			faceRefs_[language->font] = { &face, kit.renderer.create_font_texture(face) };
+		}
+		std::string qr;
+		hui::save::read_file(assets + "setup/qr.txt", &qr, 1 << 16);
+		std::istringstream rows(qr);
+		for (std::string row; std::getline(rows, row);) if (!row.empty()) qr_.push_back(row);
+		if (step == PW_SETUP_PREPARING && facts.returning) prepareFailed_ = true;
+		useLanguage(language_);
+		go(step, false);
+		feedback_.play(hui::audio::Cue::welcome);
+		proton_say("setup: starts at step %d (record done=%d runtime=%d prefix=%d returning=%d%s), %zu languages, language %s",
+			(int)step, facts.done, facts.runtime, facts.prefix, facts.returning, simulated ? ", simulated first run" : "",
+			shown_.size(), language_->tag);
+	}
+
+	// A picture's language, without saving it
+	void preview_language(const char *tag)
+	{
+		if (pw_setup_language(tag)) useLanguage(pw_setup_language(tag));
+	}
+
+	PwSetupStep step() const { return step_; }
+	float calm() const { return step_ == PW_SETUP_INSTALLING ? 1.0f : 0.0f; }
+	float clock() const { return clock_; }
+	FakeSetupEngine *fake() { return dynamic_cast<FakeSetupEngine *>(engine_.get()); }
+
+	// The first session's cover (src/pw_setup.h): what the minute of making the prefix shows, without a button, the hints
+	// or the pointer; the title draws each stage's mark over it. The launcher keeps it as a picture when Start is
+	// pressed; a test shows it with PROTON_SETUP_TEST=5:cover.
+	void cover()
+	{
+		cover_ = true;
+		layout();
+		focus_ = T_NONE;
+		entered_ = 1.0f;
+		pointerShown_ = 0.0f;
+	}
+
+	// One frame. pad: the console's pad, for the touchpad's pointer (nullptr in a test run)
+	void update(float dt, const hui::InputFrame &input, const struct pad *pad)
+	{
+		feedback_.clear();
+		clock_ += dt;
+		entered_ = std::min(1.0f, entered_ + dt / (step_ == PW_SETUP_WELCOME ? 0.9f : 0.35f));
+		press_ = std::max(0.0f, press_ - dt * 6.0f);
+		if (auto *fake = this->fake()) fake->tick(dt);
+		if (engine_ && (step_ == PW_SETUP_INSTALLING)) {
+			const auto before = install_.phase;
+			install_ = engine_->state();
+			if (install_.phase != before) {
+				proton_say("setup: install %d problem %d, %llu of %llu bytes in %.1f s", (int)install_.phase,
+					(int)install_.problem, (unsigned long long)install_.written, (unsigned long long)install_.to_write,
+					install_.seconds);
+				if (install_.phase == SetupInstall::failed) feedback_.play(hui::audio::Cue::error);
+				if (install_.phase == SetupInstall::done) {
+					feedback_.play(hui::audio::Cue::notify);
+					doneAt_ = clock_;
+				}
+			}
+			if (install_.phase == SetupInstall::done && clock_ - doneAt_ > 1.4f) {
+				facts_.runtime = 1;
+				go(pw_setup_next(PW_SETUP_INSTALLING, &facts_), true);
+			}
+		}
+		layout();
+		// A step whose buttons changed (an install that failed) keeps a focus: its first button
+		if (!target(focus_) && !targets_.empty()) focus_ = targets_.front().id;
+		pointer(dt, pad);
+		if (input.nav != hui::Direction::none) {
+			pointerShown_ = 0.0f;
+			const int to = navigate(input.nav);
+			if (to != focus_) {
+				focus_ = to;
+				feedback_.play(hui::audio::Cue::focus);
+			}
+		}
+		if (input.is_pressed(hui::Action::confirm)) activate(focus_);
+		else if (input.is_pressed(hui::Action::back) && pw_setup_back(step_) != PW_SETUP_NONE && !busy()) {
+			feedback_.play(hui::audio::Cue::back);
+			go(pw_setup_back(step_), true);
+		} else if (input.is_pressed(hui::Action::north) && skippable()) {
+			feedback_.play(hui::audio::Cue::back);
+			finish(Outcome::library, "skipped");
+		}
+		for (auto &[id, amount] : glow_) amount += ((id == focus_ ? 1.0f : 0.0f) - amount) * std::min(1.0f, dt * 14.0f);
+		if (!glow_.count(focus_)) glow_[focus_] = 0.0f;
+		kit_->play(feedback_, hui::audio::SoundSet::glass);
+		kit_->tick(dt); // the rumble's end, and the music decoded ahead
+	}
+
+	void compose(hui::gfx::DrawList &list, const hui::ui::Theme &look)
+	{
+		const auto &fonts = fonts_;
+		hui::ui::Painter paint(list, fonts, look);
+		const auto ink = paint.page_text(), muted = paint.page_text_muted();
+		paint.heading("MihawkOS", 96, 92, 32, ink);
+		if (step_ != PW_SETUP_WELCOME) progressDots(list, paint, look);
+		const float ease = 1.0f - (1.0f - entered_) * (1.0f - entered_) * (1.0f - entered_);
+		list.push_opacity(ease);
+		list.push_transform(1.0f, 0.0f, 0.0f, 0.0f, (1.0f - ease) * (step_ == PW_SETUP_WELCOME ? 36.0f : 20.0f));
+		if (cover_) {
+			card(list, paint, text(PW_TEXT_BUILD_TITLE), text(PW_TEXT_BUILD_BODY));
+			const PwSetupText stages[] = { PW_TEXT_BUILD_SETTINGS, PW_TEXT_BUILD_DOTNET, PW_TEXT_BUILD_FINISHING };
+			for (int i = 0; i < 3; ++i)
+				hui::ui::text(list, fonts.semibold, text(stages[i]), PW_SETUP_COVER_MARK_X + 52,
+					PW_SETUP_COVER_ROW_Y + i * PW_SETUP_COVER_ROW_STEP + 11, 30, look.text);
+		} else switch (step_) {
+		case PW_SETUP_WELCOME:
+			paint.heading(text(PW_TEXT_WELCOME_TITLE), 960, 470, fitted(paint, text(PW_TEXT_WELCOME_TITLE), 92, 1640), ink,
+				hui::gfx::Align::center);
+			wrapped(list, fonts.regular, text(PW_TEXT_WELCOME_BODY), 960, 538, 32, 1500, muted, hui::gfx::Align::center);
+			break;
+		case PW_SETUP_LANGUAGE:
+			card(list, paint, text(PW_TEXT_LANGUAGE_TITLE), text(PW_TEXT_LANGUAGE_BODY));
+			break;
+		case PW_SETUP_METHOD:
+			card(list, paint, text(PW_TEXT_METHOD_TITLE), text(PW_TEXT_METHOD_BODY));
+			if (facts_.runtime) status(list, text(PW_TEXT_METHOD_INSTALLED), look.success, kCard.y + 230);
+			qrCode(list, look, { kCard.x + 72, kCard.y + kCard.h - 72 - 168 }, 168, true);
+			break;
+		case PW_SETUP_USB: {
+			card(list, paint, text(PW_TEXT_USB_TITLE), nullptr);
+			float y = kCard.y + 196;
+			const PwSetupText steps[] = { PW_TEXT_USB_STEP1, PW_TEXT_USB_STEP2, PW_TEXT_USB_STEP3, PW_TEXT_USB_STEP4 };
+			for (int i = 0; i < 4; ++i) {
+				const float x = kCard.x + 72;
+				list.circle(x + 22, y + 4, 22, look.primary);
+				char number[4];
+				snprintf(number, sizeof(number), "%d", i + 1);
+				hui::ui::text(list, fonts.semibold, number, x + 22, y + 13, 24, hui::ui::Painter::on(look.primary), hui::gfx::Align::center);
+				y = wrapped(list, fonts.regular, text(steps[i]), x + 68, y + 13, 26, 680, look.text) + 26;
+			}
+			qrCode(list, look, { kCard.x + kCard.w - 72 - 300, kCard.y + 176 }, 300, false);
+			if (install_.phase == SetupInstall::ready) {
+				char size[32], line[256];
+				pw_setup_gigabytes(language_, install_.total, size, sizeof(size));
+				const char *args[] = { size };
+				pw_setup_fill(line, sizeof(line), text(PW_TEXT_FOUND), args, 1);
+				status(list, line, look.success, kStatusY);
+			} else if (install_.problem != SetupInstall::none) {
+				status(list, problem().c_str(), look.danger, kStatusY);
+			}
+			break;
+		}
+		case PW_SETUP_INSTALLING: {
+			card(list, paint, text(PW_TEXT_INSTALLING_TITLE), nullptr);
+			const float share = install_.to_write ? std::min(1.0f, (float)install_.written / (float)install_.to_write) : 0.0f;
+			char percent[16];
+			snprintf(percent, sizeof(percent), "%d%%", (int)(share * 100.0f));
+			paint.heading(percent, kCard.x + 72, kCard.y + 290, 104, look.text);
+			paint.progress({ kCard.x + 72, kCard.y + 330, kCard.w - 144, 26 }, share);
+			char line[256];
+			if (install_.phase == SetupInstall::checking) {
+				snprintf(line, sizeof(line), "%s", text(PW_TEXT_INSTALLING_CHECKING));
+			} else {
+				char done[32], total[32], speed[32];
+				snprintf(done, sizeof(done), "%llu", (unsigned long long)(install_.written / 1000000ull));
+				snprintf(total, sizeof(total), "%llu", (unsigned long long)(install_.to_write / 1000000ull));
+				snprintf(speed, sizeof(speed), "%.0f", install_.seconds > 0.0 ? install_.written / 1e6 / install_.seconds : 0.0);
+				const char *args[] = { done, total, speed };
+				pw_setup_fill(line, sizeof(line), text(PW_TEXT_INSTALLING_STATS), args, 3);
+			}
+			hui::ui::text(list, fonts.semibold, line, kCard.x + 72, kCard.y + 404, 28, look.text);
+			if (install_.phase == SetupInstall::failed)
+				status(list, problem().c_str(), look.danger, kCard.y + 500);
+			else if (install_.phase == SetupInstall::done)
+				status(list, text(PW_TEXT_INSTALLED), look.success, kCard.y + 500);
+			else
+				wrapped(list, fonts.regular, text(PW_TEXT_INSTALLING_BODY), kCard.x + 72, kCard.y + 470, 26, 1100, look.text_muted);
+			break;
+		}
+		case PW_SETUP_PREPARING: {
+			card(list, paint, text(PW_TEXT_PREPARE_TITLE), text(PW_TEXT_PREPARE_BODY));
+			const hui::gfx::Rect note{ kCard.x + 72, kCard.y + 330, kCard.w - 144, 150 };
+			list.rounded_rect(note, look.radius, look.warning.with_alpha(0.14f));
+			list.bordered_rect(note, look.radius, hui::gfx::Color{ 0, 0, 0, 0 }, 1.5f, look.warning.with_alpha(0.7f));
+			list.circle(note.x + 48, note.y + 50, 20, look.warning);
+			hui::ui::text(list, fonts.semibold, "!", note.x + 48, note.y + 60, 28, hui::gfx::Color::rgb(0x1b2430), hui::gfx::Align::center);
+			wrapped(list, fonts.regular, text(PW_TEXT_PREPARE_NOTE), note.x + 92, note.y + 60, 26, note.w - 130, look.text);
+			if (prepareFailed_) status(list, text(PW_TEXT_PREPARE_FAILED), look.danger, kCard.y + 545);
+			break;
+		}
+		case PW_SETUP_DONE:
+			paint.heading(text(PW_TEXT_DONE_TITLE), 960, 470, fitted(paint, text(PW_TEXT_DONE_TITLE), 92, 1640), ink,
+				hui::gfx::Align::center);
+			wrapped(list, fonts.regular, text(PW_TEXT_DONE_BODY), 960, 538, 32, 1500, muted, hui::gfx::Align::center);
+			break;
+		default:
+			break;
+		}
+		for (const auto &target : targets_) drawTarget(list, paint, look, target);
+		list.pop_transform();
+		list.pop_opacity();
+		if (!cover_) hints(list, look);
+		if (pointerShown_ > 0.0f && !cover_) {
+			list.push_opacity(std::min(1.0f, pointerShown_));
+			list.shadow({ pointerX_ - 13, pointerY_ - 10, 26, 26 }, 13, 10, hui::gfx::Color::rgb(0x1b2430, 0.35f));
+			list.circle(pointerX_, pointerY_, 13, hui::gfx::Color::rgb(0xffffff, 0.92f));
+			list.ring(pointerX_, pointerY_, 13, 3, look.primary);
+			list.pop_opacity();
+		}
+	}
+
+private:
+	enum Id { T_NONE = 0, T_START, T_SKIP, T_USB, T_INTERNET, T_CONTINUE, T_CHECK, T_INSTALL, T_STOP, T_BACK, T_PREPARE,
+		T_ENTER, T_LANGUAGE = 100 };
+	struct Target {
+		int id;
+		hui::gfx::Rect rect;
+		bool disabled{ false };
+	};
+	static constexpr hui::gfx::Rect kCard{ 300, 170, 1320, 760 };
+	static constexpr float kStatusY = 930 - 190;
+
+	const char *text(PwSetupText key) const { return pw_setup_text(language_, key); }
+	bool busy() const
+	{
+		return step_ == PW_SETUP_INSTALLING &&
+			(install_.phase == SetupInstall::checking || install_.phase == SetupInstall::running || install_.phase == SetupInstall::done);
+	}
+	bool skippable() const { return step_ != PW_SETUP_DONE && !busy(); }
+
+	void useLanguage(const PwSetupLanguage *language)
+	{
+		language_ = language;
+		fonts_ = kit_->fonts;
+		if (language->font && faceRefs_.count(language->font)) {
+			const auto face = faceRefs_.at(language->font);
+			fonts_.regular = fonts_.semibold = fonts_.display = fonts_.mono = face;
+		}
+	}
+
+	void go(PwSetupStep step, bool animate)
+	{
+		step_ = step;
+		entered_ = animate ? 0.0f : 1.0f;
+		if (step != PW_SETUP_USB && step != PW_SETUP_INSTALLING) install_ = {};
+		layout();
+		focus_ = targets_.empty() ? T_NONE : targets_.front().id;
+		if (step == PW_SETUP_LANGUAGE)
+			for (size_t i = 0; i < shown_.size(); ++i) if (shown_[i] == language_) focus_ = T_LANGUAGE + (int)i;
+		if (step == PW_SETUP_METHOD && facts_.runtime) focus_ = T_CONTINUE;
+		if (step == PW_SETUP_DONE) save(true);
+		proton_say("setup: step %d", (int)step);
+	}
+
+	void save(bool done)
+	{
+		PwSetupRecord record;
+		pw_setup_record_load(&record, recordPath);
+		snprintf(record.language, sizeof(record.language), "%s", language_->tag);
+		record.done = record.done || done;
+		if (test_) return; // a test run previews; the owner's record stays as it is
+		const int error = pw_setup_record_save(&record, recordPath);
+		if (error) proton_say("setup: record not saved (%d)", error);
+	}
+
+	void finish(Outcome outcome, const char *why)
+	{
+		save(true);
+		if (simulated_ && !test_) unlink(firstRunMarker);
+		this->outcome = outcome;
+		proton_say("setup: ends (%s)", why);
+	}
+
+	// The step's focusable things, laid out
+	void layout()
+	{
+		targets_.clear();
+		if (cover_) return; // nothing to choose
+		const float right = kCard.x + kCard.w - 72, bottom = kCard.y + kCard.h - 72;
+		switch (step_) {
+		case PW_SETUP_WELCOME:
+			targets_.push_back({ T_START, { 960 - 200, 596, 400, 84 } });
+			targets_.push_back({ T_SKIP, { 960 - 170, 704, 340, 60 } });
+			break;
+		case PW_SETUP_LANGUAGE: {
+			// Up to four large tiles in a row; more in two rows (nine: five and four), six at most a row
+			const int count = (int)shown_.size(), columns = count <= 4 ? count : std::min(6, (count + 1) / 2);
+			const float gap = count <= 4 ? 32 : 22;
+			const float w = count <= 4 ? 268 : std::min(220.0f, (kCard.w - 144 - (columns - 1) * gap) / columns);
+			const float h = count <= 4 ? 250 : w * 0.86f;
+			for (int i = 0; i < count; ++i) {
+				const int row = i / columns, inRow = std::min(columns, count - row * columns);
+				const float x0 = kCard.x + (kCard.w - (inRow * w + (inRow - 1) * gap)) * 0.5f;
+				const int rows = (count + columns - 1) / columns;
+				const float top = kCard.y + 250 + (kCard.h - 250 - 72 - (rows * h + (rows - 1) * gap)) * 0.5f;
+				targets_.push_back({ T_LANGUAGE + i, { x0 + (i % columns) * (w + gap), top + row * (h + gap), w, h } });
+			}
+			break;
+		}
+		case PW_SETUP_METHOD: {
+			const float y = kCard.y + (facts_.runtime ? 290 : 250), w = (kCard.w - 144 - 32) * 0.5f;
+			if (facts_.runtime) targets_.push_back({ T_CONTINUE, { right - 300, bottom - 68, 300, 68 } });
+			targets_.push_back({ T_USB, { kCard.x + 72, y, w, 210 } });
+			targets_.push_back({ T_INTERNET, { kCard.x + 72 + w + 32, y, w, 210 }, true });
+			break;
+		}
+		case PW_SETUP_USB:
+			if (install_.phase == SetupInstall::ready) targets_.push_back({ T_INSTALL, { right - 300, bottom - 68, 300, 68 } });
+			targets_.push_back({ T_CHECK, { right - (install_.phase == SetupInstall::ready ? 632 : 300), bottom - 68, 300, 68 } });
+			break;
+		case PW_SETUP_INSTALLING:
+			if (install_.phase == SetupInstall::failed) {
+				targets_.push_back({ T_CHECK, { right - 300, bottom - 68, 300, 68 } });
+				targets_.push_back({ T_BACK, { right - 632, bottom - 68, 300, 68 } });
+			} else if (install_.phase != SetupInstall::done) {
+				targets_.push_back({ T_STOP, { right - 260, bottom - 68, 260, 68 } });
+			}
+			break;
+		case PW_SETUP_PREPARING:
+			targets_.push_back({ T_PREPARE, { right - 300, bottom - 68, 300, 68 } });
+			break;
+		case PW_SETUP_DONE:
+			targets_.push_back({ T_ENTER, { 960 - 230, 596, 460, 84 } });
+			break;
+		default:
+			break;
+		}
+	}
+
+	const Target *target(int id) const
+	{
+		for (const auto &t : targets_) if (t.id == id) return &t;
+		return nullptr;
+	}
+
+	// The nearest thing in the pressed direction, favouring what lines up with the focus
+	int navigate(hui::Direction direction) const
+	{
+		const Target *from = target(focus_);
+		if (!from) return targets_.empty() ? T_NONE : targets_.front().id;
+		const float dx = direction == hui::Direction::left ? -1.0f : direction == hui::Direction::right ? 1.0f : 0.0f;
+		const float dy = direction == hui::Direction::up ? -1.0f : direction == hui::Direction::down ? 1.0f : 0.0f;
+		int best = focus_;
+		float bestScore = 1e9f;
+		for (const auto &t : targets_) {
+			const float vx = t.rect.cx() - from->rect.cx(), vy = t.rect.cy() - from->rect.cy();
+			const float along = vx * dx + vy * dy, across = std::fabs(vx * dy - vy * dx);
+			if (t.id == focus_ || along <= 1.0f) continue;
+			const float score = along + across * 2.5f;
+			if (score < bestScore) bestScore = score, best = t.id;
+		}
+		return best;
+	}
+
+	void pointer(float dt, const struct pad *pad)
+	{
+		pointerShown_ = std::max(0.0f, pointerShown_ - dt * (pointerShown_ > 1.0f ? 0.2f : 1.0f));
+		if (!pad || !pad->connected) return;
+		if (pad->touch_count) {
+			if (touching_) {
+				const float mx = (float)pad->touch_x - lastTouchX_, my = (float)pad->touch_y - lastTouchY_;
+				if (mx || my) {
+					pointerX_ = std::clamp(pointerX_ + mx * 1.4f, 0.0f, 1919.0f);
+					pointerY_ = std::clamp(pointerY_ + my * 1.4f, 0.0f, 1079.0f);
+					pointerShown_ = 4.0f;
+					for (const auto &t : targets_) {
+						const auto &r = t.rect;
+						if (pointerX_ >= r.x && pointerX_ < r.x + r.w && pointerY_ >= r.y && pointerY_ < r.y + r.h && t.id != focus_) {
+							focus_ = t.id;
+							feedback_.play(hui::audio::Cue::focus);
+						}
+					}
+				}
+			}
+			touching_ = true;
+			lastTouchX_ = pad->touch_x, lastTouchY_ = pad->touch_y;
+		} else {
+			touching_ = false;
+		}
+		// A click of the touchpad presses what the pointer is on
+		if ((pad->pressed & PAD_TOUCH_PAD) && pointerShown_ > 0.0f) {
+			for (const auto &t : targets_) {
+				const auto &r = t.rect;
+				if (pointerX_ >= r.x && pointerX_ < r.x + r.w && pointerY_ >= r.y && pointerY_ < r.y + r.h) activate(t.id);
+			}
+		}
+	}
+
+	void activate(int id)
+	{
+		const Target *t = target(id);
+		if (!t) return;
+		if (t->disabled) {
+			feedback_.play(hui::audio::Cue::error);
+			return;
+		}
+		press_ = 1.0f;
+		pressed_ = id;
+		feedback_.play(hui::audio::Cue::select);
+		if (id >= T_LANGUAGE) {
+			useLanguage(shown_[id - T_LANGUAGE]);
+			save(false);
+			proton_say("setup: language %s", language_->tag);
+			feedback_.play(hui::audio::Cue::saved);
+			go(pw_setup_next(step_, &facts_), true);
+			return;
+		}
+		switch (id) {
+		case T_START: go(PW_SETUP_LANGUAGE, true); break;
+		case T_SKIP: finish(Outcome::library, "skipped"); break;
+		case T_CONTINUE: go(pw_setup_next(PW_SETUP_METHOD, &facts_), true); break;
+		case T_USB: go(PW_SETUP_USB, true); break;
+		case T_CHECK:
+			if (step_ == PW_SETUP_INSTALLING) go(PW_SETUP_USB, true);
+			check();
+			break;
+		case T_INSTALL:
+			if (engine_) engine_->start();
+			install_ = engine_ ? engine_->state() : SetupInstall{};
+			proton_say("setup: install starts");
+			go(PW_SETUP_INSTALLING, true);
+			break;
+		case T_STOP: if (engine_) engine_->cancel(); break;
+		case T_BACK: go(PW_SETUP_USB, true); break;
+		case T_PREPARE:
+			if (!test_) {
+				if (FILE *marker = fopen(preparingMarker, "w")) fclose(marker);
+			}
+			cover();
+			this->outcome = Outcome::prepare;
+			proton_say("setup: the first Mihawk OS session starts");
+			break;
+		case T_ENTER: finish(Outcome::enter, "finished"); break;
+		default: break;
+		}
+	}
+
+	void check()
+	{
+		install_ = engine_ ? engine_->find() : SetupInstall{};
+		proton_say("setup: drive check: phase %d problem %d, %llu bytes", (int)install_.phase, (int)install_.problem,
+			(unsigned long long)install_.total);
+		if (install_.phase != SetupInstall::ready) feedback_.play(hui::audio::Cue::error);
+		layout();
+		if (install_.phase == SetupInstall::ready) focus_ = T_INSTALL;
+	}
+
+	std::string problem() const
+	{
+		static const PwSetupText keys[] = { PW_TEXT_COUNT, PW_TEXT_ERR_BUILD, PW_TEXT_ERR_NO_STICK, PW_TEXT_ERR_NO_FOLDER,
+			PW_TEXT_ERR_PARTIAL, PW_TEXT_ERR_NO_SPACE, PW_TEXT_ERR_READ, PW_TEXT_ERR_DAMAGED, PW_TEXT_ERR_FULL,
+			PW_TEXT_ERR_WRITE, PW_TEXT_ERR_CANCELLED };
+		if (install_.problem == SetupInstall::none) return "";
+		char a[32], b[32], out[512];
+		if (install_.problem == SetupInstall::partial) {
+			snprintf(a, sizeof(a), "%zu", install_.have);
+			snprintf(b, sizeof(b), "%zu", install_.pieces);
+		} else {
+			pw_setup_gigabytes(language_, install_.needed, a, sizeof(a));
+			pw_setup_gigabytes(language_, install_.available, b, sizeof(b));
+		}
+		const char *args[] = { a, b };
+		pw_setup_fill(out, sizeof(out), text(keys[install_.problem]), args, 2);
+		return out;
+	}
+
+	// ---- drawing ----
+	// Lines no wider than width. Breaks at spaces, and between Chinese and Japanese characters, which have no spaces;
+	// closing punctuation stays on the line before it (the kit's own wrap breaks at spaces alone)
+	static std::vector<std::string> lines(const hui::ui::FontRef &font, std::string_view text, float size, float width)
+	{
+		auto wide = [](uint32_t c) { return (c >= 0x2E80 && c <= 0x9FFF) || (c >= 0xF900 && c <= 0xFAFF) || (c >= 0xFF00 && c <= 0xFFEF); };
+		auto closing = [](uint32_t c) {
+			return c == 0x3001 || c == 0x3002 || c == 0xFF0C || c == 0xFF0E || c == 0xFF09 || c == 0x300D || c == 0x300F ||
+				c == 0xFF01 || c == 0xFF1F || c == 0xFF1A || c == 0xFF1B || c == 0x2026 || c == 0x201D;
+		};
+		std::vector<std::string> units; // pieces a line may end after
+		enum { none, space, cjk, word } previous = none;
+		for (size_t i = 0; i < text.size();) {
+			const size_t start = i;
+			const uint32_t c = hui::gfx::next_codepoint(text, &i);
+			const auto piece = text.substr(start, i - start);
+			const auto kind = c == ' ' ? space : wide(c) ? cjk : word;
+			// A space or closing punctuation ends the piece before it; a letter goes on its word
+			const bool joins = !units.empty() && (kind == space || closing(c) || (kind == word && previous == word));
+			if (joins) units.back() += piece;
+			else units.emplace_back(piece);
+			previous = kind;
+		}
+		std::vector<std::string> out;
+		std::string line;
+		for (const auto &unit : units) {
+			std::string trial = line + unit;
+			std::string_view trimmed(trial);
+			while (!trimmed.empty() && trimmed.back() == ' ') trimmed.remove_suffix(1);
+			if (!line.empty() && font.measure(trimmed, size) > width) {
+				while (!line.empty() && line.back() == ' ') line.pop_back();
+				out.push_back(line);
+				line = unit;
+			} else {
+				line = trial;
+			}
+		}
+		while (!line.empty() && line.back() == ' ') line.pop_back();
+		if (!line.empty()) out.push_back(line);
+		return out;
+	}
+
+	float wrapped(hui::gfx::DrawList &list, const hui::ui::FontRef &font, const char *value, float x, float y, float size,
+		float width, hui::gfx::Color color, hui::gfx::Align align = hui::gfx::Align::left) const
+	{
+		for (const auto &line : lines(font, value, size, width)) {
+			hui::ui::text(list, font, line, x, y, size, color, align);
+			y += size * 1.42f;
+		}
+		return y;
+	}
+
+	// A heading at size, or smaller when it would be wider than width
+	static float fitted(const hui::ui::Painter &paint, const char *value, float size, float width)
+	{
+		const float measured = paint.heading_width(value, size);
+		return measured > width ? size * width / measured : size;
+	}
+
+	void card(hui::gfx::DrawList &list, hui::ui::Painter &paint, const char *title, const char *body)
+	{
+		paint.panel(kCard);
+		paint.heading(title, kCard.x + 72, kCard.y + 112, fitted(paint, title, 52, kCard.w - 144), paint.theme().text);
+		if (body) wrapped(list, fonts_.regular, body, kCard.x + 72, kCard.y + 166, 27, 1120, paint.theme().text_muted);
+	}
+
+	// A line that reports an outcome: a tinted box, a mark, and the words in the colour darkened toward the ink, so
+	// they read at 4.5:1 or better on the box
+	void status(hui::gfx::DrawList &list, const char *value, hui::gfx::Color color, float y)
+	{
+		const auto &fonts = fonts_;
+		const float width = step_ == PW_SETUP_USB ? 760 : kCard.w - 144, textWidth = width - 92;
+		const int lines = (int)this->lines(fonts.semibold, value, 25, textWidth).size();
+		const hui::gfx::Rect box{ kCard.x + 72, y - 34, width, 44 + lines * 25 * 1.42f };
+		list.rounded_rect(box, 12, color.with_alpha(0.12f));
+		list.bordered_rect(box, 12, hui::gfx::Color{ 0, 0, 0, 0 }, 1.5f, color.with_alpha(0.55f));
+		list.circle(box.x + 38, box.y + 40, 15, color);
+		const bool good = color.g > color.r;
+		if (good) {
+			list.line(box.x + 31, box.y + 40, box.x + 36, box.y + 45, 3.5f, hui::gfx::Color::rgb(0xffffff));
+			list.line(box.x + 36, box.y + 45, box.x + 45, box.y + 34, 3.5f, hui::gfx::Color::rgb(0xffffff));
+		} else {
+			hui::ui::text(list, fonts.semibold, "!", box.x + 38, box.y + 49, 24, hui::gfx::Color::rgb(0xffffff), hui::gfx::Align::center);
+		}
+		wrapped(list, fonts.semibold, value, box.x + 70, box.y + 49, 25, textWidth, hui::gfx::mix(color, hui::gfx::Color::rgb(0x1b2430), 0.45f));
+	}
+
+	void qrCode(hui::gfx::DrawList &list, const hui::ui::Theme &look, hui::gfx::Rect at, float size, bool captionBeside)
+	{
+		if (qr_.empty()) return;
+		const float quiet = 4.0f, module = size / ((float)qr_.size() + quiet * 2.0f);
+		list.shadow({ at.x, at.y + 2, size, size }, 14, 10, look.shadow.with_alpha(0.25f));
+		list.rounded_rect({ at.x, at.y, size, size }, 14, hui::gfx::Color::rgb(0xffffff));
+		for (size_t r = 0; r < qr_.size(); ++r)
+			for (size_t c = 0; c < qr_[r].size(); ++c)
+				if (qr_[r][c] == '1')
+					list.rounded_rect({ at.x + (quiet + c) * module, at.y + (quiet + r) * module, module + 0.4f, module + 0.4f }, 0,
+						hui::gfx::Color::rgb(0x1b2430));
+		if (captionBeside) wrapped(list, fonts_.regular, text(PW_TEXT_QR_CAPTION), at.x + size + 32, at.y + size * 0.5f + 8, 24, 520, look.text_muted);
+		else wrapped(list, fonts_.regular, text(PW_TEXT_QR_CAPTION), at.x + size * 0.5f, at.y + size + 44, 22, size + 40, look.text_muted, hui::gfx::Align::center);
+	}
+
+	void progressDots(hui::gfx::DrawList &list, hui::ui::Painter &paint, const hui::ui::Theme &look)
+	{
+		const int index = step_ == PW_SETUP_LANGUAGE ? 1 : step_ <= PW_SETUP_INSTALLING ? 2 : step_ == PW_SETUP_PREPARING ? 3 : 4;
+		char a[4], b[4], line[64];
+		snprintf(a, sizeof(a), "%d", index + 1);
+		snprintf(b, sizeof(b), "%d", 5);
+		const char *args[] = { a, b };
+		pw_setup_fill(line, sizeof(line), text(PW_TEXT_STEP_OF), args, 2);
+		hui::ui::text(list, fonts_.semibold, line, 1824, 92, 24, paint.page_text_muted(), hui::gfx::Align::right);
+		float x = 1824;
+		for (int i = 4; i >= 0; --i) {
+			const float w = i == index ? 30.0f : 10.0f;
+			x -= w;
+			list.rounded_rect({ x, 112, w, 10 }, 5, i == index ? look.primary : i < index ? look.primary.with_alpha(0.45f) : paint.page_text_muted().with_alpha(0.35f));
+			x -= 10;
+		}
+	}
+
+	void drawTarget(hui::gfx::DrawList &list, hui::ui::Painter &paint, const hui::ui::Theme &look, const Target &t)
+	{
+		const float focus = glow_.count(t.id) ? glow_.at(t.id) : 0.0f;
+		const hui::ui::Look state{ focus, t.id == pressed_ ? press_ : 0.0f, t.disabled };
+		const auto &fonts = fonts_;
+		auto button = [&](const char *label, hui::ui::ButtonKind kind, float size) {
+			paint.button(t.rect, "", kind, state);
+			const auto color = kind == hui::ui::ButtonKind::primary ? look.on_primary : kind == hui::ui::ButtonKind::ghost ? look.primary : look.on_secondary;
+			hui::ui::text(list, fonts.semibold, label, t.rect.cx(), t.rect.cy() + size * 0.36f, size, color, hui::gfx::Align::center);
+		};
+		if (t.id >= T_LANGUAGE) {
+			const int index = t.id - T_LANGUAGE;
+			const bool big = shown_.size() <= 4;
+			const float lift = focus * 6.0f;
+			const hui::gfx::Rect r{ t.rect.x, t.rect.y - lift, t.rect.w, t.rect.h };
+			paint.surface(r, look.radius_card, look.surface, look.outline, 1.0f);
+			const float fw = big ? 192 : r.w * 0.62f, fh = fw * 0.75f;
+			const hui::gfx::Rect flag{ r.cx() - fw * 0.5f, r.y + (big ? 30 : 20), fw, fh };
+			list.shadow({ flag.x, flag.y + 2, flag.w, flag.h }, 8, 6, look.shadow.with_alpha(0.3f));
+			if (flags_[index]) list.image(flags_[index], flag, hui::gfx::kFullUv, hui::gfx::Color::rgb(0xffffff), 8);
+			list.bordered_rect(flag, 8, hui::gfx::Color{ 0, 0, 0, 0 }, 1.0f, look.outline.with_alpha(0.35f));
+			const auto own = shown_[index]->font && faceRefs_.count(shown_[index]->font) ? faceRefs_.at(shown_[index]->font) : kit_->fonts.semibold;
+			hui::ui::text(list, own, shown_[index]->name, r.cx(), flag.y + fh + (big ? 46 : 34), big ? 28 : 22, look.text,
+				hui::gfx::Align::center);
+			if (shown_[index] == language_) {
+				list.circle(r.x + r.w - 26, r.y + 26, 15, look.accent);
+				list.line(r.x + r.w - 33, r.y + 26, r.x + r.w - 28, r.y + 31, 3.5f, hui::gfx::Color::rgb(0xffffff));
+				list.line(r.x + r.w - 28, r.y + 31, r.x + r.w - 19, r.y + 20, 3.5f, hui::gfx::Color::rgb(0xffffff));
+			}
+			paint.focus_ring(r, look.radius_card, focus);
+			return;
+		}
+		switch (t.id) {
+		case T_START: button(text(PW_TEXT_GET_STARTED), hui::ui::ButtonKind::primary, 30); break;
+		case T_SKIP: button(text(PW_TEXT_SKIP_SETUP), hui::ui::ButtonKind::ghost, 24); break;
+		case T_CONTINUE: button(text(PW_TEXT_CONTINUE), hui::ui::ButtonKind::primary, 26); break;
+		case T_CHECK:
+			button(text(install_.problem != SetupInstall::none ? PW_TEXT_RETRY : PW_TEXT_CHECK_DRIVE),
+				install_.phase == SetupInstall::ready ? hui::ui::ButtonKind::secondary : hui::ui::ButtonKind::primary, 26);
+			break;
+		case T_INSTALL: button(text(PW_TEXT_INSTALL), hui::ui::ButtonKind::primary, 26); break;
+		case T_STOP: button(text(PW_TEXT_STOP), hui::ui::ButtonKind::secondary, 26); break;
+		case T_BACK: button(text(PW_TEXT_HINT_BACK), hui::ui::ButtonKind::secondary, 26); break;
+		case T_PREPARE: button(text(PW_TEXT_PREPARE_START), hui::ui::ButtonKind::primary, 26); break;
+		case T_ENTER: button(text(PW_TEXT_ENTER), hui::ui::ButtonKind::primary, 30); break;
+		case T_USB:
+		case T_INTERNET: {
+			if (t.disabled) list.push_opacity(0.6f);
+			const auto &r = t.rect;
+			paint.surface(r, look.radius_card, look.surface, look.outline, 1.0f - (t.id == pressed_ ? press_ : 0.0f));
+			const float cx = r.x + 92, cy = r.y + r.h * 0.5f;
+			list.circle(cx, cy, 52, look.primary.with_alpha(0.12f));
+			if (t.id == T_USB) {
+				// A USB drive, plug up
+				list.rounded_rect({ cx - 18, cy - 14, 36, 50 }, 8, look.primary);
+				list.rounded_rect({ cx - 12, cy - 34, 24, 22 }, 3, look.outline);
+				list.rounded_rect({ cx - 6, cy - 28, 4, 6 }, 1, look.surface);
+				list.rounded_rect({ cx + 2, cy - 28, 4, 6 }, 1, look.surface);
+			} else {
+				// A globe
+				list.ring(cx, cy, 30, 4, look.primary);
+				list.line(cx - 30, cy, cx + 30, cy, 3, look.primary);
+				list.ring(cx, cy, 30, 3, look.primary);
+				list.rounded_rect({ cx - 1.5f, cy - 30, 3, 60 }, 1.5f, look.primary);
+				list.arc(cx, cy, 17, 3, 0.0f, 6.2831853f, look.primary);
+			}
+			hui::ui::text(list, fonts.semibold, text(t.id == T_USB ? PW_TEXT_METHOD_USB : PW_TEXT_METHOD_INTERNET), r.x + 176, r.y + 82, 34, look.text);
+			wrapped(list, fonts.regular, text(t.id == T_USB ? PW_TEXT_METHOD_USB_BODY : PW_TEXT_METHOD_INTERNET_BODY), r.x + 176, r.y + 126,
+				23, r.w - 210, look.text_muted);
+			if (t.disabled) {
+				const char *soon = text(PW_TEXT_COMING_SOON);
+				const float w = fonts.semibold.measure(soon, 19) + 28;
+				list.rounded_rect({ r.x + r.w - w - 20, r.y + 20, w, 34 }, 17, look.surface_high);
+				hui::ui::text(list, fonts.semibold, soon, r.x + r.w - w * 0.5f - 20, r.y + 43, 19, look.text, hui::gfx::Align::center);
+				list.pop_opacity();
+			}
+			paint.focus_ring(r, look.radius_card, focus);
+			break;
+		}
+		default: break;
+		}
+	}
+
+	void hints(hui::gfx::DrawList &list, const hui::ui::Theme &look)
+	{
+		std::vector<hui::ui::Hint> row;
+		if (targets_.size() > 1) row.push_back({ hui::ui::Button::dpad, text(PW_TEXT_HINT_MOVE) });
+		if (!targets_.empty()) row.push_back({ hui::ui::Button::cross, text(PW_TEXT_HINT_SELECT) });
+		if (pw_setup_back(step_) != PW_SETUP_NONE && !busy()) row.push_back({ hui::ui::Button::circle, text(PW_TEXT_HINT_BACK) });
+		if (skippable() && step_ != PW_SETUP_WELCOME) row.push_back({ hui::ui::Button::triangle, text(PW_TEXT_SKIP_SETUP) });
+		hui::ui::GlyphStyle style = look.dark ? hui::ui::GlyphStyle::dark() : hui::ui::GlyphStyle::light();
+		style.label = hui::ui::Painter(list, fonts_, look).page_text(); // full ink: the row lies on the green hill
+		hui::ui::HintLayout layout;
+		layout.size = 34;
+		layout.text_size = 22;
+		layout.cy = 1022;
+		layout.item_gap = 38;
+		hui::ui::draw_hints(list, fonts_, style, row.data(), (int)row.size(), 96, false, layout);
+	}
+
+	ps5ui::Kit *kit_{ nullptr };
+	hui::ui::Fonts fonts_;                                        // the chosen language's: the kit's, or its own face
+	std::deque<hui::gfx::Font> faces_;                            // the CJK faces (kept where they are: FontRefs point in)
+	std::unordered_map<std::string, hui::ui::FontRef> faceRefs_;
+	std::unique_ptr<SetupEngine> engine_;
+	PwSetupFacts facts_{};
+	PwSetupStep step_{ PW_SETUP_WELCOME };
+	const PwSetupLanguage *language_{ nullptr };
+	std::vector<const PwSetupLanguage *> shown_;
+	std::vector<uint32_t> flags_;
+	std::vector<std::string> qr_;
+	std::vector<Target> targets_;
+	std::unordered_map<int, float> glow_;
+	hui::ui::Feedback feedback_;
+	SetupInstall install_;
+	int focus_{ T_NONE }, pressed_{ T_NONE };
+	float clock_{ 0.0f }, entered_{ 1.0f }, press_{ 0.0f }, doneAt_{ 0.0f };
+	float pointerX_{ 960.0f }, pointerY_{ 540.0f }, pointerShown_{ 0.0f }, lastTouchX_{ 0.0f }, lastTouchY_{ 0.0f };
+	bool touching_{ false }, prepareFailed_{ false }, simulated_{ false }, test_{ false }, cover_{ false };
+};

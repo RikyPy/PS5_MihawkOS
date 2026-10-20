@@ -1,0 +1,70 @@
+From 05d3a6a1a1365e897eae5edf067ee506d592e17a Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Wed, 7 Oct 2026 20:27:20 -0400
+Subject: [PATCH] wineboot: PS5: a prefix is marked set up once it is.
+
+wineboot wrote a prefix's .update-timestamp before running its update
+(PreInstall, DefaultInstall, Wow64Install), so an update cut short left
+the prefix marked current and never finished it. On the console a game's
+first launch makes its prefix, about 90 s of setup, and a launch stopped
+before then did exactly that: a 32-bit game's prefix stopped inside
+DefaultInstall, without its WoW64 side (PS5_Proton
+2026-10-07; record removed from the tree; in git history).
+
+The timestamp is now only compared before the update and written after
+it, so an interrupted update runs again on the next launch.
+---
+ programs/wineboot/wineboot.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/programs/wineboot/wineboot.c b/programs/wineboot/wineboot.c
+index 4f09ce5..6312e07 100644
+--- a/programs/wineboot/wineboot.c
++++ b/programs/wineboot/wineboot.c
+@@ -130,8 +130,9 @@ static BOOL runs_wow64(void)
+     return FALSE;
+ }
+ 
+-/* update the timestamp if different from the reference time */
+-static BOOL update_timestamp( const WCHAR *config_dir, unsigned long timestamp )
++/* update the timestamp if different from the reference time; with check, only say whether it is (PS5: the time is
++ * written once the update has run, so an update cut short, a first launch stopped mid-way, runs again) */
++static BOOL update_timestamp( const WCHAR *config_dir, unsigned long timestamp, BOOL check )
+ {
+     BOOL ret = FALSE;
+     int fd, count;
+@@ -152,12 +153,14 @@ static BOOL update_timestamp( const WCHAR *config_dir, unsigned long timestamp )
+             if (!strncmp( buffer, "disable", sizeof("disable")-1 )) goto done;
+             if (timestamp == strtoul( buffer, &end, 10 ) && (!runs_wow64() || !strncmp( end, " wow64", 6 ))) goto done;
+         }
++        if (check) { ret = TRUE; goto done; }
+         lseek( fd, 0, SEEK_SET );
+         chsize( fd, 0 );
+     }
+     else
+     {
+         if (errno != ENOENT) goto done;
++        if (check) { ret = TRUE; goto done; }
+         if ((fd = _wopen( file, O_WRONLY | O_CREAT | O_TRUNC, 0666 )) == -1) goto done;
+     }
+ 
+@@ -1690,7 +1693,7 @@ static void update_wineprefix( BOOL force )
+     fstat( fd, &st );
+     close( fd );
+ 
+-    if (update_timestamp( config_dir, st.st_mtime ) || force)
++    if (update_timestamp( config_dir, st.st_mtime, TRUE ) || force)
+     {
+         HANDLE process;
+         DWORD count = 0;
+@@ -1722,6 +1725,7 @@ static void update_wineprefix( BOOL force )
+         update_user_profile();
+         update_win_version();
+         update_root_certs();
++        update_timestamp( config_dir, st.st_mtime, FALSE );
+ 
+         TRACE( "wine: configuration in %s has been updated.\n", debugstr_w(prettyprint_configdir()) );
+     }
+-- 
+2.56.0
+

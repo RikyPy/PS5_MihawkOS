@@ -1,0 +1,54 @@
+From 5dc152ea1ae63efa08af67051d297ce85d98d4be Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Sat, 3 Oct 2026 09:41:10 -0400
+Subject: [PATCH] setupapi: skip a device interface that could not be created
+
+SETUPDI_AddDeviceInterfaces passed the result of SETUPDI_CreateDeviceInterface
+straight to SETUPDI_SetInterfaceSymbolicLink, which dereferences it. The
+creator returns NULL when it is out of memory or when the registry refuses the
+interface's keys, so enumerating device interfaces crashed the process with a
+read at address 8 inside setupapi. On the PS5 console SDL3's HID joystick scan
+met it on the in-process HID thread when the DualSense reconnected during a
+Java game run.
+
+The interface is now skipped and the failure is logged with its error, so the
+enumeration returns what it could build and the log says why one entry is
+missing.
+---
+ dlls/setupapi/devinst.c | 20 ++++++++++++++------
+ 1 file changed, 14 insertions(+), 6 deletions(-)
+
+diff --git a/dlls/setupapi/devinst.c b/dlls/setupapi/devinst.c
+index b860d72..d5184d2 100644
+--- a/dlls/setupapi/devinst.c
++++ b/dlls/setupapi/devinst.c
+@@ -1963,12 +1963,20 @@ static void SETUPDI_AddDeviceInterfaces(struct device *device, HKEY key,
+                     if (!(flags & DIGCF_PRESENT) || is_linked(subKey))
+                     {
+                         iface = SETUPDI_CreateDeviceInterface(device, guid, subKeyName + 1);
+-
+-                        len = sizeof(symbolicLink);
+-                        l = RegQueryValueExW(subKey, L"SymbolicLink", NULL, &dataType,
+-                                (BYTE *)symbolicLink, &len);
+-                        if (!l && dataType == REG_SZ)
+-                            SETUPDI_SetInterfaceSymbolicLink(iface, symbolicLink);
++                        if (!iface)
++                        {
++                            /* Out of memory, or the registry refused the interface's keys. */
++                            ERR("Could not create the interface %s (error %lu).\n",
++                                debugstr_w(subKeyName + 1), GetLastError());
++                        }
++                        else
++                        {
++                            len = sizeof(symbolicLink);
++                            l = RegQueryValueExW(subKey, L"SymbolicLink", NULL, &dataType,
++                                    (BYTE *)symbolicLink, &len);
++                            if (!l && dataType == REG_SZ)
++                                SETUPDI_SetInterfaceSymbolicLink(iface, symbolicLink);
++                        }
+                     }
+                     RegCloseKey(subKey);
+                 }
+-- 
+2.56.0
+

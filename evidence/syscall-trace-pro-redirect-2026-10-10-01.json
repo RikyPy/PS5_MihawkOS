@@ -1,0 +1,59 @@
+{
+  "run": "syscall-trace-pro-redirect-2026-10-10-01",
+  "mode": "redirect",
+  "build": {
+    "sdk_revision": "611893fc25ef3e138f5bc2c90d829d8b58174cd2",
+    "source_sha256": "c9d2529f3e12f5d76d666963a8cb9d844716d2b1acb9d7ba9587d82bfc2ae85f",
+    "elf_sha256": "72610a3e63ae8d2fa57f0b1af5d44d96cd18b8228183ebb7a0d004295b104351",
+    "host_sha256": "21da315b55c19898a4173b480dc9dfced2ffeac497430f70c1c5f02a3eef2e5e"
+  },
+  "runner_sha256": "4d6b844f8cb6df515ca9120d48bc909b259afd48e747f412fd501e9f2e243196",
+  "question": "Can an owned payload stop native syscall entry, prevent the original pipe write and resume an owned dispatcher on the stopped thread?",
+  "production_changed": false,
+  "wine_integrated": false,
+  "title_launched": false,
+  "host_only": false,
+  "passed": false,
+  "host": {
+    "passed": true,
+    "tracee": [
+      "TRACE_READY pid=675486",
+      "TRACE_RESULT mode=redirect result=1349735538 dispatched=1 pipe_bytes=-1 empty=1 native_ok=1",
+      "TRACE_TRACEE PASS"
+    ],
+    "tracer": [
+      "TRACE_CAPABILITY attached=1 registers=1 register_bytes=216",
+      "TRACE_ENTRY owned=1 code=1 tid=675486",
+      "TRACE_EXIT replacement=getpid result_matches=1",
+      "TRACE_TRACER PASS mode=redirect stops=6 entries=3 exits=3 replaced=1 ms=8"
+    ],
+    "error": null
+  },
+  "readiness": {
+    "ready": true,
+    "seconds": 0.14,
+    "settle_seconds": 0.0,
+    "census_seconds": 0.128,
+    "previous_cleanup_verified": true
+  },
+  "tracee_pid": 2046,
+  "native": {
+    "tracee": [
+      "TRACE_READY pid=2046",
+      "TRACE_RESULT mode=redirect result=2046 dispatched=0 pipe_bytes=-1 empty=1 native_ok=1",
+      "TRACE_ERROR role=tracee errno=35",
+      "TRACE_TRACEE FAIL"
+    ],
+    "tracer": [
+      "TRACE_CAPABILITY attached=1 registers=1 register_bytes=176",
+      "TRACE_ENTRY owned=1 code=4 tid=101719",
+      "TRACE_ERROR role=tracer phase=syscall-stop errno=3 attached=1 stopped=0",
+      "TRACE_TRACER FAIL mode=redirect stops=190 entries=190 exits=0 replaced=1 ms=78"
+    ],
+    "passed": false
+  },
+  "post_control": "ok procs app=4294967295 title= count=0 pids=",
+  "leftover_helpers": [],
+  "clean": true,
+  "seconds": 0.505
+}

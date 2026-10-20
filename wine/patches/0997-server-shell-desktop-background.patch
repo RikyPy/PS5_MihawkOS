@@ -1,0 +1,97 @@
+From: PS5_Proton
+Subject: [PATCH] server: the shell's desktop stays the bottom-most window
+
+In the Mihawk session the desktop window belongs to the system and
+Explorer's Progman paints the wallpaper (patch 0996). As on Windows:
+
+- the window snapshot marks the shell window as a desktop row too, above
+  the system's own, so the compositor and its Mica material take the
+  wallpaper from it; setting a shell window publishes a snapshot, and
+  GetShellWindow's query does not (it rebuilt the snapshot and made the
+  broker compose again on every call);
+- the shell window stays at the bottom whatever a SetWindowPos asks: an
+  activation turned Progman's own HWND_BOTTOM into HWND_TOP (win32u's
+  fixup_swp_flags) and raised the desktop over every window;
+- a top-level window sent to HWND_BOTTOM goes just above the shell window,
+  never below it, so it stays visible on the desktop (window-compose and
+  window-effects send their backdrops there; under Progman they vanished,
+  step3-focus-2026-10-10-02);
+- the WM_PARENTNOTIFY(WM_DESTROY) of a top-level window goes to the shell
+  window when the desktop window has no thread (the PS5 server makes it
+  without one), so the taskbar forgets windows whose thread or process
+  ended without destroying them: those send no window event, and the
+  notice was dropped.
+
+Without a shell window nothing changes.
+
+diff --git a/server/window.c b/server/window.c
+index fab7a3c..c10cd7b 100644
+--- a/server/window.c
++++ b/server/window.c
+@@ -464,7 +464,9 @@ void ps5_windows_publish(void)
+             LIST_FOR_EACH_ENTRY(win, &desktop->top_window->children, struct window, entry)
+             {
+                 ps5_snapshot_children(&snapshot,win,0);
+-                ps5_snapshot_add(&snapshot,win,0);
++                /* The shell's desktop (Explorer's Progman in the Mihawk session) is the background the compositor
++                 * and its materials take as the desktop, above the system's own desktop window. */
++                ps5_snapshot_add(&snapshot,win,win == desktop->shell_window);
+             }
+             ps5_snapshot_add(&snapshot,desktop->top_window,1);
+             if (!snapshot.overflow) ps5_snapshot_thumbnails( &snapshot );
+@@ -693,6 +695,12 @@ static int link_window( struct window *win, struct window *previous )
+ {
+     struct list *old_prev;
+ 
++#ifdef __PROSPERO__
++    /* As on Windows, the shell's desktop (Explorer's Progman) stays at the bottom, whatever a SetWindowPos asks: an
++     * activation would otherwise raise it over every window (win32u's fixup_swp_flags turns it into HWND_TOP). */
++    if (win->desktop && win == win->desktop->shell_window && win->parent && is_desktop_window( win->parent ))
++        previous = WINPTR_BOTTOM;
++#endif
+     if (previous == WINPTR_NOTOPMOST)
+     {
+         if (!(win->ex_style & WS_EX_TOPMOST) && win->is_linked) return 0;  /* nothing to do */
+@@ -705,7 +713,13 @@ static int link_window( struct window *win, struct window *previous )
+ 
+     if (previous == WINPTR_BOTTOM)
+     {
+-        list_add_tail( &win->parent->children, &win->entry );
++        struct window *shell = win->desktop ? win->desktop->shell_window : NULL;
++        /* As on Windows, the shell's desktop (Explorer's Progman) stays below every other top-level window: the
++         * bottom for any other is just above it, so a window sent to the bottom is still seen on the desktop. */
++        if (shell && shell != win && shell->parent == win->parent && shell->is_linked)
++            list_add_before( &shell->entry, &win->entry );
++        else
++            list_add_tail( &win->parent->children, &win->entry );
+         win->ex_style &= ~WS_EX_TOPMOST;
+     }
+     else if (previous == WINPTR_TOPMOST)
+@@ -2578,7 +2592,15 @@ void free_window_handle( struct window *win )
+     }
+     else if (is_desktop_window( win->parent ))
+     {
+-        post_message( win->parent->handle, WM_PARENTNOTIFY, WM_DESTROY, win->handle );
++        user_handle_t notified = win->parent->handle;
++#ifdef __PROSPERO__
++        /* The PS5 desktop window has no thread, so the notice would be dropped; the shell's desktop (Progman in the
++         * Mihawk session) hears it instead, as the desktop window's owner did, and its taskbar forgets windows whose
++         * thread or process ended without destroying them, which send no window event. */
++        if (!win->parent->thread && win->desktop->shell_window && win->desktop->shell_window != win)
++            notified = win->desktop->shell_window->handle;
++#endif
++        post_message( notified, WM_PARENTNOTIFY, WM_DESTROY, win->handle );
+     }
+ 
+     detach_window_thread( win );
+@@ -3620,6 +3642,10 @@ DECL_HANDLER(set_desktop_shell_windows)
+     desktop->shell_listview = new_shell_listview;
+     desktop->progman_window = new_progman_window;
+     desktop->taskman_window = new_taskman_window;
++#ifdef __PROSPERO__
++    /* The snapshot marks the shell's desktop: it changes only when one is set, not on GetShellWindow's query. */
++    if (req->flags) ps5_windows_dirty = 1;
++#endif
+ 
+ done:
+     release_object( desktop );

@@ -1,0 +1,233 @@
+From: PS5_Proton
+Subject: [PATCH] explorer: idle taskbar, and tabtip only where it has work
+
+A hidden Mihawk taskbar cost about 146 server calls a second behind a
+full-screen game (2026-10-10, record removed from the tree; in git history): a one-second timer
+re-read every button's window and moved and repainted every button, so the
+compositor recomposed the desktop each second too. The clock now wakes once
+a minute, the buttons follow window events (foreground, shown or hidden,
+minimized or restored, retitled, through an out-of-context WinEvent hook;
+creation and destruction keep arriving as parent notifications), and a
+sync places and repaints only buttons that moved or changed. Theme, font and
+display changes still repaint everything.
+
+tabtip.exe only drives a launcher's on-screen keyboard, and only with
+SteamDeck=1; elsewhere it sat idle (37 MiB on the PS5) holding a system-wide
+focus watcher. Explorer starts it only when that variable says it has work.
+
+diff --git a/programs/explorer/desktop.c b/programs/explorer/desktop.c
+index 4c7bad63..594b8252 100644
+--- a/programs/explorer/desktop.c
++++ b/programs/explorer/desktop.c
+@@ -1220,6 +1220,15 @@ static void set_shell_window( HWND hwnd )
+     SetShellWindow( hwnd );
+ }
+ 
++/* tabtip only drives a launcher's on-screen keyboard, and only where SteamDeck=1 (programs/tabtip/tabtip.c); anywhere
++ * else it would sit idle holding a system-wide focus watcher, which makes every process report its window events
++ * to the server (37 MiB idle on the PS5, 2026-10-10). Start it only when it has work. */
++static BOOL tabtip_has_work(void)
++{
++    WCHAR value[4];
++    return GetEnvironmentVariableW( L"SteamDeck", value, ARRAY_SIZE(value) ) == 1 && value[0] == '1';
++}
++
+ static HANDLE start_tabtip_process(void)
+ {
+     static const WCHAR tabtip_started_event[] = L"TABTIP_STARTED_EVENT";
+@@ -1447,7 +1456,7 @@ void manage_desktop( WCHAR *arg )
+     if (hwnd)
+     {
+         /* FIXME: hack, run tabtip.exe on startup. */
+-        tabtip = start_tabtip_process();
++        if (tabtip_has_work()) tabtip = start_tabtip_process();
+ 
+         start_xalia_process();
+ 
+diff --git a/programs/explorer/systray.c b/programs/explorer/systray.c
+index 1d914b91..cba173e6 100644
+--- a/programs/explorer/systray.c
++++ b/programs/explorer/systray.c
+@@ -109,6 +109,8 @@ struct taskbar_button
+     WCHAR       title[256];
+     HICON       application_icon;
+     BOOL        icon_loaded;
++    RECT        placed;        /* where the button was last shown, if placed_shown */
++    BOOL        placed_shown;
+ };
+ 
+ static struct list taskbar_buttons = LIST_INIT( taskbar_buttons );
+@@ -134,7 +136,15 @@ static int taskbar_gap, taskbar_clock_width, taskbar_padding;
+ static HTHEME taskbar_theme;
+ static HWND taskbar_preview, taskbar_preview_button, taskbar_hover;
+ static HTHUMBNAIL taskbar_preview_thumbnail;
+-enum { TASKBAR_PREVIEW_SHOW = 4, TASKBAR_PREVIEW_HIDE = 5 };
++enum { TASKBAR_PREVIEW_SHOW = 4, TASKBAR_PREVIEW_HIDE = 5, TASKBAR_SYNC = 6 };
++/* Idle unless something changed: the clock wakes at each new minute, and the buttons follow window events
++ * (foreground, shown or hidden, minimized or restored, retitled; creation and destruction arrive as parent
++ * notifications) instead of a scan of every window each second, which cost about 146 server calls a second
++ * while a full-screen game hid the taskbar (2026-10-10). */
++static HWINEVENTHOOK taskbar_events[4];
++static BOOL taskbar_sync_pending;
++static RECT taskbar_overflow_placed, taskbar_clock_placed;
++static BOOL taskbar_overflow_shown;
+ 
+ /* Palette and font are GUI-thread-owned. Wine's real theme/settings
+  * notifications refresh them; painting performs no registry/theme queries. */
+@@ -1068,13 +1078,15 @@ static void taskbar_layout(void)
+     LIST_FOR_EACH_ENTRY(win, &taskbar_buttons, struct taskbar_button, entry)
+     {
+         if (!win->hwnd) continue;
+-        win->active = win->hwnd == foreground;
++        BOOL active = win->hwnd == foreground;
++        if (active != win->active) { win->active = active; win->placed_shown = FALSE; }
+         win->visible = taskbar_eligible(win->hwnd);
+         if (win->visible) ++count;
+         WCHAR title[256], previous[256];
+         GetWindowTextW(win->hwnd, title, ARRAY_SIZE(title)); GetWindowTextW(win->button, previous, ARRAY_SIZE(previous));
+         if (lstrcmpW(title, previous))
+         {
++            win->placed_shown = FALSE;
+             lstrcpyW(win->title, title); SetWindowTextW(win->button, title);
+             if (win->tooltip)
+             {
+@@ -1094,17 +1106,80 @@ static void taskbar_layout(void)
+         BOOL visible = !win->hwnd || (win->visible && shown < slots - !!overflow);
+         if (visible)
+         {
+-            SetWindowPos(win->button, NULL, pos, (tray_height - taskbar_button_width) / 2,
+-                         taskbar_button_width, taskbar_button_width, SWP_NOACTIVATE | SWP_NOZORDER | SWP_SHOWWINDOW);
++            RECT place = {pos, (tray_height - taskbar_button_width) / 2, pos + taskbar_button_width,
++                          (tray_height - taskbar_button_width) / 2 + taskbar_button_width};
++            /* A button that moved, appeared, changed state or title is placed and repainted; the rest stay. */
++            if (!win->placed_shown || !EqualRect(&place, &win->placed))
++            {
++                SetWindowPos(win->button, NULL, place.left, place.top, taskbar_button_width, taskbar_button_width,
++                             SWP_NOACTIVATE | SWP_NOZORDER | SWP_SHOWWINDOW);
++                InvalidateRect(win->button, NULL, FALSE);
++                win->placed = place; win->placed_shown = TRUE;
++            }
+             pos += taskbar_button_width + taskbar_gap; ++shown;
+-            InvalidateRect(win->button, NULL, FALSE);
+         }
+-        else ShowWindow(win->button, SW_HIDE);
++        else if (win->placed_shown || IsWindowVisible(win->button))
++        {
++            ShowWindow(win->button, SW_HIDE); win->placed_shown = FALSE;
++        }
++    }
++    RECT more = {pos, (tray_height - taskbar_button_width) / 2, pos + taskbar_button_width,
++                 (tray_height - taskbar_button_width) / 2 + taskbar_button_width};
++    if (overflow != taskbar_overflow_shown || (overflow && !EqualRect(&more, &taskbar_overflow_placed)))
++    {
++        SetWindowPos(taskbar_overflow, NULL, more.left, more.top, taskbar_button_width, taskbar_button_width,
++                     SWP_NOACTIVATE | SWP_NOZORDER | (overflow ? SWP_SHOWWINDOW : SWP_HIDEWINDOW));
++        taskbar_overflow_placed = more; taskbar_overflow_shown = overflow;
++    }
++    RECT clock = {tray_width - taskbar_clock_width, 0, tray_width, tray_height};
++    if (!EqualRect(&clock, &taskbar_clock_placed) || !IsWindowVisible(taskbar_clock))
++    {
++        SetWindowPos(taskbar_clock, NULL, clock.left, 0, taskbar_clock_width, tray_height,
++                     SWP_NOACTIVATE | SWP_NOZORDER | SWP_SHOWWINDOW);
++        taskbar_clock_placed = clock;
++    }
++}
++
++/* Theme, font, DPI or display changes: every button, the overflow and the clock are placed and painted again. */
++static void taskbar_forget_placement(void)
++{
++    struct taskbar_button *win;
++    LIST_FOR_EACH_ENTRY(win, &taskbar_buttons, struct taskbar_button, entry) win->placed_shown = FALSE;
++    SetRectEmpty(&taskbar_overflow_placed); SetRectEmpty(&taskbar_clock_placed);
++    taskbar_overflow_shown = -1;
++}
++
++/* The clock's next wake: just after the next minute begins. */
++static void taskbar_arm_clock(void)
++{
++    SYSTEMTIME now;
++    GetLocalTime(&now);
++    SetTimer(tray_window, 3, (60 - now.wSecond) * 1000 - now.wMilliseconds + 50, NULL);
++}
++
++/* A window event (out of context, on this thread): one sync shortly after, however many arrive. */
++static void CALLBACK taskbar_event(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG object, LONG child,
++                                   DWORD thread, DWORD time)
++{
++    if (!hwnd || object != OBJID_WINDOW || child != CHILDID_SELF) return;
++    if (event != EVENT_SYSTEM_FOREGROUND && (GetWindowLongW(hwnd, GWL_STYLE) & WS_CHILD)) return;
++    if (taskbar_sync_pending) return;
++    taskbar_sync_pending = TRUE;
++    SetTimer(tray_window, TASKBAR_SYNC, 30, NULL);
++}
++
++static void taskbar_watch(BOOL on)
++{
++    static const DWORD ranges[4][2] = {{EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND},
++        {EVENT_SYSTEM_MINIMIZESTART, EVENT_SYSTEM_MINIMIZEEND}, {EVENT_OBJECT_SHOW, EVENT_OBJECT_HIDE},
++        {EVENT_OBJECT_NAMECHANGE, EVENT_OBJECT_NAMECHANGE}};
++    for (unsigned i = 0; i < ARRAY_SIZE(taskbar_events); ++i)
++    {
++        if (taskbar_events[i]) { UnhookWinEvent(taskbar_events[i]); taskbar_events[i] = NULL; }
++        if (on) taskbar_events[i] = SetWinEventHook(ranges[i][0], ranges[i][1], NULL, taskbar_event, 0, 0,
++                                                     WINEVENT_OUTOFCONTEXT);
++        if (on && !taskbar_events[i]) WARN("Mihawk taskbar event hook %u failed: %lu\n", i, GetLastError());
+     }
+-    SetWindowPos(taskbar_overflow, NULL, pos, (tray_height - taskbar_button_width) / 2,
+-                 taskbar_button_width, taskbar_button_width, SWP_NOACTIVATE | SWP_NOZORDER | (overflow ? SWP_SHOWWINDOW : SWP_HIDEWINDOW));
+-    SetWindowPos(taskbar_clock, NULL, tray_width - taskbar_clock_width, 0, taskbar_clock_width, tray_height,
+-                 SWP_NOACTIVATE | SWP_NOZORDER | SWP_SHOWWINDOW);
+ }
+ 
+ static void taskbar_overflow_menu(void)
+@@ -1587,7 +1662,7 @@ static void do_show_systray(void)
+             SystemParametersInfoW(SPI_SETWORKAREA, 0, &area, SPIF_SENDCHANGE);
+         SetWindowPos(tray_window, HWND_TOPMOST, info.rcMonitor.left, info.rcMonitor.bottom - tray_height,
+                      tray_width, tray_height, SWP_NOACTIVATE | SWP_SHOWWINDOW);
+-        taskbar_update_clock(); sync_taskbar_buttons();
++        taskbar_forget_placement(); taskbar_update_clock(); sync_taskbar_buttons();
+         return;
+     }
+     hdc = GetDC( 0 );
+@@ -1648,7 +1723,13 @@ static LRESULT WINAPI shell_traywnd_proc( HWND hwnd, UINT msg, WPARAM wparam, LP
+         }
+         break;
+     case WM_TIMER:
+-        if (mihawk_taskbar && wparam == 3) { taskbar_update_clock(); sync_taskbar_buttons(); return 0; }
++        if (mihawk_taskbar && wparam == 3) { taskbar_update_clock(); taskbar_arm_clock(); return 0; }
++        if (mihawk_taskbar && wparam == TASKBAR_SYNC)
++        {
++            KillTimer(hwnd, wparam); taskbar_sync_pending = FALSE;
++            sync_taskbar_buttons();
++            return 0;
++        }
+         if (mihawk_taskbar && wparam == TASKBAR_PREVIEW_SHOW)
+         {
+             KillTimer(hwnd, wparam);
+@@ -1671,13 +1752,14 @@ static LRESULT WINAPI shell_traywnd_proc( HWND hwnd, UINT msg, WPARAM wparam, LP
+             taskbar_refresh_theme(); taskbar_refresh_font(); taskbar_surfaces();
+             InvalidateRect(hwnd, NULL, FALSE); InvalidateRect(taskbar_clock, NULL, FALSE);
+             if (taskbar_preview) InvalidateRect(taskbar_preview, NULL, FALSE);
+-            sync_taskbar_buttons();
++            taskbar_time[0] = 0; taskbar_update_clock();  /* the locale's time and date formats may have changed */
++            taskbar_forget_placement(); sync_taskbar_buttons();
+         }
+         break;
+     case WM_DESTROY:
+         if (mihawk_taskbar)
+         {
+-            KillTimer(hwnd, 3); UnregisterHotKey(hwnd, 0x4d54);
++            KillTimer(hwnd, 3); KillTimer(hwnd, TASKBAR_SYNC); taskbar_watch(FALSE); UnregisterHotKey(hwnd, 0x4d54);
+             taskbar_preview_hide();
+             if (taskbar_preview) DestroyWindow(taskbar_preview);
+             if (taskbar_theme) CloseThemeData(taskbar_theme);
+@@ -1878,7 +1960,8 @@ void initialize_systray( BOOL arg_using_root, BOOL arg_enable_shell, BOOL arg_sh
+         taskbar_overflow = CreateWindowW(WC_BUTTONW, L"More applications", WS_CHILD | WS_TABSTOP | BS_OWNERDRAW,
+                                         0, 0, 0, 0, tray_window, (HMENU)0xfff0, NULL, NULL);
+         SetWindowSubclass(taskbar_overflow, taskbar_button_proc, 1, 0);
+-        SetTimer(tray_window, 3, 1000, NULL);
++        taskbar_arm_clock();
++        taskbar_watch(TRUE);
+         taskbar_surfaces();
+     }
+     add_taskbar_button( 0 );

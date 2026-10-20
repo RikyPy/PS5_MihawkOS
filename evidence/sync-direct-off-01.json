@@ -1,0 +1,33 @@
+{
+ "run": "sync-direct-off-01",
+ "what": "sync-probe.exe",
+ "env": [
+  "WINE_PS5_SERVER_DIRECT=0"
+ ],
+ "result": "finished",
+ "seconds": 8.4,
+ "probe_verdict": "PASS",
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": true,
+ "bench": {
+  "wait50_ms": 50.0,
+  "event_round_trip_us": 37.504,
+  "set_reset_pair_us": 29.461,
+  "wait_signalled_us": 16.663,
+  "wait_any4_us": 16.794,
+  "wait_all4_us": 16.74,
+  "sem_release_wait_us": 31.36,
+  "mutex_take_release_us": 31.608,
+  "critsec_contended_us": 0.08,
+  "sleep0_us": 4.61,
+  "sleep1_us": 1099.176
+ },
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [],
+  "top": []
+ }
+}

@@ -1,0 +1,9 @@
+anchor frame
+2 capture
+4 capture
+5 capture
+# Capture after closure. Pointer motion redraws the retained desktop even if
+# the close's single frame has already reached the display.
+12 capture
+12.2 touch 0 0 0.2
+12.4 touch 400 200 0.2

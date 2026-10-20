@@ -1,0 +1,57 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Mon, 5 Oct 2026 23:30:00 -0400
+Subject: [PATCH] win32u: PS5: a helper process's frames go to the title.
+
+A Windows program in a Sony-managed helper process composed its windows
+as in the title, but its frames reached no sink and were never seen. The
+sink now hands them to the title through a shared page (pw_wine_sink.c),
+and the title, which shows them, draws the cursor where the desktop's
+input left it. Here the driver says where its picture sits on the desktop
+and draws no cursor of its own, which in a helper would stay where that
+process last saw it.
+---
+diff --git a/dlls/win32u/ps5drv.c b/dlls/win32u/ps5drv.c
+index 9c4870d..43022a6 100644
+--- a/dlls/win32u/ps5drv.c
++++ b/dlls/win32u/ps5drv.c
+@@ -84,6 +84,11 @@ struct ps5_window
+ };
+ 
+ static int (*present_frame)( const void *bgra, UINT width, UINT height, UINT stride );
++/* In a Windows program in a Sony-managed helper process the title shows the frames (pw_wine_sink.c) and draws the
++ * cursor itself, where the desktop's input left it: this driver tells it where its picture sits on the desktop and
++ * draws no cursor of its own, which would stay where this process last saw it. */
++static void (*present_origin)( INT x, INT y );
++static BOOL helper_process;
+ static int (*next_input)( struct ps5_input *input );
+ static int (*input_fd)(void);
+ 
+@@ -182,7 +187,8 @@ static void present_screen(void)
+     view = view_rect();
+     width = view.right - view.left;
+     height = view.bottom - view.top;
+-    if ((!cursor_image || !frame) && width == (INT)screen_width && height == (INT)screen_height &&
++    if (present_origin) present_origin( view.left, view.top );
++    if ((!cursor_image || !frame || helper_process) && width == (INT)screen_width && height == (INT)screen_height &&
+         !view.left && !view.top)
+     {
+         present_frame( screen, screen_width, screen_height, screen_width * 4 );
+@@ -191,7 +197,7 @@ static void present_screen(void)
+     if (!frame) return;
+     for (y = 0; y < height; y++)
+         memcpy( frame + y * width, screen + (view.top + y) * screen_width + view.left, width * 4 );
+-    if (cursor_image) draw_cursor( frame, (POINT){view.left, view.top}, width, height );
++    if (cursor_image && !helper_process) draw_cursor( frame, (POINT){view.left, view.top}, width, height );
+     present_frame( frame, width, height, width * 4 );
+ }
+ 
+@@ -966,6 +972,8 @@ void ps5_install_user_driver(void)
+         return;
+     }
+     present_frame = dlsym( RTLD_DEFAULT, "pw_wine_present" );
++    present_origin = dlsym( RTLD_DEFAULT, "pw_wine_present_origin" );
++    helper_process = getenv( "WINE_PS5_CHILD" ) != NULL;
+     next_input = dlsym( RTLD_DEFAULT, "pw_wine_next_input" );
+     input_fd = dlsym( RTLD_DEFAULT, "pw_wine_input_fd" );
+ #ifdef SONAME_LIBVULKAN

@@ -1,0 +1,136 @@
+{
+ "launch_readiness": {
+  "ready": true,
+  "seconds": 0.155,
+  "settle_seconds": 0.0,
+  "census_seconds": 0.141,
+  "previous_cleanup_verified": true
+ },
+ "run": "mihawk-shell-gate-2026-10-09-08-native-signals",
+ "what": "pe32-probe.exe",
+ "env": [
+  "WINE_PS5_NATIVE_SIGNALS=1",
+  "PROTON_LAYOUT=launcher"
+ ],
+ "result": "finished",
+ "seconds": 26.2,
+ "probe_verdict": "PASS",
+ "clean_owner_restart": true,
+ "launcher_end_status": 0,
+ "initial_status": 0,
+ "closed_on_request": false,
+ "child_logs": [
+  "klog/mihawk-shell-gate-2026-10-09-08-native-signals-wine-child-6908.log",
+  "klog/mihawk-shell-gate-2026-10-09-08-native-signals-wine-child-6909.log",
+  "klog/mihawk-shell-gate-2026-10-09-08-native-signals-wine-child-6910.log",
+  "klog/mihawk-shell-gate-2026-10-09-08-native-signals-wine-child-6911.log",
+  "klog/mihawk-shell-gate-2026-10-09-08-native-signals-wine-child-6912.log",
+  "klog/mihawk-shell-gate-2026-10-09-08-native-signals-wine-child-6913.log",
+  "klog/mihawk-shell-gate-2026-10-09-08-native-signals-wine-child-6914.log",
+  "klog/mihawk-shell-gate-2026-10-09-08-native-signals-wine-child-6915.log",
+  "klog/mihawk-shell-gate-2026-10-09-08-native-signals-wine-child-6916.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": true,
+ "bench": {},
+ "steady": {
+  "server": {
+   "calls": 0.0,
+   "per_s": 0.0,
+   "avg_us": 0.0,
+   "selects": 0.0,
+   "blocked": 0.0,
+   "block_avg_us": 0.0,
+   "waits": 0.0,
+   "handles_avg": 0.0,
+   "wait_all": 0.0,
+   "polled": 0.0,
+   "delays": 0.0,
+   "yields": 0.0,
+   "intervals": 3
+  }
+ },
+ "intervals": {
+  "frames": [],
+  "server": [
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   }
+  ],
+  "top": []
+ },
+ "shown": {
+  "frames": 0,
+  "per_10s": [],
+  "longest_gap_ms": 0
+ },
+ "broker": {
+  "local_offer": null,
+  "host_limit": null,
+  "refused": [],
+  "refused_count": 0,
+  "clients": [],
+  "wedged": false,
+  "failure_reasons": [],
+  "host_peak": null,
+  "local_peak": null
+ },
+ "captures": [],
+ "cleanup_verified": true,
+ "hooks_removed": true
+}

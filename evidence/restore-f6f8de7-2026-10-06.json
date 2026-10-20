@@ -1,0 +1,53 @@
+{
+  "battery": "restore-f6f8de7-2026-10-06",
+  "revision": "f6f8de743ad007d3dd66d5199e489f565ca3e720",
+  "dirty": false,
+  "cases": [
+    {
+      "case": "pe64",
+      "run": "restore-f6f8de7-2026-10-06-pe64",
+      "runner_status": 0,
+      "seconds": 11.7,
+      "result": "finished",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 2,
+      "protocol_errors": 0
+    },
+    {
+      "case": "payload-eight",
+      "run": "restore-f6f8de7-2026-10-06-payload-eight",
+      "runner_status": 0,
+      "seconds": 70.8,
+      "result": "finished",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 10,
+      "protocol_errors": 0
+    },
+    {
+      "case": "descendants",
+      "run": "restore-f6f8de7-2026-10-06-descendants",
+      "runner_status": 0,
+      "seconds": 47.6,
+      "result": "finished",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 5,
+      "protocol_errors": 0
+    }
+  ],
+  "passed": true
+}

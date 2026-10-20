@@ -1,0 +1,48 @@
+{
+ "run": "ia32-decode-oracle-2026-10-07-01",
+ "where": "host PC (no console run)",
+ "what": "src/pw_ia32_decode.c and src/pw_ia32_print.c against LLVM's disassembler over the generated corpus (tools/ia32-decode-oracle.sh)",
+ "oracle": {
+  "verdict": "PASS",
+  "encodings": 8136120,
+  "agree_text": 1172482,
+  "agree_invalid": 5303450,
+  "vex_evex_xop_skipped": 12456,
+  "groups": 30193,
+  "unexplained_groups": 0,
+  "LENGTH": {
+   "encodings": 3016,
+   "unexplained_groups": 0
+  },
+  "TEXT": {
+   "encodings": 48618,
+   "unexplained_groups": 0
+  },
+  "OURS_ONLY": {
+   "encodings": 10490,
+   "unexplained_groups": 0
+  },
+  "LLVM_ONLY": {
+   "encodings": 0,
+   "unexplained_groups": 0
+  },
+  "NOFORM": {
+   "encodings": 1585608,
+   "unexplained_groups": 0
+  },
+  "forms": 408,
+  "llvm": "23.1.1"
+ },
+ "explained_encodings": {
+  "LENGTH": 3016,
+  "TEXT": 48618,
+  "OURS_ONLY": 10490
+ },
+ "explained_by": "tests/ia32-llvm-differences.txt",
+ "host_test": "tests/test_pw_ia32_decode.c passed under ASan/UBSan (tools/host-tests.sh ia32): table rules, 40 exact cases with every truncation, the 15-byte limit, 200000 random byte streams",
+ "not_covered": [
+  "x87 (D8-DF), MMX and SSE forms: length checked, no form yet (the NOFORM count)",
+  "VEX/EVEX/XOP: refused before their length (vex_evex_xop_skipped)",
+  "semantics: M2 compares execution with the CPU"
+ ]
+}

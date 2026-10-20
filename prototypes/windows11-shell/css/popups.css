@@ -1,0 +1,149 @@
+/* Popups (js/popups.js): the hardware-key indicator and the emoji / clipboard history panel.
+   OSD: Windows 11 22H2's flyout, a 192x48 acrylic pill centred 24 px above the taskbar with a
+   16 px glyph, a 4 px bar (the Slider rail: ControlStrongFillColorDefault under an accent fill)
+   and the value. Panel: a 360x480 acrylic flyout (8 px corners, flyout stroke and elevation)
+   with icon tabs (SelectorBar), the search box, the content (40 px emoji cells, clip cards) and
+   the category strip. Colours are WinUI resources from tokens.css. */
+
+/* ---------- OSD ---------- */
+#flyouts > .osd { pointer-events: none; }
+.osd {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--taskbar-reserve, var(--taskbar-height)) + 24px);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 192px;
+  height: 48px;
+  margin-left: -96px;
+  padding: 0 16px;
+  border-radius: 24px;
+  color: var(--TextFillColorPrimary);
+  font: var(--type-body);
+}
+.osd-glyph { display: flex; flex: none; width: 16px; height: 16px; }
+.osd-bar {
+  position: relative;
+  flex: 1 1 auto;
+  height: 4px;
+  border-radius: 2px;
+  background-color: var(--ControlStrongFillColorDefault);
+  overflow: hidden;
+}
+.osd-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--osd-value, 0%);
+  border-radius: 2px;
+  background-color: var(--AccentFillColorDefault);
+  transition: width var(--dur-faster) linear, background-color var(--dur-faster) linear;
+}
+.osd.muted .osd-fill { background-color: var(--ControlStrongFillColorDisabled); }
+.osd-value { flex: none; min-width: 24px; text-align: right; font-variant-numeric: tabular-nums; }
+
+/* ---------- emoji / clipboard panel ---------- */
+.cp {
+  --cp-emoji-font: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", "Twemoji Mozilla", sans-serif;
+  position: fixed;
+  left: 0;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  width: min(360px, calc(100vw - 16px));
+  height: min(480px, calc(100dvh - var(--taskbar-reserve, var(--taskbar-height)) - 16px));
+  overflow: hidden;
+  color: var(--TextFillColorPrimary);
+  font: var(--type-body);
+  outline: none;
+}
+.cp-glyph { opacity: 1; transition: opacity var(--dur-faster) linear; }
+[data-theme="dark"] .cp-glyph img { filter: invert(1); }
+:is(.cp-tab, .cp-cat):active .cp-glyph { opacity: 0.7; } /* TextFillColorSecondary / Primary */
+
+/* Tabs and categories: SelectorBar items (hover plate, pressed, 16x3 accent pill under the selected one). */
+.cp-tabs { flex: none; gap: 4px; padding: 6px 8px 0; }
+.cp-tabs > .cp-tab { min-width: 48px; padding: 0 14px 2px; }
+.cp-strip {
+  flex: none;
+  gap: 2px;
+  padding: 4px 8px;
+  border-top: 1px solid var(--DividerStrokeColorDefault);
+  overflow: auto hidden;
+  scrollbar-width: none;
+}
+.cp-strip::-webkit-scrollbar { display: none; }
+.cp-strip > .cp-cat { flex: 1 0 auto; min-width: 40px; min-height: 36px; padding: 0 8px 2px; }
+.cp-cat-text { font: var(--type-caption); white-space: nowrap; }
+
+.cp-search-row { position: relative; flex: none; padding: 8px 12px 4px; }
+.cp-search { width: 100%; }
+
+.cp-body {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 4px 8px 8px;
+  overflow: hidden auto;
+  overscroll-behavior: contain;
+}
+.cp-heading { margin: 8px 4px 4px; color: var(--TextFillColorPrimary); font: 600 14px/20px var(--font-ui); }
+
+.cp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(40px, 1fr)); }
+.cp-grid-kaomoji { grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); }
+.cp-item {
+  height: 40px;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-control);
+  background-color: var(--SubtleFillColorTransparent);
+  color: var(--TextFillColorPrimary);
+  font: 24px/1 var(--cp-emoji-font);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: background-color var(--dur-faster) linear, color var(--dur-faster) linear;
+}
+.cp-emoji { width: 24px; height: 24px; margin: auto; pointer-events: none; }
+.cp-item:hover { background-color: var(--SubtleFillColorSecondary); }
+.cp-item:active { background-color: var(--SubtleFillColorTertiary); color: var(--TextFillColorSecondary); }
+.cp-grid-kaomoji .cp-item { padding: 0 6px; font: var(--type-body); }
+.cp-grid-symbols .cp-item { font: 18px/1 var(--font-ui); }
+
+/* Clipboard history: settings-card plates (CardBackgroundFillColorDefault, card stroke). */
+.cp-clip-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 6px 4px 10px; }
+.cp-clip-title { font: 600 14px/20px var(--font-ui); }
+.cp-clips { display: flex; flex-direction: column; gap: 4px; }
+.cp-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  min-height: 64px;
+  padding: 7px 7px 7px 15px;
+  border: 1px solid var(--CardStrokeColorDefault);
+  border-radius: var(--radius-control);
+  background-color: var(--CardBackgroundFillColorDefault);
+  background-clip: padding-box;
+  transition: background-color var(--dur-faster) linear;
+}
+.cp-card:hover { background-color: var(--ControlFillColorSecondary); }
+.cp-card:active:not(:has(button:active)) { background-color: var(--ControlFillColorTertiary); }
+.cp-clip-text {
+  display: -webkit-box;
+  flex: 1 1 auto;
+  min-width: 0;
+  padding-top: 6px;
+  overflow: hidden;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+}
+.cp-actions { display: flex; flex: none; flex-direction: column; align-items: center; gap: 2px; }
+.cp-pinned { display: flex; align-items: center; justify-content: center; width: 32px; height: 24px; color: var(--TextFillColorSecondary); }
+
+.cp-note { padding: 40px 24px; text-align: center; }
+.cp-note-title { margin: 0 0 4px; font: 600 14px/20px var(--font-ui); }
+.cp-note-text { margin: 0 0 16px; color: var(--TextFillColorSecondary); }

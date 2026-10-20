@@ -1,0 +1,7046 @@
+{
+ "d3d10core": {
+  "exit_code": 0,
+  "failure_count": 1405,
+  "failures": [
+   {
+    "file": "d3d10core.c",
+    "line": 1725,
+    "text": "Adapter parent should not implement IDXGIFactory1."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 1743,
+    "text": "Got refcount 1, expected 3."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 1795,
+    "text": "Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 1861,
+    "text": "Device has 1 references left."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 2105,
+    "text": "Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 2172,
+    "text": "Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 2190,
+    "text": "Test 7: Got unexpected hr 0 (format 0x1)."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 2190,
+    "text": "Test 8: Got unexpected hr 0 (format 0x1)."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 2190,
+    "text": "Test 9: Got unexpected hr 0 (format 0x1)."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 2198,
+    "text": "Device has 2 references left."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 2380,
+    "text": "Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 2441,
+    "text": "Device has 1 references left."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 2777,
+    "text": "Test 4: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 2778,
+    "text": "Unexpected pointer 00007F79D0E06050."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 2777,
+    "text": "Test 5: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 2778,
+    "text": "Unexpected pointer 00007F79D0BD1060."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 2777,
+    "text": "Test 6: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 2778,
+    "text": "Unexpected pointer 00007F79D0BD1580."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 2777,
+    "text": "Test 7: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 2778,
+    "text": "Unexpected pointer 00007F79D0E17A50."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 2777,
+    "text": "Test 8: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 2778,
+    "text": "Unexpected pointer 00007F79D0E17F00."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 2777,
+    "text": "Test 9: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 2778,
+    "text": "Unexpected pointer 00007F79D0E183B0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 2777,
+    "text": "Test 10: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 2778,
+    "text": "Unexpected pointer 00007F79D0E18860."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 2777,
+    "text": "Test 11: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 2778,
+    "text": "Unexpected pointer 00007F79D0E18960."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 2777,
+    "text": "Test 12: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 2778,
+    "text": "Unexpected pointer 00007F79D0DD0D80."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 2784,
+    "text": "Device has 9 references left."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3015,
+    "text": "Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3159,
+    "text": "Test 6: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3160,
+    "text": "Unexpected pointer 00007F79D0DD2F38."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3159,
+    "text": "Test 7: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3160,
+    "text": "Unexpected pointer 00007F79D0DEF6C8."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3159,
+    "text": "Test 8: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3160,
+    "text": "Unexpected pointer 00007F79D0DEFA18."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3159,
+    "text": "Test 9: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3160,
+    "text": "Unexpected pointer 00007F79D0F21A38."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3159,
+    "text": "Test 10: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3160,
+    "text": "Unexpected pointer 00007F79D0F21B38."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3159,
+    "text": "Test 11: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3160,
+    "text": "Unexpected pointer 00007F79D0DD10D8."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3159,
+    "text": "Test 12: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3160,
+    "text": "Unexpected pointer 00007F79D0DD11D8."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3159,
+    "text": "Test 13: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3160,
+    "text": "Unexpected pointer 00007F79D0DD12D8."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3159,
+    "text": "Test 14: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3160,
+    "text": "Unexpected pointer 00007F79D0F3DCE8."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3159,
+    "text": "Test 23: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3160,
+    "text": "Unexpected pointer 00007F79D0F3DDE8."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3159,
+    "text": "Test 24: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3160,
+    "text": "Unexpected pointer 00007F79D0F3DEE8."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3159,
+    "text": "Test 25: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3160,
+    "text": "Unexpected pointer 00007F79D0F3DFE8."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3159,
+    "text": "Test 26: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3160,
+    "text": "Unexpected pointer 00007F79D0F3E0E8."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3159,
+    "text": "Test 27: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3160,
+    "text": "Unexpected pointer 00007F79D0F3E1E8."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3159,
+    "text": "Test 28: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3160,
+    "text": "Unexpected pointer 00007F79D0F3E2E8."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3159,
+    "text": "Test 29: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3160,
+    "text": "Unexpected pointer 00007F79D0F3E3E8."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3159,
+    "text": "Test 30: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3160,
+    "text": "Unexpected pointer 00007F79D0F3E4E8."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3159,
+    "text": "Test 31: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3160,
+    "text": "Unexpected pointer 00007F79D0F3E5E8."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3159,
+    "text": "Test 32: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3160,
+    "text": "Unexpected pointer 00007F79D0F3E6E8."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3159,
+    "text": "Test 33: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3160,
+    "text": "Unexpected pointer 00007F79D0F3E7E8."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3159,
+    "text": "Test 34: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3160,
+    "text": "Unexpected pointer 00007F79D0F3E8E8."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3166,
+    "text": "Device has 22 references left."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3759,
+    "text": "Got view dimension 0x5, expected 0x9."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3759,
+    "text": "Got view dimension 0x5, expected 0x9."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3798,
+    "text": "Test 5: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3799,
+    "text": "Unexpected pointer 00007F79D12A8BE0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3798,
+    "text": "Test 6: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3799,
+    "text": "Unexpected pointer 00007F79D12A8CF0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3798,
+    "text": "Test 7: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3799,
+    "text": "Unexpected pointer 00007F79D12A8E00."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3798,
+    "text": "Test 8: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3799,
+    "text": "Unexpected pointer 00007F79D12A8F10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3798,
+    "text": "Test 9: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3799,
+    "text": "Unexpected pointer 00007F79D12A9020."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3798,
+    "text": "Test 10: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3799,
+    "text": "Unexpected pointer 00007F79D12A9130."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3798,
+    "text": "Test 11: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3799,
+    "text": "Unexpected pointer 00007F79D12A9240."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3798,
+    "text": "Test 12: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3799,
+    "text": "Unexpected pointer 00007F79D12A9350."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3798,
+    "text": "Test 13: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3799,
+    "text": "Unexpected pointer 00007F79D12A9460."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3798,
+    "text": "Test 14: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3799,
+    "text": "Unexpected pointer 00007F79D12A9570."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3798,
+    "text": "Test 15: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3799,
+    "text": "Unexpected pointer 00007F79D12A9680."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3798,
+    "text": "Test 16: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3799,
+    "text": "Unexpected pointer 00007F79D12A9790."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3798,
+    "text": "Test 17: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3799,
+    "text": "Unexpected pointer 00007F79D12A98A0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3798,
+    "text": "Test 18: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3799,
+    "text": "Unexpected pointer 00007F79D12A99B0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3798,
+    "text": "Test 19: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3799,
+    "text": "Unexpected pointer 00007F79D12A9AC0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3798,
+    "text": "Test 20: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3799,
+    "text": "Unexpected pointer 00007F79D12A9BD0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3798,
+    "text": "Test 21: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3799,
+    "text": "Unexpected pointer 00007F79D12A9CE0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3798,
+    "text": "Test 22: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3799,
+    "text": "Unexpected pointer 00007F79D12A9DF0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3798,
+    "text": "Test 23: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3799,
+    "text": "Unexpected pointer 00007F79D12A9F00."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3798,
+    "text": "Test 34: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3799,
+    "text": "Unexpected pointer 00007F79D12AA010."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3798,
+    "text": "Test 35: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3799,
+    "text": "Unexpected pointer 00007F79D12AA120."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3798,
+    "text": "Test 36: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3799,
+    "text": "Unexpected pointer 00007F79D12AA230."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3798,
+    "text": "Test 37: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3799,
+    "text": "Unexpected pointer 00007F79D12AA340."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3798,
+    "text": "Test 38: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3799,
+    "text": "Unexpected pointer 00007F79D12AA450."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3798,
+    "text": "Test 39: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3799,
+    "text": "Unexpected pointer 00007F79D12AA560."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 3805,
+    "text": "Device has 25 references left."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 4343,
+    "text": "Got unexpected independent blend enable 0x1."
+   },
+   {
+    "file": "crash.c",
+    "line": 94480,
+    "text": "a queued test function crashed with 0xc0000005 at offset 0x6ffebbd1c26a"
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 4895,
+    "text": "Got unexpected data size 88."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 4900,
+    "text": "Got unexpected hr 0x80070057."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 4914,
+    "text": "Got unexpected hr 0x80070057."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 4925,
+    "text": "Got unexpected IAVertices count: 4294967295."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 4926,
+    "text": "Got unexpected IAPrimitives count: 4294967295."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 4927,
+    "text": "Got unexpected VSInvocations count: 4294967295."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 4929,
+    "text": "Got unexpected GSPrimitives count: 4294967295."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 4930,
+    "text": "Got unexpected CInvocations count: 4294967295."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 4932,
+    "text": "Got unexpected CPrimitives count: 4294967295."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 4944,
+    "text": "Got unexpected hr 0x80070057."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 4945,
+    "text": "Got unexpected IAVertices count: 4294967295."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 4946,
+    "text": "Got unexpected IAPrimitives count: 4294967295."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 4947,
+    "text": "Got unexpected VSInvocations count: 4294967295."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 4949,
+    "text": "Got unexpected GSPrimitives count: 4294967295."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 4950,
+    "text": "Got unexpected CInvocations count: 4294967295."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 4952,
+    "text": "Got unexpected CPrimitives count: 4294967295."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 5499,
+    "text": "Got unexpected viewport {1431655765, 1431655765, 1431655765, 1431655765, 1.46601547e+013, 1.46601547e+013} in slot 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 5499,
+    "text": "Got unexpected viewport {1431655765, 1431655765, 1431655765, 1431655765, 1.46601547e+013, 1.46601547e+013} in slot 1."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 5499,
+    "text": "Got unexpected viewport {1431655765, 1431655765, 1431655765, 1431655765, 1.46601547e+013, 1.46601547e+013} in slot 2."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 5499,
+    "text": "Got unexpected viewport {1431655765, 1431655765, 1431655765, 1431655765, 1.46601547e+013, 1.46601547e+013} in slot 3."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 5499,
+    "text": "Got unexpected viewport {1431655765, 1431655765, 1431655765, 1431655765, 1.46601547e+013, 1.46601547e+013} in slot 4."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 5499,
+    "text": "Got unexpected viewport {1431655765, 1431655765, 1431655765, 1431655765, 1.46601547e+013, 1.46601547e+013} in slot 5."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 5499,
+    "text": "Got unexpected viewport {1431655765, 1431655765, 1431655765, 1431655765, 1.46601547e+013, 1.46601547e+013} in slot 6."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 5499,
+    "text": "Got unexpected viewport {1431655765, 1431655765, 1431655765, 1431655765, 1.46601547e+013, 1.46601547e+013} in slot 7."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 5499,
+    "text": "Got unexpected viewport {1431655765, 1431655765, 1431655765, 1431655765, 1.46601547e+013, 1.46601547e+013} in slot 8."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 5499,
+    "text": "Got unexpected viewport {1431655765, 1431655765, 1431655765, 1431655765, 1.46601547e+013, 1.46601547e+013} in slot 9."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 5499,
+    "text": "Got unexpected viewport {1431655765, 1431655765, 1431655765, 1431655765, 1.46601547e+013, 1.46601547e+013} in slot 10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 5499,
+    "text": "Got unexpected viewport {1431655765, 1431655765, 1431655765, 1431655765, 1.46601547e+013, 1.46601547e+013} in slot 11."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 5499,
+    "text": "Got unexpected viewport {1431655765, 1431655765, 1431655765, 1431655765, 1.46601547e+013, 1.46601547e+013} in slot 12."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 5499,
+    "text": "Got unexpected viewport {1431655765, 1431655765, 1431655765, 1431655765, 1.46601547e+013, 1.46601547e+013} in slot 13."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 5499,
+    "text": "Got unexpected viewport {1431655765, 1431655765, 1431655765, 1431655765, 1.46601547e+013, 1.46601547e+013} in slot 14."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 5499,
+    "text": "Got unexpected viewport {1431655765, 1431655765, 1431655765, 1431655765, 1.46601547e+013, 1.46601547e+013} in slot 15."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 5724,
+    "text": "Got unexpected blend factor {1.00000001e-001, 2.00000003e-001, 3.00000012e-001, 4.00000006e-001}."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 6055,
+    "text": "Got unexpected viewport {1431655765, 1431655765, 1431655765, 1431655765, 1.46601547e+013, 1.46601547e+013} in slot 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 6055,
+    "text": "Got unexpected viewport {1431655765, 1431655765, 1431655765, 1431655765, 1.46601547e+013, 1.46601547e+013} in slot 1."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 6055,
+    "text": "Got unexpected viewport {1431655765, 1431655765, 1431655765, 1431655765, 1.46601547e+013, 1.46601547e+013} in slot 2."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 6055,
+    "text": "Got unexpected viewport {1431655765, 1431655765, 1431655765, 1431655765, 1.46601547e+013, 1.46601547e+013} in slot 3."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 6055,
+    "text": "Got unexpected viewport {1431655765, 1431655765, 1431655765, 1431655765, 1.46601547e+013, 1.46601547e+013} in slot 4."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 6055,
+    "text": "Got unexpected viewport {1431655765, 1431655765, 1431655765, 1431655765, 1.46601547e+013, 1.46601547e+013} in slot 5."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 6055,
+    "text": "Got unexpected viewport {1431655765, 1431655765, 1431655765, 1431655765, 1.46601547e+013, 1.46601547e+013} in slot 6."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 6055,
+    "text": "Got unexpected viewport {1431655765, 1431655765, 1431655765, 1431655765, 1.46601547e+013, 1.46601547e+013} in slot 7."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 6055,
+    "text": "Got unexpected viewport {1431655765, 1431655765, 1431655765, 1431655765, 1.46601547e+013, 1.46601547e+013} in slot 8."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 6055,
+    "text": "Got unexpected viewport {1431655765, 1431655765, 1431655765, 1431655765, 1.46601547e+013, 1.46601547e+013} in slot 9."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 6055,
+    "text": "Got unexpected viewport {1431655765, 1431655765, 1431655765, 1431655765, 1.46601547e+013, 1.46601547e+013} in slot 10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 6055,
+    "text": "Got unexpected viewport {1431655765, 1431655765, 1431655765, 1431655765, 1.46601547e+013, 1.46601547e+013} in slot 11."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 6055,
+    "text": "Got unexpected viewport {1431655765, 1431655765, 1431655765, 1431655765, 1.46601547e+013, 1.46601547e+013} in slot 12."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 6055,
+    "text": "Got unexpected viewport {1431655765, 1431655765, 1431655765, 1431655765, 1.46601547e+013, 1.46601547e+013} in slot 13."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 6055,
+    "text": "Got unexpected viewport {1431655765, 1431655765, 1431655765, 1431655765, 1.46601547e+013, 1.46601547e+013} in slot 14."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 6055,
+    "text": "Got unexpected viewport {1431655765, 1431655765, 1431655765, 1431655765, 1.46601547e+013, 1.46601547e+013} in slot 15."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 6331,
+    "text": "Got unexpected color 0x007f0080."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10491,
+    "text": "Got hr 0, expected 0x80070057, test 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10495,
+    "text": "Got hr 0 for READ."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10495,
+    "text": "Got hr 0 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10502,
+    "text": "Got hr 0, expected 0x80070057, test 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10506,
+    "text": "Got hr 0 for WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10506,
+    "text": "Got hr 0 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10506,
+    "text": "Got hr 0 for WRITE_DISCARD."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10513,
+    "text": "Got hr 0, expected 0x80070057, test 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10491,
+    "text": "Got hr 0, expected 0x80070057, test 1."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10495,
+    "text": "Got hr 0 for READ."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10495,
+    "text": "Got hr 0 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10502,
+    "text": "Got hr 0, expected 0x80070057, test 1."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10506,
+    "text": "Got hr 0 for WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10506,
+    "text": "Got hr 0 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10506,
+    "text": "Got hr 0 for WRITE_DISCARD."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10513,
+    "text": "Got hr 0, expected 0x80070057, test 1."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10484,
+    "text": "Got hr 0 for READ."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10484,
+    "text": "Got hr 0 for WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10484,
+    "text": "Got hr 0 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10484,
+    "text": "Got hr 0 for WRITE_DISCARD."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10491,
+    "text": "Got hr 0, expected 0x80070057, test 2."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10495,
+    "text": "Got hr 0 for READ."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10495,
+    "text": "Got hr 0 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10502,
+    "text": "Got hr 0, expected 0x80070057, test 2."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10506,
+    "text": "Got hr 0 for WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10506,
+    "text": "Got hr 0 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10506,
+    "text": "Got hr 0 for WRITE_DISCARD."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10513,
+    "text": "Got hr 0, expected 0x80070057, test 2."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10491,
+    "text": "Got hr 0, expected 0x80070057, test 3."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10495,
+    "text": "Got hr 0 for READ."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10495,
+    "text": "Got hr 0 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10502,
+    "text": "Got hr 0, expected 0x80070057, test 3."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10506,
+    "text": "Got hr 0 for WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10506,
+    "text": "Got hr 0 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10506,
+    "text": "Got hr 0 for WRITE_DISCARD."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10513,
+    "text": "Got hr 0, expected 0x80070057, test 3."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10491,
+    "text": "Got hr 0, expected 0x80070057, test 4."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10495,
+    "text": "Got hr 0 for READ."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10495,
+    "text": "Got hr 0 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10502,
+    "text": "Got hr 0, expected 0x80070057, test 4."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10506,
+    "text": "Got hr 0 for WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10506,
+    "text": "Got hr 0 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10506,
+    "text": "Got hr 0 for WRITE_DISCARD."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10513,
+    "text": "Got hr 0, expected 0x80070057, test 4."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10491,
+    "text": "Got hr 0, expected 0x80070057, test 5."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10495,
+    "text": "Got hr 0 for READ."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10495,
+    "text": "Got hr 0 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10502,
+    "text": "Got hr 0, expected 0x80070057, test 5."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10506,
+    "text": "Got hr 0 for WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10506,
+    "text": "Got hr 0 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10506,
+    "text": "Got hr 0 for WRITE_DISCARD."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10513,
+    "text": "Got hr 0, expected 0x80070057, test 5."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10480,
+    "text": "Got hr 0, expected 0x80070057, test 7."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10491,
+    "text": "Got hr 0, expected 0x80070057, test 7."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10495,
+    "text": "Got hr 0x80070057 for WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10502,
+    "text": "Got hr 0, expected 0x80070057, test 7."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10506,
+    "text": "Got hr 0x80070057 for READ."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10513,
+    "text": "Got hr 0, expected 0x80070057, test 7."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10517,
+    "text": "Got hr 0x80070057 for READ."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10517,
+    "text": "Got hr 0x80070057 for WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10517,
+    "text": "Got hr 0x80070057 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10491,
+    "text": "Got hr 0, expected 0x80070057, test 8."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10495,
+    "text": "Got hr 0x80070057 for WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10502,
+    "text": "Got hr 0, expected 0x80070057, test 8."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10506,
+    "text": "Got hr 0x80070057 for READ."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10513,
+    "text": "Got hr 0, expected 0x80070057, test 8."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10517,
+    "text": "Got hr 0x80070057 for READ."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10517,
+    "text": "Got hr 0x80070057 for WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10517,
+    "text": "Got hr 0x80070057 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10491,
+    "text": "Got hr 0, expected 0x80070057, test 9."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10495,
+    "text": "Got hr 0x80070057 for WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10502,
+    "text": "Got hr 0, expected 0x80070057, test 9."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10506,
+    "text": "Got hr 0x80070057 for READ."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10513,
+    "text": "Got hr 0, expected 0x80070057, test 9."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10517,
+    "text": "Got hr 0x80070057 for READ."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10517,
+    "text": "Got hr 0x80070057 for WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10517,
+    "text": "Got hr 0x80070057 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10491,
+    "text": "Got hr 0, expected 0x80070057, test 10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10495,
+    "text": "Got hr 0x80070057 for WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10502,
+    "text": "Got hr 0, expected 0x80070057, test 10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10506,
+    "text": "Got hr 0x80070057 for READ."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10513,
+    "text": "Got hr 0, expected 0x80070057, test 10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10517,
+    "text": "Got hr 0x80070057 for READ."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10517,
+    "text": "Got hr 0x80070057 for WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10517,
+    "text": "Got hr 0x80070057 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10491,
+    "text": "Got hr 0, expected 0x80070057, test 11."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10495,
+    "text": "Got hr 0x80070057 for WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10502,
+    "text": "Got hr 0, expected 0x80070057, test 11."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10506,
+    "text": "Got hr 0x80070057 for READ."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10513,
+    "text": "Got hr 0, expected 0x80070057, test 11."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10517,
+    "text": "Got hr 0x80070057 for READ."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10517,
+    "text": "Got hr 0x80070057 for WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10517,
+    "text": "Got hr 0x80070057 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10480,
+    "text": "Got hr 0, expected 0x80070057, test 12."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10491,
+    "text": "Got hr 0, expected 0x80070057, test 12."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10495,
+    "text": "Got hr 0x80070057 for WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10502,
+    "text": "Got hr 0, expected 0x80070057, test 12."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10506,
+    "text": "Got hr 0x80070057 for READ."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10513,
+    "text": "Got hr 0, expected 0x80070057, test 12."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10517,
+    "text": "Got hr 0x80070057 for READ."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10517,
+    "text": "Got hr 0x80070057 for WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10517,
+    "text": "Got hr 0x80070057 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10480,
+    "text": "Got hr 0, expected 0x80070057, test 13."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10491,
+    "text": "Got hr 0, expected 0x80070057, test 13."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10495,
+    "text": "Got hr 0x80070057 for WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10502,
+    "text": "Got hr 0, expected 0x80070057, test 13."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10506,
+    "text": "Got hr 0x80070057 for READ."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10513,
+    "text": "Got hr 0, expected 0x80070057, test 13."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10517,
+    "text": "Got hr 0x80070057 for READ."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10517,
+    "text": "Got hr 0x80070057 for WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10517,
+    "text": "Got hr 0x80070057 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10480,
+    "text": "Got hr 0, expected 0x80070057, test 15."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10484,
+    "text": "Got hr 0 for READ."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10484,
+    "text": "Got hr 0 for WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10484,
+    "text": "Got hr 0 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10491,
+    "text": "Got hr 0, expected 0x80070057, test 15."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10495,
+    "text": "Got hr 0 for READ."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10495,
+    "text": "Got hr 0 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10502,
+    "text": "Got hr 0, expected 0x80070057, test 15."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10506,
+    "text": "Got hr 0 for WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10506,
+    "text": "Got hr 0 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10513,
+    "text": "Got hr 0, expected 0x80070057, test 15."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10480,
+    "text": "Got hr 0, expected 0x80070057, test 16."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10484,
+    "text": "Got hr 0 for READ."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10484,
+    "text": "Got hr 0 for WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10484,
+    "text": "Got hr 0 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10495,
+    "text": "Got hr 0 for READ."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10495,
+    "text": "Got hr 0 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10502,
+    "text": "Got hr 0, expected 0x80070057, test 16."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10506,
+    "text": "Got hr 0 for WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10506,
+    "text": "Got hr 0 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10513,
+    "text": "Got hr 0, expected 0x80070057, test 16."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10480,
+    "text": "Got hr 0, expected 0x80070057, test 17."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10484,
+    "text": "Got hr 0 for READ."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10484,
+    "text": "Got hr 0 for WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10484,
+    "text": "Got hr 0 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10495,
+    "text": "Got hr 0 for READ."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10495,
+    "text": "Got hr 0 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10502,
+    "text": "Got hr 0, expected 0x80070057, test 17."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10506,
+    "text": "Got hr 0 for WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10506,
+    "text": "Got hr 0 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10513,
+    "text": "Got hr 0, expected 0x80070057, test 17."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10480,
+    "text": "Got hr 0, expected 0x80070057, test 18."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10484,
+    "text": "Got hr 0 for READ."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10484,
+    "text": "Got hr 0 for WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10484,
+    "text": "Got hr 0 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10495,
+    "text": "Got hr 0 for READ."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10495,
+    "text": "Got hr 0 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10502,
+    "text": "Got hr 0, expected 0x80070057, test 18."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10506,
+    "text": "Got hr 0 for WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10506,
+    "text": "Got hr 0 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10513,
+    "text": "Got hr 0, expected 0x80070057, test 18."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10480,
+    "text": "Got hr 0, expected 0x80070057, test 19."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10484,
+    "text": "Got hr 0 for READ."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10484,
+    "text": "Got hr 0 for WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10484,
+    "text": "Got hr 0 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10495,
+    "text": "Got hr 0 for READ."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10495,
+    "text": "Got hr 0 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10502,
+    "text": "Got hr 0, expected 0x80070057, test 19."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10506,
+    "text": "Got hr 0 for WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10506,
+    "text": "Got hr 0 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10513,
+    "text": "Got hr 0, expected 0x80070057, test 19."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10480,
+    "text": "Got hr 0, expected 0x80070057, test 20."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10484,
+    "text": "Got hr 0 for READ."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10484,
+    "text": "Got hr 0 for WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10484,
+    "text": "Got hr 0 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10491,
+    "text": "Got hr 0, expected 0x80070057, test 20."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10495,
+    "text": "Got hr 0 for READ."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10495,
+    "text": "Got hr 0 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10502,
+    "text": "Got hr 0, expected 0x80070057, test 20."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10506,
+    "text": "Got hr 0 for WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10506,
+    "text": "Got hr 0 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10513,
+    "text": "Got hr 0, expected 0x80070057, test 20."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10480,
+    "text": "Got hr 0, expected 0x80070057, test 21."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10484,
+    "text": "Got hr 0 for READ."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10484,
+    "text": "Got hr 0 for WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10484,
+    "text": "Got hr 0 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10491,
+    "text": "Got hr 0, expected 0x80070057, test 21."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10495,
+    "text": "Got hr 0 for READ."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10495,
+    "text": "Got hr 0 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10502,
+    "text": "Got hr 0, expected 0x80070057, test 21."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10506,
+    "text": "Got hr 0 for WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10506,
+    "text": "Got hr 0 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10513,
+    "text": "Got hr 0, expected 0x80070057, test 21."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10480,
+    "text": "Got hr 0, expected 0x80070057, test 23."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10484,
+    "text": "Got hr 0 for READ."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10484,
+    "text": "Got hr 0 for WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10484,
+    "text": "Got hr 0 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10484,
+    "text": "Got hr 0 for WRITE_DISCARD."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10495,
+    "text": "Got hr 0 for READ."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10495,
+    "text": "Got hr 0 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10506,
+    "text": "Got hr 0 for WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10506,
+    "text": "Got hr 0 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10506,
+    "text": "Got hr 0 for WRITE_DISCARD."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10480,
+    "text": "Got hr 0, expected 0x80070057, test 24."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10484,
+    "text": "Got hr 0 for READ."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10484,
+    "text": "Got hr 0 for WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10484,
+    "text": "Got hr 0 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10484,
+    "text": "Got hr 0 for WRITE_DISCARD."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10491,
+    "text": "Got hr 0, expected 0x80070057, test 24."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10495,
+    "text": "Got hr 0 for READ."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10495,
+    "text": "Got hr 0 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10502,
+    "text": "Got hr 0, expected 0x80070057, test 24."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10506,
+    "text": "Got hr 0 for WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10506,
+    "text": "Got hr 0 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10506,
+    "text": "Got hr 0 for WRITE_DISCARD."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10513,
+    "text": "Got hr 0, expected 0x80070057, test 24."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10480,
+    "text": "Got hr 0, expected 0x80070057, test 25."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10484,
+    "text": "Got hr 0 for READ."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10484,
+    "text": "Got hr 0 for WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10484,
+    "text": "Got hr 0 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10484,
+    "text": "Got hr 0 for WRITE_DISCARD."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10491,
+    "text": "Got hr 0, expected 0x80070057, test 25."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10495,
+    "text": "Got hr 0 for READ."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10495,
+    "text": "Got hr 0 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10502,
+    "text": "Got hr 0, expected 0x80070057, test 25."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10506,
+    "text": "Got hr 0 for WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10506,
+    "text": "Got hr 0 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10506,
+    "text": "Got hr 0 for WRITE_DISCARD."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10513,
+    "text": "Got hr 0, expected 0x80070057, test 25."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10480,
+    "text": "Got hr 0, expected 0x80070057, test 26."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10484,
+    "text": "Got hr 0 for READ."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10484,
+    "text": "Got hr 0 for WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10484,
+    "text": "Got hr 0 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10484,
+    "text": "Got hr 0 for WRITE_DISCARD."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10491,
+    "text": "Got hr 0, expected 0x80070057, test 26."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10495,
+    "text": "Got hr 0 for READ."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10495,
+    "text": "Got hr 0 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10502,
+    "text": "Got hr 0, expected 0x80070057, test 26."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10506,
+    "text": "Got hr 0 for WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10506,
+    "text": "Got hr 0 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10506,
+    "text": "Got hr 0 for WRITE_DISCARD."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10513,
+    "text": "Got hr 0, expected 0x80070057, test 26."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10480,
+    "text": "Got hr 0, expected 0x80070057, test 27."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10484,
+    "text": "Got hr 0 for READ."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10484,
+    "text": "Got hr 0 for WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10484,
+    "text": "Got hr 0 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10484,
+    "text": "Got hr 0 for WRITE_DISCARD."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10491,
+    "text": "Got hr 0, expected 0x80070057, test 27."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10495,
+    "text": "Got hr 0 for READ."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10495,
+    "text": "Got hr 0 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10502,
+    "text": "Got hr 0, expected 0x80070057, test 27."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10506,
+    "text": "Got hr 0 for WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10506,
+    "text": "Got hr 0 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10506,
+    "text": "Got hr 0 for WRITE_DISCARD."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10513,
+    "text": "Got hr 0, expected 0x80070057, test 27."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10480,
+    "text": "Got hr 0, expected 0x80070057, test 28."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10484,
+    "text": "Got hr 0 for READ."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10484,
+    "text": "Got hr 0 for WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10484,
+    "text": "Got hr 0 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10484,
+    "text": "Got hr 0 for WRITE_DISCARD."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10491,
+    "text": "Got hr 0, expected 0x80070057, test 28."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10495,
+    "text": "Got hr 0 for READ."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10495,
+    "text": "Got hr 0 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10502,
+    "text": "Got hr 0, expected 0x80070057, test 28."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10506,
+    "text": "Got hr 0 for WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10506,
+    "text": "Got hr 0 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10506,
+    "text": "Got hr 0 for WRITE_DISCARD."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10513,
+    "text": "Got hr 0, expected 0x80070057, test 28."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10480,
+    "text": "Got hr 0, expected 0x80070057, test 29."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10484,
+    "text": "Got hr 0 for READ."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10484,
+    "text": "Got hr 0 for WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10484,
+    "text": "Got hr 0 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10484,
+    "text": "Got hr 0 for WRITE_DISCARD."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10491,
+    "text": "Got hr 0, expected 0x80070057, test 29."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10495,
+    "text": "Got hr 0 for READ."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10495,
+    "text": "Got hr 0 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10502,
+    "text": "Got hr 0, expected 0x80070057, test 29."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10506,
+    "text": "Got hr 0 for WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10506,
+    "text": "Got hr 0 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10506,
+    "text": "Got hr 0 for WRITE_DISCARD."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10513,
+    "text": "Got hr 0, expected 0x80070057, test 29."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10567,
+    "text": "Got hr 0, expected 0x80070057, test 6."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10574,
+    "text": "Got hr 0x80070057 for WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10581,
+    "text": "Got hr 0, expected 0x80070057, test 6."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10588,
+    "text": "Got hr 0x80070057 for READ."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10595,
+    "text": "Got hr 0, expected 0x80070057, test 6."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10602,
+    "text": "Got hr 0x80070057 for READ."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10602,
+    "text": "Got hr 0x80070057 for WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10602,
+    "text": "Got hr 0x80070057 for READ_WRITE."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10556,
+    "text": "Got hr 0, expected 0x80070057, test 7."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10567,
+    "text": "Got hr 0, expected 0x80070057, test 7."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10581,
+    "text": "Got hr 0, expected 0x80070057, test 7."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10595,
+    "text": "Got hr 0, expected 0x80070057, test 7."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10567,
+    "text": "Got hr 0, expected 0x80070057, test 11."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10581,
+    "text": "Got hr 0, expected 0x80070057, test 11."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10595,
+    "text": "Got hr 0, expected 0x80070057, test 11."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10556,
+    "text": "Got hr 0, expected 0x80070057, test 13."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10567,
+    "text": "Got hr 0, expected 0x80070057, test 13."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10581,
+    "text": "Got hr 0, expected 0x80070057, test 13."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10595,
+    "text": "Got hr 0, expected 0x80070057, test 13."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10556,
+    "text": "Got hr 0, expected 0x80070057, test 14."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10567,
+    "text": "Got hr 0, expected 0x80070057, test 14."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10581,
+    "text": "Got hr 0, expected 0x80070057, test 14."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10595,
+    "text": "Got hr 0, expected 0x80070057, test 14."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10556,
+    "text": "Got hr 0, expected 0x80070057, test 15."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10560,
+    "text": "Got hr 0x80070057 for WRITE_DISCARD."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10567,
+    "text": "Got hr 0, expected 0x80070057, test 15."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10581,
+    "text": "Got hr 0, expected 0x80070057, test 15."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10588,
+    "text": "Got hr 0x80070057 for WRITE_DISCARD."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10595,
+    "text": "Got hr 0, expected 0x80070057, test 15."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10556,
+    "text": "Got hr 0, expected 0x80070057, test 19."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10560,
+    "text": "Got hr 0x80070057 for WRITE_DISCARD."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10581,
+    "text": "Got hr 0, expected 0x80070057, test 19."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10588,
+    "text": "Got hr 0x80070057 for WRITE_DISCARD."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10595,
+    "text": "Got hr 0, expected 0x80070057, test 19."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10556,
+    "text": "Got hr 0, expected 0x80070057, test 21."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10560,
+    "text": "Got hr 0x80070057 for WRITE_DISCARD."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10567,
+    "text": "Got hr 0, expected 0x80070057, test 21."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10581,
+    "text": "Got hr 0, expected 0x80070057, test 21."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10588,
+    "text": "Got hr 0x80070057 for WRITE_DISCARD."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10595,
+    "text": "Got hr 0, expected 0x80070057, test 21."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10556,
+    "text": "Got hr 0, expected 0x80070057, test 22."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10560,
+    "text": "Got hr 0x80070057 for WRITE_DISCARD."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10567,
+    "text": "Got hr 0, expected 0x80070057, test 22."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10581,
+    "text": "Got hr 0, expected 0x80070057, test 22."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10588,
+    "text": "Got hr 0x80070057 for WRITE_DISCARD."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10595,
+    "text": "Got hr 0, expected 0x80070057, test 22."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10556,
+    "text": "Got hr 0, expected 0x80070057, test 23."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10556,
+    "text": "Got hr 0, expected 0x80070057, test 27."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10567,
+    "text": "Got hr 0, expected 0x80070057, test 27."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10581,
+    "text": "Got hr 0, expected 0x80070057, test 27."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10595,
+    "text": "Got hr 0, expected 0x80070057, test 27."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10556,
+    "text": "Got hr 0, expected 0x80070057, test 29."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10567,
+    "text": "Got hr 0, expected 0x80070057, test 29."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10581,
+    "text": "Got hr 0, expected 0x80070057, test 29."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10595,
+    "text": "Got hr 0, expected 0x80070057, test 29."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10556,
+    "text": "Got hr 0, expected 0x80070057, test 30."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10567,
+    "text": "Got hr 0, expected 0x80070057, test 30."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10581,
+    "text": "Got hr 0, expected 0x80070057, test 30."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 10595,
+    "text": "Got hr 0, expected 0x80070057, test 30."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x1."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x2."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x3."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x4."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x5."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x6."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x7."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x8."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x9."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0xa."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0xb."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0xc."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0xd."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0xe."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0xf."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x11."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x12."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x13."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13840,
+    "text": "Unexpected SHADER_GATHER_COMPARISON for format 0x13."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x14."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13840,
+    "text": "Unexpected SHADER_GATHER_COMPARISON for format 0x14."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x15."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13840,
+    "text": "Unexpected SHADER_GATHER_COMPARISON for format 0x15."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x16."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13840,
+    "text": "Unexpected SHADER_GATHER_COMPARISON for format 0x16."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x17."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x18."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x19."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x1a."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x1b."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x1c."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x1d."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x1e."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x1f."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x20."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x21."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x22."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x23."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x24."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x25."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x26."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x27."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13840,
+    "text": "Unexpected SHADER_GATHER_COMPARISON for format 0x27."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x28."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13840,
+    "text": "Unexpected SHADER_GATHER_COMPARISON for format 0x28."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x29."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13840,
+    "text": "Unexpected SHADER_GATHER_COMPARISON for format 0x29."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x2a."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x2b."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x2c."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13840,
+    "text": "Unexpected SHADER_GATHER_COMPARISON for format 0x2c."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x2d."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13840,
+    "text": "Unexpected SHADER_GATHER_COMPARISON for format 0x2d."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x2e."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13840,
+    "text": "Unexpected SHADER_GATHER_COMPARISON for format 0x2e."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x2f."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13840,
+    "text": "Unexpected SHADER_GATHER_COMPARISON for format 0x2f."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x30."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x31."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x32."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x33."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x34."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x35."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13840,
+    "text": "Unexpected SHADER_GATHER_COMPARISON for format 0x35."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x36."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13840,
+    "text": "Unexpected SHADER_GATHER_COMPARISON for format 0x36."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x37."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13840,
+    "text": "Unexpected SHADER_GATHER_COMPARISON for format 0x37."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x38."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13840,
+    "text": "Unexpected SHADER_GATHER_COMPARISON for format 0x38."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x39."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x3a."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x3b."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x3c."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x3d."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x3e."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x3f."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x40."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x41."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x43."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x44."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x45."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x46."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x47."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x48."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x49."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x4a."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x4b."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x4c."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x4d."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x4e."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x4f."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x50."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x51."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x52."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x53."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x54."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x55."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x56."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x57."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x58."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x5a."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x5b."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x5c."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x5d."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x5e."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x5f."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x60."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x61."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x62."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x63."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x64."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x67."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x68."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x69."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x6a."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x6b."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 13838,
+    "text": "Unexpected SHADER_GATHER for format 0x73."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15647,
+    "text": "Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15647,
+    "text": "Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15649,
+    "text": "Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15649,
+    "text": "Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15653,
+    "text": "Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15653,
+    "text": "Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15655,
+    "text": "Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15655,
+    "text": "Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15657,
+    "text": "Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15657,
+    "text": "Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15675,
+    "text": "Test 0: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15675,
+    "text": "Test 0: Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15675,
+    "text": "Test 1: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15675,
+    "text": "Test 1: Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15675,
+    "text": "Test 2: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15675,
+    "text": "Test 2: Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15675,
+    "text": "Test 3: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15675,
+    "text": "Test 3: Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15675,
+    "text": "Test 4: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15675,
+    "text": "Test 4: Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15675,
+    "text": "Test 5: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15675,
+    "text": "Test 5: Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15675,
+    "text": "Test 6: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15675,
+    "text": "Test 6: Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15675,
+    "text": "Test 7: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15675,
+    "text": "Test 7: Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15675,
+    "text": "Test 8: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15675,
+    "text": "Test 8: Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15675,
+    "text": "Test 9: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15675,
+    "text": "Test 9: Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15675,
+    "text": "Test 10: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15675,
+    "text": "Test 10: Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15675,
+    "text": "Test 11: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15675,
+    "text": "Test 11: Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15675,
+    "text": "Test 12: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15675,
+    "text": "Test 12: Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15675,
+    "text": "Test 13: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15675,
+    "text": "Test 13: Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15675,
+    "text": "Test 14: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15675,
+    "text": "Test 14: Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15676,
+    "text": "Test 15: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15676,
+    "text": "Test 15: Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15676,
+    "text": "Test 16: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15676,
+    "text": "Test 16: Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15676,
+    "text": "Test 17: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15676,
+    "text": "Test 17: Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15675,
+    "text": "Test 18: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15675,
+    "text": "Test 18: Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15676,
+    "text": "Test 19: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15676,
+    "text": "Test 19: Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15676,
+    "text": "Test 20: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15676,
+    "text": "Test 20: Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15676,
+    "text": "Test 21: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15676,
+    "text": "Test 21: Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15675,
+    "text": "Test 22: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15675,
+    "text": "Test 22: Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15690,
+    "text": "Test 0: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15690,
+    "text": "Test 0: Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15691,
+    "text": "Test 0: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15691,
+    "text": "Test 0: Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15690,
+    "text": "Test 1: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15690,
+    "text": "Test 1: Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15691,
+    "text": "Test 1: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15691,
+    "text": "Test 1: Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15690,
+    "text": "Test 2: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15690,
+    "text": "Test 2: Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15691,
+    "text": "Test 2: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15691,
+    "text": "Test 2: Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15690,
+    "text": "Test 3: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15690,
+    "text": "Test 3: Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15691,
+    "text": "Test 3: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15691,
+    "text": "Test 3: Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15690,
+    "text": "Test 4: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15690,
+    "text": "Test 4: Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15691,
+    "text": "Test 4: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15691,
+    "text": "Test 4: Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15690,
+    "text": "Test 6: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15690,
+    "text": "Test 6: Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15691,
+    "text": "Test 6: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15691,
+    "text": "Test 6: Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15690,
+    "text": "Test 7: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15690,
+    "text": "Test 7: Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15691,
+    "text": "Test 7: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15691,
+    "text": "Test 7: Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15690,
+    "text": "Test 8: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15690,
+    "text": "Test 8: Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15691,
+    "text": "Test 8: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15691,
+    "text": "Test 8: Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15690,
+    "text": "Test 9: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15690,
+    "text": "Test 9: Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15691,
+    "text": "Test 9: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15691,
+    "text": "Test 9: Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15690,
+    "text": "Test 10: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15690,
+    "text": "Test 10: Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15691,
+    "text": "Test 10: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15691,
+    "text": "Test 10: Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15690,
+    "text": "Test 11: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15690,
+    "text": "Test 11: Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15691,
+    "text": "Test 11: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15691,
+    "text": "Test 11: Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15690,
+    "text": "Test 14: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15690,
+    "text": "Test 14: Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15691,
+    "text": "Test 14: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15691,
+    "text": "Test 14: Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15690,
+    "text": "Test 16: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15690,
+    "text": "Test 16: Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15691,
+    "text": "Test 16: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15691,
+    "text": "Test 16: Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15690,
+    "text": "Test 17: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15690,
+    "text": "Test 17: Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15691,
+    "text": "Test 17: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15691,
+    "text": "Test 17: Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15690,
+    "text": "Test 18: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15690,
+    "text": "Test 18: Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15691,
+    "text": "Test 18: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15691,
+    "text": "Test 18: Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15690,
+    "text": "Test 19: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15690,
+    "text": "Test 19: Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15691,
+    "text": "Test 19: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15691,
+    "text": "Test 19: Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15690,
+    "text": "Test 20: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15690,
+    "text": "Test 20: Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15691,
+    "text": "Test 20: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15691,
+    "text": "Test 20: Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15690,
+    "text": "Test 21: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15690,
+    "text": "Test 21: Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15691,
+    "text": "Test 21: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15691,
+    "text": "Test 21: Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15696,
+    "text": "Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15696,
+    "text": "Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15697,
+    "text": "Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15697,
+    "text": "Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15698,
+    "text": "Got unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15698,
+    "text": "Got unexpected geometry shader 00007F79D11E8C10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15800,
+    "text": "Got 0xffffffff, expected 0xff0000ff at (0, 0), sub-resource 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15809,
+    "text": "Got 0xff00ff00, expected 0xff0000ff at (0, 0), sub-resource 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 15818,
+    "text": "Got 0xff0000ff, expected 0xffffffff at (0, 0), sub-resource 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 6: Got unexpected colour 0xff0000ff at (1, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 6: Got unexpected colour 0xff00ffff at (2, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 6: Got unexpected colour 0xff00ff00 at (3, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 6: Got unexpected colour 0xffff0000 at (1, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 6: Got unexpected colour 0xffff00ff at (2, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 6: Got unexpected colour 0xff000000 at (3, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 6: Got unexpected colour 0xffffffff at (1, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 6: Got unexpected colour 0xffffffff at (2, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 6: Got unexpected colour 0xffffffff at (3, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 6: Got unexpected colour 0xff0000ff at (0, 0), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 6: Got unexpected colour 0xff00ffff at (1, 0), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 6: Got unexpected colour 0xff00ff00 at (2, 0), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 6: Got unexpected colour 0xffffff00 at (3, 0), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 6: Got unexpected colour 0xffff0000 at (0, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 6: Got unexpected colour 0xffff00ff at (1, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 6: Got unexpected colour 0xff000000 at (2, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 6: Got unexpected colour 0xff7f7f7f at (3, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 6: Got unexpected colour 0xffffffff at (0, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 6: Got unexpected colour 0xffffffff at (1, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 6: Got unexpected colour 0xffffffff at (2, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 6: Got unexpected colour 0xff000000 at (3, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 6: Got unexpected colour 0xffffffff at (0, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 6: Got unexpected colour 0xff000000 at (1, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 6: Got unexpected colour 0xff000000 at (2, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 6: Got unexpected colour 0xff000000 at (3, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 7: Got unexpected colour 0xff0000ff at (1, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 7: Got unexpected colour 0xff00ffff at (2, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 7: Got unexpected colour 0xff00ff00 at (3, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 7: Got unexpected colour 0xffff0000 at (1, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 7: Got unexpected colour 0xffff00ff at (2, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 7: Got unexpected colour 0xff000000 at (3, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 7: Got unexpected colour 0xffffffff at (1, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 7: Got unexpected colour 0xffffffff at (2, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 7: Got unexpected colour 0xffffffff at (3, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 7: Got unexpected colour 0xff0000ff at (0, 0), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 7: Got unexpected colour 0xff00ffff at (1, 0), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 7: Got unexpected colour 0xff00ff00 at (2, 0), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 7: Got unexpected colour 0xffffff00 at (3, 0), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 7: Got unexpected colour 0xffff0000 at (0, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 7: Got unexpected colour 0xffff00ff at (1, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 7: Got unexpected colour 0xff000000 at (2, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 7: Got unexpected colour 0xff7f7f7f at (3, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 7: Got unexpected colour 0xffffffff at (0, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 7: Got unexpected colour 0xffffffff at (1, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 7: Got unexpected colour 0xffffffff at (2, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 7: Got unexpected colour 0xff000000 at (3, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 7: Got unexpected colour 0xffffffff at (0, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 7: Got unexpected colour 0xff000000 at (1, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 7: Got unexpected colour 0xff000000 at (2, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 7: Got unexpected colour 0xff000000 at (3, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 14: Got unexpected colour 0xff0000ff at (1, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 14: Got unexpected colour 0xff00ffff at (2, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 14: Got unexpected colour 0xff00ff00 at (3, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 14: Got unexpected colour 0xffff0000 at (1, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 14: Got unexpected colour 0xffff00ff at (2, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 14: Got unexpected colour 0xff000000 at (3, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 14: Got unexpected colour 0xffffffff at (1, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 14: Got unexpected colour 0xffffffff at (2, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 14: Got unexpected colour 0xffffffff at (3, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 14: Got unexpected colour 0xff0000ff at (0, 0), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 14: Got unexpected colour 0xff00ffff at (1, 0), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 14: Got unexpected colour 0xff00ff00 at (2, 0), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 14: Got unexpected colour 0xffffff00 at (3, 0), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 14: Got unexpected colour 0xffff0000 at (0, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 14: Got unexpected colour 0xffff00ff at (1, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 14: Got unexpected colour 0xff000000 at (2, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 14: Got unexpected colour 0xff7f7f7f at (3, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 14: Got unexpected colour 0xffffffff at (0, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 14: Got unexpected colour 0xffffffff at (1, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 14: Got unexpected colour 0xffffffff at (2, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 14: Got unexpected colour 0xff000000 at (3, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 14: Got unexpected colour 0xffffffff at (0, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 14: Got unexpected colour 0xff000000 at (1, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 14: Got unexpected colour 0xff000000 at (2, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 14: Got unexpected colour 0xff000000 at (3, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 15: Got unexpected colour 0xff0000ff at (1, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 15: Got unexpected colour 0xff00ffff at (2, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 15: Got unexpected colour 0xff00ff00 at (3, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 15: Got unexpected colour 0xffff0000 at (1, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 15: Got unexpected colour 0xffff00ff at (2, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 15: Got unexpected colour 0xff000000 at (3, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 15: Got unexpected colour 0xffffffff at (1, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 15: Got unexpected colour 0xffffffff at (2, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 15: Got unexpected colour 0xffffffff at (3, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 15: Got unexpected colour 0xff0000ff at (0, 0), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 15: Got unexpected colour 0xff00ffff at (1, 0), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 15: Got unexpected colour 0xff00ff00 at (2, 0), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 15: Got unexpected colour 0xffffff00 at (3, 0), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 15: Got unexpected colour 0xffff0000 at (0, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 15: Got unexpected colour 0xffff00ff at (1, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 15: Got unexpected colour 0xff000000 at (2, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 15: Got unexpected colour 0xff7f7f7f at (3, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 15: Got unexpected colour 0xffffffff at (0, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 15: Got unexpected colour 0xffffffff at (1, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 15: Got unexpected colour 0xffffffff at (2, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 15: Got unexpected colour 0xff000000 at (3, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 15: Got unexpected colour 0xffffffff at (0, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 15: Got unexpected colour 0xff000000 at (1, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 15: Got unexpected colour 0xff000000 at (2, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 15: Got unexpected colour 0xff000000 at (3, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 16: Got unexpected colour 0xff0000ff at (1, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 16: Got unexpected colour 0xff00ffff at (2, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 16: Got unexpected colour 0xff00ff00 at (3, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 16: Got unexpected colour 0xffff0000 at (1, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 16: Got unexpected colour 0xffff00ff at (2, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 16: Got unexpected colour 0xff000000 at (3, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 16: Got unexpected colour 0xffffffff at (1, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 16: Got unexpected colour 0xffffffff at (2, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 16: Got unexpected colour 0xffffffff at (3, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 16: Got unexpected colour 0xff0000ff at (0, 0), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 16: Got unexpected colour 0xff00ffff at (1, 0), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 16: Got unexpected colour 0xff00ff00 at (2, 0), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 16: Got unexpected colour 0xffffff00 at (3, 0), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 16: Got unexpected colour 0xffff0000 at (0, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 16: Got unexpected colour 0xffff00ff at (1, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 16: Got unexpected colour 0xff000000 at (2, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 16: Got unexpected colour 0xff7f7f7f at (3, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 16: Got unexpected colour 0xffffffff at (0, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 16: Got unexpected colour 0xffffffff at (1, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 16: Got unexpected colour 0xffffffff at (2, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 16: Got unexpected colour 0xff000000 at (3, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 16: Got unexpected colour 0xffffffff at (0, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 16: Got unexpected colour 0xff000000 at (1, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 16: Got unexpected colour 0xff000000 at (2, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 16: Got unexpected colour 0xff000000 at (3, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 17: Got unexpected colour 0xff0000ff at (1, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 17: Got unexpected colour 0xff00ffff at (2, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 17: Got unexpected colour 0xff00ff00 at (3, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 17: Got unexpected colour 0xffff0000 at (1, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 17: Got unexpected colour 0xffff00ff at (2, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 17: Got unexpected colour 0xff000000 at (3, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 17: Got unexpected colour 0xffffffff at (1, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 17: Got unexpected colour 0xffffffff at (2, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 17: Got unexpected colour 0xffffffff at (3, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 17: Got unexpected colour 0xff0000ff at (0, 0), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 17: Got unexpected colour 0xff00ffff at (1, 0), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 17: Got unexpected colour 0xff00ff00 at (2, 0), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 17: Got unexpected colour 0xffffff00 at (3, 0), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 17: Got unexpected colour 0xffff0000 at (0, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 17: Got unexpected colour 0xffff00ff at (1, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 17: Got unexpected colour 0xff000000 at (2, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 17: Got unexpected colour 0xff7f7f7f at (3, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 17: Got unexpected colour 0xffffffff at (0, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 17: Got unexpected colour 0xffffffff at (1, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 17: Got unexpected colour 0xffffffff at (2, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 17: Got unexpected colour 0xff000000 at (3, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 17: Got unexpected colour 0xffffffff at (0, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 17: Got unexpected colour 0xff000000 at (1, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 17: Got unexpected colour 0xff000000 at (2, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 17: Got unexpected colour 0xff000000 at (3, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 18: Got unexpected colour 0xff0000ff at (1, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 18: Got unexpected colour 0xff00ffff at (2, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 18: Got unexpected colour 0xff00ff00 at (3, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 18: Got unexpected colour 0xffff0000 at (1, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 18: Got unexpected colour 0xffff00ff at (2, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 18: Got unexpected colour 0xff000000 at (3, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 18: Got unexpected colour 0xffffffff at (1, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 18: Got unexpected colour 0xffffffff at (2, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 18: Got unexpected colour 0xffffffff at (3, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 18: Got unexpected colour 0xff0000ff at (0, 0), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 18: Got unexpected colour 0xff00ffff at (1, 0), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 18: Got unexpected colour 0xff00ff00 at (2, 0), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 18: Got unexpected colour 0xffffff00 at (3, 0), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 18: Got unexpected colour 0xffff0000 at (0, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 18: Got unexpected colour 0xffff00ff at (1, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 18: Got unexpected colour 0xff000000 at (2, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 18: Got unexpected colour 0xff7f7f7f at (3, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 18: Got unexpected colour 0xffffffff at (0, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 18: Got unexpected colour 0xffffffff at (1, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 18: Got unexpected colour 0xffffffff at (2, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 18: Got unexpected colour 0xff000000 at (3, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 18: Got unexpected colour 0xffffffff at (0, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 18: Got unexpected colour 0xff000000 at (1, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 18: Got unexpected colour 0xff000000 at (2, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 18: Got unexpected colour 0xff000000 at (3, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 19: Got unexpected colour 0xff0000ff at (1, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 19: Got unexpected colour 0xff00ffff at (2, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 19: Got unexpected colour 0xff00ff00 at (3, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 19: Got unexpected colour 0xffff0000 at (1, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 19: Got unexpected colour 0xffff00ff at (2, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 19: Got unexpected colour 0xff000000 at (3, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 19: Got unexpected colour 0xffffffff at (1, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 19: Got unexpected colour 0xffffffff at (2, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 19: Got unexpected colour 0xffffffff at (3, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 19: Got unexpected colour 0xff0000ff at (0, 0), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 19: Got unexpected colour 0xff00ffff at (1, 0), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 19: Got unexpected colour 0xff00ff00 at (2, 0), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 19: Got unexpected colour 0xffffff00 at (3, 0), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 19: Got unexpected colour 0xffff0000 at (0, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 19: Got unexpected colour 0xffff00ff at (1, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 19: Got unexpected colour 0xff000000 at (2, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 19: Got unexpected colour 0xff7f7f7f at (3, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 19: Got unexpected colour 0xffffffff at (0, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 19: Got unexpected colour 0xffffffff at (1, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 19: Got unexpected colour 0xffffffff at (2, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 19: Got unexpected colour 0xff000000 at (3, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 19: Got unexpected colour 0xffffffff at (0, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 19: Got unexpected colour 0xff000000 at (1, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 19: Got unexpected colour 0xff000000 at (2, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 19: Got unexpected colour 0xff000000 at (3, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 20: Got unexpected colour 0xff0000ff at (1, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 20: Got unexpected colour 0xff00ffff at (2, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 20: Got unexpected colour 0xff00ff00 at (3, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 20: Got unexpected colour 0xffff0000 at (1, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 20: Got unexpected colour 0xffff00ff at (2, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 20: Got unexpected colour 0xff000000 at (3, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 20: Got unexpected colour 0xffffffff at (1, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 20: Got unexpected colour 0xffffffff at (2, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16453,
+    "text": "Test 20: Got unexpected colour 0xffffffff at (3, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 20: Got unexpected colour 0xff0000ff at (0, 0), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 20: Got unexpected colour 0xff00ffff at (1, 0), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 20: Got unexpected colour 0xff00ff00 at (2, 0), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 20: Got unexpected colour 0xffffff00 at (3, 0), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 20: Got unexpected colour 0xffff0000 at (0, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 20: Got unexpected colour 0xffff00ff at (1, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 20: Got unexpected colour 0xff000000 at (2, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 20: Got unexpected colour 0xff7f7f7f at (3, 1), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 20: Got unexpected colour 0xffffffff at (0, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 20: Got unexpected colour 0xffffffff at (1, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 20: Got unexpected colour 0xffffffff at (2, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 20: Got unexpected colour 0xff000000 at (3, 2), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 20: Got unexpected colour 0xffffffff at (0, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 20: Got unexpected colour 0xff000000 at (1, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 20: Got unexpected colour 0xff000000 at (2, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16468,
+    "text": "Test 20: Got unexpected colour 0xff000000 at (3, 3), expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x1 -> 0x49: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x1 -> 0x49: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x1 -> 0x4a: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x1 -> 0x4a: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x1 -> 0x4b: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x1 -> 0x4b: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x1 -> 0x4c: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x1 -> 0x4c: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x1 -> 0x4d: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x1 -> 0x4d: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x1 -> 0x4e: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x1 -> 0x4e: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x1 -> 0x52: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x1 -> 0x52: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x1 -> 0x53: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x1 -> 0x53: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x1 -> 0x54: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x1 -> 0x54: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x2 -> 0x49: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x2 -> 0x49: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x2 -> 0x4a: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x2 -> 0x4a: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x2 -> 0x4b: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x2 -> 0x4b: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x2 -> 0x4c: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x2 -> 0x4c: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x2 -> 0x4d: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x2 -> 0x4d: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x2 -> 0x4e: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x2 -> 0x4e: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x2 -> 0x52: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x2 -> 0x52: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x2 -> 0x53: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x2 -> 0x53: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x2 -> 0x54: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x2 -> 0x54: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x3 -> 0x49: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x3 -> 0x49: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x3 -> 0x4a: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x3 -> 0x4a: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x3 -> 0x4b: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x3 -> 0x4b: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x3 -> 0x4c: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x3 -> 0x4c: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x3 -> 0x4d: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x3 -> 0x4d: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x3 -> 0x4e: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x3 -> 0x4e: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x3 -> 0x52: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x3 -> 0x52: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x3 -> 0x53: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x3 -> 0x53: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x3 -> 0x54: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x3 -> 0x54: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x4 -> 0x49: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x4 -> 0x49: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x4 -> 0x4a: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x4 -> 0x4a: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x4 -> 0x4b: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x4 -> 0x4b: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x4 -> 0x4c: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x4 -> 0x4c: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x4 -> 0x4d: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x4 -> 0x4d: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x4 -> 0x4e: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x4 -> 0x4e: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x4 -> 0x52: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x4 -> 0x52: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x4 -> 0x53: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x4 -> 0x53: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x4 -> 0x54: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x4 -> 0x54: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x9 -> 0x46: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x9 -> 0x46: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x9 -> 0x47: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x9 -> 0x47: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x9 -> 0x48: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x9 -> 0x48: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x9 -> 0x4f: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x9 -> 0x4f: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x9 -> 0x50: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x9 -> 0x50: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x9 -> 0x51: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x9 -> 0x51: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0xa -> 0x46: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0xa -> 0x46: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0xa -> 0x47: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0xa -> 0x47: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0xa -> 0x48: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0xa -> 0x48: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0xa -> 0x4f: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0xa -> 0x4f: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0xa -> 0x50: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0xa -> 0x50: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0xa -> 0x51: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0xa -> 0x51: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0xb -> 0x46: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0xb -> 0x46: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0xb -> 0x47: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0xb -> 0x47: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0xb -> 0x48: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0xb -> 0x48: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0xb -> 0x4f: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0xb -> 0x4f: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0xb -> 0x50: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0xb -> 0x50: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0xb -> 0x51: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0xb -> 0x51: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0xc -> 0x46: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0xc -> 0x46: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0xc -> 0x47: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0xc -> 0x47: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0xc -> 0x48: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0xc -> 0x48: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0xc -> 0x4f: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0xc -> 0x4f: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0xc -> 0x50: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0xc -> 0x50: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0xc -> 0x51: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0xc -> 0x51: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0xd -> 0x46: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0xd -> 0x46: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0xd -> 0x47: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0xd -> 0x47: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0xd -> 0x48: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0xd -> 0x48: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0xd -> 0x4f: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0xd -> 0x4f: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0xd -> 0x50: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0xd -> 0x50: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0xd -> 0x51: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0xd -> 0x51: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0xe -> 0x46: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0xe -> 0x46: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0xe -> 0x47: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0xe -> 0x47: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0xe -> 0x48: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0xe -> 0x48: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0xe -> 0x4f: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0xe -> 0x4f: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0xe -> 0x50: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0xe -> 0x50: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0xe -> 0x51: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0xe -> 0x51: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0xf -> 0x46: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0xf -> 0x46: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0xf -> 0x47: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0xf -> 0x47: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0xf -> 0x48: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0xf -> 0x48: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0xf -> 0x4f: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0xf -> 0x4f: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0xf -> 0x50: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0xf -> 0x50: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0xf -> 0x51: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0xf -> 0x51: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x10 -> 0x46: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x10 -> 0x46: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x10 -> 0x47: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x10 -> 0x47: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x10 -> 0x48: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x10 -> 0x48: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x10 -> 0x4f: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x10 -> 0x4f: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x10 -> 0x50: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x10 -> 0x50: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x10 -> 0x51: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x10 -> 0x51: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x11 -> 0x46: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x11 -> 0x46: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x11 -> 0x47: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x11 -> 0x47: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x11 -> 0x48: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x11 -> 0x48: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x11 -> 0x4f: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x11 -> 0x4f: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x11 -> 0x50: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x11 -> 0x50: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x11 -> 0x51: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x11 -> 0x51: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x12 -> 0x46: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x12 -> 0x46: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x12 -> 0x47: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x12 -> 0x47: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x12 -> 0x48: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x12 -> 0x48: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x12 -> 0x4f: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x12 -> 0x4f: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x12 -> 0x50: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x12 -> 0x50: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x12 -> 0x51: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x12 -> 0x51: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x46 -> 0x9: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x46 -> 0x9: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x46 -> 0xa: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x46 -> 0xa: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x46 -> 0xb: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x46 -> 0xb: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x46 -> 0xc: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x46 -> 0xc: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x46 -> 0xd: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x46 -> 0xd: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x46 -> 0xe: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x46 -> 0xe: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x46 -> 0xf: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x46 -> 0xf: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x46 -> 0x10: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x46 -> 0x10: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x46 -> 0x11: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x46 -> 0x11: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x46 -> 0x12: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x46 -> 0x12: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x47 -> 0x9: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x47 -> 0x9: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x47 -> 0xa: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x47 -> 0xa: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x47 -> 0xb: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x47 -> 0xb: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x47 -> 0xc: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x47 -> 0xc: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x47 -> 0xd: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x47 -> 0xd: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x47 -> 0xe: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x47 -> 0xe: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x47 -> 0xf: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x47 -> 0xf: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x47 -> 0x10: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x47 -> 0x10: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x47 -> 0x11: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x47 -> 0x11: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x47 -> 0x12: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x47 -> 0x12: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x48 -> 0x9: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x48 -> 0x9: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x48 -> 0xa: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x48 -> 0xa: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x48 -> 0xb: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x48 -> 0xb: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x48 -> 0xc: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x48 -> 0xc: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x48 -> 0xd: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x48 -> 0xd: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x48 -> 0xe: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x48 -> 0xe: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x48 -> 0xf: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x48 -> 0xf: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x48 -> 0x10: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x48 -> 0x10: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x48 -> 0x11: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x48 -> 0x11: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x48 -> 0x12: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x48 -> 0x12: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x49 -> 0x1: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x49 -> 0x1: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x49 -> 0x2: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x49 -> 0x2: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x49 -> 0x3: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x49 -> 0x3: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x49 -> 0x4: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x49 -> 0x4: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x4a -> 0x1: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x4a -> 0x1: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x4a -> 0x2: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x4a -> 0x2: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x4a -> 0x3: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x4a -> 0x3: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x4a -> 0x4: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x4a -> 0x4: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x4b -> 0x1: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x4b -> 0x1: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x4b -> 0x2: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x4b -> 0x2: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x4b -> 0x3: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x4b -> 0x3: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x4b -> 0x4: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x4b -> 0x4: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x4c -> 0x1: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x4c -> 0x1: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x4c -> 0x2: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x4c -> 0x2: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x4c -> 0x3: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x4c -> 0x3: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x4c -> 0x4: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x4c -> 0x4: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x4d -> 0x1: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x4d -> 0x1: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x4d -> 0x2: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x4d -> 0x2: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x4d -> 0x3: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x4d -> 0x3: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x4d -> 0x4: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x4d -> 0x4: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x4e -> 0x1: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x4e -> 0x1: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x4e -> 0x2: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x4e -> 0x2: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x4e -> 0x3: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x4e -> 0x3: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x4e -> 0x4: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x4e -> 0x4: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x4f -> 0x9: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x4f -> 0x9: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x4f -> 0xa: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x4f -> 0xa: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x4f -> 0xb: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x4f -> 0xb: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x4f -> 0xc: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x4f -> 0xc: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x4f -> 0xd: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x4f -> 0xd: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x4f -> 0xe: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x4f -> 0xe: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x4f -> 0xf: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x4f -> 0xf: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x4f -> 0x10: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x4f -> 0x10: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x4f -> 0x11: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x4f -> 0x11: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x4f -> 0x12: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x4f -> 0x12: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x50 -> 0x9: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x50 -> 0x9: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x50 -> 0xa: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x50 -> 0xa: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x50 -> 0xb: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x50 -> 0xb: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x50 -> 0xc: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x50 -> 0xc: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x50 -> 0xd: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x50 -> 0xd: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x50 -> 0xe: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x50 -> 0xe: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x50 -> 0xf: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x50 -> 0xf: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x50 -> 0x10: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x50 -> 0x10: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x50 -> 0x11: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x50 -> 0x11: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x50 -> 0x12: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x50 -> 0x12: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x51 -> 0x9: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x51 -> 0x9: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x51 -> 0xa: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x51 -> 0xa: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x51 -> 0xb: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x51 -> 0xb: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x51 -> 0xc: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x51 -> 0xc: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x51 -> 0xd: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x51 -> 0xd: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x51 -> 0xe: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x51 -> 0xe: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x51 -> 0xf: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x51 -> 0xf: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x51 -> 0x10: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x51 -> 0x10: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x51 -> 0x11: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x51 -> 0x11: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x51 -> 0x12: Got unexpected colour 0xff0000ff at 10, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x51 -> 0x12: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x52 -> 0x1: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x52 -> 0x1: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x52 -> 0x2: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x52 -> 0x2: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x52 -> 0x3: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x52 -> 0x3: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x52 -> 0x4: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x52 -> 0x4: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x53 -> 0x1: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x53 -> 0x1: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x53 -> 0x2: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x53 -> 0x2: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x53 -> 0x3: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x53 -> 0x3: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x53 -> 0x4: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x53 -> 0x4: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x54 -> 0x1: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x54 -> 0x1: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x54 -> 0x2: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x54 -> 0x2: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x54 -> 0x3: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x54 -> 0x3: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16647,
+    "text": "0x54 -> 0x4: Got unexpected colour 0xff0000ff at 20, expected 0x00000000."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16666,
+    "text": "0x54 -> 0x4: Got unexpected colour 0xff0000ff at 0, expected 0x00000000."
+   },
+   {
+    "file": "crash.c",
+    "line": 288560,
+    "text": "a queued test function crashed with 0xc0000005 at offset 0x46c16"
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 18511,
+    "text": "Got unexpected value 2.00000000e+000 at 1."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 18511,
+    "text": "Got unexpected value 4.00000000e+000 at 2."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 18511,
+    "text": "Got unexpected value 6.00000000e+000 at 3."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 18511,
+    "text": "Got unexpected value 8.00000000e+000 at 4."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 18511,
+    "text": "Got unexpected value 1.00000000e+001 at 5."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 18511,
+    "text": "Got unexpected value 1.20000000e+001 at 6."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 18511,
+    "text": "Got unexpected value 1.40000000e+001 at 7."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 18511,
+    "text": "Got unexpected value 1.60000000e+001 at 8."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 18511,
+    "text": "Got unexpected value 1.80000000e+001 at 9."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 18511,
+    "text": "Got unexpected value 2.00000000e+001 at 10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 18511,
+    "text": "Got unexpected value 2.20000000e+001 at 11."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 18511,
+    "text": "Got unexpected value 2.40000000e+001 at 12."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 18511,
+    "text": "Got unexpected value 2.60000000e+001 at 13."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 18511,
+    "text": "Got unexpected value 2.80000000e+001 at 14."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 18511,
+    "text": "Got unexpected value 3.00000000e+001 at 15."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 18651,
+    "text": "Got unexpected hr 0x87a0001."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 19604,
+    "text": "Format 0x58: Got {3.96078438e-001, 2.62745112e-001, 1.29411772e-001, 5.29411793e-001}, expected {3.96078438e-001, 2.62745112e-001, 1.29411772e-001, 1.00000000e+000} at (0, 0), sub-resource 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16009,
+    "text": "Test 1: Got 1.00000000e+000, expected -1.00000000e+000 at 4."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16009,
+    "text": "Test 1: Got 2.00000000e+000, expected 1.00000000e+000 at 5."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16009,
+    "text": "Test 1: Got 3.00000000e+000, expected 0.00000000e+000 at 6."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16009,
+    "text": "Test 1: Got 4.00000000e+000, expected 1.00000000e+000 at 7."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16009,
+    "text": "Test 1: Got 5.00000000e+000, expected 1.00000000e+000 at 8."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16009,
+    "text": "Test 1: Got 6.00000000e+000, expected -1.00000000e+000 at 9."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16009,
+    "text": "Test 1: Got 7.00000000e+000, expected 0.00000000e+000 at 10."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16009,
+    "text": "Test 1: Got 8.00000000e+000, expected 1.00000000e+000 at 11."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 16009,
+    "text": "Test 1: Got -1.00000000e+000, expected 1.00000000e+000 at 12."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 17522,
+    "text": "Unexpected hr 0."
+   },
+   {
+    "file": "d3d10core.c",
+    "line": 17563,
+    "text": "Device has 1 references left."
+   }
+  ],
+  "guarded": 111,
+  "last_line": "winetest-batch: done",
+  "seconds": 37.6,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 1498,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 174823,
+   "todo": 132
+  },
+  "todo_lines": 132
+ }
+}

@@ -1,0 +1,154 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Sat, 3 Oct 2026 18:30:00 -0400
+Subject: [PATCH] server: read and write a process object's memory directly on the PS5
+
+ReadProcessMemory and WriteProcessMemory on a handle that is not the pseudo handle go through the
+server, which reads another process's memory with process_vm_readv or ptrace. The console has
+neither, nor /proc, so even a handle to the program's own process (OpenProcess on its own pid,
+what a crash handler, a debugger helper or a memory scanner does) failed with STATUS_ACCESS_DENIED.
+A title is one process and so is every Windows process Wine can have there, since none can be
+created: the memory of a process object is this process's, and the server is a thread of it. The
+copy goes through a pipe, so that an address that is not mapped fails with EFAULT (reported as
+STATUS_PARTIAL_COPY) instead of the server taking the fault.
+---
+  server/ptrace.c | 93 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  1 file changed, 93 insertions(+)
+
+diff --git a/server/ptrace.c b/server/ptrace.c
+index 6016e21..40dc01d 100644
+--- a/server/ptrace.c
++++ b/server/ptrace.c
+@@ -28,6 +28,9 @@
+ #include <stdarg.h>
+ #include <sys/types.h>
+ #include <sys/wait.h>
++#ifdef __PROSPERO__
++#include <sys/ioctl.h>
++#endif
+ #ifdef HAVE_SYS_PTRACE_H
+ # include <sys/ptrace.h>
+ #endif
+@@ -471,9 +474,80 @@ static int read_process_memory_ptrace( struct thread *thread, client_ptr_t ptr,
+     return !len;
+ }
+ 
++#ifdef __PROSPERO__
++/* A title is one process, and so is every Windows process Wine has there (none can be created): the
++ * memory of a process object is this process's own, and the server is a thread of it. There is
++ * no /proc and no ptrace to go through. The copy goes through a pipe, so that an address that is
++ * not mapped makes the kernel answer EFAULT instead of the server taking the fault. */
++static int ps5_copy_pipe[2] = { -1, -1 };
++
++static int ps5_copy_pipe_open(void)
++{
++    if (ps5_copy_pipe[0] == -1 && pipe( ps5_copy_pipe ))
++    {
++        ps5_copy_pipe[0] = ps5_copy_pipe[1] = -1;
++        return 0;
++    }
++    return 1;
++}
++
++/* from this process's memory into dest (read), or from src into this process's memory (write) */
++static data_size_t ps5_copy_memory( int writing, char *local, const char *target, data_size_t size )
++{
++    data_size_t done = 0;
++    char scratch[4096];
++
++    if (!ps5_copy_pipe_open()) return 0;
++    while (done < size)
++    {
++        data_size_t chunk = size - done < 16384 ? size - done : 16384;
++        ssize_t count;
++
++        if (writing)
++        {
++            if (write( ps5_copy_pipe[1], local + done, chunk ) != (ssize_t)chunk) break;
++            count = read( ps5_copy_pipe[0], (char *)target + done, chunk );
++            if (count < (ssize_t)chunk)
++            {
++                /* the target was not writable all the way: what is left in the pipe is not wanted */
++                for (;;)
++                {
++                    long left = 0;
++                    if (ioctl( ps5_copy_pipe[0], FIONREAD, &left ) || left <= 0) break;
++                    if (read( ps5_copy_pipe[0], scratch, left < (long)sizeof(scratch) ? left : (long)sizeof(scratch) ) <= 0) break;
++                }
++                if (count > 0) done += count;
++                break;
++            }
++        }
++        else
++        {
++            count = write( ps5_copy_pipe[1], target + done, chunk );
++            if (count <= 0) break;
++            if (read( ps5_copy_pipe[0], local + done, count ) != count) break;
++        }
++        done += count;
++    }
++    return done;
++}
++#endif
++
+ /* read data from a process memory space */
+ int read_process_memory( struct process *process, client_ptr_t ptr, data_size_t size, char *dest )
+ {
++#ifdef __PROSPERO__
++    if ((unsigned long)ptr != ptr)
++    {
++        set_error( STATUS_ACCESS_DENIED );
++        return 0;
++    }
++    if (ps5_copy_memory( 0, dest, (const char *)(unsigned long)ptr, size ) != size)
++    {
++        set_error( STATUS_PARTIAL_COPY );
++        return 0;
++    }
++    return 1;
++#else
+     struct thread *thread = get_ptrace_thread( process );
+     int ret;
+ 
+@@ -487,6 +561,7 @@ int read_process_memory( struct process *process, client_ptr_t ptr, data_size_t
+ 
+     if ((ret = read_process_memory_vm( thread, ptr, size, dest )) != -1) return ret;
+     return read_process_memory_ptrace( thread, ptr, size, dest );
++#endif
+ }
+ 
+ /* make sure we can write to the whole address range */
+@@ -589,6 +664,23 @@ static int write_process_memory_ptrace( struct thread *thread, client_ptr_t ptr,
+ int write_process_memory( struct process *process, client_ptr_t ptr, data_size_t size, const char *src,
+                           data_size_t *written )
+ {
++#ifdef __PROSPERO__
++    data_size_t done;
++
++    if ((unsigned long)ptr != ptr)
++    {
++        set_error( STATUS_ACCESS_DENIED );
++        return 0;
++    }
++    done = ps5_copy_memory( 1, (char *)src, (const char *)(unsigned long)ptr, size );
++    if (written) *written = done;
++    if (done != size)
++    {
++        set_error( STATUS_PARTIAL_COPY );
++        return 0;
++    }
++    return 1;
++#else
+     struct thread *thread = get_ptrace_thread( process );
+     int ret;
+ 
+@@ -602,6 +694,7 @@ int write_process_memory( struct process *process, client_ptr_t ptr, data_size_t
+ 
+     if ((ret = write_process_memory_vm( thread, ptr, size, src, written )) != -1) return ret;
+     return write_process_memory_ptrace( thread, ptr, size, src, written );
++#endif
+ }
+ 
+ 
+-- 
+2.43.0

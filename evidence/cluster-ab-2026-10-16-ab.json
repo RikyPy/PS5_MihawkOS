@@ -1,0 +1,26 @@
+{
+ "date": "2026-10-16-ab",
+ "rule": "M16 <= M64 - 25 MiB, T16 - T64 <= 1000 ms, G16 <= 1.15 x G64; a failing arm loses",
+ "G": "the title's loading screen closing as the game's presenter takes the display",
+ "arms": {
+  "64k": {
+   "browser_passed": true,
+   "game_passed": true,
+   "M_mib": 281,
+   "C_kib": 202288,
+   "T_ms": 6478,
+   "G_ms": 19600,
+   "game_converted_kib": 91952
+  },
+  "16k": {
+   "browser_passed": true,
+   "game_passed": true,
+   "M_mib": 214,
+   "C_kib": 128256,
+   "T_ms": 6287,
+   "G_ms": 14000,
+   "game_converted_kib": 64480
+  }
+ },
+ "winner": "16k"
+}

@@ -1,0 +1,21 @@
+{
+ "run": "mapping-class-2026-10-08-01",
+ "read_only": false,
+ "temporary_direct_backing_bytes": 16384,
+ "kernel_reads": false,
+ "kernel_writes": false,
+ "no_overwrite": true,
+ "payload": true,
+ "elf_sha256": "c905c4308a9c44957891059e1054d3631e1f192f8769e63c00894a51e97df5cc",
+ "source_sha256": "063216a1eb8839b43a100ab7210a2ac6d97d4488b8a43f11e9e0bed5f0ff99a9",
+ "passed": false,
+ "lines": [
+  "mapping-class memconf status=0 size=8 version=1 flags=0x1",
+  "mapping-class allocation=0",
+  "mapping-class route=direct band=ordinary status=0 exact=1",
+  "mapping-class route=direct unmap=0",
+  "mapping-class route=direct band=extended status=0x80020016 exact=0",
+  "mapping-class release=0",
+  "mapping-class route=pool band=ordinary status=0x80020016 exact=0"
+ ]
+}

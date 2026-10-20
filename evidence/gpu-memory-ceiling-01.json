@@ -1,0 +1,832 @@
+{
+  "title": "PPSA99170",
+  "identity": "2177b1ec09154cdb9cf12e40dc5ab613",
+  "kind": "service-native",
+  "build": {
+    "revision": "2c69e35be59c390ffa765aa40ac641d7e84b0b87",
+    "kind": "service-native",
+    "elevate_gpu_helper": true,
+    "vulkan_gpu_helper": false,
+    "gpu_draw_helper": false,
+    "gpu_present_helper": false,
+    "wine_gpu_broker": false,
+    "sdk_revision": "611893fc25ef3e138f5bc2c90d829d8b58174cd2",
+    "source_sha256": {
+      "ps5/src/main.cpp": "f1eb468f9603425c6543f0b02d8cf91e3e85a6919d7248dec85a24fd2f5aa457",
+      "ps5/CMakeLists.txt": "100c9ea15664ff118f3206617e36b07d4a2b000462269da91eafb474016d37eb",
+      "native/proton_service_preflight.h": "3a8a7611112a1b454b8844fc7d8a5aec695d6fc9b706c714f72568787e68773b",
+      "native/proton_service_preflight.cpp": "69ba47f5862cd9e13c6e41e6cf5f36dacc883e4f617a1810eb546168163960bd",
+      "native/proton_service_helper.c": "7b14472c5491e3bae23aea5886a4a79e934480de1b44ca5995eb41387127e802",
+      "native/proton_gpu_broker_probe.h": "bfa4068b7afc55db81731748776fc30334ec04f967a914f3315f0c22ac2df210",
+      "native/proton_gpu_broker_probe.cpp": "9452f23403ba3fce4899ce3f6e7944bf95af35f77bc238f6086477f60bd87817",
+      "native/proton_gpu_memory_probe.cpp": "bcc145c21a8258baf12aecdc6f5f217845008f479385f425bdb159d99847c376",
+      "native/proton_gpu_server_probe.cpp": "ea310f9241373a966b305976f3624c408a9e77527eebef9a342482396bc216d5",
+      "native/proton_gpu_display.cpp": "27e04095d61bb7906534fda8a390ae81027f28b18b929fb448fa2c64c94efc82",
+      "native/proton_gpu_display.h": "dfacadd01093f3fb05f0353d1a577678af1ce5c780942cab262c896494e23a35",
+      "native/proton_gpu_server.h": "f43e2cfb4f4a355e099aea21eda898c7f7f55640e94cc7a9e7ae841914b3102f",
+      "src/pw_gpu_broker.h": "c79d4e63bc365e87b278844310f1c0a5b7e1140287103ac97026bc08d26dff8d",
+      "wine/ps5/pw_wine_process_io.c": "dd3ccac3b63058aaf743146fbf5791217ec9b6451ad0dc4c61dcbbad7abbd6c5",
+      "wine/ps5/pw_wine_process_io.h": "c375a67872391d47ef20cb7bc0001b66655aa29c44c446af31102c0fe5f937a7"
+    },
+    "radv_recipe_sha256": "e2844f49e4af12a9718d5b8b6055ace83e7eaa1d68870de2a79d39d1c92fa674",
+    "radv_platform_header_sha256": "24e770da15304fe95a4e0191271bc33f545dc8f964e186408c7996f5bce2aa97",
+    "radv_archive_sha256": "0ffa39311881236b4872ec77a56bca417ce56c71cefca5954224b9ea8f3a1bf5",
+    "helper_tool_sha256": "614377a0e37006e1454c67f228fc370a2f785c060205cb9f0264f27af04b5f18",
+    "helper_tool_revision": "ab37acd506305ba3e575435e3ae9a351cfaf7cf4",
+    "helper_patch_sha256": "defd28005f7c15664658f8d61928886864f00e4e3df586396460b4d27057275c",
+    "helper_layout_sha256": "fbc52518761b58b703a2225c847c5f44a81523cd0e751755adf890ae0f0dd74c",
+    "helper_symbols_sha256": "470ce72a27a7be8e35dd7a25b485faa733d61570bdaf24d3c75bb4e3e3c63cf7",
+    "helper_preload_mask": "0x8000000000000002",
+    "radv_sdk_revision": "b83202be73e930050e00de0f1b4d9ec46c0391bf",
+    "radv_provenance_sha256": "695395c399b3ab2b85fed11bb57a9d28563bf283b77ab44498a7525139711cb4",
+    "helper_recipe_sha256": "cae067ca688056574b0090fef8b235ae333df3de02b49e43acc4a47585713dae",
+    "helper_sha256": "3ff5135abf217cc3133c61b7e6fba6df1892b2ba91431c97d8772d3eca54a02a",
+    "helper_needed": [
+      "libkernel.sprx",
+      "libSceLibcInternal.sprx"
+    ],
+    "identity": "bb1e8cb5d1f0f10112a9fbeb8d633fe27f7819696a3f0abbab8aed7903b5c218",
+    "eboot_sha256": "64b2831a74ea4436069eb34a4a10b3cb8aa9946a86975b1badfc0e84d096b1a2"
+  },
+  "capture": "klog/gpu-memory-ceiling-01",
+  "expected_missing_image": false,
+  "mode": "gpu-memory",
+  "passed": true,
+  "status": "complete",
+  "production_sha256": "8f63bbc57bd9203520653d9e3eb765798a434b737ac6c1f79b106437542761c3",
+  "production_restored": true,
+  "root_reference_balance_verified": false,
+  "forced_title_close": false,
+  "transfer_stage": "read eboot.bin",
+  "installed_readback_sha256": "d3d7cb497833ebb57876fe4465257217608ac9765f9a360a3ca0e658b845f325",
+  "production_executable_sha256": "bc5c7a75f249a59e7bce80218c6e749b9ea2f426e9bec4c96939ce7f75ceb17d",
+  "probe_readback_sha256": "500201eba1b63f2b83d682f7ec3e2c602de9871aac1a6f8dfb8ebfb57c5367ef",
+  "probe_executable_sha256": "d8b9c16953ef96531d04ede8576ceef925c5da1f1a5290eb8344e8b5f22ae8e6",
+  "helper_uploaded": true,
+  "helper_executable_verified": true,
+  "shell_idle_after_run": true,
+  "post_launch_fault_records": 0,
+  "parent_shell_exit_seen": true,
+  "observations": [
+    "service-native identity=2177b1ec09154cdb9cf12e40dc5ab613 revision=4 parent=388 elevated=1",
+    "gpu-broker warmup_submit=0 gpu_value=77",
+    "gpu-memory baseline owner=388 flexible=434110464 direct=12863864832 pool=12884901888 descriptors=12",
+    "gpu-memory helper service=268536065 pid=391 hello=1 elevation=0 helper_flexible_mib=411",
+    "gpu-memory command_page=1",
+    "gpu-memory shared chunk=0 address=0x6000000000 bytes=16777216 owner_flexible_before=430964736 owner_flexible_touched=414187520 owner_flexible_after=397410304 helper_map=1 helper_stage=3 helper_flexible_mib=379 total=16777216",
+    "gpu-memory shared chunk=1 address=0x6001000000 bytes=16777216 owner_flexible_before=397410304 owner_flexible_touched=380633088 owner_flexible_after=363855872 helper_map=1 helper_stage=3 helper_flexible_mib=347 total=33554432",
+    "gpu-memory shared chunk=2 address=0x6002000000 bytes=16777216 owner_flexible_before=363855872 owner_flexible_touched=347078656 owner_flexible_after=330301440 helper_map=1 helper_stage=3 helper_flexible_mib=315 total=50331648",
+    "gpu-memory shared chunk=3 address=0x6003000000 bytes=16777216 owner_flexible_before=330301440 owner_flexible_touched=313524224 owner_flexible_after=296747008 helper_map=1 helper_stage=3 helper_flexible_mib=283 total=67108864",
+    "gpu-memory shared chunk=4 address=0x6004000000 bytes=16777216 owner_flexible_before=296747008 owner_flexible_touched=279969792 owner_flexible_after=263192576 helper_map=1 helper_stage=3 helper_flexible_mib=251 total=83886080",
+    "gpu-memory shared chunk=5 address=0x6005000000 bytes=16777216 owner_flexible_before=263192576 owner_flexible_touched=246415360 owner_flexible_after=229638144 helper_map=1 helper_stage=3 helper_flexible_mib=219 total=100663296",
+    "gpu-memory shared chunk=6 address=0x6006000000 bytes=16777216 owner_flexible_before=229638144 owner_flexible_touched=212860928 owner_flexible_after=196083712 helper_map=1 helper_stage=3 helper_flexible_mib=187 total=117440512",
+    "gpu-memory shared chunk=7 address=0x6007000000 bytes=16777216 owner_flexible_before=196083712 owner_flexible_touched=179306496 owner_flexible_after=162529280 helper_map=1 helper_stage=3 helper_flexible_mib=155 total=134217728",
+    "gpu-memory shared chunk=8 address=0x6008000000 bytes=16777216 owner_flexible_before=162529280 owner_flexible_touched=145752064 owner_flexible_after=128974848 helper_map=1 helper_stage=3 helper_flexible_mib=123 total=150994944",
+    "gpu-memory shared chunk=9 address=0x6009000000 bytes=16777216 owner_flexible_before=128974848 owner_flexible_touched=112197632 owner_flexible_after=95420416 helper_map=1 helper_stage=3 helper_flexible_mib=91 total=167772160",
+    "gpu-memory shared stop=owner_flexible_reserve chunks=10 total=167772160 owner_flexible=95420416",
+    "gpu-memory shared gpu chunk=0 marker=0x6000fffc00 value=0x51000000 submit=0 gpu=0x51000000 helper=0x51000000 verdict=1",
+    "gpu-memory shared gpu chunk=9 marker=0x6009fffc00 value=0x51000009 submit=0 gpu=0x51000009 helper=0x51000009 verdict=1",
+    "gpu-memory shared released helper=1 helper_flexible_mib=251 owner_flexible=430964736",
+    "gpu-memory direct chunk=0 address=0x4000000000 bytes=268435456 helper_reserve=1 helper_stage=2 direct_available=12593397760 owner_flexible=430964736 helper_flexible_mib=411 total=268435456",
+    "gpu-memory direct chunk=1 address=0x4010000000 bytes=268435456 helper_reserve=1 helper_stage=2 direct_available=12324962304 owner_flexible=430964736 helper_flexible_mib=411 total=536870912",
+    "gpu-memory direct chunk=2 address=0x4020000000 bytes=268435456 helper_reserve=1 helper_stage=2 direct_available=12056526848 owner_flexible=430964736 helper_flexible_mib=411 total=805306368",
+    "gpu-memory direct chunk=3 address=0x4030000000 bytes=268435456 helper_reserve=1 helper_stage=2 direct_available=11788091392 owner_flexible=430964736 helper_flexible_mib=411 total=1073741824",
+    "gpu-memory direct chunk=4 address=0x4040000000 bytes=268435456 helper_reserve=1 helper_stage=2 direct_available=11519655936 owner_flexible=430964736 helper_flexible_mib=411 total=1342177280",
+    "gpu-memory direct chunk=5 address=0x4050000000 bytes=268435456 helper_reserve=1 helper_stage=2 direct_available=11251220480 owner_flexible=430964736 helper_flexible_mib=411 total=1610612736",
+    "gpu-memory direct chunk=6 address=0x4060000000 bytes=268435456 helper_reserve=1 helper_stage=2 direct_available=10982785024 owner_flexible=430964736 helper_flexible_mib=411 total=1879048192",
+    "gpu-memory direct chunk=7 address=0x4070000000 bytes=268435456 helper_reserve=1 helper_stage=2 direct_available=10714349568 owner_flexible=430964736 helper_flexible_mib=411 total=2147483648",
+    "gpu-memory direct chunk=8 address=0x4080000000 bytes=268435456 helper_reserve=1 helper_stage=2 direct_available=10445914112 owner_flexible=430964736 helper_flexible_mib=411 total=2415919104",
+    "gpu-memory direct chunk=9 address=0x4090000000 bytes=268435456 helper_reserve=1 helper_stage=2 direct_available=10177478656 owner_flexible=430964736 helper_flexible_mib=411 total=2684354560",
+    "gpu-memory direct chunk=10 address=0x40a0000000 bytes=268435456 helper_reserve=1 helper_stage=2 direct_available=9909043200 owner_flexible=430964736 helper_flexible_mib=411 total=2952790016",
+    "gpu-memory direct chunk=11 address=0x40b0000000 bytes=268435456 helper_reserve=1 helper_stage=2 direct_available=9640607744 owner_flexible=430964736 helper_flexible_mib=411 total=3221225472",
+    "gpu-memory direct chunk=12 address=0x40c0000000 bytes=268435456 helper_reserve=1 helper_stage=2 direct_available=9372172288 owner_flexible=430964736 helper_flexible_mib=411 total=3489660928",
+    "gpu-memory direct chunk=13 address=0x40d0000000 bytes=268435456 helper_reserve=1 helper_stage=2 direct_available=9103736832 owner_flexible=430964736 helper_flexible_mib=411 total=3758096384",
+    "gpu-memory direct chunk=14 address=0x40e0000000 bytes=268435456 helper_reserve=1 helper_stage=2 direct_available=8835301376 owner_flexible=430964736 helper_flexible_mib=411 total=4026531840",
+    "gpu-memory direct chunk=15 address=0x40f0000000 bytes=268435456 helper_reserve=1 helper_stage=2 direct_available=8566865920 owner_flexible=430964736 helper_flexible_mib=411 total=4294967296",
+    "gpu-memory direct chunk=16 address=0x4100000000 bytes=268435456 helper_reserve=1 helper_stage=2 direct_available=8298430464 owner_flexible=430964736 helper_flexible_mib=411 total=4563402752",
+    "gpu-memory direct chunk=17 address=0x4110000000 bytes=268435456 helper_reserve=1 helper_stage=2 direct_available=8029995008 owner_flexible=430964736 helper_flexible_mib=411 total=4831838208",
+    "gpu-memory direct chunk=18 address=0x4120000000 bytes=268435456 helper_reserve=1 helper_stage=2 direct_available=7761559552 owner_flexible=430964736 helper_flexible_mib=411 total=5100273664",
+    "gpu-memory direct chunk=19 address=0x4130000000 bytes=268435456 helper_reserve=1 helper_stage=2 direct_available=7493124096 owner_flexible=430964736 helper_flexible_mib=411 total=5368709120",
+    "gpu-memory direct chunk=20 address=0x4140000000 bytes=268435456 helper_reserve=1 helper_stage=2 direct_available=7224688640 owner_flexible=430964736 helper_flexible_mib=411 total=5637144576",
+    "gpu-memory direct chunk=21 address=0x4150000000 bytes=268435456 helper_reserve=1 helper_stage=2 direct_available=6956253184 owner_flexible=430964736 helper_flexible_mib=411 total=5905580032",
+    "gpu-memory direct chunk=22 address=0x4160000000 bytes=268435456 helper_reserve=1 helper_stage=2 direct_available=6687817728 owner_flexible=430964736 helper_flexible_mib=411 total=6174015488",
+    "gpu-memory direct chunk=23 address=0x4170000000 bytes=268435456 helper_reserve=1 helper_stage=2 direct_available=6419382272 owner_flexible=430964736 helper_flexible_mib=411 total=6442450944",
+    "gpu-memory direct chunk=24 address=0x4180000000 bytes=268435456 helper_reserve=1 helper_stage=2 direct_available=6150946816 owner_flexible=430964736 helper_flexible_mib=411 total=6710886400",
+    "gpu-memory direct chunk=25 address=0x4190000000 bytes=268435456 helper_reserve=1 helper_stage=2 direct_available=5882511360 owner_flexible=430964736 helper_flexible_mib=411 total=6979321856",
+    "gpu-memory direct chunk=26 address=0x41a0000000 bytes=268435456 helper_reserve=1 helper_stage=2 direct_available=5614075904 owner_flexible=430964736 helper_flexible_mib=411 total=7247757312",
+    "gpu-memory direct chunk=27 address=0x41b0000000 bytes=268435456 helper_reserve=1 helper_stage=2 direct_available=5345640448 owner_flexible=430964736 helper_flexible_mib=411 total=7516192768",
+    "gpu-memory direct chunk=28 address=0x41c0000000 bytes=268435456 helper_reserve=1 helper_stage=2 direct_available=5077204992 owner_flexible=430964736 helper_flexible_mib=411 total=7784628224",
+    "gpu-memory direct chunk=29 address=0x41d0000000 bytes=268435456 helper_reserve=1 helper_stage=2 direct_available=4808769536 owner_flexible=430964736 helper_flexible_mib=411 total=8053063680",
+    "gpu-memory direct chunk=30 address=0x41e0000000 bytes=268435456 helper_reserve=1 helper_stage=2 direct_available=4540334080 owner_flexible=430964736 helper_flexible_mib=411 total=8321499136",
+    "gpu-memory direct chunk=31 address=0x41f0000000 bytes=268435456 helper_reserve=1 helper_stage=2 direct_available=4271898624 owner_flexible=430964736 helper_flexible_mib=411 total=8589934592",
+    "gpu-memory direct stop=cap chunks=32 total=8589934592 direct_available=4271898624 owner_flexible=430964736 flexible_before_arm=430964736",
+    "gpu-memory direct gpu chunk=0 marker=0x400ffffc00 value=0xd1000000 submit=0 gpu=0xd1000000 verdict=1",
+    "gpu-memory direct gpu chunk=1 marker=0x401ffffc00 value=0xd1000001 submit=0 gpu=0xd1000001 verdict=1",
+    "gpu-memory direct gpu chunk=2 marker=0x402ffffc00 value=0xd1000002 submit=0 gpu=0xd1000002 verdict=1",
+    "gpu-memory direct gpu chunk=3 marker=0x403ffffc00 value=0xd1000003 submit=0 gpu=0xd1000003 verdict=1",
+    "gpu-memory direct gpu chunk=4 marker=0x404ffffc00 value=0xd1000004 submit=0 gpu=0xd1000004 verdict=1",
+    "gpu-memory direct gpu chunk=5 marker=0x405ffffc00 value=0xd1000005 submit=0 gpu=0xd1000005 verdict=1",
+    "gpu-memory direct gpu chunk=6 marker=0x406ffffc00 value=0xd1000006 submit=0 gpu=0xd1000006 verdict=1",
+    "gpu-memory direct gpu chunk=7 marker=0x407ffffc00 value=0xd1000007 submit=0 gpu=0xd1000007 verdict=1",
+    "gpu-memory direct gpu chunk=8 marker=0x408ffffc00 value=0xd1000008 submit=0 gpu=0xd1000008 verdict=1",
+    "gpu-memory direct gpu chunk=9 marker=0x409ffffc00 value=0xd1000009 submit=0 gpu=0xd1000009 verdict=1",
+    "gpu-memory direct gpu chunk=10 marker=0x40affffc00 value=0xd100000a submit=0 gpu=0xd100000a verdict=1",
+    "gpu-memory direct gpu chunk=11 marker=0x40bffffc00 value=0xd100000b submit=0 gpu=0xd100000b verdict=1",
+    "gpu-memory direct gpu chunk=12 marker=0x40cffffc00 value=0xd100000c submit=0 gpu=0xd100000c verdict=1",
+    "gpu-memory direct gpu chunk=13 marker=0x40dffffc00 value=0xd100000d submit=0 gpu=0xd100000d verdict=1",
+    "gpu-memory direct gpu chunk=14 marker=0x40effffc00 value=0xd100000e submit=0 gpu=0xd100000e verdict=1",
+    "gpu-memory direct gpu chunk=15 marker=0x40fffffc00 value=0xd100000f submit=0 gpu=0xd100000f verdict=1",
+    "gpu-memory direct gpu chunk=16 marker=0x410ffffc00 value=0xd1000010 submit=0 gpu=0xd1000010 verdict=1",
+    "gpu-memory direct gpu chunk=17 marker=0x411ffffc00 value=0xd1000011 submit=0 gpu=0xd1000011 verdict=1",
+    "gpu-memory direct gpu chunk=18 marker=0x412ffffc00 value=0xd1000012 submit=0 gpu=0xd1000012 verdict=1",
+    "gpu-memory direct gpu chunk=19 marker=0x413ffffc00 value=0xd1000013 submit=0 gpu=0xd1000013 verdict=1",
+    "gpu-memory direct gpu chunk=20 marker=0x414ffffc00 value=0xd1000014 submit=0 gpu=0xd1000014 verdict=1",
+    "gpu-memory direct gpu chunk=21 marker=0x415ffffc00 value=0xd1000015 submit=0 gpu=0xd1000015 verdict=1",
+    "gpu-memory direct gpu chunk=22 marker=0x416ffffc00 value=0xd1000016 submit=0 gpu=0xd1000016 verdict=1",
+    "gpu-memory direct gpu chunk=23 marker=0x417ffffc00 value=0xd1000017 submit=0 gpu=0xd1000017 verdict=1",
+    "gpu-memory direct gpu chunk=24 marker=0x418ffffc00 value=0xd1000018 submit=0 gpu=0xd1000018 verdict=1",
+    "gpu-memory direct gpu chunk=25 marker=0x419ffffc00 value=0xd1000019 submit=0 gpu=0xd1000019 verdict=1",
+    "gpu-memory direct gpu chunk=26 marker=0x41affffc00 value=0xd100001a submit=0 gpu=0xd100001a verdict=1",
+    "gpu-memory direct gpu chunk=27 marker=0x41bffffc00 value=0xd100001b submit=0 gpu=0xd100001b verdict=1",
+    "gpu-memory direct gpu chunk=28 marker=0x41cffffc00 value=0xd100001c submit=0 gpu=0xd100001c verdict=1",
+    "gpu-memory direct gpu chunk=29 marker=0x41dffffc00 value=0xd100001d submit=0 gpu=0xd100001d verdict=1",
+    "gpu-memory direct gpu chunk=30 marker=0x41effffc00 value=0xd100001e submit=0 gpu=0xd100001e verdict=1",
+    "gpu-memory direct gpu chunk=31 marker=0x41fffffc00 value=0xd100001f submit=0 gpu=0xd100001f verdict=1",
+    "gpu-memory direct released helper=1 direct_available=12863864832 owner_flexible=430964736",
+    "gpu-memory helper closed=0 absent=1",
+    "gpu-memory summary shared_bytes=167772160 shared_gpu_checks=2/2 direct_bytes=8589934592 direct_gpu_checks=32/32 flexible_before=434110464 flexible_after=434110464 direct_before=12863864832 direct_after=12863864832 descriptors_before=12 descriptors_after=12 restored=1",
+    "result=PASS"
+  ],
+  "fresh_identity_seen": true,
+  "memory_baseline": [
+    {
+      "flexible": 434110464,
+      "direct": 12863864832,
+      "pool": 12884901888,
+      "descriptors": 12
+    }
+  ],
+  "memory_shared_chunks": [
+    {
+      "chunk": 0,
+      "address": 412316860416,
+      "owner_flexible_before": 430964736,
+      "owner_flexible_touched": 414187520,
+      "owner_flexible_after": 397410304,
+      "helper_map": 1,
+      "helper_stage": 3,
+      "helper_flexible_mib": 379,
+      "total": 16777216
+    },
+    {
+      "chunk": 1,
+      "address": 412333637632,
+      "owner_flexible_before": 397410304,
+      "owner_flexible_touched": 380633088,
+      "owner_flexible_after": 363855872,
+      "helper_map": 1,
+      "helper_stage": 3,
+      "helper_flexible_mib": 347,
+      "total": 33554432
+    },
+    {
+      "chunk": 2,
+      "address": 412350414848,
+      "owner_flexible_before": 363855872,
+      "owner_flexible_touched": 347078656,
+      "owner_flexible_after": 330301440,
+      "helper_map": 1,
+      "helper_stage": 3,
+      "helper_flexible_mib": 315,
+      "total": 50331648
+    },
+    {
+      "chunk": 3,
+      "address": 412367192064,
+      "owner_flexible_before": 330301440,
+      "owner_flexible_touched": 313524224,
+      "owner_flexible_after": 296747008,
+      "helper_map": 1,
+      "helper_stage": 3,
+      "helper_flexible_mib": 283,
+      "total": 67108864
+    },
+    {
+      "chunk": 4,
+      "address": 412383969280,
+      "owner_flexible_before": 296747008,
+      "owner_flexible_touched": 279969792,
+      "owner_flexible_after": 263192576,
+      "helper_map": 1,
+      "helper_stage": 3,
+      "helper_flexible_mib": 251,
+      "total": 83886080
+    },
+    {
+      "chunk": 5,
+      "address": 412400746496,
+      "owner_flexible_before": 263192576,
+      "owner_flexible_touched": 246415360,
+      "owner_flexible_after": 229638144,
+      "helper_map": 1,
+      "helper_stage": 3,
+      "helper_flexible_mib": 219,
+      "total": 100663296
+    },
+    {
+      "chunk": 6,
+      "address": 412417523712,
+      "owner_flexible_before": 229638144,
+      "owner_flexible_touched": 212860928,
+      "owner_flexible_after": 196083712,
+      "helper_map": 1,
+      "helper_stage": 3,
+      "helper_flexible_mib": 187,
+      "total": 117440512
+    },
+    {
+      "chunk": 7,
+      "address": 412434300928,
+      "owner_flexible_before": 196083712,
+      "owner_flexible_touched": 179306496,
+      "owner_flexible_after": 162529280,
+      "helper_map": 1,
+      "helper_stage": 3,
+      "helper_flexible_mib": 155,
+      "total": 134217728
+    },
+    {
+      "chunk": 8,
+      "address": 412451078144,
+      "owner_flexible_before": 162529280,
+      "owner_flexible_touched": 145752064,
+      "owner_flexible_after": 128974848,
+      "helper_map": 1,
+      "helper_stage": 3,
+      "helper_flexible_mib": 123,
+      "total": 150994944
+    },
+    {
+      "chunk": 9,
+      "address": 412467855360,
+      "owner_flexible_before": 128974848,
+      "owner_flexible_touched": 112197632,
+      "owner_flexible_after": 95420416,
+      "helper_map": 1,
+      "helper_stage": 3,
+      "helper_flexible_mib": 91,
+      "total": 167772160
+    }
+  ],
+  "memory_direct_chunks": [
+    {
+      "chunk": 0,
+      "address": 274877906944,
+      "bytes": 268435456,
+      "helper_reserve": 1,
+      "helper_stage": 2,
+      "direct_available": 12593397760,
+      "owner_flexible": 430964736,
+      "helper_flexible_mib": 411,
+      "total": 268435456
+    },
+    {
+      "chunk": 1,
+      "address": 275146342400,
+      "bytes": 268435456,
+      "helper_reserve": 1,
+      "helper_stage": 2,
+      "direct_available": 12324962304,
+      "owner_flexible": 430964736,
+      "helper_flexible_mib": 411,
+      "total": 536870912
+    },
+    {
+      "chunk": 2,
+      "address": 275414777856,
+      "bytes": 268435456,
+      "helper_reserve": 1,
+      "helper_stage": 2,
+      "direct_available": 12056526848,
+      "owner_flexible": 430964736,
+      "helper_flexible_mib": 411,
+      "total": 805306368
+    },
+    {
+      "chunk": 3,
+      "address": 275683213312,
+      "bytes": 268435456,
+      "helper_reserve": 1,
+      "helper_stage": 2,
+      "direct_available": 11788091392,
+      "owner_flexible": 430964736,
+      "helper_flexible_mib": 411,
+      "total": 1073741824
+    },
+    {
+      "chunk": 4,
+      "address": 275951648768,
+      "bytes": 268435456,
+      "helper_reserve": 1,
+      "helper_stage": 2,
+      "direct_available": 11519655936,
+      "owner_flexible": 430964736,
+      "helper_flexible_mib": 411,
+      "total": 1342177280
+    },
+    {
+      "chunk": 5,
+      "address": 276220084224,
+      "bytes": 268435456,
+      "helper_reserve": 1,
+      "helper_stage": 2,
+      "direct_available": 11251220480,
+      "owner_flexible": 430964736,
+      "helper_flexible_mib": 411,
+      "total": 1610612736
+    },
+    {
+      "chunk": 6,
+      "address": 276488519680,
+      "bytes": 268435456,
+      "helper_reserve": 1,
+      "helper_stage": 2,
+      "direct_available": 10982785024,
+      "owner_flexible": 430964736,
+      "helper_flexible_mib": 411,
+      "total": 1879048192
+    },
+    {
+      "chunk": 7,
+      "address": 276756955136,
+      "bytes": 268435456,
+      "helper_reserve": 1,
+      "helper_stage": 2,
+      "direct_available": 10714349568,
+      "owner_flexible": 430964736,
+      "helper_flexible_mib": 411,
+      "total": 2147483648
+    },
+    {
+      "chunk": 8,
+      "address": 277025390592,
+      "bytes": 268435456,
+      "helper_reserve": 1,
+      "helper_stage": 2,
+      "direct_available": 10445914112,
+      "owner_flexible": 430964736,
+      "helper_flexible_mib": 411,
+      "total": 2415919104
+    },
+    {
+      "chunk": 9,
+      "address": 277293826048,
+      "bytes": 268435456,
+      "helper_reserve": 1,
+      "helper_stage": 2,
+      "direct_available": 10177478656,
+      "owner_flexible": 430964736,
+      "helper_flexible_mib": 411,
+      "total": 2684354560
+    },
+    {
+      "chunk": 10,
+      "address": 277562261504,
+      "bytes": 268435456,
+      "helper_reserve": 1,
+      "helper_stage": 2,
+      "direct_available": 9909043200,
+      "owner_flexible": 430964736,
+      "helper_flexible_mib": 411,
+      "total": 2952790016
+    },
+    {
+      "chunk": 11,
+      "address": 277830696960,
+      "bytes": 268435456,
+      "helper_reserve": 1,
+      "helper_stage": 2,
+      "direct_available": 9640607744,
+      "owner_flexible": 430964736,
+      "helper_flexible_mib": 411,
+      "total": 3221225472
+    },
+    {
+      "chunk": 12,
+      "address": 278099132416,
+      "bytes": 268435456,
+      "helper_reserve": 1,
+      "helper_stage": 2,
+      "direct_available": 9372172288,
+      "owner_flexible": 430964736,
+      "helper_flexible_mib": 411,
+      "total": 3489660928
+    },
+    {
+      "chunk": 13,
+      "address": 278367567872,
+      "bytes": 268435456,
+      "helper_reserve": 1,
+      "helper_stage": 2,
+      "direct_available": 9103736832,
+      "owner_flexible": 430964736,
+      "helper_flexible_mib": 411,
+      "total": 3758096384
+    },
+    {
+      "chunk": 14,
+      "address": 278636003328,
+      "bytes": 268435456,
+      "helper_reserve": 1,
+      "helper_stage": 2,
+      "direct_available": 8835301376,
+      "owner_flexible": 430964736,
+      "helper_flexible_mib": 411,
+      "total": 4026531840
+    },
+    {
+      "chunk": 15,
+      "address": 278904438784,
+      "bytes": 268435456,
+      "helper_reserve": 1,
+      "helper_stage": 2,
+      "direct_available": 8566865920,
+      "owner_flexible": 430964736,
+      "helper_flexible_mib": 411,
+      "total": 4294967296
+    },
+    {
+      "chunk": 16,
+      "address": 279172874240,
+      "bytes": 268435456,
+      "helper_reserve": 1,
+      "helper_stage": 2,
+      "direct_available": 8298430464,
+      "owner_flexible": 430964736,
+      "helper_flexible_mib": 411,
+      "total": 4563402752
+    },
+    {
+      "chunk": 17,
+      "address": 279441309696,
+      "bytes": 268435456,
+      "helper_reserve": 1,
+      "helper_stage": 2,
+      "direct_available": 8029995008,
+      "owner_flexible": 430964736,
+      "helper_flexible_mib": 411,
+      "total": 4831838208
+    },
+    {
+      "chunk": 18,
+      "address": 279709745152,
+      "bytes": 268435456,
+      "helper_reserve": 1,
+      "helper_stage": 2,
+      "direct_available": 7761559552,
+      "owner_flexible": 430964736,
+      "helper_flexible_mib": 411,
+      "total": 5100273664
+    },
+    {
+      "chunk": 19,
+      "address": 279978180608,
+      "bytes": 268435456,
+      "helper_reserve": 1,
+      "helper_stage": 2,
+      "direct_available": 7493124096,
+      "owner_flexible": 430964736,
+      "helper_flexible_mib": 411,
+      "total": 5368709120
+    },
+    {
+      "chunk": 20,
+      "address": 280246616064,
+      "bytes": 268435456,
+      "helper_reserve": 1,
+      "helper_stage": 2,
+      "direct_available": 7224688640,
+      "owner_flexible": 430964736,
+      "helper_flexible_mib": 411,
+      "total": 5637144576
+    },
+    {
+      "chunk": 21,
+      "address": 280515051520,
+      "bytes": 268435456,
+      "helper_reserve": 1,
+      "helper_stage": 2,
+      "direct_available": 6956253184,
+      "owner_flexible": 430964736,
+      "helper_flexible_mib": 411,
+      "total": 5905580032
+    },
+    {
+      "chunk": 22,
+      "address": 280783486976,
+      "bytes": 268435456,
+      "helper_reserve": 1,
+      "helper_stage": 2,
+      "direct_available": 6687817728,
+      "owner_flexible": 430964736,
+      "helper_flexible_mib": 411,
+      "total": 6174015488
+    },
+    {
+      "chunk": 23,
+      "address": 281051922432,
+      "bytes": 268435456,
+      "helper_reserve": 1,
+      "helper_stage": 2,
+      "direct_available": 6419382272,
+      "owner_flexible": 430964736,
+      "helper_flexible_mib": 411,
+      "total": 6442450944
+    },
+    {
+      "chunk": 24,
+      "address": 281320357888,
+      "bytes": 268435456,
+      "helper_reserve": 1,
+      "helper_stage": 2,
+      "direct_available": 6150946816,
+      "owner_flexible": 430964736,
+      "helper_flexible_mib": 411,
+      "total": 6710886400
+    },
+    {
+      "chunk": 25,
+      "address": 281588793344,
+      "bytes": 268435456,
+      "helper_reserve": 1,
+      "helper_stage": 2,
+      "direct_available": 5882511360,
+      "owner_flexible": 430964736,
+      "helper_flexible_mib": 411,
+      "total": 6979321856
+    },
+    {
+      "chunk": 26,
+      "address": 281857228800,
+      "bytes": 268435456,
+      "helper_reserve": 1,
+      "helper_stage": 2,
+      "direct_available": 5614075904,
+      "owner_flexible": 430964736,
+      "helper_flexible_mib": 411,
+      "total": 7247757312
+    },
+    {
+      "chunk": 27,
+      "address": 282125664256,
+      "bytes": 268435456,
+      "helper_reserve": 1,
+      "helper_stage": 2,
+      "direct_available": 5345640448,
+      "owner_flexible": 430964736,
+      "helper_flexible_mib": 411,
+      "total": 7516192768
+    },
+    {
+      "chunk": 28,
+      "address": 282394099712,
+      "bytes": 268435456,
+      "helper_reserve": 1,
+      "helper_stage": 2,
+      "direct_available": 5077204992,
+      "owner_flexible": 430964736,
+      "helper_flexible_mib": 411,
+      "total": 7784628224
+    },
+    {
+      "chunk": 29,
+      "address": 282662535168,
+      "bytes": 268435456,
+      "helper_reserve": 1,
+      "helper_stage": 2,
+      "direct_available": 4808769536,
+      "owner_flexible": 430964736,
+      "helper_flexible_mib": 411,
+      "total": 8053063680
+    },
+    {
+      "chunk": 30,
+      "address": 282930970624,
+      "bytes": 268435456,
+      "helper_reserve": 1,
+      "helper_stage": 2,
+      "direct_available": 4540334080,
+      "owner_flexible": 430964736,
+      "helper_flexible_mib": 411,
+      "total": 8321499136
+    },
+    {
+      "chunk": 31,
+      "address": 283199406080,
+      "bytes": 268435456,
+      "helper_reserve": 1,
+      "helper_stage": 2,
+      "direct_available": 4271898624,
+      "owner_flexible": 430964736,
+      "helper_flexible_mib": 411,
+      "total": 8589934592
+    }
+  ],
+  "memory_stops": [
+    [
+      "shared",
+      "owner_flexible_reserve",
+      "10",
+      "167772160"
+    ],
+    [
+      "direct",
+      "cap",
+      "32",
+      "8589934592"
+    ]
+  ],
+  "memory_gpu_checks": [
+    {
+      "arm": "shared",
+      "chunk": 0,
+      "verdict": 1
+    },
+    {
+      "arm": "shared",
+      "chunk": 9,
+      "verdict": 1
+    },
+    {
+      "arm": "direct",
+      "chunk": 0,
+      "verdict": 1
+    },
+    {
+      "arm": "direct",
+      "chunk": 1,
+      "verdict": 1
+    },
+    {
+      "arm": "direct",
+      "chunk": 2,
+      "verdict": 1
+    },
+    {
+      "arm": "direct",
+      "chunk": 3,
+      "verdict": 1
+    },
+    {
+      "arm": "direct",
+      "chunk": 4,
+      "verdict": 1
+    },
+    {
+      "arm": "direct",
+      "chunk": 5,
+      "verdict": 1
+    },
+    {
+      "arm": "direct",
+      "chunk": 6,
+      "verdict": 1
+    },
+    {
+      "arm": "direct",
+      "chunk": 7,
+      "verdict": 1
+    },
+    {
+      "arm": "direct",
+      "chunk": 8,
+      "verdict": 1
+    },
+    {
+      "arm": "direct",
+      "chunk": 9,
+      "verdict": 1
+    },
+    {
+      "arm": "direct",
+      "chunk": 10,
+      "verdict": 1
+    },
+    {
+      "arm": "direct",
+      "chunk": 11,
+      "verdict": 1
+    },
+    {
+      "arm": "direct",
+      "chunk": 12,
+      "verdict": 1
+    },
+    {
+      "arm": "direct",
+      "chunk": 13,
+      "verdict": 1
+    },
+    {
+      "arm": "direct",
+      "chunk": 14,
+      "verdict": 1
+    },
+    {
+      "arm": "direct",
+      "chunk": 15,
+      "verdict": 1
+    },
+    {
+      "arm": "direct",
+      "chunk": 16,
+      "verdict": 1
+    },
+    {
+      "arm": "direct",
+      "chunk": 17,
+      "verdict": 1
+    },
+    {
+      "arm": "direct",
+      "chunk": 18,
+      "verdict": 1
+    },
+    {
+      "arm": "direct",
+      "chunk": 19,
+      "verdict": 1
+    },
+    {
+      "arm": "direct",
+      "chunk": 20,
+      "verdict": 1
+    },
+    {
+      "arm": "direct",
+      "chunk": 21,
+      "verdict": 1
+    },
+    {
+      "arm": "direct",
+      "chunk": 22,
+      "verdict": 1
+    },
+    {
+      "arm": "direct",
+      "chunk": 23,
+      "verdict": 1
+    },
+    {
+      "arm": "direct",
+      "chunk": 24,
+      "verdict": 1
+    },
+    {
+      "arm": "direct",
+      "chunk": 25,
+      "verdict": 1
+    },
+    {
+      "arm": "direct",
+      "chunk": 26,
+      "verdict": 1
+    },
+    {
+      "arm": "direct",
+      "chunk": 27,
+      "verdict": 1
+    },
+    {
+      "arm": "direct",
+      "chunk": 28,
+      "verdict": 1
+    },
+    {
+      "arm": "direct",
+      "chunk": 29,
+      "verdict": 1
+    },
+    {
+      "arm": "direct",
+      "chunk": 30,
+      "verdict": 1
+    },
+    {
+      "arm": "direct",
+      "chunk": 31,
+      "verdict": 1
+    }
+  ],
+  "memory_summary": {
+    "shared_bytes": 167772160,
+    "shared_passed": 2,
+    "shared_checks": 2,
+    "direct_bytes": 8589934592,
+    "direct_passed": 32,
+    "direct_checks": 32,
+    "restored": 1
+  },
+  "restored_readback_sha256": "d3d7cb497833ebb57876fe4465257217608ac9765f9a360a3ca0e658b845f325",
+  "helper_removed": true
+}

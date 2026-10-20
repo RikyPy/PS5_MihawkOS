@@ -1,0 +1,213 @@
+{
+ "exception": {
+  "context": {
+   "arch": "i386",
+   "batch_header_sha256": "29b29d960f4c6cb1517812814c85353c99197bbeb068470d44d62fefefbf3dd1",
+   "host_wine_sha256": "ddaea569e3f97724ccae7bbc063aed6dbec0549eb67f5a70559d6babf4f8a5d1",
+   "test_sha256": "4ffda45a1f37901cde7c4b66451f67d7a7abc48fa295a3742309f8d5684d56d1",
+   "wine_revision": "7e893751d256bfe062fd1d159375f024dedfa696"
+  },
+  "exit_code": 5,
+  "failure_count": 12,
+  "failures": [
+   {
+    "file": "exception.c",
+    "line": 11560,
+    "text": "Got unexpected data 0, i 4."
+   },
+   {
+    "file": "exception.c",
+    "line": 11560,
+    "text": "Got unexpected data 0, i 5."
+   },
+   {
+    "file": "exception.c",
+    "line": 11560,
+    "text": "Got unexpected data 0, i 6."
+   },
+   {
+    "file": "exception.c",
+    "line": 11560,
+    "text": "Got unexpected data 0, i 7."
+   },
+   {
+    "file": "exception.c",
+    "line": 11614,
+    "text": "Got unexpected data 0, i 4."
+   },
+   {
+    "file": "exception.c",
+    "line": 11614,
+    "text": "Got unexpected data 0, i 5."
+   },
+   {
+    "file": "exception.c",
+    "line": 11614,
+    "text": "Got unexpected data 0, i 6."
+   },
+   {
+    "file": "exception.c",
+    "line": 11614,
+    "text": "Got unexpected data 0, i 7."
+   },
+   {
+    "file": "exception.c",
+    "line": 11617,
+    "text": "Got unexpected data 0, i 0."
+   },
+   {
+    "file": "exception.c",
+    "line": 11617,
+    "text": "Got unexpected data 0, i 1."
+   },
+   {
+    "file": "exception.c",
+    "line": 11617,
+    "text": "Got unexpected data 0, i 2."
+   },
+   {
+    "file": "exception.c",
+    "line": 11617,
+    "text": "Got unexpected data 0, i 3."
+   }
+  ],
+  "guarded": null,
+  "last_line": "exception.c:1344: exception 0x80000003 at 01550009 firstchance=1 Eip=0x155000a, Eax=0xcbea10 ctx.ContextFlags 0xc8010027",
+  "seconds": 0.4,
+  "skipped_lines": [
+   "exception.c:11694: Tests skipped: avx512 is not available, skipping test.",
+   "exception.c:11852: Tests skipped: avx512 is not available, skipping test."
+  ],
+  "status": "incomplete",
+  "summary": null,
+  "todo_lines": 3
+ },
+ "thread": {
+  "context": {
+   "arch": "i386",
+   "batch_header_sha256": "29b29d960f4c6cb1517812814c85353c99197bbeb068470d44d62fefefbf3dd1",
+   "host_wine_sha256": "ddaea569e3f97724ccae7bbc063aed6dbec0549eb67f5a70559d6babf4f8a5d1",
+   "test_sha256": "fe723960a05daacbea5cc67a4f235fd27175918ea955ebcd97028e6221889f51",
+   "wine_revision": "7e893751d256bfe062fd1d159375f024dedfa696"
+  },
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "log": "klog/wt-host-i386-ntdll-thread-1791424160817055769.log",
+  "seconds": 1.3,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 49,
+   "todo": 0
+  },
+  "todo_lines": 0
+ },
+ "virtual": {
+  "context": {
+   "arch": "i386",
+   "batch_header_sha256": "29b29d960f4c6cb1517812814c85353c99197bbeb068470d44d62fefefbf3dd1",
+   "host_wine_sha256": "ddaea569e3f97724ccae7bbc063aed6dbec0549eb67f5a70559d6babf4f8a5d1",
+   "test_sha256": "fe723960a05daacbea5cc67a4f235fd27175918ea955ebcd97028e6221889f51",
+   "wine_revision": "7e893751d256bfe062fd1d159375f024dedfa696"
+  },
+  "exit_code": 2,
+  "failure_count": 2,
+  "failures": [
+   {
+    "file": "virtual.c",
+    "line": 2646,
+    "text": "Unexpected old_prot 0."
+   },
+   {
+    "file": "virtual.c",
+    "line": 2653,
+    "text": "Unexpected old_prot 0."
+   }
+  ],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "log": "klog/wt-host-i386-ntdll-virtual-1791424159544566349.log",
+  "seconds": 0.9,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 2,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 2179,
+   "todo": 60
+  },
+  "todo_lines": 60
+ },
+ "wow64": {
+  "context": {
+   "arch": "i386",
+   "batch_header_sha256": "29b29d960f4c6cb1517812814c85353c99197bbeb068470d44d62fefefbf3dd1",
+   "host_wine_sha256": "ddaea569e3f97724ccae7bbc063aed6dbec0549eb67f5a70559d6babf4f8a5d1",
+   "test_sha256": "4ffda45a1f37901cde7c4b66451f67d7a7abc48fa295a3742309f8d5684d56d1",
+   "wine_revision": "7e893751d256bfe062fd1d159375f024dedfa696"
+  },
+  "exit_code": 5,
+  "failure_count": 9,
+  "failures": [
+   {
+    "file": "wow64.c",
+    "line": 2560,
+    "text": "wrong limit FFFEFFFF"
+   },
+   {
+    "file": "wow64.c",
+    "line": 2903,
+    "text": "status changed to 0"
+   },
+   {
+    "file": "wow64.c",
+    "line": 2904,
+    "text": "pointer changed to 0"
+   },
+   {
+    "file": "wow64.c",
+    "line": 2905,
+    "text": "info changed to 7bdeb36d"
+   },
+   {
+    "file": "wow64.c",
+    "line": 2908,
+    "text": "got error 6"
+   },
+   {
+    "file": "wow64.c",
+    "line": 2911,
+    "text": "Wrong information 0"
+   },
+   {
+    "file": "wow64.c",
+    "line": 2912,
+    "text": "pointer changed to 0"
+   },
+   {
+    "file": "wow64.c",
+    "line": 2913,
+    "text": "info changed to 7bdeb36d"
+   },
+   {
+    "file": "wow64.c",
+    "line": 2923,
+    "text": "got error 6"
+   }
+  ],
+  "guarded": null,
+  "last_line": "wow64.c:2923: Test failed: got error 6",
+  "seconds": 10.8,
+  "skipped_lines": [],
+  "status": "incomplete",
+  "summary": null,
+  "todo_lines": 1
+ }
+}

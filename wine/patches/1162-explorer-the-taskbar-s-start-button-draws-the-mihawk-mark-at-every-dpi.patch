@@ -1,0 +1,60 @@
+From: PS5_Proton <local>
+Subject: [PATCH] explorer: the taskbar's Start button draws the Mihawk mark at every DPI
+
+The Start button showed the Windows four-pane logo, a Microsoft trademark: at 96 DPI as sprites captured from the
+prototype (patch 1140's PW_SPRITE_START and PW_SPRITE_START_HOVER), at another DPI drawn. The owner replaced it with
+the project's own Mihawk mark (PS5_Proton themes/windows11/start.svg: a white squircle, an amber frame and a navy M,
+original artwork), drawn by one function at every DPI (PS5_Proton src/pw_taskbar_logo.h through
+wine/ps5/pw_shell_taskbar.h's pw_taskbar_logo_draw), 22 px in the 40 px button at 96 DPI where the logo was. The
+button's size, place, plates and clicks are unchanged: at 96 DPI the prototype's hover and press plates go under the
+mark (the hover sprite was the plate under the logo, within one level), at another DPI the taskbar's own plate. At
+another DPI it replaces patch 0981's PP mark polygon, as the four panes did. Host test (tests/test_taskbar_logo.py):
+librsvg's drawing of start.svg at 22, 33 and 44 px is within 1.5 levels on average.
+---
+diff --git a/programs/explorer/systray.c b/programs/explorer/systray.c
+index 848e600..439c32d 100644
+--- a/programs/explorer/systray.c
++++ b/programs/explorer/systray.c
+@@ -1068,25 +1068,9 @@ static void taskbar_paint_icon(const DRAWITEMSTRUCT *dis, struct taskbar_button
+     if (!icon) icon = LoadIconW(NULL, (LPCWSTR)IDI_APPLICATION); /* Borrowed system fallback. */
+     if (start)
+     {
+-        /* The project's own PP mark (ps5/tools/icon0.svg) is native geometry: the icon's path in a
+-         * 312-unit box with its arcs as chords, filled even-odd so the two bowls stay open. */
+-        static const POINT mark[] = {
+-            {139,0}, {139,260}, {140,267}, {144,272}, {149,276}, {156,277}, {163,276}, {168,272}, {172,267}, {173,260}, {173,0}, {241,0},
+-            {262,4}, {281,16}, {293,35}, {297,56}, {293,77}, {281,96}, {262,108}, {241,112}, {208,112}, {208,260}, {204,280}, {193,297},
+-            {176,308}, {156,312}, {136,308}, {119,297}, {108,280}, {104,260}, {104,112}, {71,112}, {50,108}, {31,96}, {19,77}, {15,56},
+-            {19,35}, {31,16}, {50,4}, {71,0}, {208,79}, {241,79}, {250,77}, {257,72}, {262,65}, {264,56}, {262,47}, {257,40},
+-            {250,35}, {241,33}, {208,33}, {104,79}, {71,79}, {62,77}, {55,72}, {50,65}, {48,56}, {50,47}, {55,40}, {62,35},
+-            {71,33}, {104,33}
+-        };
+-        static const INT mark_counts[] = {40, 11, 11};
+-        int extent = MulDiv(PW_APPEARANCE_TASKBAR_START_SIZE, dpi, 96), x = (rect.right - extent) / 2, y = (rect.bottom - extent) / 2;
+-        HBRUSH brush = CreateSolidBrush(PW_APPEARANCE_START_MARK); POINT points[ARRAY_SIZE(mark)];
+-        HGDIOBJ prior_brush = SelectObject(dc, brush), prior_pen = SelectObject(dc, GetStockObject(NULL_PEN));
+-        int prior_mode = SetPolyFillMode(dc, ALTERNATE);
+-        for (unsigned int i = 0; i < ARRAY_SIZE(mark); ++i)
+-        { points[i].x = x + MulDiv(mark[i].x, extent, 312); points[i].y = y + MulDiv(mark[i].y, extent, 312); }
+-        PolyPolygon(dc, points, mark_counts, ARRAY_SIZE(mark_counts));
+-        SetPolyFillMode(dc, prior_mode); SelectObject(dc, prior_pen); SelectObject(dc, prior_brush); DeleteObject(brush);
++        /* The project's Mihawk mark (themes/windows11/start.svg) at this DPI (PS5_Proton src/pw_taskbar_logo.h). */
++        int extent = MulDiv(PW_APPEARANCE_TASKBAR_START_SIZE, dpi, 96);
++        pw_taskbar_logo_draw(dc, (rect.right - extent) / 2, (rect.bottom - extent) / 2, extent);
+     }
+     else if (icon) DrawIconEx(dc, (rect.right - size) / 2, (rect.bottom - size) / 2,
+                               icon, size, size, 0, NULL, DI_NORMAL);
+@@ -1626,8 +1610,11 @@ static BOOL taskbar_paint_prototype(const DRAWITEMSTRUCT *dis, struct taskbar_bu
+     if (item == taskbar_search) pw_taskbar_sprite(dc, dark, hot || pressed ? PW_SPRITE_SEARCH_HOVER : PW_SPRITE_SEARCH, 0, 0);
+     else if (win && !win->hwnd)
+     {
+-        if (pressed) { taskbar_plate(dc, PW_SPRITE_PLATE_PRESS, width); pw_taskbar_sprite(dc, dark, PW_SPRITE_START, 0, 0); }
+-        else pw_taskbar_sprite(dc, dark, hot ? PW_SPRITE_START_HOVER : PW_SPRITE_START, 0, 0);
++        /* The prototype's plates under the drawn Mihawk mark (src/pw_taskbar_logo.h), 22 px in the 40 px button. */
++        int extent = PW_APPEARANCE_TASKBAR_START_SIZE;
++        if (pressed) taskbar_plate(dc, PW_SPRITE_PLATE_PRESS, width);
++        else if (hot) taskbar_plate(dc, PW_SPRITE_PLATE_HOVER, width);
++        pw_taskbar_logo_draw(dc, (width - extent) / 2, (rect.bottom - rect.top - extent) / 2, extent);
+     }
+     else
+     {

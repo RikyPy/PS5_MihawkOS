@@ -1,0 +1,279 @@
+{
+  "case": "basic",
+  "loader": {
+    "sdk_revision": "611893fc25ef3e138f5bc2c90d829d8b58174cd2",
+    "converter_revision": "ab37acd506305ba3e575435e3ae9a351cfaf7cf4",
+    "converter_sha256": "614377a0e37006e1454c67f228fc370a2f785c060205cb9f0264f27af04b5f18",
+    "recipe_sha256": "a0be052a4d973baa280d974e11efe8a6efb5efe72b353da31bdcf2908f33a685",
+    "sources": {
+      "native/proton_wine_child.c": "4a235b94441d3dc2da40edca58a727ce88516193fa5a100449b21f76424a004f",
+      "src/pw_wine_start.c": "52bdf039228ca13e9931fc7f7097b196ece76868990b6ea44588990714bf22e2",
+      "wine/ps5/pw_wine_prx.c": "67b8393fca62a72a7aaf53a409c9a34684dd7704037bf194066e5173808c16a2",
+      "wine/ps5/pw_wine_process_io.c": "dd3ccac3b63058aaf743146fbf5791217ec9b6451ad0dc4c61dcbbad7abbd6c5",
+      "wine/ps5/pw_wine_process.h": "83f94d1bcfeaa94079d3b2ea9f67a860ef9f364bdae1b950c19f4c7d95e1046b",
+      "wine/ps5/pw_wine_process_io.h": "c375a67872391d47ef20cb7bc0001b66655aa29c44c446af31102c0fe5f937a7",
+      "src/pw_wine_start.h": "f450215176a5bf7b898728ab0a84cbd6b8a3bfd497a4996ee4f590aab95c6ed7",
+      "wine/ps5/pw_wine_prx.h": "82e4cf6b56377bb3ca9e007bd78a3302633fa8675e77d5b507823829959f9bb0",
+      "native/proton_gpu_identity.h": "5a8f1a0d4ee4ee624f1e68da2f3373f361cc42444d2c64866c97c726a117b52f"
+    },
+    "preload_mask": "0x8000000000000002",
+    "gpu_preflight": false,
+    "gpu_device_query": true,
+    "ps5-pie.ld": "fbc52518761b58b703a2225c847c5f44a81523cd0e751755adf890ae0f0dd74c",
+    "app-symbols.map": "470ce72a27a7be8e35dd7a25b485faa733d61570bdaf24d3c75bb4e3e3c63cf7",
+    "identity": "c133db0c5b885152ac47d1a6c54d615a83826bbe6a45dac302c4a0af17c6d55a",
+    "sha256": "2ea469139f81b776a9301ffd1e2ada86f8d01aabc344fb05b93e7ead8828508c"
+  },
+  "runtime": {
+    "ntdll": "4fa68b0f36f2e6f48a9f567722cab8912a4d58dae5d818a6269acc4134ffa541",
+    "wineserver": "9dc0637c4ba021ecacd43fc1f299c9842846f41d661bb6386e7b1dfbb7b3471d"
+  },
+  "passed": false,
+  "production_restored": true,
+  "helper_removed": true,
+  "status": "complete",
+  "gpu_device_share": true,
+  "owner_title": {
+    "revision": "2dd897b1e3c7645fcb3d8902df3680be0b81b9f8",
+    "kind": "wine-owner",
+    "sdk_revision": "611893fc25ef3e138f5bc2c90d829d8b58174cd2",
+    "source_sha256": {
+      "ps5/src/main.cpp": "f1eb468f9603425c6543f0b02d8cf91e3e85a6919d7248dec85a24fd2f5aa457",
+      "ps5/CMakeLists.txt": "0e1769164ed4c5b42a0b0ebbcb07e6cce79c77d57c71c69730a2fe3b73a2df04",
+      "native/proton_wine.cpp": "570731f23d025d47b1c17771877d8f31222b8d21bef851bf4ca86326ccdfa40f",
+      "native/proton_gpu_identity.h": "5a8f1a0d4ee4ee624f1e68da2f3373f361cc42444d2c64866c97c726a117b52f",
+      "wine/ps5/pw_wine_process.h": "83f94d1bcfeaa94079d3b2ea9f67a860ef9f364bdae1b950c19f4c7d95e1046b"
+    },
+    "radv_recipe_sha256": "e2844f49e4af12a9718d5b8b6055ace83e7eaa1d68870de2a79d39d1c92fa674",
+    "identity": "0b81f5d820f8f6938308a00746e897dc7665aadc6fb276331ef8b71aa1467179",
+    "eboot_sha256": "f089017315a1265b22df05ea74574e96ef56ab10a412f3c571132168ce9ef724"
+  },
+  "parent_restored": true,
+  "parent_deployed": true,
+  "deployed_modules": [
+    "ntdll",
+    "wineserver"
+  ],
+  "helper_uploaded": true,
+  "probe_uploaded": true,
+  "deployment_verified": true,
+  "probe_sha256": "78bba82e80f17682164a7c332d5478c75c3a600a15733f4dede2cf77b637dc87",
+  "descendant_patch_sha256": "57fb947935f4178616a4ce3faeb753acd370fa737d691a86bf73d18c0322713f",
+  "graphics_patch_sha256": "c781a26850dfa9c68dbece702d9349185a7025dc51f65c61bba00da9e2606adc",
+  "patch_sha256": "2767c06d7ca2d2355275e644fe22f0045b713e90ab5f7946da7c3b22af5712a1",
+  "adapter_sha256": {
+    "pw_wine_process.c": "9bb500729f13f40c181457dc7095ac0dc4bd727b16b95aba3f09190a86de8c01",
+    "pw_wine_process.h": "83f94d1bcfeaa94079d3b2ea9f67a860ef9f364bdae1b950c19f4c7d95e1046b",
+    "pw_wine_threads.c": "9fb82ed67f775782a8ec9d9d0dbaf0837adb004cc1241ceebf6f58e60bbe38a0",
+    "pw_wine_threads.h": "a28177375ad16666504b3d05cb285c8f23634b800c2e4bd9b3c20ead21722d30",
+    "pw_wine_process_io.c": "dd3ccac3b63058aaf743146fbf5791217ec9b6451ad0dc4c61dcbbad7abbd6c5",
+    "pw_wine_process_io.h": "c375a67872391d47ef20cb7bc0001b66655aa29c44c446af31102c0fe5f937a7"
+  },
+  "runner_status": 0,
+  "post_launch_fault_records": 0,
+  "native_descriptor_samples": [
+    {
+      "stage": "before_spawn",
+      "count": 28,
+      "limit": 12555
+    },
+    {
+      "stage": "before_spawn",
+      "count": 36,
+      "limit": 12555
+    },
+    {
+      "stage": "before_spawn",
+      "count": 90,
+      "limit": 12555
+    },
+    {
+      "stage": "closed",
+      "count": 91,
+      "limit": 12555
+    },
+    {
+      "stage": "closed",
+      "count": 66,
+      "limit": 12555
+    },
+    {
+      "stage": "closed",
+      "count": 66,
+      "limit": 12555
+    },
+    {
+      "stage": "all_children_closed",
+      "count": 66,
+      "limit": 12555
+    }
+  ],
+  "windows_handle_samples": [],
+  "native_children": [
+    {
+      "pid": 992,
+      "service_id": 436307777
+    },
+    {
+      "pid": 995,
+      "service_id": 436307794
+    },
+    {
+      "pid": 998,
+      "service_id": 436307810
+    }
+  ],
+  "native_child_deletions": [
+    992,
+    995,
+    998
+  ],
+  "child_logs": [
+    "wine-child-992.log",
+    "wine-child-995.log",
+    "wine-child-998.log"
+  ],
+  "gpu_process_identity": [
+    {
+      "role": "owner",
+      "pid": 989,
+      "type": 2147614723,
+      "abi": 1,
+      "app_status": 0,
+      "guard": 1,
+      "app": 40984,
+      "header4": 1,
+      "header8": 0,
+      "header12": 0
+    },
+    {
+      "role": "before_elevation",
+      "pid": 992,
+      "type": 2147614798,
+      "abi": 1,
+      "app_status": 0,
+      "guard": 1,
+      "app": 40984,
+      "header4": 0,
+      "header8": 0,
+      "header12": 0
+    },
+    {
+      "role": "after_elevation",
+      "pid": 992,
+      "type": 2147614723,
+      "abi": 1,
+      "app_status": 0,
+      "guard": 1,
+      "app": 40984,
+      "header4": 0,
+      "header8": 0,
+      "header12": 0
+    },
+    {
+      "role": "before_elevation",
+      "pid": 995,
+      "type": 2147614798,
+      "abi": 1,
+      "app_status": 0,
+      "guard": 1,
+      "app": 40984,
+      "header4": 0,
+      "header8": 0,
+      "header12": 0
+    },
+    {
+      "role": "after_elevation",
+      "pid": 995,
+      "type": 2147614723,
+      "abi": 1,
+      "app_status": 0,
+      "guard": 1,
+      "app": 40984,
+      "header4": 0,
+      "header8": 0,
+      "header12": 0
+    },
+    {
+      "role": "before_elevation",
+      "pid": 998,
+      "type": 2147614798,
+      "abi": 1,
+      "app_status": 0,
+      "guard": 1,
+      "app": 40984,
+      "header4": 0,
+      "header8": 0,
+      "header12": 0
+    },
+    {
+      "role": "after_elevation",
+      "pid": 998,
+      "type": 2147614723,
+      "abi": 1,
+      "app_status": 0,
+      "guard": 1,
+      "app": 40984,
+      "header4": 0,
+      "header8": 0,
+      "header12": 0
+    }
+  ],
+  "gpu_child_queries": [
+    {
+      "phase": "before_elevation",
+      "status": -1,
+      "errno": 1,
+      "value": 0
+    },
+    {
+      "phase": "after_elevation",
+      "status": -1,
+      "errno": 1,
+      "value": 0
+    },
+    {
+      "phase": "before_elevation",
+      "status": -1,
+      "errno": 1,
+      "value": 0
+    },
+    {
+      "phase": "after_elevation",
+      "status": -1,
+      "errno": 1,
+      "value": 0
+    },
+    {
+      "phase": "before_elevation",
+      "status": -1,
+      "errno": 1,
+      "value": 0
+    },
+    {
+      "phase": "after_elevation",
+      "status": -1,
+      "errno": 1,
+      "value": 0
+    }
+  ],
+  "gpu_owner_queries": [
+    {
+      "status": 0,
+      "errno": 0,
+      "value": 0
+    },
+    {
+      "status": 0,
+      "errno": 0,
+      "value": 0
+    },
+    {
+      "status": 0,
+      "errno": 0,
+      "value": 0
+    }
+  ],
+  "gpu_query_passed": false,
+  "probe_removed": true
+}

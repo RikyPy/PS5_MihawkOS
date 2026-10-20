@@ -1,0 +1,27 @@
+{
+  "daemon_revision": "5b8397b9f2b5f12a7bc2f9c8745a00d1c2dd01ad",
+  "daemon_elf_sha256": "1c3142d0bdb61debe143e6b4f1940b201df6acae9a89585895f4de29f39e1445",
+  "daemon_build_id": "cecb3c02b0a14ec19220c80994f13eb515e5f4cc741747f3213bb39800ebe601",
+  "mode": "one-shot",
+  "patches": [
+    "platform/lapy/stdout-mirror.patch",
+    "platform/lapy/donor-wait.patch"
+  ],
+  "title_launched": false,
+  "complete_balanced_lifecycle": false,
+  "kernel_fault_records": 1,
+  "kernel_fault_signatures": 2,
+  "capture_errors": [],
+  "lifecycle_records": [
+    "1\t1032958843804\tMARK\tdaemon_start build=cecb3c02b0a14ec19220c80994f13eb515e5f4cc741747f3213bb39800ebe601 firmware=10010000 title=PPSA99170 service=0 require_client_result=1 max_requests=0",
+    "7\t1032959833292\tMARK\troot_sample build=cecb3c02b0a14ec19220c80994f13eb515e5f4cc741747f3213bb39800ebe601 phase=layout_before hold=55 use=54",
+    "8\t1033010274572\tMARK\troot_sample build=cecb3c02b0a14ec19220c80994f13eb515e5f4cc741747f3213bb39800ebe601 phase=layout_donor hold=57 use=56",
+    "9\t1033361097896\tMARK\troot_sample build=cecb3c02b0a14ec19220c80994f13eb515e5f4cc741747f3213bb39800ebe601 phase=layout_released hold=55 use=54",
+    "11\t1033361124839\tMARK\troot_layout build=cecb3c02b0a14ec19220c80994f13eb515e5f4cc741747f3213bb39800ebe601 valid=1 error=0 attempts=1",
+    "12\t1033361142399\tMARK\troot_sample build=cecb3c02b0a14ec19220c80994f13eb515e5f4cc741747f3213bb39800ebe601 phase=baseline hold=55 use=54",
+    "13\t1093364841994\tERR\tdaemon_result build=cecb3c02b0a14ec19220c80994f13eb515e5f4cc741747f3213bb39800ebe601 stage=find_request error=60 pid=-1 acknowledged=0 root_balanced=0"
+  ],
+  "title_passed": false,
+  "capture": "klog/kstuff-lapy-lifecycle-02",
+  "passed": false
+}

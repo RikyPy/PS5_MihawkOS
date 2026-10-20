@@ -1,0 +1,206 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Mon, 5 Oct 2026 23:00:00 -0400
+Subject: [PATCH] server: PS5: the title injects desktop input itself.
+
+With every Windows program in a Sony-managed helper process (the launcher
+layout), the title has no Windows thread to send the touchpad's pointer
+and the controller's keys from, and its close request reached nothing
+(2026-10-05, record removed from the tree; in git history: "inputs delivered 0 of 1 posted"). Hardware input belongs
+to the desktop, not to a process: pw_wineserver_input queues it from the
+title's thread, and the server thread delivers it as a device's would,
+to the window under the cursor or the foreground window, in whichever
+process owns it. A close request posts WM_CLOSE to the foreground window.
+The cursor the input leaves is kept for the title to draw (pw_wineserver_cursor),
+and the native process of the foreground window for it to show
+(pw_wineserver_foreground).
+---
+diff --git a/server/queue.c b/server/queue.c
+index 520de70..386044a 100644
+--- a/server/queue.c
++++ b/server/queue.c
+@@ -694,6 +694,19 @@ void set_clip_rectangle( struct desktop *desktop, const struct rectangle *rect,
+         queue_cursor_message( desktop, 0, WM_WINE_CLIPCURSOR, flags, reset );
+ }
+ 
++#ifdef __PROSPERO__
++/* The native process of the foreground window (pw_wineserver_foreground), for the title to show its pictures. */
++static int ps5_foreground_pid;
++static void ps5_note_foreground( struct process *process )
++{
++    __atomic_store_n( &ps5_foreground_pid, process ? process->unix_pid : 0, __ATOMIC_RELAXED );
++}
++DECLSPEC_EXPORT int pw_wineserver_foreground(void)
++{
++    return __atomic_load_n( &ps5_foreground_pid, __ATOMIC_RELAXED );
++}
++#endif
++
+ /* change the foreground input and reset the cursor clip rect */
+ static void set_foreground_input( struct desktop *desktop, struct process *process, struct thread_input *input )
+ {
+@@ -708,6 +721,9 @@ static void set_foreground_input( struct desktop *desktop, struct process *proce
+     set_clip_rectangle( desktop, NULL, SET_CURSOR_NOCLIP, 1 );
+     desktop->foreground_input = input;
+     desktop->foreground_pid = process->id;
++#ifdef __PROSPERO__
++    ps5_note_foreground( process );
++#endif
+ 
+     SHARED_WRITE_BEGIN( old_input_shm, input_shm_t )
+     {
+@@ -3440,6 +3456,73 @@ DECL_HANDLER(send_hardware_message)
+     release_object( desktop );
+ }
+ 
++#ifdef __PROSPERO__
++/* Input the title injects itself (request.c, pw_wineserver_input): with every Windows program in a helper process
++ * the title has no Windows thread to send it from, and hardware input belongs to the desktop, not to a process. It
++ * goes where a real device's would: to the window under the cursor or the foreground window, in whichever process
++ * owns it. type 1 key (code: virtual key), 2 relative mouse motion (x, y), 3 mouse button (code 0 left, 1 right,
++ * 2 middle), 4 close: WM_CLOSE to the foreground window, as a user closing it would. The cursor it leaves is kept
++ * for pw_wineserver_cursor. */
++static int ps5_cursor_x, ps5_cursor_y;
++
++void ps5_inject_input( unsigned int type, unsigned int code, int x, int y, unsigned int down )
++{
++    static const unsigned int buttons[3][2] =
++    {
++        {MOUSEEVENTF_LEFTUP, MOUSEEVENTF_LEFTDOWN},
++        {MOUSEEVENTF_RIGHTUP, MOUSEEVENTF_RIGHTDOWN},
++        {MOUSEEVENTF_MIDDLEUP, MOUSEEVENTF_MIDDLEDOWN},
++    };
++    union hw_input input;
++    struct desktop *desktop;
++
++    if (!(desktop = get_hardware_input_desktop( 0 ))) return;
++    if (!set_input_desktop( desktop->winstation, desktop ))
++    {
++        release_object( desktop );
++        return;
++    }
++    memset( &input, 0, sizeof(input) );
++    switch (type)
++    {
++    case 1:
++        if (!code || code > 255) break;
++        input.kbd.type  = INPUT_KEYBOARD;
++        input.kbd.vkey  = code;
++        input.kbd.flags = down ? 0 : KEYEVENTF_KEYUP;
++        queue_keyboard_message( desktop, 0, &input, IMO_HARDWARE, NULL, 0, 0 );
++        break;
++    case 2:
++        input.mouse.type  = INPUT_MOUSE;
++        input.mouse.x     = x;
++        input.mouse.y     = y;
++        input.mouse.flags = MOUSEEVENTF_MOVE;
++        queue_mouse_message( desktop, 0, &input, IMO_HARDWARE, NULL, 0 );
++        break;
++    case 3:
++        if (code > 2) break;
++        input.mouse.type  = INPUT_MOUSE;
++        input.mouse.flags = buttons[code][down != 0];
++        queue_mouse_message( desktop, 0, &input, IMO_HARDWARE, NULL, 0 );
++        break;
++    case 4:
++        if (desktop->foreground_input && desktop->foreground_input->shared->active)
++            post_message( desktop->foreground_input->shared->active, WM_CLOSE, 0, 0 );
++        break;
++    }
++    __atomic_store_n( &ps5_cursor_x, desktop->shared->cursor.x, __ATOMIC_RELAXED );
++    __atomic_store_n( &ps5_cursor_y, desktop->shared->cursor.y, __ATOMIC_RELAXED );
++    release_object( desktop );
++}
++
++/* Where the injected input left the cursor, for the title to draw it over whatever process's frame it shows. */
++DECLSPEC_EXPORT void pw_wineserver_cursor( int *x, int *y )
++{
++    *x = __atomic_load_n( &ps5_cursor_x, __ATOMIC_RELAXED );
++    *y = __atomic_load_n( &ps5_cursor_y, __ATOMIC_RELAXED );
++}
++#endif
++
+ /* post a quit message to the current queue */
+ DECL_HANDLER(post_quit_message)
+ {
+diff --git a/server/request.c b/server/request.c
+index 091e390..53c9801 100644
+--- a/server/request.c
++++ b/server/request.c
+@@ -754,6 +754,7 @@ static const struct fd_ops inprocess_wake_fd_ops =
+ /* receive one client socket sent by connect_inprocess_client */
+ #ifdef __PROSPERO__
+ static void inprocess_flush_requested(void);
++static void inprocess_input_requested(void);
+ #endif
+ static int receive_inprocess_client( int channel )
+ {
+@@ -779,11 +780,56 @@ static int receive_inprocess_client( int channel )
+ #ifdef __PROSPERO__
+     if (dummy == 'F') inprocess_flush_requested();
+     else if (dummy == 'T') terminate_all_processes();
++    else if (dummy == 'I') inprocess_input_requested();
+ #endif
+     return -1;
+ }
+ 
+ #ifdef __PROSPERO__
++/* Input from the title for the desktop (queue.c, ps5_inject_input): pw_wineserver_input queues it from the title's
++ * own thread and sends 'I'; the server thread, the only one that may touch the desktop, delivers it. The events are
++ * PwWineInput's (wine/ps5/pw_wine_sink.h). */
++struct ps5_input { unsigned int type, code; int x, y; unsigned int down; };
++static pthread_mutex_t input_mutex = PTHREAD_MUTEX_INITIALIZER;
++static struct ps5_input input_queue[256];
++static unsigned int input_head, input_count;
++
++static void inprocess_input_requested(void)
++{
++    for (;;)
++    {
++        struct ps5_input event;
++
++        pthread_mutex_lock( &input_mutex );
++        if (!input_count)
++        {
++            pthread_mutex_unlock( &input_mutex );
++            return;
++        }
++        event = input_queue[input_head];
++        input_head = (input_head + 1) % ARRAY_SIZE(input_queue);
++        input_count--;
++        pthread_mutex_unlock( &input_mutex );
++        ps5_inject_input( event.type, event.code, event.x, event.y, event.down );
++    }
++}
++
++/* 0, or -1 with no server or a full queue. */
++DECLSPEC_EXPORT int pw_wineserver_input( const void *events, unsigned int count )
++{
++    const struct ps5_input *event = events;
++    unsigned int i, queued = 0;
++    char request = 'I';
++
++    if (client_channel == -1) return -1;
++    pthread_mutex_lock( &input_mutex );
++    for (i = 0; i < count && input_count < ARRAY_SIZE(input_queue); i++, queued++)
++        input_queue[(input_head + input_count++) % ARRAY_SIZE(input_queue)] = event[i];
++    pthread_mutex_unlock( &input_mutex );
++    if (queued && send( client_channel, &request, 1, 0 ) != 1) return -1;
++    return queued == count ? 0 : -1;
++}
++
+ /* The title asks for the registry on disk before it replaces the process
+  * (a game ended, or the title stops it): pw_wineserver_flush sends 'F' on the
+  * client channel, and the server thread, the only one that may touch the
+diff --git a/server/request.h b/server/request.h
+index 19b0c81..8ae4b6b 100644
+--- a/server/request.h
++++ b/server/request.h
+@@ -54,6 +54,7 @@ extern int receive_fd( struct process *process );
+ extern int send_client_fd( struct process *process, int fd, obj_handle_t handle );
+ #ifdef __PROSPERO__
+ extern int ps5_is_child_process( const struct process *process );
++extern void ps5_inject_input( unsigned int type, unsigned int code, int x, int y, unsigned int down );
+ #endif
+ extern void read_request( struct thread *thread );
+ extern void write_reply( struct thread *thread );

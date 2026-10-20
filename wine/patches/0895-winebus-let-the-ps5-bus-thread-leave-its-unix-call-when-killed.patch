@@ -1,0 +1,96 @@
+From d551eb62ef331163bfada1cb0d04048e41bff683 Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Sat, 3 Oct 2026 10:31:09 -0400
+Subject: [PATCH] winebus: let the PS5 bus thread leave its Unix call when the
+ thread is killed
+
+A thread the server kills while it is inside the Unix side is marked and ends
+only on its way back to user mode (patch 0885). ps5_bus_wait loops inside one
+Unix call, sleeping 8 ms and polling the pad, until an event or the stop
+request: with a connected pad and no consumer neither comes, so after the
+server ended a game (the title's terminate request, patch 0899) this thread
+stayed, was the one thread still counted, and the process never exited. A
+probe that never exits showed it: five threads killed, "1 left", and thread
+002c, the bus thread, the one missing.
+
+ntdll now exports ps5_thread_is_terminating and the loop leaves when it is
+set, so the thread returns to user mode and ends with the others.
+---
+ dlls/ntdll/unix/thread.c   | 16 ++++++++++++++++
+ dlls/winebus.sys/bus_ps5.c | 10 +++++++++-
+ 2 files changed, 25 insertions(+), 1 deletion(-)
+
+diff --git a/dlls/ntdll/unix/thread.c b/dlls/ntdll/unix/thread.c
+index e3956a6..3fa50dc 100644
+--- a/dlls/ntdll/unix/thread.c
++++ b/dlls/ntdll/unix/thread.c
+@@ -1522,6 +1522,22 @@ void abort_thread( int status )
+ }
+ 
+ 
++#ifdef __PROSPERO__
++/***********************************************************************
++ *           ps5_thread_is_terminating
++ *
++ * For the Unix-side libraries that wait or loop for long (the HID bus
++ * thread): 1 once the server has killed the calling thread. A thread killed
++ * inside the Unix side ends only when it returns to user mode
++ * (quit_handler, ps5_dispatcher_terminate), so a loop that never returns
++ * keeps the process alive for ever: a process leaves with its last thread.
++ */
++DECLSPEC_EXPORT int ps5_thread_is_terminating(void)
++{
++    return __atomic_load_n( &ntdll_get_thread_data()->ps5_terminating, __ATOMIC_RELAXED );
++}
++#endif
++
+ /***********************************************************************
+  *           abort_process
+  */
+diff --git a/dlls/winebus.sys/bus_ps5.c b/dlls/winebus.sys/bus_ps5.c
+index 3d96e64..abbb553 100644
+--- a/dlls/winebus.sys/bus_ps5.c
++++ b/dlls/winebus.sys/bus_ps5.c
+@@ -5,6 +5,7 @@
+ #endif
+ #include "config.h"
+ #include <dlfcn.h>
++#include <stdio.h>
+ #include <unistd.h>
+ #include <pthread.h>
+ #include <string.h>
+@@ -75,8 +76,11 @@ static void feature(struct unix_device *iface, HID_XFER_PACKET *packet, IO_STATU
+ }
+ static const struct raw_device_vtbl vtbl = {destroy, start, stop, get_descriptor, unsupported, feature, unsupported};
+ 
++static int (*thread_is_terminating)(void);
+ NTSTATUS ps5_bus_init(void *args)
+ {
++    thread_is_terminating = dlsym(RTLD_DEFAULT, "ps5_thread_is_terminating");
++    fprintf(stderr, "wine-ps5: bus thread %s ps5_thread_is_terminating\n", thread_is_terminating ? "found" : "has no");
+     read_pad = dlsym(RTLD_DEFAULT, "pw_wine_dualsense");
+     return read_pad ? STATUS_SUCCESS : STATUS_NOT_SUPPORTED;
+ }
+@@ -86,7 +90,10 @@ NTSTATUS ps5_bus_wait(void *args)
+     BYTE report[64];
+     int connected;
+     bus_event_cleanup(event);
+-    while (!__atomic_load_n(&stopping, __ATOMIC_ACQUIRE))
++    /* This loop stays in the Unix call until an event or the stop request. A
++     * thread the server killed ends only when it returns to user mode, so the
++     * loop also leaves when the thread is killed, or the process never ends. */
++    while (!__atomic_load_n(&stopping, __ATOMIC_ACQUIRE) && !(thread_is_terminating && thread_is_terminating()))
+     {
+         usleep(8000);
+         connected = read_pad(report);
+@@ -112,6 +119,7 @@ NTSTATUS ps5_bus_wait(void *args)
+         pthread_mutex_unlock(&device_lock);
+         if (bus_event_queue_pop(&events, event)) return STATUS_PENDING;
+     }
++    if (thread_is_terminating && thread_is_terminating()) fprintf(stderr, "wine-ps5: bus thread leaves its Unix call: killed\n");
+     return STATUS_SUCCESS;
+ }
+ NTSTATUS ps5_bus_stop(void *args)
+-- 
+2.56.0
+

@@ -1,0 +1,23 @@
+{
+ "run": "exec-jit-limits-2026-10-14-01",
+ "elf_sha256": "befb2e8a4dba77152271dbf509ae30f0aeb23107ccbeed353ff0bf252cf73113",
+ "passed": true,
+ "lines": [
+  "--- exec2",
+  "PS5_PROTON_EXEC_GRANT type=jit-own-rw map=0 errno=0",
+  "PS5_PROTON_EXEC_GRANT type=jit-own-rw-then-rx protection=5 rc=0 query=0 prot=0x5",
+  "PS5_PROTON_EXEC_GRANT type=jit-own-rw-then-rx used=ok",
+  "PS5_PROTON_EXEC_GRANT type=jit-own-rwx map=0 errno=0",
+  "PS5_PROTON_EXEC_GRANT type=jit-own-rwx query=0 prot=0x7",
+  "PS5_PROTON_EXEC_GRANT type=jit-own-rwx used=ok",
+  "PS5_PROTON_EXEC_GRANT type=pools phase=before-256mib flexible_kib=8268800 (0) direct_largest_kib=0 (0x8002000c)",
+  "PS5_PROTON_EXEC_GRANT type=jit-256mib create=0 rw=0",
+  "PS5_PROTON_EXEC_GRANT type=pools phase=created-256mib flexible_kib=8268800 (0) direct_largest_kib=0 (0x8002000c)",
+  "PS5_PROTON_EXEC_GRANT type=pools phase=touched-256mib flexible_kib=8268800 (0) direct_largest_kib=0 (0x8002000c)",
+  "PS5_PROTON_EXEC_GRANT type=pools phase=closed-256mib flexible_kib=8268800 (0) direct_largest_kib=0 (0x8002000c)",
+  "PS5_PROTON_EXEC_GRANT type=jit-count made=512 last=0",
+  "PS5_PROTON_EXEC_GRANT type=pools phase=closed-many flexible_kib=8268800 (0) direct_largest_kib=0 (0x8002000c)",
+  "PS5_PROTON_EXEC_GRANT DONE limits",
+  ""
+ ]
+}

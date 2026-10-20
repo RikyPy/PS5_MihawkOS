@@ -1,0 +1,116 @@
+{
+ "battery": "mihawk-theme-focused-2026-10-09-10",
+ "expected_cases": [
+  "appearance32",
+  "appearance64",
+  "theme-notify32",
+  "theme-notify64"
+ ],
+ "revision": "364ec945e865e646d9e11a42f5600c300a257f47",
+ "dirty": true,
+ "cases": [
+  {
+   "case": "appearance32",
+   "run": "mihawk-theme-focused-2026-10-09-10-appearance32",
+   "runner_status": 0,
+   "seconds": 32.8,
+   "result": "finished",
+   "probe_verdict": "PASS",
+   "returned_to_launcher": true,
+   "exit_stall": false,
+   "passed": true,
+   "run_seconds": 30.8,
+   "launch_readiness": {
+    "ready": true,
+    "seconds": 0.169,
+    "settle_seconds": 0.0,
+    "census_seconds": 0.154,
+    "previous_cleanup_verified": false
+   },
+   "runner_overhead_seconds": 2.0,
+   "layout": "launcher",
+   "fault_records": 0,
+   "helpers": 8,
+   "protocol_errors": 0
+  },
+  {
+   "case": "appearance64",
+   "run": "mihawk-theme-focused-2026-10-09-10-appearance64",
+   "runner_status": 0,
+   "seconds": 26.2,
+   "result": "finished",
+   "probe_verdict": "PASS",
+   "returned_to_launcher": true,
+   "exit_stall": false,
+   "passed": true,
+   "run_seconds": 24.3,
+   "launch_readiness": {
+    "ready": true,
+    "seconds": 0.165,
+    "settle_seconds": 0.0,
+    "census_seconds": 0.147,
+    "previous_cleanup_verified": true
+   },
+   "runner_overhead_seconds": 1.9,
+   "layout": "launcher",
+   "fault_records": 0,
+   "helpers": 8,
+   "protocol_errors": 0
+  },
+  {
+   "case": "theme-notify32",
+   "run": "mihawk-theme-focused-2026-10-09-10-theme-notify32",
+   "runner_status": 0,
+   "seconds": 13.6,
+   "result": "finished",
+   "probe_verdict": "PASS",
+   "returned_to_launcher": true,
+   "exit_stall": false,
+   "passed": true,
+   "run_seconds": 12.9,
+   "launch_readiness": {
+    "ready": true,
+    "seconds": 0.163,
+    "settle_seconds": 0.0,
+    "census_seconds": 0.14,
+    "previous_cleanup_verified": true
+   },
+   "runner_overhead_seconds": 0.7,
+   "layout": "launcher",
+   "fault_records": 0,
+   "helpers": 9,
+   "protocol_errors": 0
+  },
+  {
+   "case": "theme-notify64",
+   "run": "mihawk-theme-focused-2026-10-09-10-theme-notify64",
+   "runner_status": 0,
+   "seconds": 12.3,
+   "result": "finished",
+   "probe_verdict": "PASS",
+   "returned_to_launcher": true,
+   "exit_stall": false,
+   "passed": true,
+   "run_seconds": 11.6,
+   "launch_readiness": {
+    "ready": true,
+    "seconds": 0.152,
+    "settle_seconds": 0.0,
+    "census_seconds": 0.138,
+    "previous_cleanup_verified": true
+   },
+   "runner_overhead_seconds": 0.7,
+   "layout": "launcher",
+   "fault_records": 0,
+   "helpers": 9,
+   "protocol_errors": 0
+  }
+ ],
+ "complete": true,
+ "seconds": 84.9,
+ "passed": true,
+ "build_fingerprint": "17c233ab2fd5ea7b1e7074e254455725c823b73927dea4a5a005415c4dcf84b9",
+ "theme_notification_checks_per_architecture": 14,
+ "caption_visual_qualified": false,
+ "caption_visual_observation": "The existing pane/icon/metric checks pass, but actual caption captures remain classic: Wine IsThemePartDefined requires state zero and the new hook passed nonzero state. Do not treat this focused pass as a caption or commit-gate pass."
+}

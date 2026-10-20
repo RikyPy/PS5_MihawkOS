@@ -1,0 +1,225 @@
+{
+  "case": "graphics",
+  "loader": {
+    "sdk_revision": "611893fc25ef3e138f5bc2c90d829d8b58174cd2",
+    "converter_revision": "ab37acd506305ba3e575435e3ae9a351cfaf7cf4",
+    "converter_sha256": "614377a0e37006e1454c67f228fc370a2f785c060205cb9f0264f27af04b5f18",
+    "recipe_sha256": "014b5334a5516d2240ff6e0c7b794635c5a4868b199d0d0201f02eb7ee6870d7",
+    "sources": {
+      "native/proton_wine_child.c": "d90f813dfcd1a12444778db1206424340de61ffb64121c2eefeeb3ff80c8e37c",
+      "src/pw_wine_start.c": "52bdf039228ca13e9931fc7f7097b196ece76868990b6ea44588990714bf22e2",
+      "wine/ps5/pw_wine_prx.c": "67b8393fca62a72a7aaf53a409c9a34684dd7704037bf194066e5173808c16a2",
+      "wine/ps5/pw_wine_process_io.c": "dd3ccac3b63058aaf743146fbf5791217ec9b6451ad0dc4c61dcbbad7abbd6c5",
+      "wine/ps5/pw_wine_process.h": "6a94782704d6b2edd588221f17fe902e6d07cba5382a898574a9e1ab288e807e",
+      "wine/ps5/pw_wine_process_io.h": "c375a67872391d47ef20cb7bc0001b66655aa29c44c446af31102c0fe5f937a7",
+      "src/pw_wine_start.h": "f450215176a5bf7b898728ab0a84cbd6b8a3bfd497a4996ee4f590aab95c6ed7",
+      "wine/ps5/pw_wine_prx.h": "82e4cf6b56377bb3ca9e007bd78a3302633fa8675e77d5b507823829959f9bb0"
+    },
+    "preload_mask": "0x8000000000000002",
+    "gpu_preflight": false,
+    "gpu_device_query": false,
+    "ps5-pie.ld": "fbc52518761b58b703a2225c847c5f44a81523cd0e751755adf890ae0f0dd74c",
+    "app-symbols.map": "470ce72a27a7be8e35dd7a25b485faa733d61570bdaf24d3c75bb4e3e3c63cf7",
+    "identity": "03362814e5e65dd93907e85d47bcf8913e59dc689faf8ab94d4600cc959bc2af",
+    "sha256": "1bd75e1ffedbfeec17c6ab07becc58af2b777c44d4749437e7e358844d5b56e4"
+  },
+  "runtime": {
+    "ntdll": "7849d8991b908ae871d62e45a56c9bd935859534899142d89ea4de0d58fcacc6",
+    "wineserver": "9dc0637c4ba021ecacd43fc1f299c9842846f41d661bb6386e7b1dfbb7b3471d"
+  },
+  "passed": true,
+  "production_restored": true,
+  "helper_removed": true,
+  "status": "complete",
+  "owner_title": {
+    "revision": "8dfcc3cd254e2a6ad3b6cbc07258a95fb2f23c9f",
+    "kind": "wine-owner",
+    "sdk_revision": "611893fc25ef3e138f5bc2c90d829d8b58174cd2",
+    "source_sha256": {
+      "ps5/src/main.cpp": "f1eb468f9603425c6543f0b02d8cf91e3e85a6919d7248dec85a24fd2f5aa457",
+      "ps5/CMakeLists.txt": "0e1769164ed4c5b42a0b0ebbcb07e6cce79c77d57c71c69730a2fe3b73a2df04",
+      "native/proton_wine.cpp": "c09ba650d2e8e86ce93f09282372bad4ea397d13c7f9fae161ffeefd30d71d3c",
+      "wine/ps5/pw_wine_process.h": "6a94782704d6b2edd588221f17fe902e6d07cba5382a898574a9e1ab288e807e"
+    },
+    "radv_recipe_sha256": "e2844f49e4af12a9718d5b8b6055ace83e7eaa1d68870de2a79d39d1c92fa674",
+    "identity": "63b49de0b7711c9050d3cbaf700d1727497eeae7555d76ebe23eecae1e637483",
+    "eboot_sha256": "62402ed6e7c6c3152ab26de575f51dc8ca1318a19330199dbc416d4de0ace4e0"
+  },
+  "parent_restored": true,
+  "loading_screen": true,
+  "graphics_sha256": "48e1c2e6b4a758bc1ae078b721e621f3a00376b3d96ec3d010625d0894ee589e",
+  "parent_deployed": true,
+  "deployed_modules": [
+    "ntdll",
+    "wineserver"
+  ],
+  "helper_uploaded": true,
+  "probe_uploaded": true,
+  "deployment_verified": true,
+  "probe_sha256": "3e97bbaaea32a076c952e380a19f9e4e4cd96a0fd040f901d82df809b648b81a",
+  "descendant_patch_sha256": "57fb947935f4178616a4ce3faeb753acd370fa737d691a86bf73d18c0322713f",
+  "patch_sha256": "2767c06d7ca2d2355275e644fe22f0045b713e90ab5f7946da7c3b22af5712a1",
+  "adapter_sha256": {
+    "pw_wine_process.c": "ee833438146acfb386293a256cd9c45a95eb52872aa32db4e119faa03d1e4ea9",
+    "pw_wine_process.h": "6a94782704d6b2edd588221f17fe902e6d07cba5382a898574a9e1ab288e807e",
+    "pw_wine_threads.c": "9fb82ed67f775782a8ec9d9d0dbaf0837adb004cc1241ceebf6f58e60bbe38a0",
+    "pw_wine_threads.h": "a28177375ad16666504b3d05cb285c8f23634b800c2e4bd9b3c20ead21722d30",
+    "pw_wine_process_io.c": "dd3ccac3b63058aaf743146fbf5791217ec9b6451ad0dc4c61dcbbad7abbd6c5",
+    "pw_wine_process_io.h": "c375a67872391d47ef20cb7bc0001b66655aa29c44c446af31102c0fe5f937a7"
+  },
+  "runner_status": 0,
+  "post_launch_fault_records": 0,
+  "native_descriptor_samples": [
+    {
+      "stage": "before_spawn",
+      "count": 30,
+      "limit": 12555
+    },
+    {
+      "stage": "before_spawn",
+      "count": 38,
+      "limit": 12555
+    },
+    {
+      "stage": "closed",
+      "count": 117,
+      "limit": 12555
+    },
+    {
+      "stage": "before_spawn",
+      "count": 274,
+      "limit": 12555
+    },
+    {
+      "stage": "closed",
+      "count": 82,
+      "limit": 12555
+    },
+    {
+      "stage": "closed",
+      "count": 82,
+      "limit": 12555
+    },
+    {
+      "stage": "all_children_closed",
+      "count": 82,
+      "limit": 12555
+    }
+  ],
+  "windows_handle_samples": [],
+  "native_children": [
+    {
+      "pid": 882,
+      "service_id": 436307105
+    },
+    {
+      "pid": 885,
+      "service_id": 436307122
+    },
+    {
+      "pid": 888,
+      "service_id": 436307138
+    }
+  ],
+  "native_child_deletions": [
+    882,
+    885,
+    888
+  ],
+  "child_logs": [
+    "wine-child-882.log",
+    "wine-child-885.log",
+    "wine-child-888.log"
+  ],
+  "windows_parent_passed": true,
+  "second_graphics_rejected": true,
+  "graphics_metadata_passed": true,
+  "graphics_teardown_passed": true,
+  "graphics_descendant_passed": true,
+  "frame_count": 180,
+  "readback_sha256": "f224253333555e210dde7c71af6aa109cc270076f71c842eb17e796a3d7ec6d8",
+  "readback_bytes": 2764816,
+  "readback_format_passed": true,
+  "pixel_samples": [
+    {
+      "x": 10,
+      "y": 10,
+      "rgb": [
+        6,
+        13,
+        26
+      ],
+      "expected": [
+        6,
+        13,
+        26
+      ],
+      "passed": true
+    },
+    {
+      "x": 640,
+      "y": 360,
+      "rgb": [
+        127,
+        64,
+        64
+      ],
+      "expected": [
+        127,
+        64,
+        64
+      ],
+      "passed": true
+    },
+    {
+      "x": 640,
+      "y": 100,
+      "rgb": [
+        242,
+        6,
+        6
+      ],
+      "expected": [
+        242,
+        6,
+        6
+      ],
+      "passed": true
+    },
+    {
+      "x": 220,
+      "y": 630,
+      "rgb": [
+        8,
+        19,
+        228
+      ],
+      "expected": [
+        8,
+        19,
+        228
+      ],
+      "passed": true
+    },
+    {
+      "x": 1060,
+      "y": 630,
+      "rgb": [
+        8,
+        228,
+        19
+      ],
+      "expected": [
+        8,
+        228,
+        19
+      ],
+      "passed": true
+    }
+  ],
+  "readback_pixels_passed": true,
+  "display_handoff_passed": true,
+  "probe_removed": true,
+  "graphics_removed": true,
+  "graphics_capture_removed": true
+}

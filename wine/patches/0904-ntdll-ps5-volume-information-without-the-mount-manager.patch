@@ -1,0 +1,75 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Sat, 3 Oct 2026 21:30:00 -0400
+Subject: [PATCH] ntdll: describe a volume without the mount manager on the PS5
+
+FileFsVolumeInformation (GetVolumeInformation's serial number and label) asks the mount manager,
+a driver of winedevice.exe. The console cannot start that process, so the query failed with
+STATUS_NOT_IMPLEMENTED and a program that reads the volume serial number got nothing. The volume
+is now described as Wine does one the mount manager knows nothing about: an NTFS volume without a
+label, with a serial number made from the device.
+The file id information asks for the same serial number, so both give the one serial.
+---
+  dlls/ntdll/unix/file.c | 32 ++++++++++++++++++++++++++++++++
+  1 file changed, 32 insertions(+)
+
+diff --git a/dlls/ntdll/unix/file.c b/dlls/ntdll/unix/file.c
+index d022395..74f270d 100644
+--- a/dlls/ntdll/unix/file.c
++++ b/dlls/ntdll/unix/file.c
+@@ -2443,6 +2443,15 @@ static NTSTATUS get_mountmgr_fs_info( HANDLE handle, int fd, struct mountmgr_uni
+ }
+ 
+ 
++#ifdef __PROSPERO__
++/* The serial number of a volume the mount manager cannot describe, made from its device. */
++static ULONG ps5_volume_serial( const struct stat *st )
++{
++    return (ULONG)(st->st_dev * 2654435761u) | 1;
++}
++#endif
++
++
+ /***********************************************************************
+  *           get_dir_data_entry
+  *
+@@ -5402,6 +5411,10 @@ NTSTATUS WINAPI NtQueryInformationFile( HANDLE handle, IO_STATUS_BLOCK *io,
+             info->VolumeSerialNumber = 0;
+             if (!get_mountmgr_fs_info( handle, fd, &drive, sizeof(drive) ))
+                 info->VolumeSerialNumber = drive.serial;
++#ifdef __PROSPERO__
++            else
++                info->VolumeSerialNumber = ps5_volume_serial( &st );
++#endif
+             memset( &info->FileId, 0, sizeof(info->FileId) );
+             *(ULONGLONG *)&info->FileId = st.st_ino;
+         }
+@@ -8097,7 +8110,26 @@ NTSTATUS WINAPI NtQueryVolumeInformationFile( HANDLE handle, IO_STATUS_BLOCK *io
+ 
+         if (get_mountmgr_fs_info( handle, fd, drive, sizeof(data) ))
+         {
++#ifdef __PROSPERO__
++            /* The mount manager is a driver of winedevice.exe, a process the console cannot start, so
++             * nothing answers: describe the volume as Wine does one the mount manager knows nothing
++             * about (an NTFS volume without a label), with a serial number made from the device. */
++            struct stat st;
++
++            if (fstat( fd, &st ))
++            {
++                status = errno_to_status( errno );
++                break;
++            }
++            info->VolumeCreationTime.QuadPart = 0;
++            info->VolumeSerialNumber = ps5_volume_serial( &st );
++            info->VolumeLabelLength = 0;
++            info->SupportsObjects = 1;
++            io->Information = offsetof( FILE_FS_VOLUME_INFORMATION, VolumeLabel );
++            status = STATUS_SUCCESS;
++#else
+             status = STATUS_NOT_IMPLEMENTED;
++#endif
+             break;
+         }
+ 
+-- 
+2.43.0

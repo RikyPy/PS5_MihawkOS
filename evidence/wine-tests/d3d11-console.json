@@ -1,0 +1,1223 @@
+{
+ "d3d11@0-27": {
+  "failure_count": 217,
+  "failures": [
+   {
+    "file": "d3d11.c",
+    "line": 2327,
+    "text": "Got unexpected hr 0x80004005."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 2342,
+    "text": "CreateProcess failed."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 2344,
+    "text": "No child process handle (CreateProcess failed?)"
+   },
+   {
+    "file": "d3d11.c",
+    "line": 2375,
+    "text": "Feature level 0xb100: Got hr 0, expected 0x80004002."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 2376,
+    "text": "Feature level 0xb100: Got hr 0, expected 0x80004002."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 2375,
+    "text": "Feature level 0xb000: Got hr 0, expected 0x80004002."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 2376,
+    "text": "Feature level 0xb000: Got hr 0, expected 0x80004002."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 2375,
+    "text": "Feature level 0xa100: Got hr 0, expected 0x80004002."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 2376,
+    "text": "Feature level 0xa100: Got hr 0, expected 0x80004002."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 2375,
+    "text": "Feature level 0xa000: Got hr 0, expected 0x80004002."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 2376,
+    "text": "Feature level 0xa000: Got hr 0, expected 0x80004002."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 2375,
+    "text": "Feature level 0x9300: Got hr 0, expected 0x80004002."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 2376,
+    "text": "Feature level 0x9300: Got hr 0, expected 0x80004002."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 2375,
+    "text": "Feature level 0x9200: Got hr 0, expected 0x80004002."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 2376,
+    "text": "Feature level 0x9200: Got hr 0, expected 0x80004002."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 2375,
+    "text": "Feature level 0x9100: Got hr 0, expected 0x80004002."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 2376,
+    "text": "Feature level 0x9100: Got hr 0, expected 0x80004002."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 2551,
+    "text": "Got refcount 3, expected 2."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 2598,
+    "text": "Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 2664,
+    "text": "Device has 1 references left."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 2960,
+    "text": "Test 0: Got unexpected device pointer 00000010007D5980, expected NULL."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 2960,
+    "text": "Test 1: Got unexpected device pointer 00000010007D5980, expected NULL."
+   },
+   {
+    "file": "crash.c",
+    "line": 53888,
+    "text": "a queued test function crashed with 0xc0000005 at offset 0xfffffffec0000000"
+   },
+   {
+    "file": "d3d11.c",
+    "line": 3103,
+    "text": "Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 3171,
+    "text": "Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 3200,
+    "text": "Test 7: Got unexpected hr 0 (format 0x1)."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 3200,
+    "text": "Test 8: Got unexpected hr 0 (format 0x1)."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 3200,
+    "text": "Test 9: Got unexpected hr 0 (format 0x1)."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 3208,
+    "text": "Device has 2 references left."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 3364,
+    "text": "Test 0: Got unexpected device pointer 00000010007DD000, expected NULL."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 3364,
+    "text": "Test 1: Got unexpected device pointer 00000010007DD000, expected NULL."
+   },
+   {
+    "file": "crash.c",
+    "line": 62832,
+    "text": "a queued test function crashed with 0xc0000005 at offset 0xfffffffec0000000"
+   },
+   {
+    "file": "d3d11.c",
+    "line": 3424,
+    "text": "Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 3485,
+    "text": "Device has 1 references left."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 3622,
+    "text": "Test 0: Got unexpected device pointer 00000010007DFC90, expected NULL."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 3622,
+    "text": "Test 1: Got unexpected device pointer 00000010007DFC90, expected NULL."
+   },
+   {
+    "file": "crash.c",
+    "line": 69888,
+    "text": "a queued test function crashed with 0xc0000005 at offset 0xfffffffec0000000"
+   },
+   {
+    "file": "d3d11.c",
+    "line": 3913,
+    "text": "Test 0: Got unexpected device pointer 0000001000BF9AC0, expected NULL."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 3913,
+    "text": "Test 1: Got unexpected device pointer 0000001000BF9AC0, expected NULL."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 3913,
+    "text": "Test 2: Got unexpected device pointer 0000001000BF9AC0, expected NULL."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 3913,
+    "text": "Test 3: Got unexpected device pointer 0000001000BF9AC0, expected NULL."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 3913,
+    "text": "Test 4: Got unexpected device pointer 0000001000BF9AC0, expected NULL."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 3913,
+    "text": "Test 5: Got unexpected device pointer 0000001000BF9AC0, expected NULL."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 3913,
+    "text": "Test 6: Got unexpected device pointer 0000001000BF9AC0, expected NULL."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 3913,
+    "text": "Test 7: Got unexpected device pointer 0000001000BF9AC0, expected NULL."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 3913,
+    "text": "Test 8: Got unexpected device pointer 0000001000BF9AC0, expected NULL."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 3913,
+    "text": "Test 12: Got unexpected device pointer 0000001000BF9AC0, expected NULL."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 3913,
+    "text": "Test 15: Got unexpected device pointer 0000001000BF9AC0, expected NULL."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 3913,
+    "text": "Test 30: Got unexpected device pointer 0000001000BF9AC0, expected NULL."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 3913,
+    "text": "Test 31: Got unexpected device pointer 0000001000BF9AC0, expected NULL."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 3913,
+    "text": "Test 32: Got unexpected device pointer 0000001000BF9AC0, expected NULL."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 3913,
+    "text": "Test 33: Got unexpected device pointer 0000001000BF9AC0, expected NULL."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 3913,
+    "text": "Test 36: Got unexpected device pointer 0000001000BF9AC0, expected NULL."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4129,
+    "text": "Test 4: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4130,
+    "text": "Unexpected pointer 000000100297DCF0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4129,
+    "text": "Test 5: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4130,
+    "text": "Unexpected pointer 0000001002AF5880."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4129,
+    "text": "Test 6: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4130,
+    "text": "Unexpected pointer 0000001002AF5D30."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4129,
+    "text": "Test 7: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4130,
+    "text": "Unexpected pointer 0000001002AF5E30."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4129,
+    "text": "Test 8: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4130,
+    "text": "Unexpected pointer 0000001002AF5F30."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4129,
+    "text": "Test 9: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4130,
+    "text": "Unexpected pointer 0000001002B924B0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4129,
+    "text": "Test 10: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4130,
+    "text": "Unexpected pointer 0000001002B92960."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4129,
+    "text": "Test 11: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4130,
+    "text": "Unexpected pointer 0000001002B92E10."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4129,
+    "text": "Test 12: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4130,
+    "text": "Unexpected pointer 0000001002B92F10."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4136,
+    "text": "Device has 9 references left."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4368,
+    "text": "Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4512,
+    "text": "Test 6: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4513,
+    "text": "Unexpected pointer 0000001002B93130."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4512,
+    "text": "Test 7: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4513,
+    "text": "Unexpected pointer 0000001002BB6990."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4512,
+    "text": "Test 8: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4513,
+    "text": "Unexpected pointer 0000001002BB4DD0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4512,
+    "text": "Test 9: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4513,
+    "text": "Unexpected pointer 0000001002B88340."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4512,
+    "text": "Test 10: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4513,
+    "text": "Unexpected pointer 0000001002B88160."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4512,
+    "text": "Test 11: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4513,
+    "text": "Unexpected pointer 0000001002C504D0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4512,
+    "text": "Test 12: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4513,
+    "text": "Unexpected pointer 0000001002C505D0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4512,
+    "text": "Test 13: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4513,
+    "text": "Unexpected pointer 0000001002B88440."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4512,
+    "text": "Test 14: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4513,
+    "text": "Unexpected pointer 0000001002B88540."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4512,
+    "text": "Test 23: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4513,
+    "text": "Unexpected pointer 0000001002C6B1C0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4512,
+    "text": "Test 24: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4513,
+    "text": "Unexpected pointer 0000001002C6B2C0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4512,
+    "text": "Test 25: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4513,
+    "text": "Unexpected pointer 0000001002C6B3C0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4512,
+    "text": "Test 26: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4513,
+    "text": "Unexpected pointer 0000001002C6B4C0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4512,
+    "text": "Test 27: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4513,
+    "text": "Unexpected pointer 0000001002C6B5C0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4512,
+    "text": "Test 28: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4513,
+    "text": "Unexpected pointer 0000001002C6B6C0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4512,
+    "text": "Test 29: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4513,
+    "text": "Unexpected pointer 0000001002C6B7C0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4512,
+    "text": "Test 30: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4513,
+    "text": "Unexpected pointer 0000001002C6B8C0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4512,
+    "text": "Test 31: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4513,
+    "text": "Unexpected pointer 0000001002C6B9C0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4512,
+    "text": "Test 32: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4513,
+    "text": "Unexpected pointer 0000001002C6BAC0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4512,
+    "text": "Test 33: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4513,
+    "text": "Unexpected pointer 0000001002C6BBC0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4512,
+    "text": "Test 34: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4513,
+    "text": "Unexpected pointer 0000001002C6BCC0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4519,
+    "text": "Device has 22 references left."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4866,
+    "text": "Got view dimension 0x5, expected 0x9."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4866,
+    "text": "Got view dimension 0x5, expected 0x9."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4866,
+    "text": "Got view dimension 0x5, expected 0x9."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4866,
+    "text": "Got view dimension 0x5, expected 0x9."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4866,
+    "text": "Got view dimension 0x5, expected 0xa."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4866,
+    "text": "Got view dimension 0x5, expected 0xa."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4866,
+    "text": "Got view dimension 0x5, expected 0xa."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4866,
+    "text": "Got view dimension 0x5, expected 0xa."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4913,
+    "text": "Test 5: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4914,
+    "text": "Unexpected pointer 0000001002BA5250."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4913,
+    "text": "Test 6: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4914,
+    "text": "Unexpected pointer 0000001002BA5360."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4913,
+    "text": "Test 7: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4914,
+    "text": "Unexpected pointer 0000001002BA5470."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4913,
+    "text": "Test 8: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4914,
+    "text": "Unexpected pointer 0000001002BA5580."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4913,
+    "text": "Test 9: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4914,
+    "text": "Unexpected pointer 0000001002BA5690."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4913,
+    "text": "Test 10: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4914,
+    "text": "Unexpected pointer 0000001002BA57A0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4913,
+    "text": "Test 11: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4914,
+    "text": "Unexpected pointer 0000001002BA58B0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4913,
+    "text": "Test 12: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4914,
+    "text": "Unexpected pointer 0000001002BA59C0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4913,
+    "text": "Test 13: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4914,
+    "text": "Unexpected pointer 0000001002BA5AD0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4913,
+    "text": "Test 14: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4914,
+    "text": "Unexpected pointer 0000001002BA5BE0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4913,
+    "text": "Test 15: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4914,
+    "text": "Unexpected pointer 0000001002BA5CF0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4913,
+    "text": "Test 16: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4914,
+    "text": "Unexpected pointer 0000001002BA5E00."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4913,
+    "text": "Test 17: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4914,
+    "text": "Unexpected pointer 0000001002BA5F10."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4913,
+    "text": "Test 18: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4914,
+    "text": "Unexpected pointer 0000001002BA6020."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4913,
+    "text": "Test 19: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4914,
+    "text": "Unexpected pointer 0000001002BA6130."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4913,
+    "text": "Test 20: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4914,
+    "text": "Unexpected pointer 0000001002BA6240."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4913,
+    "text": "Test 21: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4914,
+    "text": "Unexpected pointer 0000001002BA6350."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4913,
+    "text": "Test 22: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4914,
+    "text": "Unexpected pointer 0000001002BA6460."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4913,
+    "text": "Test 23: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4914,
+    "text": "Unexpected pointer 0000001002BA6570."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4913,
+    "text": "Test 24: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4914,
+    "text": "Unexpected pointer 0000001002BA6680."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4913,
+    "text": "Test 25: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4914,
+    "text": "Unexpected pointer 0000001002BA6790."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4913,
+    "text": "Test 26: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4914,
+    "text": "Unexpected pointer 0000001002BA68A0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4913,
+    "text": "Test 27: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4914,
+    "text": "Unexpected pointer 0000001002BA69B0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4913,
+    "text": "Test 28: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4914,
+    "text": "Unexpected pointer 0000001002E1EF30."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4913,
+    "text": "Test 29: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4914,
+    "text": "Unexpected pointer 0000001002E1F040."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4913,
+    "text": "Test 30: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4914,
+    "text": "Unexpected pointer 0000001002E1F150."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4913,
+    "text": "Test 31: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4914,
+    "text": "Unexpected pointer 0000001002E1F260."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4913,
+    "text": "Test 32: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4914,
+    "text": "Unexpected pointer 0000001002E1F370."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4913,
+    "text": "Test 33: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4914,
+    "text": "Unexpected pointer 0000001002E1F480."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4913,
+    "text": "Test 34: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4914,
+    "text": "Unexpected pointer 0000001002E1F590."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4913,
+    "text": "Test 35: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4914,
+    "text": "Unexpected pointer 0000001002E1F6A0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4913,
+    "text": "Test 38: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4914,
+    "text": "Unexpected pointer 0000001002E1F7B0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4913,
+    "text": "Test 39: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4914,
+    "text": "Unexpected pointer 0000001002E1F8C0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4913,
+    "text": "Test 50: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4914,
+    "text": "Unexpected pointer 0000001002E1F9D0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4913,
+    "text": "Test 51: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4914,
+    "text": "Unexpected pointer 0000001002E1FAE0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4913,
+    "text": "Test 52: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4914,
+    "text": "Unexpected pointer 0000001002E1FBF0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4913,
+    "text": "Test 53: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4914,
+    "text": "Unexpected pointer 0000001002E1FD00."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4913,
+    "text": "Test 54: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4914,
+    "text": "Unexpected pointer 0000001002E1FE10."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4913,
+    "text": "Test 55: Got unexpected hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4914,
+    "text": "Unexpected pointer 0000001002E1FF20."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 4920,
+    "text": "Device has 39 references left."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 5217,
+    "text": "Feature level 0x9300: Got hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 5250,
+    "text": "Feature level 0x9300: Got hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 5261,
+    "text": "Feature level 0x9300: Got hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 5294,
+    "text": "Feature level 0x9300: Got hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 5305,
+    "text": "Feature level 0x9300: Got hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 5338,
+    "text": "Feature level 0x9300: Got hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 5362,
+    "text": "Feature level 0x9300: Device has 3 references left."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 5217,
+    "text": "Feature level 0x9200: Got hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 5250,
+    "text": "Feature level 0x9200: Got hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 5261,
+    "text": "Feature level 0x9200: Got hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 5294,
+    "text": "Feature level 0x9200: Got hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 5305,
+    "text": "Feature level 0x9200: Got hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 5338,
+    "text": "Feature level 0x9200: Got hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 5362,
+    "text": "Feature level 0x9200: Device has 3 references left."
+   }
+  ],
+  "guarded": 215,
+  "last_line": "winetest-batch: done",
+  "seconds": 8.9,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 230,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 2463,
+   "todo": 32
+  },
+  "todo_lines": 32
+ },
+ "d3d11@27-54": {
+  "failure_count": 20,
+  "failures": [
+   {
+    "file": "d3d11.c",
+    "line": 5217,
+    "text": "Feature level 0x9100: Got hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 5250,
+    "text": "Feature level 0x9100: Got hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 5261,
+    "text": "Feature level 0x9100: Got hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 5294,
+    "text": "Feature level 0x9100: Got hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 5305,
+    "text": "Feature level 0x9100: Got hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 5338,
+    "text": "Feature level 0x9100: Got hr 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 5362,
+    "text": "Feature level 0x9100: Device has 3 references left."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 6090,
+    "text": "Got hr 0x80004002, expected 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 6095,
+    "text": "Got unexpected hr 0x80070057 for query type 7."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 6099,
+    "text": "Got unexpected hr 0x80070057 for query type 7."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 6090,
+    "text": "Got hr 0x80004002, expected 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 6090,
+    "text": "Got hr 0x80004002, expected 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 6090,
+    "text": "Got hr 0x80004002, expected 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 6090,
+    "text": "Got hr 0x80004002, expected 0."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 6392,
+    "text": "Got unexpected VSInvocations count: 5."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 6415,
+    "text": "Got unexpected VSInvocations count: 5."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 7425,
+    "text": "Got hr 0, expected 0x80004002."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 7426,
+    "text": "Got hr 0, expected 0x80004002."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 7467,
+    "text": "Got unexpected feature level 0xc0de0000."
+   },
+   {
+    "file": "d3d11.c",
+    "line": 8844,
+    "text": "Got unexpected colour 0x007f0080."
+   }
+  ],
+  "guarded": 215,
+  "last_line": "winetest-batch: done",
+  "seconds": 6.7,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 47,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 3886,
+   "todo": 47
+  },
+  "todo_lines": 47
+ }
+}

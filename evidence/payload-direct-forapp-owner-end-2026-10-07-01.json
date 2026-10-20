@@ -1,0 +1,18 @@
+{
+ "run": "payload-direct-forapp-owner-end-2026-10-07-01",
+ "owner": 524,
+ "mib": null,
+ "wait_owner": true,
+ "app": true,
+ "elf_sha256": "7090e5b50e7f55fe3896e8ba92fa3c63c1d49e49485c886235adcfc60c1c043a",
+ "passed": true,
+ "lines": [
+  "direct start owner=524 budget=0 budget_status=0 app=1 pool_mib=11712 bytes=16384",
+  "direct before pid=531 fmem_status=0 resident_kib=3504 mapped_kib=16864 free_status=0x8002000c largest_mib=0",
+  "direct allocation=0 map=0 offset=37748736",
+  "direct touched pid=531 fmem_status=0 resident_kib=3504 mapped_kib=16864 free_status=0x8002000c largest_mib=0",
+  "direct original_owner_absent=1",
+  "direct released pid=531 fmem_status=0 resident_kib=3504 mapped_kib=16864 free_status=0x8002000c largest_mib=0",
+  "PS5_PROTON_PAYLOAD_DMEM_PROBE PASS contents=1 unmap=0 release=0"
+ ]
+}

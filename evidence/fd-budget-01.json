@@ -1,0 +1,244 @@
+{
+  "title": "PPSA99170",
+  "identity": "fc98005d45ad4ade972f5e91be043d3a",
+  "kind": "service-native",
+  "build": {
+    "revision": "37cf90473d194fe2a4122ad40ce44d1062d7d813",
+    "kind": "service-native",
+    "elevate_gpu_helper": true,
+    "vulkan_gpu_helper": false,
+    "gpu_draw_helper": false,
+    "gpu_present_helper": false,
+    "wine_gpu_broker": false,
+    "sdk_revision": "611893fc25ef3e138f5bc2c90d829d8b58174cd2",
+    "source_sha256": {
+      "ps5/src/main.cpp": "f1eb468f9603425c6543f0b02d8cf91e3e85a6919d7248dec85a24fd2f5aa457",
+      "ps5/CMakeLists.txt": "d0deb1be18e79d5dda4224a7409a87936adc7d3893632801b8bf4665247061cc",
+      "native/proton_service_preflight.h": "3a8a7611112a1b454b8844fc7d8a5aec695d6fc9b706c714f72568787e68773b",
+      "native/proton_service_preflight.cpp": "5729eb48e3798e845bd202f68f3bed023b7dcb70e47039ee9ef2e5560b098ba0",
+      "native/proton_service_helper.c": "f94aa45c3f382c0c8da3e0206865be9fe1e54c92977c759a71823d6e91894064",
+      "native/proton_gpu_broker_probe.h": "54571c13fe2e4ed60914e2dcdcc187636281e8048da1c6de23f53e4b0b479a9f",
+      "native/proton_gpu_broker_probe.cpp": "9452f23403ba3fce4899ce3f6e7944bf95af35f77bc238f6086477f60bd87817",
+      "native/proton_gpu_memory_probe.cpp": "a6da45b08e0cfef1e2f2890231a49bba0727ea85c4784e2dd82a522758005eb9",
+      "native/proton_fd_budget_probe.cpp": "739d02ea9c684a670c37857f97a725e2db452e0853f443920b24c45e5ddbae94",
+      "native/proton_gpu_server_probe.cpp": "32effd5357906d6d9e2aec70e3070d254fefb2c71d6a64a085776ef9bc59b3fd",
+      "native/proton_gpu_display.cpp": "da3ebf3c5a76e5014c70657acdba8a49bd8756bbfed8dbab9b3cd758c72acac8",
+      "native/proton_gpu_display.h": "655fae4efb21e4c9c7ca8c6244590c5915e777781d82619e80b2697248c2c243",
+      "native/proton_gpu_server.h": "5a72c6284a2c6a015a1d39d1536fd5f400087f4959bd600def1a8a03933a9c39",
+      "src/pw_gpu_broker.h": "0854ed93a20b79735d92f372764dea49f8faccb0f52e13b28804e0b244c24602",
+      "wine/ps5/pw_wine_process_io.c": "dd3ccac3b63058aaf743146fbf5791217ec9b6451ad0dc4c61dcbbad7abbd6c5",
+      "wine/ps5/pw_wine_process_io.h": "c375a67872391d47ef20cb7bc0001b66655aa29c44c446af31102c0fe5f937a7",
+      "ps5/tools/link-title.sh": "08260eba2eeab01b82b284b7e65376d62b95fe1d036d9c3a45519a13b1ca0807"
+    },
+    "radv_recipe_sha256": "efef0a82c7ba4ffd97c225f6969a31bc550938689b03e9fafe2cf69734e8d7c9",
+    "radv_platform_header_sha256": "24e770da15304fe95a4e0191271bc33f545dc8f964e186408c7996f5bce2aa97",
+    "radv_archive_sha256": "0ffa39311881236b4872ec77a56bca417ce56c71cefca5954224b9ea8f3a1bf5",
+    "helper_tool_sha256": "614377a0e37006e1454c67f228fc370a2f785c060205cb9f0264f27af04b5f18",
+    "helper_tool_revision": "ab37acd506305ba3e575435e3ae9a351cfaf7cf4",
+    "helper_patch_sha256": "defd28005f7c15664658f8d61928886864f00e4e3df586396460b4d27057275c",
+    "helper_layout_sha256": "fbc52518761b58b703a2225c847c5f44a81523cd0e751755adf890ae0f0dd74c",
+    "helper_symbols_sha256": "470ce72a27a7be8e35dd7a25b485faa733d61570bdaf24d3c75bb4e3e3c63cf7",
+    "helper_preload_mask": "0x8000000000000002",
+    "radv_sdk_revision": "95c08f27386fc698f6bbe21dde3030140a41d10b",
+    "radv_provenance_sha256": "695395c399b3ab2b85fed11bb57a9d28563bf283b77ab44498a7525139711cb4",
+    "helper_recipe_sha256": "4bdacb8333745015d03d78ff19a303751eb401a85a888ccbe860769be21810ad",
+    "helper_sha256": "2ca717d6b4c9b1456ae4ef60087f7fef851605fb46b4ba88436e377ce1d1e74f",
+    "helper_needed": [
+      "libkernel.sprx",
+      "libSceLibcInternal.sprx"
+    ],
+    "identity": "d5e22ef080d5926b5867b3692d7acca19fb1764b3af5dfd798e859ee550b0b4d",
+    "eboot_sha256": "76b9022f11bf7b37637744e1552abca2658fc7d250e004f3a3c23a5a5a95f644"
+  },
+  "capture": "klog/fd-budget-01",
+  "expected_missing_image": false,
+  "mode": "fd-budget",
+  "passed": true,
+  "status": "complete",
+  "production_sha256": "8f63bbc57bd9203520653d9e3eb765798a434b737ac6c1f79b106437542761c3",
+  "production_restored": true,
+  "root_reference_balance_verified": false,
+  "forced_title_close": false,
+  "transfer_stage": "read eboot.bin",
+  "installed_readback_sha256": "d3d7cb497833ebb57876fe4465257217608ac9765f9a360a3ca0e658b845f325",
+  "production_executable_sha256": "bc5c7a75f249a59e7bce80218c6e749b9ea2f426e9bec4c96939ce7f75ceb17d",
+  "probe_readback_sha256": "09f306c2c521d528e1a3b6007f7812f1c03f43a51a894ab495221d55e456b67d",
+  "probe_executable_sha256": "34782f7207b9998b0788c4c125c1c2fc60ab037e6fb481c2aed28fda00e355a8",
+  "helper_uploaded": true,
+  "helper_executable_verified": true,
+  "shell_idle_after_run": true,
+  "post_launch_fault_records": 0,
+  "kernel_fmem": [
+    "0x40000000"
+  ],
+  "kernel_dmem": [
+    "0x2dc000000"
+  ],
+  "parent_shell_exit_seen": true,
+  "observations": [
+    "service-native identity=fc98005d45ad4ade972f5e91be043d3a revision=5 parent=235 elevated=1",
+    "fd-budget alone owner=250 errno=24 owner_files=1 dirs=0 devices=8 sockets=0 open=12 path=/data/homebrew/PPSA99170/sce_sys/param.json",
+    "fd-budget helper service=402752721 pid=238 hello=1 elevation=-1 helper_files=0",
+    "fd-budget step=baseline owner=249 owner_errno=24 owner_files=1 helper=249 helper_errno=24 helper_files=0 asked=1",
+    "fd-budget owner_opened=40",
+    "fd-budget step=owner_holds_40 owner=209 owner_errno=24 owner_files=41 helper=209 helper_errno=24 helper_files=0 asked=1",
+    "fd-budget owner_gave=40",
+    "fd-budget step=helper_holds_owners_40 owner=209 owner_errno=24 owner_files=1 helper=209 helper_errno=24 helper_files=40 asked=1",
+    "fd-budget step=helper_closed owner=249 owner_errno=24 owner_files=1 helper=249 helper_errno=24 helper_files=0 asked=1",
+    "fd-budget helper_opened=40 status=0",
+    "fd-budget step=helper_holds_40 owner=209 owner_errno=24 owner_files=1 helper=209 helper_errno=24 helper_files=40 asked=1",
+    "fd-budget owner_took=40",
+    "fd-budget step=owner_holds_helpers_40 owner=209 owner_errno=24 owner_files=41 helper=209 helper_errno=24 helper_files=0 asked=1",
+    "fd-budget step=owner_closed owner=249 owner_errno=24 owner_files=1 helper=249 helper_errno=24 helper_files=0 asked=1",
+    "fd-budget step=owner_dup_40 owner=248 owner_errno=24 owner_files=41 helper=248 helper_errno=24 helper_files=0 asked=1",
+    "fd-budget owner_mapped=40",
+    "fd-budget step=owner_maps_40_closed owner=249 owner_errno=24 owner_files=1 helper=249 helper_errno=24 helper_files=0 asked=1",
+    "fd-budget step=owner_unmapped owner=249 owner_errno=24 owner_files=1 helper=249 helper_errno=24 helper_files=0 asked=1",
+    "fd-budget owner_other_descriptors=120",
+    "fd-budget step=owner_holds_other_120 owner=249 owner_errno=24 owner_files=21 helper=249 helper_errno=24 helper_files=0 asked=1",
+    "fd-budget owner_dirs=10",
+    "fd-budget step=owner_holds_10_dirs owner=239 owner_errno=24 owner_files=1 helper=239 helper_errno=24 helper_files=0 asked=1",
+    "fd-budget helper_opened_before_close=40 status=0",
+    "fd-budget step=helper_holds_40_before_close owner=209 owner_errno=24 owner_files=1 helper=209 helper_errno=24 helper_files=40 asked=1",
+    "fd-budget helper closed=0 absent=1",
+    "fd-budget after_helper_closed attempt=0 owner=250 errno=24",
+    "fd-budget summary alone=250 after=250 steps=13 measured=13 absent=1 open=12",
+    "result=PASS"
+  ],
+  "fresh_identity_seen": true,
+  "budget_alone": [
+    {
+      "owner": 250,
+      "errno": 24,
+      "owner_files": 1
+    }
+  ],
+  "budget_steps": [
+    {
+      "step": "baseline",
+      "owner": 249,
+      "owner_errno": 24,
+      "owner_files": 1,
+      "helper": 249,
+      "helper_errno": 24,
+      "helper_files": 0
+    },
+    {
+      "step": "owner_holds_40",
+      "owner": 209,
+      "owner_errno": 24,
+      "owner_files": 41,
+      "helper": 209,
+      "helper_errno": 24,
+      "helper_files": 0
+    },
+    {
+      "step": "helper_holds_owners_40",
+      "owner": 209,
+      "owner_errno": 24,
+      "owner_files": 1,
+      "helper": 209,
+      "helper_errno": 24,
+      "helper_files": 40
+    },
+    {
+      "step": "helper_closed",
+      "owner": 249,
+      "owner_errno": 24,
+      "owner_files": 1,
+      "helper": 249,
+      "helper_errno": 24,
+      "helper_files": 0
+    },
+    {
+      "step": "helper_holds_40",
+      "owner": 209,
+      "owner_errno": 24,
+      "owner_files": 1,
+      "helper": 209,
+      "helper_errno": 24,
+      "helper_files": 40
+    },
+    {
+      "step": "owner_holds_helpers_40",
+      "owner": 209,
+      "owner_errno": 24,
+      "owner_files": 41,
+      "helper": 209,
+      "helper_errno": 24,
+      "helper_files": 0
+    },
+    {
+      "step": "owner_closed",
+      "owner": 249,
+      "owner_errno": 24,
+      "owner_files": 1,
+      "helper": 249,
+      "helper_errno": 24,
+      "helper_files": 0
+    },
+    {
+      "step": "owner_dup_40",
+      "owner": 248,
+      "owner_errno": 24,
+      "owner_files": 41,
+      "helper": 248,
+      "helper_errno": 24,
+      "helper_files": 0
+    },
+    {
+      "step": "owner_maps_40_closed",
+      "owner": 249,
+      "owner_errno": 24,
+      "owner_files": 1,
+      "helper": 249,
+      "helper_errno": 24,
+      "helper_files": 0
+    },
+    {
+      "step": "owner_unmapped",
+      "owner": 249,
+      "owner_errno": 24,
+      "owner_files": 1,
+      "helper": 249,
+      "helper_errno": 24,
+      "helper_files": 0
+    },
+    {
+      "step": "owner_holds_other_120",
+      "owner": 249,
+      "owner_errno": 24,
+      "owner_files": 21,
+      "helper": 249,
+      "helper_errno": 24,
+      "helper_files": 0
+    },
+    {
+      "step": "owner_holds_10_dirs",
+      "owner": 239,
+      "owner_errno": 24,
+      "owner_files": 1,
+      "helper": 239,
+      "helper_errno": 24,
+      "helper_files": 0
+    },
+    {
+      "step": "helper_holds_40_before_close",
+      "owner": 209,
+      "owner_errno": 24,
+      "owner_files": 1,
+      "helper": 209,
+      "helper_errno": 24,
+      "helper_files": 40
+    }
+  ],
+  "budget_summary": {
+    "alone": 250,
+    "after": 250,
+    "steps": 13,
+    "measured": 13,
+    "absent": 1
+  },
+  "restored_readback_sha256": "d3d7cb497833ebb57876fe4465257217608ac9765f9a360a3ca0e658b845f325",
+  "helper_removed": true
+}

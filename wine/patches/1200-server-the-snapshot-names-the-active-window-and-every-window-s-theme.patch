@@ -1,0 +1,69 @@
+From: PS5_Proton <local>
+Subject: [PATCH] server: the snapshot names the active window and every window's theme
+
+The approved Windows 11 prototype draws a framed window's shadow as --shadow-window while it is active and
+--shadow-window-inactive otherwise, each in light and dark (css/tokens.css), and PS5_Proton's compositor now draws
+both (src/pw_window_effects.h). The snapshot marks the foreground thread's active window with PW_WINDOW_ACTIVE, and
+reports every top-level window's theme (DWMWA_USE_IMMERSIVE_DARK_MODE) as its material, not only a glass window's.
+Activating a window, bringing one to the foreground or attaching thread input republishes the snapshot.
+---
+--- a/server/queue.c
++++ b/server/queue.c
+@@ -3485,6 +3485,11 @@
+  * for pw_wineserver_cursor. */
+ /* The same authoritative input desktop used by hardware injection. */
+ struct desktop *ps5_hardware_desktop(void) { return get_hardware_input_desktop(0); }
++/* The foreground thread's active window, which DWM draws as the active one. */
++user_handle_t ps5_foreground_active( struct desktop *desktop )
++{
++    return desktop->foreground_input ? desktop->foreground_input->shared->active : 0;
++}
+ 
+ void ps5_inject_input( unsigned int type, unsigned int code, int x, int y, unsigned int down )
+ {
+--- a/server/window.c
++++ b/server/window.c
+@@ -174,6 +174,9 @@
+ static pthread_mutex_t ps5_snapshot_mutex = PTHREAD_MUTEX_INITIALIZER;
+ static PwWindowSnapshot ps5_snapshot;
+ struct desktop *ps5_hardware_desktop(void);
++user_handle_t ps5_foreground_active( struct desktop *desktop );
++/* The foreground's active window while a snapshot is built: its frame shadow is the active one. */
++static user_handle_t ps5_active_window;
+ static int is_visible(const struct window *win);
+ static inline int is_desktop_window(const struct window *win);
+ static struct region *get_visible_region(struct window *win,unsigned int flags);
+@@ -199,6 +202,7 @@
+     case REQ_update_window_zorder: case REQ_set_window_layered_info:
+     case REQ_create_desktop: case REQ_set_input_desktop: case REQ_set_thread_desktop:
+     case REQ_ps5_set_window_dwm: case REQ_ps5_update_thumbnail: case REQ_ps5_unregister_thumbnail:
++    case REQ_set_active_window: case REQ_set_foreground_window: case REQ_attach_thread_input:
+         ps5_windows_dirty = 1;break;
+     }
+ }
+@@ -246,6 +250,9 @@
+         row->flags |= PW_WINDOW_BORDER;
+         row->border = 0x66757575;
+     }
++    /* The theme its effects draw in, glass and shadow alike, and whether its shadow is the active one. */
++    row->material = win->ps5_dark ? PW_MATERIAL_DARK : PW_MATERIAL_LIGHT;
++    if (win->handle == ps5_active_window) row->flags |= PW_WINDOW_ACTIVE;
+     if (win->ps5_border_mode == 1)
+     {
+         row->flags |= PW_WINDOW_BORDER;
+@@ -257,7 +264,6 @@
+     {
+         row->flags |= PW_WINDOW_GLASS;
+         row->backdrop = kinds[win->ps5_backdrop];
+-        row->material = win->ps5_dark ? PW_MATERIAL_DARK : PW_MATERIAL_LIGHT;
+         if (row->backdrop == PW_BACKDROP_FLYOUT_BASE || row->backdrop == PW_BACKDROP_FLYOUT)
+         {
+             /* .surface-flyout: --shadow-28 and SurfaceStrokeColorFlyout, black at 5.9% (20% in dark), unless the
+@@ -483,6 +489,7 @@
+     desktop = ps5_hardware_desktop();
+     if (desktop)
+     {
++        ps5_active_window = ps5_foreground_active( desktop );
+         if (desktop->top_window)
+         {
+             LIST_FOR_EACH_ENTRY(win, &desktop->top_window->children, struct window, entry)

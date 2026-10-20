@@ -1,0 +1,63 @@
+{
+  "run": "syscall-trace-pro-gate-2026-10-10-03",
+  "mode": "redirect",
+  "build": {
+    "sdk_revision": "611893fc25ef3e138f5bc2c90d829d8b58174cd2",
+    "source_sha256": "01ad928f129f36a7529711b1552da647c5806724e51f9a1cb3896741f0b7f7e6",
+    "ptrace_adapter_sha256": "32e980c4d690dd0fc358153ec2c8c96ec0a46adbae662625a458d8ae7034f245",
+    "elf_sha256": "35af4e12ad03f42c2a585f1c30e4d1ccdcdedeecd08c9936486b87c04fbc0509",
+    "host_sha256": "35129fb528365eb8496ba91c72dcd894b263cbc977a021f89a58316ad6f5c306"
+  },
+  "runner_sha256": "a5df5d5d6c2d205b0558b5386008e66e84b5317de41a44abd04611e9e05dcba1",
+  "question": "Can an owned payload stop native syscall entry, prevent the original pipe write and resume an owned dispatcher on the stopped thread?",
+  "production_changed": false,
+  "wine_integrated": false,
+  "title_launched": false,
+  "host_only": false,
+  "passed": true,
+  "host": {
+    "passed": true,
+    "tracee": [
+      "TRACE_READY pid=768291",
+      "TRACE_RESULT mode=redirect result=1349735538 dispatched=1 pipe_bytes=-1 empty=1 native_ok=1",
+      "TRACE_TRACEE PASS"
+    ],
+    "tracer": [
+      "TRACE_CAPABILITY attached=1 registers=1 register_bytes=216",
+      "TRACE_ENTRY owned=1 code=1 tid=768291",
+      "TRACE_STOP flags=0 kind=2 tid=768291 at_owned=0 result_matches=1",
+      "TRACE_EXIT replacement=getpid result_matches=1 method=owned-return-gate",
+      "TRACE_TRACER PASS mode=redirect stops=6 entries=3 exits=3 replaced=1 ms=8"
+    ],
+    "error": null
+  },
+  "readiness": {
+    "ready": true,
+    "seconds": 0.156,
+    "settle_seconds": 0.0,
+    "census_seconds": 0.141,
+    "previous_cleanup_verified": false
+  },
+  "tracee_pid": 2110,
+  "native": {
+    "tracee": [
+      "TRACE_READY pid=2110",
+      "TRACE_RESULT mode=redirect result=1349735538 dispatched=1 pipe_bytes=-1 empty=1 native_ok=1",
+      "TRACE_TRACEE PASS"
+    ],
+    "tracer": [
+      "TRACE_CAPABILITY attached=1 registers=1 register_bytes=176",
+      "syscall-trace: request=33 target=2110 errno=14",
+      "TRACE_NATIVE_ERRNO invalid_register_buffer=14 PASS",
+      "TRACE_ENTRY owned=1 code=4 tid=102130",
+      "TRACE_STOP flags=40 kind=2 tid=102130 at_owned=0 result_matches=1",
+      "TRACE_EXIT replacement=getpid result_matches=1 method=owned-return-gate",
+      "TRACE_TRACER PASS mode=redirect stops=5 entries=4 exits=1 replaced=1 ms=2"
+    ],
+    "passed": true
+  },
+  "post_control": "ok procs app=4294967295 title= count=0 pids=",
+  "leftover_helpers": [],
+  "clean": true,
+  "seconds": 0.463
+}

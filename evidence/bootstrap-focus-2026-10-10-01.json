@@ -1,0 +1,30 @@
+{
+  "battery": "bootstrap-focus-2026-10-10-01",
+  "expected_cases": [
+    "pe64",
+    "payload-eight",
+    "payload-memory",
+    "descendants"
+  ],
+  "revision": "0dbf647df9437d1cbe53b78dce352d84f83ec520",
+  "dirty": true,
+  "cases": [
+    {
+      "case": "pe64",
+      "run": "bootstrap-focus-2026-10-10-01-pe64",
+      "runner_status": 1,
+      "seconds": 0.3,
+      "result": "runner_error",
+      "probe_verdict": null,
+      "returned_to_launcher": null,
+      "exit_stall": null,
+      "passed": false,
+      "run_seconds": null,
+      "launch_readiness": null
+    }
+  ],
+  "stopped_after": "pe64",
+  "complete": false,
+  "seconds": 0.3,
+  "passed": false
+}

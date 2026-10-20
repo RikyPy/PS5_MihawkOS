@@ -1,0 +1,121 @@
+{
+ "telemetry_hold": null,
+ "launch_readiness": {
+  "ready": true,
+  "seconds": 0.157,
+  "settle_seconds": 0.0,
+  "census_seconds": 0.142,
+  "previous_cleanup_verified": false
+ },
+ "native_close_failures": [],
+ "run": "hs-perms-2026-10-12-05",
+ "what": "profile mihawk-os program Z:\\data\\ps5proton\\prefixes\\probe\\drive_c\\agent-permissions64-probe.exe",
+ "env": [],
+ "result": "finished",
+ "seconds": 11.5,
+ "probe_verdict": null,
+ "clean_owner_restart": true,
+ "launcher_end_status": 0,
+ "initial_status": 0,
+ "closed_on_request": false,
+ "child_logs": [
+  "klog/hs-perms-2026-10-12-05-wine-child-8136.log",
+  "klog/hs-perms-2026-10-12-05-wine-child-8137.log",
+  "klog/hs-perms-2026-10-12-05-wine-child-8138.log",
+  "klog/hs-perms-2026-10-12-05-wine-child-8139.log",
+  "klog/hs-perms-2026-10-12-05-wine-child-8140.log",
+  "klog/hs-perms-2026-10-12-05-wine-child-8141.log",
+  "klog/hs-perms-2026-10-12-05-wine-child-8142.log",
+  "klog/hs-perms-2026-10-12-05-wine-child-8143.log",
+  "klog/hs-perms-2026-10-12-05-wine-child-8144.log",
+  "klog/hs-perms-2026-10-12-05-wine-child-8145.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": false,
+ "bench": {},
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [],
+  "top": []
+ },
+ "shown": {
+  "frames": 1,
+  "per_10s": [
+   1
+  ],
+  "longest_gap_ms": 0
+ },
+ "broker": {
+  "local_offer": 8589934592,
+  "host_limit": 1073741824,
+  "windows": {
+   "presents": 13,
+   "effect_bytes": 0,
+   "mica_builds": 0,
+   "thumbnail_builds": 0,
+   "compositions": 13,
+   "compose_avg_us": 189,
+   "compose_max_us": 270
+  },
+  "refused": [],
+  "refused_count": 0,
+  "clients": [
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   }
+  ],
+  "wedged": false,
+  "failure_reasons": [],
+  "host_peak": 0,
+  "local_peak": 0
+ },
+ "pacing": null,
+ "captures": [],
+ "cleanup_verified": false,
+ "hooks_removed": true
+}

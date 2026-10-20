@@ -1,0 +1,21 @@
+{
+ "run": "m0-2026-10-07-01",
+ "elf_sha256": "7cf309a1afb5da85128d4f7309374f11ac2ac827b2d2cd4f2285978608ea2562",
+ "process": "payload through websrv/elfldr, no title running",
+ "modes": {
+  "ident": {
+   "lines": [
+    "M0 start mode=ident",
+    "M0 ident pid=1322 cs=0x43 ss=0x3b ds=0x3b es=0x3b fs=0x13 gs=0x1b fsbase=0x8ff800080(0) gsbase=0(0) text=20000882d"
+   ],
+   "ended": true
+  },
+  "low4g": {
+   "lines": [
+    "M0 start mode=low4g",
+    "M0 low4g free_16mib_slots=255 of 255 first_mib=16 last_mib=4080"
+   ],
+   "ended": true
+  }
+ }
+}

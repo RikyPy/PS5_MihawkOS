@@ -1,0 +1,71 @@
+{
+  "review": "battery-duration-estimate-2026-10-08-01",
+  "scope": "37-case mandatory gate, excluding production build and deployment",
+  "new_runner_measured": false,
+  "console_benchmark_blocker": "User confirms payload services are not loaded; no console contact or launch attempted.",
+  "production_fingerprint": "20294822ed0713a979689d2808699772ec32e2c468fb5d44f2e278b7966cac5a",
+  "measured_previous_gate": {
+    "source": "evidence/gate-shared-section-2026-10-08-01.json",
+    "cases": 26,
+    "case_wall_seconds": 1875.5,
+    "recorded_run_seconds": 549.1,
+    "remaining_seconds_include": "Pacing, fresh-prefix setup/removal, readiness and log collection; not all removable."
+  },
+  "additional_historical_console_runs": [
+    {
+      "source": "evidence/physical-backing-gate-2026-10-08-01-proton-ui32.json",
+      "seconds": 12.4
+    },
+    {
+      "source": "evidence/physical-backing-gate-2026-10-08-01-proton-ui64.json",
+      "seconds": 11.3
+    },
+    {
+      "source": "evidence/physical-backing-gate-2026-10-08-01-memory-classes.json",
+      "seconds": 168.7
+    },
+    {
+      "source": "evidence/physical-backing-gate-2026-10-08-01-graphics-teardown.json",
+      "seconds": 21.5
+    },
+    {
+      "source": "evidence/dnsapi-console32-2026-10-08-01.json",
+      "seconds": 8.7
+    },
+    {
+      "source": "evidence/dnsapi-console64-2026-10-08-01.json",
+      "seconds": 8.2
+    },
+    {
+      "source": "evidence/network-adapters-default32-2026-10-08-01.json",
+      "seconds": 8.3
+    },
+    {
+      "source": "evidence/network-adapters-default64-2026-10-08-01.json",
+      "seconds": 8.3
+    },
+    {
+      "source": "evidence/socket-options-fixed32-2026-10-08-01.json",
+      "seconds": 5.9
+    },
+    {
+      "source": "evidence/socket-options-fixed64-2026-10-08-01.json",
+      "seconds": 6.0
+    }
+  ],
+  "recorded_runtime_subtotal_seconds": 808.4,
+  "subtotal_limit": "Includes 35 timed runs; controls-menu already belongs to the old 26 but lacks runtime timing, and late-library is new without a selected timing. Sources span builds. Prefix file operations, readiness and collection are outside run timings. This subtotal is not a full-battery benchmark.",
+  "estimate_minutes": [
+    15,
+    20
+  ],
+  "planning_minutes": 20,
+  "assumptions": [
+    "Healthy console and services, no failing-case timeout or outage.",
+    "All 37 mandatory cases retained, with readiness-driven launches.",
+    "Historical fresh-prefix and memory-class runtimes remain representative.",
+    "Allowance for fresh-prefix FTP work, helper census, log collection and unmeasured cases.",
+    "Accelerated input schedules are host-tested but their console saving is unmeasured."
+  ],
+  "next_measurement": "After services are restored and safe fresh-boot state is verified, qualify focused readiness/input/graphics then time the full exact-source gate; report wall time and per-case readiness/run/overhead, failures and completeness."
+}

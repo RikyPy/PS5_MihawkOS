@@ -1,0 +1,57 @@
+{
+ "run": "fst-01",
+ "what": "profile 8",
+ "env": [],
+ "result": "finished",
+ "seconds": 11.3,
+ "probe_verdict": null,
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": true,
+ "bench": {},
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [
+   {
+    "calls": 17718.0,
+    "per_s": 3490.0,
+    "avg_us": 258.3,
+    "selects": 1295.0,
+    "blocked": 391.0,
+    "block_avg_us": 10406.9,
+    "waits": 1280.0,
+    "handles_avg": 1.31,
+    "wait_all": 0.0,
+    "polled": 781.0,
+    "delays": 0.0,
+    "yields": 0.0
+   }
+  ],
+  "top": [
+   {
+    "set_fd_eof_info": {
+     "count": 167,
+     "avg_us": 6841.5
+    },
+    "event_op": {
+     "count": 391,
+     "avg_us": 2693.1
+    },
+    "create_file": {
+     "count": 1070,
+     "avg_us": 944.2
+    },
+    "set_fd_name_info": {
+     "count": 166,
+     "avg_us": 5679.9
+    },
+    "create_mapping": {
+     "count": 120,
+     "avg_us": 1001.6
+    }
+   }
+  ]
+ }
+}

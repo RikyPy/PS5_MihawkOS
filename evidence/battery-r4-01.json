@@ -1,0 +1,69 @@
+{
+  "battery": "battery-r4-01",
+  "revision": "e81e81944e4c27b7a1c64128a0f0e55a52cfaf63",
+  "dirty": true,
+  "cases": [
+    {
+      "case": "pe64",
+      "run": "battery-r4-01-pe64",
+      "runner_status": 0,
+      "seconds": 52.4,
+      "result": "finished",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "layout": "title",
+      "fault_records": 0,
+      "helpers": 1,
+      "protocol_errors": 0
+    },
+    {
+      "case": "d3d11",
+      "run": "battery-r4-01-d3d11",
+      "runner_status": 0,
+      "seconds": 64.0,
+      "result": "finished",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "layout": "title",
+      "fault_records": 0,
+      "helpers": 1,
+      "protocol_errors": 0
+    },
+    {
+      "case": "opengl",
+      "run": "battery-r4-01-opengl",
+      "runner_status": 0,
+      "seconds": 56.8,
+      "result": "finished",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "layout": "title",
+      "fault_records": 0,
+      "helpers": 1,
+      "protocol_errors": 0
+    },
+    {
+      "case": "children",
+      "run": "battery-r4-01-children",
+      "runner_status": 1,
+      "seconds": 206.2,
+      "result": "timed out",
+      "probe_verdict": null,
+      "returned_to_launcher": false,
+      "exit_stall": false,
+      "passed": false,
+      "layout": "title",
+      "fault_records": 0,
+      "helpers": 2,
+      "protocol_errors": 0
+    }
+  ],
+  "stopped_after": "children",
+  "passed": false
+}

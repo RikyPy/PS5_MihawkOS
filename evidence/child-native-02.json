@@ -1,0 +1,42 @@
+{
+  "title": "PPSA99170",
+  "identity": "9d98d00839c241d2a7068717f333c263",
+  "build": {
+    "revision": "31a46b89b6a8db4eb16fe8b0fada56afad0c4dc6",
+    "sdk_revision": "611893fc25ef3e138f5bc2c90d829d8b58174cd2",
+    "source_sha256": {
+      "native/proton_child_probe.h": "a3a0c1324b7fa4c2482ea22e7a206df63a385d2467bc5abe1ba041166faf668e",
+      "native/proton_child_probe.cpp": "91eccecb89a69cfccb8015e562e69eb43805ebf6d2b055d87f05d044a6518f1d",
+      "ps5/src/main.cpp": "0dcea5cd6aed4575c7609fa658e44d2d729dc1bc9f6d9cb3ca161658e257375e",
+      "ps5/CMakeLists.txt": "c6e22feae5b334d2a8396bc06bc635a49306393b5d3a3e5a09a9482b3a982597"
+    },
+    "radv_recipe_sha256": "bcb92ff14ae32fbee7991399a7b79c065c78bda3162c76d41c49d170a46b4022",
+    "identity": "24122cda382e2a76cdf6992d9f709bea9dc0e4fdf2e13a7b803740137dc2228e",
+    "eboot_sha256": "8532f91817044d08110a68c4ce71bd991251dd57b84fd41211cb32112b04e7a7"
+  },
+  "capture": "klog/child-native-02",
+  "passed": false,
+  "status": "complete",
+  "production_sha256": "8f63bbc57bd9203520653d9e3eb765798a434b737ac6c1f79b106437542761c3",
+  "production_restored": true,
+  "root_reference_balance_verified": false,
+  "forced_title_close": false,
+  "installed_readback_sha256": "d3d7cb497833ebb57876fe4465257217608ac9765f9a360a3ca0e658b845f325",
+  "production_executable_sha256": "bc5c7a75f249a59e7bce80218c6e749b9ea2f426e9bec4c96939ce7f75ceb17d",
+  "probe_readback_sha256": "7832356c04c159b23fc17b06b7e7d98a9e65bde574d0578a9926693a25e87ad7",
+  "probe_executable_sha256": "be5646f489fb19a40ba2ba1d4d5fb710a7482521318a2acbc5753d05bccda0ec",
+  "shell_idle_after_run": true,
+  "post_launch_fault_records": 0,
+  "parent_shell_exit_seen": true,
+  "observations": [
+    "child-probe identity=9d98d00839c241d2a7068717f333c263 revision=1 parent=928 elevated=1 uid=0 euid=0",
+    "firmware status=0 version=12090001",
+    "binding module=1 name=rfork_thread status=-2147352573 present=0",
+    "result=PRECONDITION_FAILED"
+  ],
+  "fresh_identity_seen": true,
+  "restored_readback_sha256": "d3d7cb497833ebb57876fe4465257217608ac9765f9a360a3ca0e658b845f325",
+  "title_launch_attempted": true,
+  "parent_shell_exit_assessment": "Verified against captured exit status 1: asking the shell to close the title",
+  "probe_result": "lookup precondition failed; no spawn attempted"
+}

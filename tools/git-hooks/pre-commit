@@ -1,0 +1,7 @@
+#!/bin/sh
+# SPDX-License-Identifier: GPL-3.0-or-later
+# The privacy guard (tools/privacy_check.py), resolved beside this hook so a hooks path that points here guards every
+# worktree; then the commit gate (tools/gate.py): code is committed only when the console passed the gate battery on a
+# build of exactly that code. Installed with: git config core.hooksPath tools/git-hooks
+python3 "$(dirname "$0")/../privacy_check.py" staged || exit 1
+exec python3 "$(git rev-parse --show-toplevel)/tools/gate.py" check

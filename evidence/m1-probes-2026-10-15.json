@@ -1,0 +1,112 @@
+{
+  "battery": "m1-probes-2026-10-15",
+  "expected_cases": [
+    "large-shared-section",
+    "payload-vm",
+    "vm-truth32",
+    "vm-truth64"
+  ],
+  "revision": "f3aa632b4a344d3e169a02d63e1895e648bea57e",
+  "dirty": true,
+  "cases": [
+    {
+      "case": "large-shared-section",
+      "run": "m1-probes-2026-10-15-large-shared-section",
+      "runner_status": 0,
+      "seconds": 105.1,
+      "result": "finished",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "run_seconds": 44.1,
+      "launch_readiness": {
+        "ready": true,
+        "seconds": 0.161,
+        "settle_seconds": 0.0,
+        "census_seconds": 0.15,
+        "previous_cleanup_verified": true
+      },
+      "runner_overhead_seconds": 61.0,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 8,
+      "protocol_errors": 0
+    },
+    {
+      "case": "payload-vm",
+      "run": "m1-probes-2026-10-15-payload-vm",
+      "runner_status": 0,
+      "seconds": 14.1,
+      "result": "finished",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "run_seconds": 13.4,
+      "launch_readiness": {
+        "ready": true,
+        "seconds": 0.142,
+        "settle_seconds": 0.0,
+        "census_seconds": 0.132,
+        "previous_cleanup_verified": true
+      },
+      "runner_overhead_seconds": 0.7,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 8,
+      "protocol_errors": 0
+    },
+    {
+      "case": "vm-truth32",
+      "run": "m1-probes-2026-10-15-vm-truth32",
+      "runner_status": 0,
+      "seconds": 13.4,
+      "result": "finished",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "run_seconds": 12.7,
+      "launch_readiness": {
+        "ready": true,
+        "seconds": 0.156,
+        "settle_seconds": 0.0,
+        "census_seconds": 0.145,
+        "previous_cleanup_verified": true
+      },
+      "runner_overhead_seconds": 0.7,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 8,
+      "protocol_errors": 0
+    },
+    {
+      "case": "vm-truth64",
+      "run": "m1-probes-2026-10-15-vm-truth64",
+      "runner_status": 0,
+      "seconds": 12.9,
+      "result": "finished",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "run_seconds": 12.3,
+      "launch_readiness": {
+        "ready": true,
+        "seconds": 0.147,
+        "settle_seconds": 0.0,
+        "census_seconds": 0.136,
+        "previous_cleanup_verified": true
+      },
+      "runner_overhead_seconds": 0.6,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 8,
+      "protocol_errors": 0
+    }
+  ],
+  "complete": true,
+  "seconds": 145.4,
+  "passed": true
+}

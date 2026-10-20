@@ -1,0 +1,119 @@
+{
+ "telemetry_hold": null,
+ "launch_readiness": {
+  "ready": true,
+  "seconds": 0.196,
+  "settle_seconds": 0.0,
+  "census_seconds": 0.178,
+  "previous_cleanup_verified": true
+ },
+ "native_close_failures": [],
+ "run": "broker-file-2026-10-10-01-pe64",
+ "what": "wine-probe.exe",
+ "env": [],
+ "result": "finished",
+ "seconds": 9.9,
+ "probe_verdict": "PASS",
+ "clean_owner_restart": true,
+ "launcher_end_status": 0,
+ "initial_status": 0,
+ "closed_on_request": false,
+ "child_logs": [
+  "klog/broker-file-2026-10-10-01-pe64-wine-child-8360.log",
+  "klog/broker-file-2026-10-10-01-pe64-wine-child-8361.log",
+  "klog/broker-file-2026-10-10-01-pe64-wine-child-8362.log",
+  "klog/broker-file-2026-10-10-01-pe64-wine-child-8363.log",
+  "klog/broker-file-2026-10-10-01-pe64-wine-child-8364.log",
+  "klog/broker-file-2026-10-10-01-pe64-wine-child-8365.log",
+  "klog/broker-file-2026-10-10-01-pe64-wine-child-8366.log",
+  "klog/broker-file-2026-10-10-01-pe64-wine-child-8367.log",
+  "klog/broker-file-2026-10-10-01-pe64-wine-child-8368.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": true,
+ "bench": {},
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   }
+  ],
+  "top": []
+ },
+ "shown": {
+  "frames": 0,
+  "per_10s": [],
+  "longest_gap_ms": 0
+ },
+ "broker": {
+  "local_offer": null,
+  "host_limit": null,
+  "windows": {
+   "presents": 0,
+   "effect_bytes": 0,
+   "mica_builds": 0,
+   "thumbnail_builds": 0,
+   "compositions": 0,
+   "compose_avg_us": 0,
+   "compose_max_us": 0
+  },
+  "refused": [],
+  "refused_count": 0,
+  "clients": [],
+  "wedged": false,
+  "failure_reasons": [],
+  "host_peak": null,
+  "local_peak": null,
+  "results_file": {
+   "open": {
+    "fd": 17,
+    "status": 0,
+    "dev": 687931141,
+    "ino": 90664,
+    "nlink": 1,
+    "size": 0,
+    "path_status": 0,
+    "path_ino": 90664
+   },
+   "stop": {
+    "piped": 1,
+    "bytes_in": 0,
+    "bytes_out": 0,
+    "write_errno": 0,
+    "read_result": 0,
+    "read_errno": 0,
+    "fd": 17,
+    "fd_flags": 0,
+    "fd_errno": 0,
+    "status": 0,
+    "dev": 687931141,
+    "ino": 90664,
+    "nlink": 1,
+    "size": 0,
+    "same": 1,
+    "path_status": 0,
+    "path_ino": 90664,
+    "path_size": 0
+   }
+  },
+  "fetched_bytes": 0
+ },
+ "captures": [],
+ "cleanup_verified": true,
+ "hooks_removed": true
+}

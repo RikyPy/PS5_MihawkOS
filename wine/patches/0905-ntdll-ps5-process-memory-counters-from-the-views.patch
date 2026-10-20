@@ -1,0 +1,141 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Sat, 3 Oct 2026 21:30:00 -0400
+Subject: [PATCH] ntdll: process memory counters from the views on the PS5
+
+ProcessVmCounters, GetProcessMemoryInfo and SystemProcessInformation read the working set and the
+page file usage from /proc (Linux) or procstat, and the console has neither, so a program that
+watches its memory use saw zero. The counters now come from the virtual memory manager's views:
+the address space is their total, the working set everything committed, and the page file usage
+the committed memory that no file backs. A peak is the highest value seen at a query.
+A handle opened on the process's own id asks the server, which counts from /proc as well; the one process
+there is this one, so its counters are used for such a handle too.
+---
+  dlls/ntdll/unix/process.c      | 23 ++++++++++++++++++++
+  dlls/ntdll/unix/unix_private.h |  3 +++
+  dlls/ntdll/unix/virtual.c      | 48 ++++++++++++++++++++++++++++++++++++++++++
+  3 files changed, 74 insertions(+)
+
+diff --git a/dlls/ntdll/unix/process.c b/dlls/ntdll/unix/process.c
+index d3c08d5..41de799 100644
+--- a/dlls/ntdll/unix/process.c
++++ b/dlls/ntdll/unix/process.c
+@@ -1125,6 +1125,10 @@ int get_unix_debugger_pid(void)
+ 
+ void fill_vm_counters( VM_COUNTERS_EX *pvmi, int unix_pid )
+ {
++#ifdef __PROSPERO__
++    /* There is no /proc and no procstat for a title, and the only process it can know is itself */
++    if (unix_pid == -1 || unix_pid == getpid()) virtual_fill_vm_counters( pvmi );
++#endif
+     /* FIXME : real data */
+ }
+ 
+@@ -1154,6 +1158,21 @@ static NTSTATUS get_unix_pid( HANDLE process, int *pid )
+     return status;
+ }
+ 
++#ifdef __PROSPERO__
++static BOOL ps5_is_own_process( HANDLE handle )
++{
++    BOOL own = FALSE;
++
++    SERVER_START_REQ( get_process_info )
++    {
++        req->handle = wine_server_obj_handle( handle );
++        if (!wine_server_call( req )) own = reply->pid == HandleToULong( NtCurrentTeb()->ClientId.UniqueProcess );
++    }
++    SERVER_END_REQ;
++    return own;
++}
++#endif
++
+ #define UNIMPLEMENTED_INFO_CLASS(c) \
+     case c: \
+         FIXME( "(process=%p) Unimplemented information class: " #c "\n", handle); \
+@@ -1290,6 +1309,10 @@ NTSTATUS WINAPI NtQueryInformationProcess( HANDLE handle, PROCESSINFOCLASS class
+                         }
+                         SERVER_END_REQ;
+                         if (ret) break;
++#ifdef __PROSPERO__
++                        /* the server counts from /proc, which the console lacks; the one process there is is this */
++                        if (!pvmi.WorkingSetSize && ps5_is_own_process( handle )) fill_vm_counters( &pvmi, -1 );
++#endif
+                     }
+                     if (size >= sizeof(VM_COUNTERS_EX))
+                         pvmi.PrivateUsage = pvmi.PagefileUsage;
+diff --git a/dlls/ntdll/unix/unix_private.h b/dlls/ntdll/unix/unix_private.h
+index 41eba23..c7060f5 100644
+--- a/dlls/ntdll/unix/unix_private.h
++++ b/dlls/ntdll/unix/unix_private.h
+@@ -364,6 +364,9 @@ extern NTSTATUS signal_set_full_context( CONTEXT *context );
+ extern NTSTATUS get_thread_wow64_context( HANDLE handle, void *ctx, ULONG size );
+ extern NTSTATUS set_thread_wow64_context( HANDLE handle, const void *ctx, ULONG size );
+ extern void fill_vm_counters( VM_COUNTERS_EX *pvmi, int unix_pid );
++#ifdef __PROSPERO__
++extern void virtual_fill_vm_counters( VM_COUNTERS_EX *pvmi );
++#endif
+ extern NTSTATUS open_hkcu_key( const char *path, HANDLE *key );
+ 
+ extern NTSTATUS sync_ioctl( HANDLE file, ULONG code, void *in_buffer, ULONG in_size,
+diff --git a/dlls/ntdll/unix/virtual.c b/dlls/ntdll/unix/virtual.c
+index 399099a..4fc7dea 100644
+--- a/dlls/ntdll/unix/virtual.c
++++ b/dlls/ntdll/unix/virtual.c
+@@ -1929,6 +1929,54 @@ static void dump_memory_statistics(void)
+                       marked_native );
+ }
+ 
++#ifdef __PROSPERO__
++/***********************************************************************
++ *           virtual_fill_vm_counters
++ *
++ * The memory counters of this process (GetProcessMemoryInfo, ProcessVmCounters), from the views
++ * themselves: the console has no /proc to read them from. The address space is the views' total,
++ * the working set is everything committed (image, mapped files and private memory alike, all of
++ * it resident on the console, which does not page), and the page file usage is the committed
++ * memory that is not backed by a file. A peak is the highest value seen at a query.
++ */
++void virtual_fill_vm_counters( VM_COUNTERS_EX *pvmi )
++{
++    static SIZE_T peak_virtual, peak_working_set, peak_pagefile;
++    SIZE_T virtual_size = 0, working_set = 0, pagefile = 0, size, c_size;
++    struct file_view *view;
++    sigset_t sigset;
++    char *base;
++    BYTE vprot;
++
++    server_enter_uninterrupted_section( &virtual_mutex, &sigset );
++    WINE_RB_FOR_EACH_ENTRY( view, &views_tree, struct file_view, entry )
++    {
++        base = view->base;
++        c_size = 0;
++        while (base != (char *)view->base + view->size)
++        {
++            size = get_vprot_range_size( base, (char *)view->base + view->size - base, VPROT_COMMITTED, &vprot );
++            if (vprot & VPROT_COMMITTED) c_size += size;
++            base += size;
++        }
++        virtual_size += view->size;
++        working_set += c_size;
++        if (!(view->protect & SEC_FILE)) pagefile += c_size;
++    }
++    if (virtual_size > peak_virtual) peak_virtual = virtual_size;
++    if (working_set > peak_working_set) peak_working_set = working_set;
++    if (pagefile > peak_pagefile) peak_pagefile = pagefile;
++    pvmi->VirtualSize = virtual_size;
++    pvmi->PeakVirtualSize = peak_virtual;
++    pvmi->WorkingSetSize = working_set;
++    pvmi->PeakWorkingSetSize = peak_working_set;
++    pvmi->PagefileUsage = pagefile;
++    pvmi->PeakPagefileUsage = peak_pagefile;
++    server_leave_uninterrupted_section( &virtual_mutex, &sigset );
++}
++#endif
++
++
+ /***********************************************************************
+  *           find_view
+  *
+-- 
+2.43.0

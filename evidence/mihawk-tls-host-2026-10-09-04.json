@@ -1,0 +1,29 @@
+{
+ "host_wine_revision": "7e893751d256bfe062fd1d159375f024dedfa696",
+ "probe_source": "tests/tls-probe.c",
+ "runner": "tools/run-tls-fixture.py",
+ "public_internet_required": false,
+ "console_qualified": false,
+ "passed": true,
+ "strict_https_status": 200,
+ "trusted_chain_errors": 0,
+ "untrusted_chain_errors": 32,
+ "test_root_removed": true,
+ "server_answers": [
+  2,
+  1
+ ],
+ "log": "klog/mihawk-tls-host-check-2026-10-09-04.log",
+ "failures_preserved": [
+  "klog/mihawk-tls-host-check-2026-10-09-03.log"
+ ],
+ "fixes": [
+  "Create the test-owned ROOT store in a fresh prefix.",
+  "Commit the added root before the chain engine opens its registry-backed snapshot.",
+  "Bind IP and DNS SAN entries to the actual LAN endpoint without disabling name checks."
+ ],
+ "limitations": [
+  "This qualifies the owned fixture on pinned Linux Wine, not console WinHTTP.",
+  "IP-only SAN matching remains unsupported by this pinned Wine SSL policy."
+ ]
+}

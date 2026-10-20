@@ -1,0 +1,30 @@
+{
+  "merge": "dc96d53",
+  "payload_default": true,
+  "layout_default": "launcher",
+  "sources": {
+    "native/proton_wine.cpp": "d9e84b60630c6cfaf0345303c3dfe7c7cbd1495f887108a58f5f673f99d87168",
+    "native/proton_payload_child.c": "583091a2b38c7675d80301ef2c673685a31762becd0bb58e9ebfca77b2ea1d1c",
+    "native/proton_wine_child.c": "210a08f2918682ab9eeee462488219001571b12a374dd06bb7b6c0a1e73e7e40",
+    "wine/ps5/pw_wine_process.c": "b51f656ed4b0b70362f6db509b33e22183929fadfa7aa060bafc94106db883ff",
+    "wine/ps5/pw_wine_dmem_ps5.c": "3bb3b2db818a9adf9d8915ad0fbb7750a590dfd3436042455804f1a9c9e25346",
+    "wine/ps5/pw_wine_dl_libc.c": "73da15584a949e57f11fd80cdc9b6cb7431dbbf6eb090930b7c59861fe8247f4",
+    "tools/build-production.sh": "2d3375f2c0639009c9341fd4b3894f2009b4bf0d0f5cb809ba6f41d05687da93",
+    "tools/build-wine-ps5.sh": "a869c611f90602e078e4718cf506aa3429e5ad017b010dd79f97a2e2dc33321d",
+    "tools/stage-wine.py": "e530847a63a8dc2434f32d4b68bf60c3d05cfd1d585aaee8c2f3720dd7697055",
+    "tools/deploy-wine.py": "403df3922d436ecaab6dcabe7ede11841abdbd31d62e2315c1718138fb424b04",
+    "tools/run-console.py": "2bb3b6ba692b53000518e647c212e611e872b680445632260390d902bb924c57"
+  },
+  "artifacts": {
+    "dist/PPSA99170/eboot.bin": "0d9022da68177ddf78b1495440a3ef843c5c964f9b209c725e94f01ae26f244b",
+    "dist/PPSA99170/wine-child.bin": "7e8e1ceccac2935eb5b18beaec208b546534293d1d09920d9aa48dbd6db7a942",
+    "build/proton-payload-child.elf": "041fa56068a9946af1385550e400637b018afec0440976d01596eeeba0fd0332",
+    ".deps/staged/manifest.json": "94d5f5d939f3e84552e8d3473821b086e20d7f53479687b65d6de7d71a4dbac9"
+  },
+  "console_tests": [
+    "payload-production-basic-02",
+    "payload-production-eight-01",
+    "payload-production-d3d11-01"
+  ],
+  "acceptance_complete": false
+}

@@ -1,0 +1,77 @@
+{
+ "launch_readiness": {
+  "ready": true,
+  "seconds": 0.172,
+  "settle_seconds": 0.0,
+  "census_seconds": 0.155,
+  "previous_cleanup_verified": true
+ },
+ "run": "mihawk-shell-gate-2026-10-09-08-pe32",
+ "what": "pe32-probe.exe",
+ "env": [
+  "PROTON_LAYOUT=launcher"
+ ],
+ "result": "finished",
+ "seconds": 11.4,
+ "probe_verdict": "PASS",
+ "clean_owner_restart": true,
+ "launcher_end_status": 0,
+ "initial_status": 0,
+ "closed_on_request": false,
+ "child_logs": [
+  "klog/mihawk-shell-gate-2026-10-09-08-pe32-wine-child-6891.log",
+  "klog/mihawk-shell-gate-2026-10-09-08-pe32-wine-child-6892.log",
+  "klog/mihawk-shell-gate-2026-10-09-08-pe32-wine-child-6893.log",
+  "klog/mihawk-shell-gate-2026-10-09-08-pe32-wine-child-6894.log",
+  "klog/mihawk-shell-gate-2026-10-09-08-pe32-wine-child-6895.log",
+  "klog/mihawk-shell-gate-2026-10-09-08-pe32-wine-child-6896.log",
+  "klog/mihawk-shell-gate-2026-10-09-08-pe32-wine-child-6897.log",
+  "klog/mihawk-shell-gate-2026-10-09-08-pe32-wine-child-6898.log",
+  "klog/mihawk-shell-gate-2026-10-09-08-pe32-wine-child-6899.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": true,
+ "bench": {},
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   }
+  ],
+  "top": []
+ },
+ "shown": {
+  "frames": 0,
+  "per_10s": [],
+  "longest_gap_ms": 0
+ },
+ "broker": {
+  "local_offer": null,
+  "host_limit": null,
+  "refused": [],
+  "refused_count": 0,
+  "clients": [],
+  "wedged": false,
+  "failure_reasons": [],
+  "host_peak": null,
+  "local_peak": null
+ },
+ "captures": [],
+ "cleanup_verified": true,
+ "hooks_removed": true
+}

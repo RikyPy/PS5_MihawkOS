@@ -1,0 +1,40 @@
+From: PS5_Proton
+Subject: [PATCH] driver: reset retained opacity on layered style transitions
+
+The lifecycle probe observes half-opacity pixels after removing WS_EX_LAYERED.
+Reset the driver-owned opacity and input cache in the existing style callback,
+before Wine updates its surface. Keep Wine responsible for pixel/region state.
+
+--- a/dlls/win32u/ps5drv.c
++++ b/dlls/win32u/ps5drv.c
+@@ -1088,6 +1088,22 @@
+     /* update_window_state applies key/alpha to Wine's surface immediately after this callback. */
+ }
+ 
++/* Wine resets layered attributes when WS_EX_LAYERED changes. Reset the
++ * driver's separate opacity before update_window_state publishes the surface. */
++static void ps5_SetWindowStyle( HWND hwnd, INT offset, STYLESTRUCT *style )
++{
++    struct ps5_window *window;
++
++    if (offset != GWL_EXSTYLE || !((style->styleOld ^ style->styleNew) & WS_EX_LAYERED)) return;
++    pthread_mutex_lock( &screen_lock );
++    if ((window = find_window( hwnd )))
++    {
++        window->opacity = 255;
++        window->input_shape_valid = FALSE;
++    }
++    pthread_mutex_unlock( &screen_lock );
++}
++
+ static const struct user_driver_funcs ps5_user_driver =
+ {
+     .pUpdateDisplayDevices = ps5_UpdateDisplayDevices,
+@@ -1098,6 +1114,7 @@
+     .pDestroyWindow = ps5_DestroyWindow,
+     .pUpdateLayeredWindow = ps5_UpdateLayeredWindow,
+     .pSetLayeredWindowAttributes = ps5_SetLayeredWindowAttributes,
++    .pSetWindowStyle = ps5_SetWindowStyle,
+     .pProcessEvents = ps5_ProcessEvents,
+     .pGetCursorPos = ps5_GetCursorPos,
+     .pSetCursor = ps5_SetCursor,

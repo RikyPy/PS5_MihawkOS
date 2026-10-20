@@ -1,0 +1,51 @@
+{
+  "battery": "fixed-base32-2026-10-19-01",
+  "expected_cases": [
+    "virtual-query32",
+    "virtual-query64",
+    "pe64",
+    "pe32",
+    "fixed-base32",
+    "wow64"
+  ],
+  "revision": "f6e3a02b1f5be6e169c6c751f3d541cf8f2bdf76",
+  "dirty": true,
+  "cases": [
+    {
+      "case": "virtual-query32",
+      "run": "fixed-base32-2026-10-19-01-virtual-query32",
+      "runner_status": 1,
+      "seconds": 137.4,
+      "result": "crashed",
+      "probe_verdict": null,
+      "returned_to_launcher": false,
+      "exit_stall": false,
+      "passed": false,
+      "run_seconds": 85.5,
+      "launch_readiness": {
+        "ready": true,
+        "seconds": 0.325,
+        "settle_seconds": 0.0,
+        "census_seconds": 0.301,
+        "previous_cleanup_verified": true
+      },
+      "stages": {
+        "launched": 1.05,
+        "title_started": 1.56,
+        "elevated": 1.56,
+        "wine_loaded": 1.83,
+        "wineboot_started": 4.64,
+        "closed": 85.52
+      },
+      "runner_overhead_seconds": 51.9,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 15,
+      "protocol_errors": 0
+    }
+  ],
+  "stopped_after": "virtual-query32",
+  "complete": false,
+  "seconds": 137.4,
+  "passed": false
+}

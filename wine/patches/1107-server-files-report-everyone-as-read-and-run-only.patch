@@ -1,0 +1,35 @@
+From: PS5_Proton <local>
+Subject: [PATCH] server: files report Everyone as read and run only, as Wine on Linux does
+
+The console's file system reports every file as 0777 and ignores chmod, so every DACL read "Everyone: modify" and a DACL that was set never showed.
+Blizzard's Agent checks a folder's DACL against what it wants (Everyone read and run only, 0x1200a9), found 0x1301ff, rewrote the ACL of each of 10,500 files at every
+start (the SetNamedSecurityInfoW trace of 2026-10-12) and marked the game unplayable: Permissions check failure (2123), the game shows Update.
+Wine on Linux under umask 022 reports exactly 0x1200a9 (the host oracle, tests/agent-permissions-probe.c). Group and others now lose write in the
+descriptor made from the mode; the owner keeps everything, and the kernel decides access as before.
+---
+diff --git a/server/file.c b/server/file.c
+--- a/server/file.c
++++ b/server/file.c
+@@ -546,9 +546,19 @@
+         return obj->sd;
+ 
+     sd = get_xattr_sd( unix_fd );
+-    if (!sd) sd = mode_to_sd( st.st_mode,
+-                              security_unix_uid_to_sid( st.st_uid ),
+-                              token_get_primary_group( current->process->token ));
++    if (!sd)
++    {
++        mode_t shown = st.st_mode;
++#ifdef __PROSPERO__
++        /* The console's file system reports every file as 0777 and ignores chmod, so every DACL read "Everyone: modify" and no
++         * change ever showed. Wine on Linux, under the usual umask 022, reports Everyone as read and run only; so does this, and a
++         * program that checks a folder's permissions gets the Linux answer. Blizzard's Agent wants exactly that: finding more, it
++         * set the ACL of each of 10,500 files at every start and marked the game unplayable (error 2123, the game: Update). */
++        shown &= ~(S_IWGRP | S_IWOTH);
++#endif
++        sd = mode_to_sd( shown, security_unix_uid_to_sid( st.st_uid ),
++                         token_get_primary_group( current->process->token ));
++    }
+     if (!sd) return obj->sd;
+ 
+     *mode = st.st_mode;

@@ -1,0 +1,258 @@
+{
+  "title": "PPSA99170",
+  "identity": "ce867cb5d2114c9d977db3612f90b831",
+  "kind": "service-native",
+  "build": {
+    "revision": "2c69e35be59c390ffa765aa40ac641d7e84b0b87",
+    "kind": "service-native",
+    "elevate_gpu_helper": true,
+    "vulkan_gpu_helper": false,
+    "gpu_draw_helper": false,
+    "gpu_present_helper": false,
+    "wine_gpu_broker": false,
+    "sdk_revision": "611893fc25ef3e138f5bc2c90d829d8b58174cd2",
+    "source_sha256": {
+      "ps5/src/main.cpp": "f1eb468f9603425c6543f0b02d8cf91e3e85a6919d7248dec85a24fd2f5aa457",
+      "ps5/CMakeLists.txt": "100c9ea15664ff118f3206617e36b07d4a2b000462269da91eafb474016d37eb",
+      "native/proton_service_preflight.h": "3a8a7611112a1b454b8844fc7d8a5aec695d6fc9b706c714f72568787e68773b",
+      "native/proton_service_preflight.cpp": "33b95dc9c4c40ca251688eeeb3c5fe674e9508c47fee695b66139d62f1fb7c56",
+      "native/proton_service_helper.c": "7b14472c5491e3bae23aea5886a4a79e934480de1b44ca5995eb41387127e802",
+      "native/proton_gpu_broker_probe.h": "fc00a93fc5243fe6f6bc0b1549d68922c27289bcd04e4a54fc95e8f7699a5ae2",
+      "native/proton_gpu_broker_probe.cpp": "9452f23403ba3fce4899ce3f6e7944bf95af35f77bc238f6086477f60bd87817",
+      "native/proton_gpu_memory_probe.cpp": "6710d39f3cc6341ff09e3fd545784613a18b9749966accc3b9778bc7258e2e45",
+      "native/proton_gpu_server_probe.cpp": "ea310f9241373a966b305976f3624c408a9e77527eebef9a342482396bc216d5",
+      "native/proton_gpu_display.cpp": "27e04095d61bb7906534fda8a390ae81027f28b18b929fb448fa2c64c94efc82",
+      "native/proton_gpu_display.h": "dfacadd01093f3fb05f0353d1a577678af1ce5c780942cab262c896494e23a35",
+      "native/proton_gpu_server.h": "f43e2cfb4f4a355e099aea21eda898c7f7f55640e94cc7a9e7ae841914b3102f",
+      "src/pw_gpu_broker.h": "c79d4e63bc365e87b278844310f1c0a5b7e1140287103ac97026bc08d26dff8d",
+      "wine/ps5/pw_wine_process_io.c": "dd3ccac3b63058aaf743146fbf5791217ec9b6451ad0dc4c61dcbbad7abbd6c5",
+      "wine/ps5/pw_wine_process_io.h": "c375a67872391d47ef20cb7bc0001b66655aa29c44c446af31102c0fe5f937a7"
+    },
+    "radv_recipe_sha256": "e2844f49e4af12a9718d5b8b6055ace83e7eaa1d68870de2a79d39d1c92fa674",
+    "radv_platform_header_sha256": "24e770da15304fe95a4e0191271bc33f545dc8f964e186408c7996f5bce2aa97",
+    "radv_archive_sha256": "0ffa39311881236b4872ec77a56bca417ce56c71cefca5954224b9ea8f3a1bf5",
+    "helper_tool_sha256": "614377a0e37006e1454c67f228fc370a2f785c060205cb9f0264f27af04b5f18",
+    "helper_tool_revision": "ab37acd506305ba3e575435e3ae9a351cfaf7cf4",
+    "helper_patch_sha256": "defd28005f7c15664658f8d61928886864f00e4e3df586396460b4d27057275c",
+    "helper_layout_sha256": "fbc52518761b58b703a2225c847c5f44a81523cd0e751755adf890ae0f0dd74c",
+    "helper_symbols_sha256": "470ce72a27a7be8e35dd7a25b485faa733d61570bdaf24d3c75bb4e3e3c63cf7",
+    "helper_preload_mask": "0x8000000000000002",
+    "radv_sdk_revision": "b83202be73e930050e00de0f1b4d9ec46c0391bf",
+    "radv_provenance_sha256": "695395c399b3ab2b85fed11bb57a9d28563bf283b77ab44498a7525139711cb4",
+    "helper_recipe_sha256": "cae067ca688056574b0090fef8b235ae333df3de02b49e43acc4a47585713dae",
+    "helper_sha256": "3ff5135abf217cc3133c61b7e6fba6df1892b2ba91431c97d8772d3eca54a02a",
+    "helper_needed": [
+      "libkernel.sprx",
+      "libSceLibcInternal.sprx"
+    ],
+    "identity": "ebd310b50954f4b26ad1d11bd65e7c0e9b3ae1e5d4e81f2bbbeccbcc8cef732e",
+    "eboot_sha256": "c4ba204f79d8daae52d43c2d7a29993f2d1b0ec8149d320bada69dac73ab1216"
+  },
+  "capture": "klog/gpu-memory-ceiling-02",
+  "expected_missing_image": false,
+  "mode": "gpu-memory",
+  "passed": true,
+  "status": "complete",
+  "production_sha256": "8f63bbc57bd9203520653d9e3eb765798a434b737ac6c1f79b106437542761c3",
+  "production_restored": true,
+  "root_reference_balance_verified": false,
+  "forced_title_close": false,
+  "transfer_stage": "read eboot.bin",
+  "installed_readback_sha256": "d3d7cb497833ebb57876fe4465257217608ac9765f9a360a3ca0e658b845f325",
+  "production_executable_sha256": "bc5c7a75f249a59e7bce80218c6e749b9ea2f426e9bec4c96939ce7f75ceb17d",
+  "probe_readback_sha256": "a1a7c266528616288feef0c41814bb33e3c318bdaea788388ee0af7532885df9",
+  "probe_executable_sha256": "75cbf00635e7eed5753320fbc8ebc363e01e34b176d6550e14f3a28d6c71d6a7",
+  "helper_uploaded": true,
+  "helper_executable_verified": true,
+  "shell_idle_after_run": true,
+  "post_launch_fault_records": 0,
+  "parent_shell_exit_seen": true,
+  "observations": [
+    "service-native identity=ce867cb5d2114c9d977db3612f90b831 revision=4 parent=395 elevated=1",
+    "gpu-broker warmup_submit=0 gpu_value=77",
+    "gpu-memory baseline owner=395 flexible=434110464 direct=12863864832 pool=12884901888 descriptors=12 owner_touch=0 direct_arm=0",
+    "gpu-memory helper service=302090545 pid=398 hello=1 elevation=0 helper_flexible_mib=411",
+    "gpu-memory command_page=1",
+    "gpu-memory shared chunk=0 address=0x6000000000 bytes=16777216 owner_flexible_before=430964736 owner_flexible_touched=414187520 owner_flexible_after=397410304 helper_map=1 helper_stage=3 helper_flexible_mib=379 total=16777216",
+    "gpu-memory shared chunk=1 address=0x6001000000 bytes=16777216 owner_flexible_before=397410304 owner_flexible_touched=380633088 owner_flexible_after=363855872 helper_map=1 helper_stage=3 helper_flexible_mib=347 total=33554432",
+    "gpu-memory shared chunk=2 address=0x6002000000 bytes=16777216 owner_flexible_before=363855872 owner_flexible_touched=347078656 owner_flexible_after=330301440 helper_map=1 helper_stage=3 helper_flexible_mib=315 total=50331648",
+    "gpu-memory shared chunk=3 address=0x6003000000 bytes=16777216 owner_flexible_before=330301440 owner_flexible_touched=313524224 owner_flexible_after=296747008 helper_map=1 helper_stage=3 helper_flexible_mib=283 total=67108864",
+    "gpu-memory shared chunk=4 address=0x6004000000 bytes=16777216 owner_flexible_before=296747008 owner_flexible_touched=279969792 owner_flexible_after=263192576 helper_map=1 helper_stage=3 helper_flexible_mib=251 total=83886080",
+    "gpu-memory shared chunk=5 address=0x6005000000 bytes=16777216 owner_flexible_before=263192576 owner_flexible_touched=246415360 owner_flexible_after=229638144 helper_map=1 helper_stage=3 helper_flexible_mib=219 total=100663296",
+    "gpu-memory shared chunk=6 address=0x6006000000 bytes=16777216 owner_flexible_before=229638144 owner_flexible_touched=212860928 owner_flexible_after=196083712 helper_map=1 helper_stage=3 helper_flexible_mib=187 total=117440512",
+    "gpu-memory shared chunk=7 address=0x6007000000 bytes=16777216 owner_flexible_before=196083712 owner_flexible_touched=179306496 owner_flexible_after=162529280 helper_map=1 helper_stage=3 helper_flexible_mib=155 total=134217728",
+    "gpu-memory shared chunk=8 address=0x6008000000 bytes=16777216 owner_flexible_before=162529280 owner_flexible_touched=145752064 owner_flexible_after=128974848 helper_map=1 helper_stage=3 helper_flexible_mib=123 total=150994944",
+    "gpu-memory shared chunk=9 address=0x6009000000 bytes=16777216 owner_flexible_before=128974848 owner_flexible_touched=112197632 owner_flexible_after=95420416 helper_map=1 helper_stage=3 helper_flexible_mib=91 total=167772160",
+    "gpu-memory shared stop=owner_flexible_reserve chunks=10 total=167772160 owner_flexible=95420416",
+    "gpu-memory shared gpu chunk=0 marker=0x6000fffc00 value=0x51000000 submit=0 gpu=0x51000000 helper=0x51000000 verdict=1",
+    "gpu-memory shared gpu chunk=9 marker=0x6009fffc00 value=0x51000009 submit=0 gpu=0x51000009 helper=0x51000009 verdict=1",
+    "gpu-memory shared released helper=1 helper_flexible_mib=251 owner_flexible=430964736",
+    "gpu-memory direct stop=cap chunks=0 total=0 direct_available=12863864832 owner_flexible=430964736 flexible_before_arm=430964736",
+    "gpu-memory helper closed=0 absent=1",
+    "gpu-memory summary shared_bytes=167772160 shared_gpu_checks=2/2 direct_bytes=0 direct_gpu_checks=0/0 flexible_before=434110464 flexible_after=434110464 direct_before=12863864832 direct_after=12863864832 descriptors_before=12 descriptors_after=12 restored=1",
+    "result=PASS"
+  ],
+  "fresh_identity_seen": true,
+  "memory_baseline": [
+    {
+      "flexible": 434110464,
+      "direct": 12863864832,
+      "pool": 12884901888,
+      "descriptors": 12
+    }
+  ],
+  "memory_settings": {
+    "owner_touch": 0,
+    "direct_arm": 0
+  },
+  "memory_shared_chunks": [
+    {
+      "chunk": 0,
+      "address": 412316860416,
+      "owner_flexible_before": 430964736,
+      "owner_flexible_touched": 414187520,
+      "owner_flexible_after": 397410304,
+      "helper_map": 1,
+      "helper_stage": 3,
+      "helper_flexible_mib": 379,
+      "total": 16777216
+    },
+    {
+      "chunk": 1,
+      "address": 412333637632,
+      "owner_flexible_before": 397410304,
+      "owner_flexible_touched": 380633088,
+      "owner_flexible_after": 363855872,
+      "helper_map": 1,
+      "helper_stage": 3,
+      "helper_flexible_mib": 347,
+      "total": 33554432
+    },
+    {
+      "chunk": 2,
+      "address": 412350414848,
+      "owner_flexible_before": 363855872,
+      "owner_flexible_touched": 347078656,
+      "owner_flexible_after": 330301440,
+      "helper_map": 1,
+      "helper_stage": 3,
+      "helper_flexible_mib": 315,
+      "total": 50331648
+    },
+    {
+      "chunk": 3,
+      "address": 412367192064,
+      "owner_flexible_before": 330301440,
+      "owner_flexible_touched": 313524224,
+      "owner_flexible_after": 296747008,
+      "helper_map": 1,
+      "helper_stage": 3,
+      "helper_flexible_mib": 283,
+      "total": 67108864
+    },
+    {
+      "chunk": 4,
+      "address": 412383969280,
+      "owner_flexible_before": 296747008,
+      "owner_flexible_touched": 279969792,
+      "owner_flexible_after": 263192576,
+      "helper_map": 1,
+      "helper_stage": 3,
+      "helper_flexible_mib": 251,
+      "total": 83886080
+    },
+    {
+      "chunk": 5,
+      "address": 412400746496,
+      "owner_flexible_before": 263192576,
+      "owner_flexible_touched": 246415360,
+      "owner_flexible_after": 229638144,
+      "helper_map": 1,
+      "helper_stage": 3,
+      "helper_flexible_mib": 219,
+      "total": 100663296
+    },
+    {
+      "chunk": 6,
+      "address": 412417523712,
+      "owner_flexible_before": 229638144,
+      "owner_flexible_touched": 212860928,
+      "owner_flexible_after": 196083712,
+      "helper_map": 1,
+      "helper_stage": 3,
+      "helper_flexible_mib": 187,
+      "total": 117440512
+    },
+    {
+      "chunk": 7,
+      "address": 412434300928,
+      "owner_flexible_before": 196083712,
+      "owner_flexible_touched": 179306496,
+      "owner_flexible_after": 162529280,
+      "helper_map": 1,
+      "helper_stage": 3,
+      "helper_flexible_mib": 155,
+      "total": 134217728
+    },
+    {
+      "chunk": 8,
+      "address": 412451078144,
+      "owner_flexible_before": 162529280,
+      "owner_flexible_touched": 145752064,
+      "owner_flexible_after": 128974848,
+      "helper_map": 1,
+      "helper_stage": 3,
+      "helper_flexible_mib": 123,
+      "total": 150994944
+    },
+    {
+      "chunk": 9,
+      "address": 412467855360,
+      "owner_flexible_before": 128974848,
+      "owner_flexible_touched": 112197632,
+      "owner_flexible_after": 95420416,
+      "helper_map": 1,
+      "helper_stage": 3,
+      "helper_flexible_mib": 91,
+      "total": 167772160
+    }
+  ],
+  "memory_direct_chunks": [],
+  "memory_stops": [
+    [
+      "shared",
+      "owner_flexible_reserve",
+      "10",
+      "167772160"
+    ],
+    [
+      "direct",
+      "cap",
+      "0",
+      "0"
+    ]
+  ],
+  "memory_gpu_checks": [
+    {
+      "arm": "shared",
+      "chunk": 0,
+      "verdict": 1
+    },
+    {
+      "arm": "shared",
+      "chunk": 9,
+      "verdict": 1
+    }
+  ],
+  "memory_summary": {
+    "shared_bytes": 167772160,
+    "shared_passed": 2,
+    "shared_checks": 2,
+    "direct_bytes": 0,
+    "direct_passed": 0,
+    "direct_checks": 0,
+    "restored": 1
+  },
+  "restored_readback_sha256": "d3d7cb497833ebb57876fe4465257217608ac9765f9a360a3ca0e658b845f325",
+  "helper_removed": true
+}

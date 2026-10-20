@@ -1,0 +1,22 @@
+{
+  "run": "dnsapi-host-backend-2026-10-08-01",
+  "source_sha256": "cf74697fb8415566814689d9927a922457f44dc27c8292ae91454f0ab70bb21d",
+  "cares_version": "1.34.8",
+  "cares_archive_sha256": "c222b6d681096f9444d2c4863d2c1174019e27cacca0a4a5c114d36dd7d7bf78",
+  "sanitizers": [
+    "address",
+    "undefined"
+  ],
+  "checks": 14,
+  "failures": 0,
+  "passed": true,
+  "initial_finding": {
+    "passed": false,
+    "finding": "c-ares signed public writable-bit macro shifts into bit 31 at socket slot 15; corrected to unsigned mask operations"
+  },
+  "paired_wine_oracles": [
+    "dnsapi-host32-2026-10-08-01",
+    "dnsapi-host64-2026-10-08-01"
+  ],
+  "console_qualified": false
+}

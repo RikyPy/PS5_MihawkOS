@@ -1,0 +1,21 @@
+{
+  "route": "websrv",
+  "build": {
+    "mib": 1,
+    "blob_fnv": "96e18c119264f26a",
+    "elf_bytes": 1158952,
+    "elf_sha256": "e1df27d1ec6d139fc704670d3f6f15ab8f545f9de5a361399713a42df3b91c7f",
+    "sdk_revision": "611893fc25ef3e138f5bc2c90d829d8b58174cd2",
+    "source_sha256": "4e8c1f9c926523dc6be9d781f7300e14414d0fd938badfe38123113d505dca3c"
+  },
+  "started": "2026-10-18T21:42:36Z",
+  "passed": true,
+  "send": {
+    "sent": 1158952,
+    "reply": "HTTP/1.1 200 OK"
+  },
+  "klog_line": "mihawkos-big-elf: bytes=1048576 fnv=96e18c119264f26a expect=96e18c119264f26a route=-",
+  "seconds_to_line": 0.2,
+  "intact": true,
+  "capture": "klog/probe-big-elf-websrv-1-2026-10-18-01.log"
+}

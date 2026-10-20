@@ -1,0 +1,1353 @@
+{
+  "telemetry_hold": null,
+  "launch_readiness": {
+    "ready": true,
+    "seconds": 0.146,
+    "settle_seconds": 0.0,
+    "census_seconds": 0.136,
+    "previous_cleanup_verified": true
+  },
+  "native_close_failures": [],
+  "run": "gate-2026-10-17-shell-batch-02-prefix-fresh32",
+  "what": "profile proton-baseline-test",
+  "env": [
+    "PROTON_LAYOUT=launcher",
+    "PROTON_STOP_TERMINATE=0"
+  ],
+  "result": "finished",
+  "seconds": 135.3,
+  "probe_verdict": "PASS",
+  "stages": {
+    "launched": 1.02,
+    "title_started": 1.48,
+    "elevated": 1.49,
+    "wine_loaded": 1.81,
+    "wineboot_started": 3.05,
+    "wineboot_ended": 104.97,
+    "program_started": 120.81,
+    "marker": 131.63,
+    "program_ended": 131.72,
+    "wine_ended": 132.99,
+    "launcher_started": 134.54,
+    "launcher_ended": 134.8,
+    "closed": 135.34
+  },
+  "clean_owner_restart": true,
+  "launcher_end_status": 0,
+  "initial_status": 0,
+  "closed_on_request": false,
+  "child_logs": [
+    "klog/gate-2026-10-17-shell-batch-02-prefix-fresh32-wine-child-4300.log",
+    "klog/gate-2026-10-17-shell-batch-02-prefix-fresh32-wine-child-4301.log",
+    "klog/gate-2026-10-17-shell-batch-02-prefix-fresh32-wine-child-4302.log",
+    "klog/gate-2026-10-17-shell-batch-02-prefix-fresh32-wine-child-4303.log",
+    "klog/gate-2026-10-17-shell-batch-02-prefix-fresh32-wine-child-4304.log",
+    "klog/gate-2026-10-17-shell-batch-02-prefix-fresh32-wine-child-4305.log",
+    "klog/gate-2026-10-17-shell-batch-02-prefix-fresh32-wine-child-4306.log",
+    "klog/gate-2026-10-17-shell-batch-02-prefix-fresh32-wine-child-4307.log",
+    "klog/gate-2026-10-17-shell-batch-02-prefix-fresh32-wine-child-4308.log",
+    "klog/gate-2026-10-17-shell-batch-02-prefix-fresh32-wine-child-4309.log",
+    "klog/gate-2026-10-17-shell-batch-02-prefix-fresh32-wine-child-4310.log",
+    "klog/gate-2026-10-17-shell-batch-02-prefix-fresh32-wine-child-4311.log",
+    "klog/gate-2026-10-17-shell-batch-02-prefix-fresh32-wine-child-4312.log",
+    "klog/gate-2026-10-17-shell-batch-02-prefix-fresh32-wine-child-4313.log",
+    "klog/gate-2026-10-17-shell-batch-02-prefix-fresh32-wine-child-4314.log",
+    "klog/gate-2026-10-17-shell-batch-02-prefix-fresh32-wine-child-4315.log",
+    "klog/gate-2026-10-17-shell-batch-02-prefix-fresh32-wine-child-4316.log",
+    "klog/gate-2026-10-17-shell-batch-02-prefix-fresh32-wine-child-4317.log",
+    "klog/gate-2026-10-17-shell-batch-02-prefix-fresh32-wine-child-4318.log",
+    "klog/gate-2026-10-17-shell-batch-02-prefix-fresh32-wine-child-4319.log"
+  ],
+  "child_logs_missing": [],
+  "session_logs_status": 0,
+  "storage_errors": 0,
+  "stop_terminate": "0",
+  "injected_fault": null,
+  "exec_protection": {
+    "refused": 0,
+    "conversions": 1026,
+    "converted_kib": 128176,
+    "convert_failed": 0,
+    "exec_refused": 0,
+    "grant_retries": 0,
+    "modules": 99,
+    "sdk_refused": 0
+  },
+  "foreign_mappings": {
+    "found": 0,
+    "skipped_unmaps": 0,
+    "refused_maps": 0,
+    "query_failed": 0,
+    "holes": 0,
+    "hole_list": []
+  },
+  "helper_sched": {
+    "helpers": [
+      {
+        "kind": "memory",
+        "mode": "rr",
+        "main_tid": "102109",
+        "entry": "1/700",
+        "entry_kernel": "10/700",
+        "entry_cpus": "0xea00",
+        "plain": "1/700",
+        "plain_kernel": "10/700",
+        "plain_cpus": "0xea00",
+        "service": "700",
+        "program": "767",
+        "program_cpus": "0",
+        "census": "0",
+        "error": "0",
+        "service_status": "0",
+        "now": "3/700",
+        "now_kernel": "2/700"
+      },
+      {
+        "kind": "program",
+        "mode": "rr",
+        "main_tid": "101531",
+        "entry": "1/700",
+        "entry_kernel": "10/700",
+        "entry_cpus": "0xea00",
+        "plain": "1/700",
+        "plain_kernel": "10/700",
+        "plain_cpus": "0xea00",
+        "service": "700",
+        "program": "767",
+        "program_cpus": "0",
+        "census": "0",
+        "error": "0",
+        "service_status": "0",
+        "now": "3/700",
+        "now_kernel": "2/700"
+      },
+      {
+        "kind": "program",
+        "mode": "rr",
+        "main_tid": "101615",
+        "entry": "1/700",
+        "entry_kernel": "10/700",
+        "entry_cpus": "0xea00",
+        "plain": "1/700",
+        "plain_kernel": "10/700",
+        "plain_cpus": "0xea00",
+        "service": "700",
+        "program": "767",
+        "program_cpus": "0",
+        "census": "0",
+        "error": "0",
+        "service_status": "0",
+        "now": "3/700",
+        "now_kernel": "2/700"
+      },
+      {
+        "kind": "program",
+        "mode": "rr",
+        "main_tid": "102493",
+        "entry": "1/700",
+        "entry_kernel": "10/700",
+        "entry_cpus": "0xea00",
+        "plain": "1/700",
+        "plain_kernel": "10/700",
+        "plain_cpus": "0xea00",
+        "service": "700",
+        "program": "767",
+        "program_cpus": "0",
+        "census": "0",
+        "error": "0",
+        "service_status": "0",
+        "now": "3/700",
+        "now_kernel": "2/700"
+      },
+      {
+        "kind": "program",
+        "mode": "rr",
+        "main_tid": "101656",
+        "entry": "1/700",
+        "entry_kernel": "10/700",
+        "entry_cpus": "0xea00",
+        "plain": "1/700",
+        "plain_kernel": "10/700",
+        "plain_cpus": "0xea00",
+        "service": "700",
+        "program": "767",
+        "program_cpus": "0",
+        "census": "0",
+        "error": "0",
+        "service_status": "0",
+        "now": "3/700",
+        "now_kernel": "2/700"
+      },
+      {
+        "kind": "program",
+        "mode": "rr",
+        "main_tid": "102259",
+        "entry": "1/700",
+        "entry_kernel": "10/700",
+        "entry_cpus": "0xea00",
+        "plain": "1/700",
+        "plain_kernel": "10/700",
+        "plain_cpus": "0xea00",
+        "service": "700",
+        "program": "767",
+        "program_cpus": "0",
+        "census": "0",
+        "error": "0",
+        "service_status": "0",
+        "now": "3/700",
+        "now_kernel": "2/700"
+      },
+      {
+        "kind": "program",
+        "mode": "rr",
+        "main_tid": "102347",
+        "entry": "1/700",
+        "entry_kernel": "10/700",
+        "entry_cpus": "0xea00",
+        "plain": "1/700",
+        "plain_kernel": "10/700",
+        "plain_cpus": "0xea00",
+        "service": "700",
+        "program": "767",
+        "program_cpus": "0",
+        "census": "0",
+        "error": "0",
+        "service_status": "0",
+        "now": "3/700",
+        "now_kernel": "2/700"
+      },
+      {
+        "kind": "program",
+        "mode": "rr",
+        "main_tid": "101656",
+        "entry": "1/700",
+        "entry_kernel": "10/700",
+        "entry_cpus": "0xea00",
+        "plain": "1/700",
+        "plain_kernel": "10/700",
+        "plain_cpus": "0xea00",
+        "service": "700",
+        "program": "767",
+        "program_cpus": "0",
+        "census": "0",
+        "error": "0",
+        "service_status": "0",
+        "now": "3/700",
+        "now_kernel": "2/700"
+      },
+      {
+        "kind": "program",
+        "mode": "rr",
+        "main_tid": "101187",
+        "entry": "1/700",
+        "entry_kernel": "10/700",
+        "entry_cpus": "0xea00",
+        "plain": "1/700",
+        "plain_kernel": "10/700",
+        "plain_cpus": "0xea00",
+        "service": "700",
+        "program": "767",
+        "program_cpus": "0",
+        "census": "0",
+        "error": "0",
+        "service_status": "0",
+        "now": "3/700",
+        "now_kernel": "2/700"
+      },
+      {
+        "kind": "program",
+        "mode": "rr",
+        "main_tid": "102232",
+        "entry": "1/700",
+        "entry_kernel": "10/700",
+        "entry_cpus": "0xea00",
+        "plain": "1/700",
+        "plain_kernel": "10/700",
+        "plain_cpus": "0xea00",
+        "service": "700",
+        "program": "767",
+        "program_cpus": "0",
+        "census": "0",
+        "error": "0",
+        "service_status": "0",
+        "now": "3/700",
+        "now_kernel": "2/700"
+      },
+      {
+        "kind": "program",
+        "mode": "rr",
+        "main_tid": "102271",
+        "entry": "1/700",
+        "entry_kernel": "10/700",
+        "entry_cpus": "0xea00",
+        "plain": "1/700",
+        "plain_kernel": "10/700",
+        "plain_cpus": "0xea00",
+        "service": "700",
+        "program": "767",
+        "program_cpus": "0",
+        "census": "0",
+        "error": "0",
+        "service_status": "0",
+        "now": "3/700",
+        "now_kernel": "2/700"
+      },
+      {
+        "kind": "program",
+        "mode": "rr",
+        "main_tid": "102479",
+        "entry": "1/700",
+        "entry_kernel": "10/700",
+        "entry_cpus": "0xea00",
+        "plain": "1/700",
+        "plain_kernel": "10/700",
+        "plain_cpus": "0xea00",
+        "service": "700",
+        "program": "767",
+        "program_cpus": "0",
+        "census": "0",
+        "error": "0",
+        "service_status": "0",
+        "now": "3/700",
+        "now_kernel": "2/700"
+      },
+      {
+        "kind": "program",
+        "mode": "rr",
+        "main_tid": "102232",
+        "entry": "1/700",
+        "entry_kernel": "10/700",
+        "entry_cpus": "0xea00",
+        "plain": "1/700",
+        "plain_kernel": "10/700",
+        "plain_cpus": "0xea00",
+        "service": "700",
+        "program": "767",
+        "program_cpus": "0",
+        "census": "0",
+        "error": "0",
+        "service_status": "0",
+        "now": "3/700",
+        "now_kernel": "2/700"
+      },
+      {
+        "kind": "program",
+        "mode": "rr",
+        "main_tid": "101659",
+        "entry": "1/700",
+        "entry_kernel": "10/700",
+        "entry_cpus": "0xea00",
+        "plain": "1/700",
+        "plain_kernel": "10/700",
+        "plain_cpus": "0xea00",
+        "service": "700",
+        "program": "767",
+        "program_cpus": "0",
+        "census": "0",
+        "error": "0",
+        "service_status": "0",
+        "now": "3/700",
+        "now_kernel": "2/700"
+      },
+      {
+        "kind": "program",
+        "mode": "rr",
+        "main_tid": "101277",
+        "entry": "1/700",
+        "entry_kernel": "10/700",
+        "entry_cpus": "0xea00",
+        "plain": "1/700",
+        "plain_kernel": "10/700",
+        "plain_cpus": "0xea00",
+        "service": "700",
+        "program": "767",
+        "program_cpus": "0",
+        "census": "0",
+        "error": "0",
+        "service_status": "0",
+        "now": "3/700",
+        "now_kernel": "2/700"
+      },
+      {
+        "kind": "program",
+        "mode": "rr",
+        "main_tid": "102271",
+        "entry": "1/700",
+        "entry_kernel": "10/700",
+        "entry_cpus": "0xea00",
+        "plain": "1/700",
+        "plain_kernel": "10/700",
+        "plain_cpus": "0xea00",
+        "service": "700",
+        "program": "767",
+        "program_cpus": "0",
+        "census": "0",
+        "error": "0",
+        "service_status": "0",
+        "now": "3/700",
+        "now_kernel": "2/700"
+      },
+      {
+        "kind": "program",
+        "mode": "rr",
+        "main_tid": "101457",
+        "entry": "1/700",
+        "entry_kernel": "10/700",
+        "entry_cpus": "0xea00",
+        "plain": "1/700",
+        "plain_kernel": "10/700",
+        "plain_cpus": "0xea00",
+        "service": "700",
+        "program": "767",
+        "program_cpus": "0",
+        "census": "0",
+        "error": "0",
+        "service_status": "0",
+        "now": "3/700",
+        "now_kernel": "2/700"
+      },
+      {
+        "kind": "program",
+        "mode": "rr",
+        "main_tid": "101435",
+        "entry": "1/700",
+        "entry_kernel": "10/700",
+        "entry_cpus": "0xea00",
+        "plain": "1/700",
+        "plain_kernel": "10/700",
+        "plain_cpus": "0xea00",
+        "service": "700",
+        "program": "767",
+        "program_cpus": "0",
+        "census": "0",
+        "error": "0",
+        "service_status": "0",
+        "now": "3/700",
+        "now_kernel": "2/700"
+      },
+      {
+        "kind": "program",
+        "mode": "rr",
+        "main_tid": "101790",
+        "entry": "1/700",
+        "entry_kernel": "10/700",
+        "entry_cpus": "0xea00",
+        "plain": "1/700",
+        "plain_kernel": "10/700",
+        "plain_cpus": "0xea00",
+        "service": "700",
+        "program": "767",
+        "program_cpus": "0",
+        "census": "0",
+        "error": "0",
+        "service_status": "0",
+        "now": "3/700",
+        "now_kernel": "2/700"
+      },
+      {
+        "kind": "program",
+        "mode": "rr",
+        "main_tid": "102247",
+        "entry": "1/700",
+        "entry_kernel": "10/700",
+        "entry_cpus": "0xea00",
+        "plain": "1/700",
+        "plain_kernel": "10/700",
+        "plain_cpus": "0xea00",
+        "service": "700",
+        "program": "767",
+        "program_cpus": "0",
+        "census": "0",
+        "error": "0",
+        "service_status": "0",
+        "now": "3/700",
+        "now_kernel": "2/700"
+      }
+    ],
+    "workers": [
+      {
+        "worker": "3/767",
+        "worker_kernel": "2/767",
+        "worker_cpus": "0xea00",
+        "status": "0",
+        "inherit": "3/767",
+        "inherit_kernel": "2/767",
+        "inherit_cpus": "0xea00"
+      },
+      {
+        "worker": "3/767",
+        "worker_kernel": "2/767",
+        "worker_cpus": "0xea00",
+        "status": "0",
+        "inherit": "3/767",
+        "inherit_kernel": "2/767",
+        "inherit_cpus": "0xea00"
+      },
+      {
+        "worker": "3/767",
+        "worker_kernel": "2/767",
+        "worker_cpus": "0xea00",
+        "status": "0",
+        "inherit": "3/767",
+        "inherit_kernel": "2/767",
+        "inherit_cpus": "0xea00"
+      },
+      {
+        "worker": "3/767",
+        "worker_kernel": "2/767",
+        "worker_cpus": "0xea00",
+        "status": "0",
+        "inherit": "3/767",
+        "inherit_kernel": "2/767",
+        "inherit_cpus": "0xea00"
+      },
+      {
+        "worker": "3/767",
+        "worker_kernel": "2/767",
+        "worker_cpus": "0xea00",
+        "status": "0",
+        "inherit": "3/767",
+        "inherit_kernel": "2/767",
+        "inherit_cpus": "0xea00"
+      },
+      {
+        "worker": "3/767",
+        "worker_kernel": "2/767",
+        "worker_cpus": "0xea00",
+        "status": "0",
+        "inherit": "3/767",
+        "inherit_kernel": "2/767",
+        "inherit_cpus": "0xea00"
+      },
+      {
+        "worker": "3/767",
+        "worker_kernel": "2/767",
+        "worker_cpus": "0xea00",
+        "status": "0",
+        "inherit": "3/767",
+        "inherit_kernel": "2/767",
+        "inherit_cpus": "0xea00"
+      },
+      {
+        "worker": "3/767",
+        "worker_kernel": "2/767",
+        "worker_cpus": "0xea00",
+        "status": "0",
+        "inherit": "3/767",
+        "inherit_kernel": "2/767",
+        "inherit_cpus": "0xea00"
+      },
+      {
+        "worker": "3/767",
+        "worker_kernel": "2/767",
+        "worker_cpus": "0xea00",
+        "status": "0",
+        "inherit": "3/767",
+        "inherit_kernel": "2/767",
+        "inherit_cpus": "0xea00"
+      },
+      {
+        "worker": "3/767",
+        "worker_kernel": "2/767",
+        "worker_cpus": "0xea00",
+        "status": "0",
+        "inherit": "3/767",
+        "inherit_kernel": "2/767",
+        "inherit_cpus": "0xea00"
+      },
+      {
+        "worker": "3/767",
+        "worker_kernel": "2/767",
+        "worker_cpus": "0xea00",
+        "status": "0",
+        "inherit": "3/767",
+        "inherit_kernel": "2/767",
+        "inherit_cpus": "0xea00"
+      },
+      {
+        "worker": "3/767",
+        "worker_kernel": "2/767",
+        "worker_cpus": "0xea00",
+        "status": "0",
+        "inherit": "3/767",
+        "inherit_kernel": "2/767",
+        "inherit_cpus": "0xea00"
+      },
+      {
+        "worker": "3/767",
+        "worker_kernel": "2/767",
+        "worker_cpus": "0xea00",
+        "status": "0",
+        "inherit": "3/767",
+        "inherit_kernel": "2/767",
+        "inherit_cpus": "0xea00"
+      },
+      {
+        "worker": "3/767",
+        "worker_kernel": "2/767",
+        "worker_cpus": "0xea00",
+        "status": "0",
+        "inherit": "3/767",
+        "inherit_kernel": "2/767",
+        "inherit_cpus": "0xea00"
+      },
+      {
+        "worker": "3/767",
+        "worker_kernel": "2/767",
+        "worker_cpus": "0xea00",
+        "status": "0",
+        "inherit": "3/767",
+        "inherit_kernel": "2/767",
+        "inherit_cpus": "0xea00"
+      },
+      {
+        "worker": "3/767",
+        "worker_kernel": "2/767",
+        "worker_cpus": "0xea00",
+        "status": "0",
+        "inherit": "3/767",
+        "inherit_kernel": "2/767",
+        "inherit_cpus": "0xea00"
+      },
+      {
+        "worker": "3/767",
+        "worker_kernel": "2/767",
+        "worker_cpus": "0xea00",
+        "status": "0",
+        "inherit": "3/767",
+        "inherit_kernel": "2/767",
+        "inherit_cpus": "0xea00"
+      },
+      {
+        "worker": "3/767",
+        "worker_kernel": "2/767",
+        "worker_cpus": "0xea00",
+        "status": "0",
+        "inherit": "3/767",
+        "inherit_kernel": "2/767",
+        "inherit_cpus": "0xea00"
+      },
+      {
+        "worker": "3/767",
+        "worker_kernel": "2/767",
+        "worker_cpus": "0xea00",
+        "status": "0",
+        "inherit": "3/767",
+        "inherit_kernel": "2/767",
+        "inherit_cpus": "0xea00"
+      }
+    ],
+    "program_threads": {
+      "set": 25,
+      "failed": 0
+    },
+    "census": null,
+    "census_processes": 0,
+    "row": null,
+    "scheduled": {
+      "ok": true,
+      "reasons": []
+    }
+  },
+  "helpers_ended": {
+    "why": null,
+    "count": 0,
+    "signals": {},
+    "gone_ms": {},
+    "still_there": [],
+    "after_kill": null,
+    "stalled": null,
+    "wedge_s": null,
+    "recorder_rows": "process rows from kern.proc (the title's own: state=3 pri=10/0 cpu=15 threads=17)"
+  },
+  "helper_doom": [
+    {
+      "seen": [
+        "exit"
+      ],
+      "doomed": null,
+      "stamped_ms_ago": null,
+      "ended": true
+    },
+    {
+      "seen": [
+        "exit"
+      ],
+      "doomed": null,
+      "stamped_ms_ago": null,
+      "ended": true
+    },
+    {
+      "seen": [
+        "exit"
+      ],
+      "doomed": null,
+      "stamped_ms_ago": null,
+      "ended": true
+    },
+    {
+      "seen": [
+        "exit"
+      ],
+      "doomed": null,
+      "stamped_ms_ago": null,
+      "ended": true
+    },
+    {
+      "seen": [
+        "exit"
+      ],
+      "doomed": null,
+      "stamped_ms_ago": null,
+      "ended": true
+    },
+    {
+      "seen": [
+        "exit"
+      ],
+      "doomed": null,
+      "stamped_ms_ago": null,
+      "ended": true
+    },
+    {
+      "seen": [
+        "exit"
+      ],
+      "doomed": null,
+      "stamped_ms_ago": null,
+      "ended": true
+    },
+    {
+      "seen": [
+        "exit"
+      ],
+      "doomed": null,
+      "stamped_ms_ago": null,
+      "ended": true
+    },
+    {
+      "seen": [
+        "exit"
+      ],
+      "doomed": null,
+      "stamped_ms_ago": null,
+      "ended": true
+    },
+    {
+      "seen": [
+        "exit"
+      ],
+      "doomed": null,
+      "stamped_ms_ago": null,
+      "ended": true
+    },
+    {
+      "seen": [
+        "exit"
+      ],
+      "doomed": null,
+      "stamped_ms_ago": null,
+      "ended": true
+    },
+    {
+      "seen": [
+        "exit"
+      ],
+      "doomed": null,
+      "stamped_ms_ago": null,
+      "ended": true
+    },
+    {
+      "seen": [
+        "exit"
+      ],
+      "doomed": null,
+      "stamped_ms_ago": null,
+      "ended": true
+    },
+    {
+      "seen": [
+        "exit"
+      ],
+      "doomed": null,
+      "stamped_ms_ago": null,
+      "ended": true
+    },
+    {
+      "seen": [
+        "exit"
+      ],
+      "doomed": null,
+      "stamped_ms_ago": null,
+      "ended": true
+    },
+    {
+      "seen": [
+        "exit"
+      ],
+      "doomed": null,
+      "stamped_ms_ago": null,
+      "ended": true
+    },
+    {
+      "seen": [
+        "exit"
+      ],
+      "doomed": null,
+      "stamped_ms_ago": null,
+      "ended": true
+    },
+    {
+      "seen": [
+        "exit"
+      ],
+      "doomed": null,
+      "stamped_ms_ago": null,
+      "ended": true
+    }
+  ],
+  "broker_phases": null,
+  "memory_helper_slowest": {
+    "census": 53,
+    "alloc": 0,
+    "shared": 0,
+    "touch": 1,
+    "dmem": 0,
+    "grant": 0,
+    "free": 1,
+    "stall": 0
+  },
+  "memory_helper": {
+    "dead": [],
+    "stall_tests": 0,
+    "sections_mib": [],
+    "given_back": 0,
+    "lost": 0,
+    "gave_back_lines": 0
+  },
+  "assertion": false,
+  "chunk_maps": null,
+  "mapped_mib": null,
+  "ask_failures_max": null,
+  "misplaced_max": null,
+  "rep_step_us": null,
+  "exec_rewrites_us": null,
+  "exit_stall": false,
+  "stop_requested": null,
+  "returned_to_launcher": true,
+  "passed": true,
+  "bench": {},
+  "steady": {
+    "server": {
+      "calls": 0.0,
+      "per_s": 0.0,
+      "avg_us": 0.0,
+      "selects": 0.0,
+      "blocked": 0.0,
+      "block_avg_us": 0.0,
+      "waits": 0.0,
+      "handles_avg": 0.0,
+      "wait_all": 0.0,
+      "polled": 0.0,
+      "delays": 0.0,
+      "yields": 0.0,
+      "intervals": 24
+    }
+  },
+  "intervals": {
+    "frames": [],
+    "server": [
+      {
+        "calls": 0.0,
+        "per_s": 0.0,
+        "avg_us": 0.0,
+        "selects": 0.0,
+        "blocked": 0.0,
+        "block_avg_us": 0.0,
+        "waits": 0.0,
+        "handles_avg": 0.0,
+        "wait_all": 0.0,
+        "polled": 0.0,
+        "delays": 0.0,
+        "yields": 0.0
+      },
+      {
+        "calls": 0.0,
+        "per_s": 0.0,
+        "avg_us": 0.0,
+        "selects": 0.0,
+        "blocked": 0.0,
+        "block_avg_us": 0.0,
+        "waits": 0.0,
+        "handles_avg": 0.0,
+        "wait_all": 0.0,
+        "polled": 0.0,
+        "delays": 0.0,
+        "yields": 0.0
+      },
+      {
+        "calls": 0.0,
+        "per_s": 0.0,
+        "avg_us": 0.0,
+        "selects": 0.0,
+        "blocked": 0.0,
+        "block_avg_us": 0.0,
+        "waits": 0.0,
+        "handles_avg": 0.0,
+        "wait_all": 0.0,
+        "polled": 0.0,
+        "delays": 0.0,
+        "yields": 0.0
+      },
+      {
+        "calls": 0.0,
+        "per_s": 0.0,
+        "avg_us": 0.0,
+        "selects": 0.0,
+        "blocked": 0.0,
+        "block_avg_us": 0.0,
+        "waits": 0.0,
+        "handles_avg": 0.0,
+        "wait_all": 0.0,
+        "polled": 0.0,
+        "delays": 0.0,
+        "yields": 0.0
+      },
+      {
+        "calls": 0.0,
+        "per_s": 0.0,
+        "avg_us": 0.0,
+        "selects": 0.0,
+        "blocked": 0.0,
+        "block_avg_us": 0.0,
+        "waits": 0.0,
+        "handles_avg": 0.0,
+        "wait_all": 0.0,
+        "polled": 0.0,
+        "delays": 0.0,
+        "yields": 0.0
+      },
+      {
+        "calls": 0.0,
+        "per_s": 0.0,
+        "avg_us": 0.0,
+        "selects": 0.0,
+        "blocked": 0.0,
+        "block_avg_us": 0.0,
+        "waits": 0.0,
+        "handles_avg": 0.0,
+        "wait_all": 0.0,
+        "polled": 0.0,
+        "delays": 0.0,
+        "yields": 0.0
+      },
+      {
+        "calls": 0.0,
+        "per_s": 0.0,
+        "avg_us": 0.0,
+        "selects": 0.0,
+        "blocked": 0.0,
+        "block_avg_us": 0.0,
+        "waits": 0.0,
+        "handles_avg": 0.0,
+        "wait_all": 0.0,
+        "polled": 0.0,
+        "delays": 0.0,
+        "yields": 0.0
+      },
+      {
+        "calls": 0.0,
+        "per_s": 0.0,
+        "avg_us": 0.0,
+        "selects": 0.0,
+        "blocked": 0.0,
+        "block_avg_us": 0.0,
+        "waits": 0.0,
+        "handles_avg": 0.0,
+        "wait_all": 0.0,
+        "polled": 0.0,
+        "delays": 0.0,
+        "yields": 0.0
+      },
+      {
+        "calls": 0.0,
+        "per_s": 0.0,
+        "avg_us": 0.0,
+        "selects": 0.0,
+        "blocked": 0.0,
+        "block_avg_us": 0.0,
+        "waits": 0.0,
+        "handles_avg": 0.0,
+        "wait_all": 0.0,
+        "polled": 0.0,
+        "delays": 0.0,
+        "yields": 0.0
+      },
+      {
+        "calls": 0.0,
+        "per_s": 0.0,
+        "avg_us": 0.0,
+        "selects": 0.0,
+        "blocked": 0.0,
+        "block_avg_us": 0.0,
+        "waits": 0.0,
+        "handles_avg": 0.0,
+        "wait_all": 0.0,
+        "polled": 0.0,
+        "delays": 0.0,
+        "yields": 0.0
+      },
+      {
+        "calls": 0.0,
+        "per_s": 0.0,
+        "avg_us": 0.0,
+        "selects": 0.0,
+        "blocked": 0.0,
+        "block_avg_us": 0.0,
+        "waits": 0.0,
+        "handles_avg": 0.0,
+        "wait_all": 0.0,
+        "polled": 0.0,
+        "delays": 0.0,
+        "yields": 0.0
+      },
+      {
+        "calls": 0.0,
+        "per_s": 0.0,
+        "avg_us": 0.0,
+        "selects": 0.0,
+        "blocked": 0.0,
+        "block_avg_us": 0.0,
+        "waits": 0.0,
+        "handles_avg": 0.0,
+        "wait_all": 0.0,
+        "polled": 0.0,
+        "delays": 0.0,
+        "yields": 0.0
+      },
+      {
+        "calls": 0.0,
+        "per_s": 0.0,
+        "avg_us": 0.0,
+        "selects": 0.0,
+        "blocked": 0.0,
+        "block_avg_us": 0.0,
+        "waits": 0.0,
+        "handles_avg": 0.0,
+        "wait_all": 0.0,
+        "polled": 0.0,
+        "delays": 0.0,
+        "yields": 0.0
+      },
+      {
+        "calls": 0.0,
+        "per_s": 0.0,
+        "avg_us": 0.0,
+        "selects": 0.0,
+        "blocked": 0.0,
+        "block_avg_us": 0.0,
+        "waits": 0.0,
+        "handles_avg": 0.0,
+        "wait_all": 0.0,
+        "polled": 0.0,
+        "delays": 0.0,
+        "yields": 0.0
+      },
+      {
+        "calls": 0.0,
+        "per_s": 0.0,
+        "avg_us": 0.0,
+        "selects": 0.0,
+        "blocked": 0.0,
+        "block_avg_us": 0.0,
+        "waits": 0.0,
+        "handles_avg": 0.0,
+        "wait_all": 0.0,
+        "polled": 0.0,
+        "delays": 0.0,
+        "yields": 0.0
+      },
+      {
+        "calls": 0.0,
+        "per_s": 0.0,
+        "avg_us": 0.0,
+        "selects": 0.0,
+        "blocked": 0.0,
+        "block_avg_us": 0.0,
+        "waits": 0.0,
+        "handles_avg": 0.0,
+        "wait_all": 0.0,
+        "polled": 0.0,
+        "delays": 0.0,
+        "yields": 0.0
+      },
+      {
+        "calls": 0.0,
+        "per_s": 0.0,
+        "avg_us": 0.0,
+        "selects": 0.0,
+        "blocked": 0.0,
+        "block_avg_us": 0.0,
+        "waits": 0.0,
+        "handles_avg": 0.0,
+        "wait_all": 0.0,
+        "polled": 0.0,
+        "delays": 0.0,
+        "yields": 0.0
+      },
+      {
+        "calls": 0.0,
+        "per_s": 0.0,
+        "avg_us": 0.0,
+        "selects": 0.0,
+        "blocked": 0.0,
+        "block_avg_us": 0.0,
+        "waits": 0.0,
+        "handles_avg": 0.0,
+        "wait_all": 0.0,
+        "polled": 0.0,
+        "delays": 0.0,
+        "yields": 0.0
+      },
+      {
+        "calls": 0.0,
+        "per_s": 0.0,
+        "avg_us": 0.0,
+        "selects": 0.0,
+        "blocked": 0.0,
+        "block_avg_us": 0.0,
+        "waits": 0.0,
+        "handles_avg": 0.0,
+        "wait_all": 0.0,
+        "polled": 0.0,
+        "delays": 0.0,
+        "yields": 0.0
+      },
+      {
+        "calls": 0.0,
+        "per_s": 0.0,
+        "avg_us": 0.0,
+        "selects": 0.0,
+        "blocked": 0.0,
+        "block_avg_us": 0.0,
+        "waits": 0.0,
+        "handles_avg": 0.0,
+        "wait_all": 0.0,
+        "polled": 0.0,
+        "delays": 0.0,
+        "yields": 0.0
+      },
+      {
+        "calls": 0.0,
+        "per_s": 0.0,
+        "avg_us": 0.0,
+        "selects": 0.0,
+        "blocked": 0.0,
+        "block_avg_us": 0.0,
+        "waits": 0.0,
+        "handles_avg": 0.0,
+        "wait_all": 0.0,
+        "polled": 0.0,
+        "delays": 0.0,
+        "yields": 0.0
+      },
+      {
+        "calls": 0.0,
+        "per_s": 0.0,
+        "avg_us": 0.0,
+        "selects": 0.0,
+        "blocked": 0.0,
+        "block_avg_us": 0.0,
+        "waits": 0.0,
+        "handles_avg": 0.0,
+        "wait_all": 0.0,
+        "polled": 0.0,
+        "delays": 0.0,
+        "yields": 0.0
+      },
+      {
+        "calls": 0.0,
+        "per_s": 0.0,
+        "avg_us": 0.0,
+        "selects": 0.0,
+        "blocked": 0.0,
+        "block_avg_us": 0.0,
+        "waits": 0.0,
+        "handles_avg": 0.0,
+        "wait_all": 0.0,
+        "polled": 0.0,
+        "delays": 0.0,
+        "yields": 0.0
+      },
+      {
+        "calls": 0.0,
+        "per_s": 0.0,
+        "avg_us": 0.0,
+        "selects": 0.0,
+        "blocked": 0.0,
+        "block_avg_us": 0.0,
+        "waits": 0.0,
+        "handles_avg": 0.0,
+        "wait_all": 0.0,
+        "polled": 0.0,
+        "delays": 0.0,
+        "yields": 0.0
+      },
+      {
+        "calls": 0.0,
+        "per_s": 0.0,
+        "avg_us": 0.0,
+        "selects": 0.0,
+        "blocked": 0.0,
+        "block_avg_us": 0.0,
+        "waits": 0.0,
+        "handles_avg": 0.0,
+        "wait_all": 0.0,
+        "polled": 0.0,
+        "delays": 0.0,
+        "yields": 0.0
+      }
+    ],
+    "top": []
+  },
+  "shown": {
+    "frames": 11,
+    "per_10s": [
+      11
+    ],
+    "longest_gap_ms": 701
+  },
+  "broker": {
+    "local_offer": 8589934592,
+    "host_limit": 1073741824,
+    "windows": {
+      "presents": 0,
+      "effect_bytes": 0,
+      "mica_builds": 0,
+      "thumbnail_builds": 0,
+      "compositions": 0,
+      "compose_avg_us": 0,
+      "compose_max_us": 0
+    },
+    "refused": [],
+    "refused_count": 0,
+    "clients": [
+      {
+        "pid": 4304,
+        "frames": 0,
+        "submissions": 0
+      },
+      {
+        "pid": -1,
+        "frames": 0,
+        "submissions": 0
+      },
+      {
+        "pid": 4309,
+        "frames": 0,
+        "submissions": 0
+      },
+      {
+        "pid": 4310,
+        "frames": 0,
+        "submissions": 0
+      },
+      {
+        "pid": 4311,
+        "frames": 0,
+        "submissions": 0
+      },
+      {
+        "pid": 4308,
+        "frames": 0,
+        "submissions": 0
+      },
+      {
+        "pid": 4307,
+        "frames": 0,
+        "submissions": 0
+      },
+      {
+        "pid": 4312,
+        "frames": 0,
+        "submissions": 0
+      },
+      {
+        "pid": 4306,
+        "frames": 0,
+        "submissions": 0
+      },
+      {
+        "pid": 4316,
+        "frames": 0,
+        "submissions": 0
+      },
+      {
+        "pid": 4317,
+        "frames": 0,
+        "submissions": 0
+      },
+      {
+        "pid": -1,
+        "frames": 0,
+        "submissions": 0
+      },
+      {
+        "pid": -1,
+        "frames": 0,
+        "submissions": 0
+      },
+      {
+        "pid": 4302,
+        "frames": 0,
+        "submissions": 0
+      },
+      {
+        "pid": 4301,
+        "frames": 0,
+        "submissions": 0
+      },
+      {
+        "pid": -1,
+        "frames": 0,
+        "submissions": 0
+      },
+      {
+        "pid": -1,
+        "frames": 0,
+        "submissions": 0
+      },
+      {
+        "pid": -1,
+        "frames": 0,
+        "submissions": 0
+      },
+      {
+        "pid": -1,
+        "frames": 0,
+        "submissions": 0
+      }
+    ],
+    "wedged": false,
+    "failure_reasons": [],
+    "host_peak": 8454144,
+    "local_peak": 0
+  },
+  "pacing": null,
+  "captures": [
+    "klog/gate-2026-10-17-shell-batch-02-prefix-fresh32-capture-01.png",
+    "klog/gate-2026-10-17-shell-batch-02-prefix-fresh32-capture-02.png"
+  ],
+  "pad_script": [
+    "# Capture the probe's actual presented text, after its bitmap/glyph checks.",
+    "anchor frame",
+    "1 capture",
+    "3 capture"
+  ],
+  "cleanup_verified": true,
+  "hooks_removed": true,
+  "fresh_prefix": true,
+  "architecture": "32",
+  "probe_sha256": "e3ef8b878d8e5d17aed82e34560331218edd6f6706cae07c03adb77b386a4017",
+  "test_data_removed": true
+}

@@ -1,0 +1,17 @@
+{
+  "kind": "console_availability",
+  "passed": false,
+  "status": "not_run",
+  "stage": "idle_check_before_deployment",
+  "deployment_performed": false,
+  "launch_performed": false,
+  "reason": "Console unreachable; user confirmed an intentional shutdown after the passing probe.",
+  "console_kernel_panic_reported_by_user": false,
+  "last_completed_probe": "graphics-child-gpu-broker-shm-window-01",
+  "production_restored_by_last_probe": true,
+  "helper_removed_by_last_probe": true,
+  "pending": [
+    "normal_child_lifecycle_regression",
+    "restored_production_launcher_check"
+  ]
+}

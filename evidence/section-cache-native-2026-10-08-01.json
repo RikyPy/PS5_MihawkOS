@@ -1,0 +1,25 @@
+{
+ "run": "section-cache-native-2026-10-08-01",
+ "read_only": false,
+ "temporary_direct_backing_bytes": 0,
+ "kernel_reads": false,
+ "kernel_writes": false,
+ "no_overwrite": true,
+ "payload": true,
+ "elf_sha256": "f6c698c8208cebc2e3e3aa1ebb90efe7d140081664776fb70e30cc703f9a5282",
+ "source_sha256": "b16d7452587252dfec1c381df9ce1126450aeb543c5505a856612b58a8a646ca",
+ "inputs": {
+  "/tmp/pw_wine_section.h": "429ab9df3e843d01213b4b503b6f0651daccd8f20f20e43fd5c17cfe9c5fad4a",
+  "/tmp/pw_wine_section.c": "549eaea0ab72a3b9bcb021290608d124fbdac670d78287e4eb44498ab78f44cf",
+  "/tmp/test_pw_wine_section_native.c": "b16d7452587252dfec1c381df9ce1126450aeb543c5505a856612b58a8a646ca"
+ },
+ "completed": true,
+ "full_contiguous_view_supported": false,
+ "bounded_native_cache_contract_passed": true,
+ "passed": true,
+ "purpose": "two 13.5 GiB virtual aliases, eight threads, four mapped shared pages, eviction and cleanup; not Wine integration",
+ "lines": [
+  "SECTION_NATIVE threads=8 errors=0",
+  "SECTION_NATIVE PASS aliases=2 virtual_bytes=14495514624 threads=8 cache_pages=4 faults=389 evictions=384 cleanup=1 stage=0 failures=0"
+ ]
+}

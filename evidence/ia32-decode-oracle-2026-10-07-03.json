@@ -1,0 +1,78 @@
+{
+ "run": "ia32-decode-oracle-2026-10-07-03",
+ "where": "host PC (no console run)",
+ "what": "the decoder and printer against LLVM's disassembler (tools/ia32-decode-oracle.sh), and the decoder against this PC's CPU in 32-bit mode, single-stepped (tools/ia32-cpu-decode-check.sh)",
+ "llvm_oracle": {
+  "verdict": "PASS",
+  "encodings": 12486072,
+  "agree_text": 2497796,
+  "agree_invalid": 8372826,
+  "vex_evex_xop_length_agree": 976132,
+  "groups": 11196,
+  "unexplained_groups": 0,
+  "LENGTH": {
+   "encodings": 3016,
+   "unexplained_groups": 0
+  },
+  "TEXT": {
+   "encodings": 53430,
+   "unexplained_groups": 0
+  },
+  "OURS_ONLY": {
+   "encodings": 85726,
+   "unexplained_groups": 0
+  },
+  "LLVM_ONLY": {
+   "encodings": 1308,
+   "unexplained_groups": 0
+  },
+  "NOFORM": {
+   "encodings": 495838,
+   "unexplained_groups": 0
+  },
+  "forms": 943,
+  "llvm": "23.1.1"
+ },
+ "cpu_oracle": {
+  "encodings": 2576220,
+  "lost_to_dead_workers": 0,
+  "LENGTH": {
+   "encodings": 0,
+   "groups": 0
+  },
+  "CPU_EXECUTES": {
+   "encodings": 0,
+   "groups": 0
+  },
+  "CPU_UD": {
+   "encodings": 0,
+   "groups": 0
+  },
+  "LOCK_UD": {
+   "encodings": 0,
+   "groups": 0
+  },
+  "LOCK_RUNS": {
+   "encodings": 0,
+   "groups": 0
+  },
+  "NOFORM_RUNS": {
+   "encodings": 1586,
+   "groups": 107
+  },
+  "HANG": {
+   "encodings": 0,
+   "groups": 0
+  }
+ },
+ "cpu": "Intel (this PC); the console's AMD Zen 2 answers vendor-specific encodings once M0 runs 32-bit code there",
+ "cpu_refused": "INT 80h, SYSENTER, SYSCALL, and SLDT/STR/SGDT/SIDT/SMSW (the kernel's UMIP emulation does not return under single-step: one process from an earlier run is stuck in the kernel until the PC reboots)",
+ "table_changes_from_the_cpu": [
+  "XGETBV takes no prefix",
+  "MOVBE/RDRAND/RDSEED are #UD with F2/F3 (NOREP)",
+  "MOV CS is #UD (MALFORMED)",
+  "UD2 carries UD",
+  "XBEGIN/XABORT removed (no RTM on Zen 2 or this PC)",
+  "hint NOPs 0F 0D/18-1F, ENDBR32, LAR/LSL/VERR/VERW, ADCX/ADOX, XSAVE family, x87 register aliases added"
+ ]
+}

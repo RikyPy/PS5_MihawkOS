@@ -1,0 +1,28 @@
+From: PS5_Proton
+Subject: [PATCH] server: keep unscoped IPv6 addresses unscoped on PS5
+
+The real interface-index implementation exposed an existing Linux-oriented
+bind translation: Wine adds the loopback interface index to ::1 even when
+Windows supplies scope zero. The previous missing-index implementation left
+it zero and both IPv6 loopback probes passed. Sony now rejects the scoped
+loopback address with WSAEADDRNOTAVAIL. Derive a default index only for
+link-local addresses; retain explicit scopes and other-host behavior. The
+unmodified paired traffic probes must confirm the diagnosis on the console.
+
+--- a/server/sock.c
++++ b/server/sock.c
+@@ -3075,7 +3075,13 @@
+             /* Windows allows specifying zero to use the default scope. Linux
+              * interprets it as an interface index and requires that it be
+              * nonzero. */
+-            if (!unix_addr.in6.sin6_scope_id)
++            if (!unix_addr.in6.sin6_scope_id
++#ifdef __PROSPERO__
++                /* An interface index is meaningful for link-local addresses.
++                 * Sony rejects the scope added to ordinary ::1 loopback. */
++                && IN6_IS_ADDR_LINKLOCAL( &unix_addr.in6.sin6_addr )
++#endif
++                )
+                 bind_addr.in6.sin6_scope_id = get_ipv6_interface_index( &unix_addr.in6.sin6_addr );
+ #endif
+         }

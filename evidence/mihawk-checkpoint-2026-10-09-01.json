@@ -1,0 +1,27 @@
+{
+ "passed": true,
+ "scope": "Shared runtime, persistent desktop session and managed appearance checkpoint",
+ "source_fingerprint": "dc021394024cd0186060e3c8e67d396e7ed9efd014691df7f705697e8bd2d36f",
+ "gate": "evidence/mihawk-gate-2026-10-09-01.json",
+ "gate_cases": 40,
+ "gate_seconds": 1369.5,
+ "fault_records": 0,
+ "protocol_errors": 0,
+ "host_suite_count": 41,
+ "appearance_checks_per_architecture": 1009,
+ "runtime_pixels": [
+  "Light and dark pane/icon pixels in PE32 and PE64",
+  "PE64 and PE32 child windows and actual Explorer C: window",
+  "Foreground retained-content overlap"
+ ],
+ "tls": "Strict HTTPS 200, trusted chain 0, unknown root 0x20, root/prefix/entry removed. No public internet required.",
+ "unqualified": [
+  "Full Windows 11 pixel parity",
+  "Cross-process HWND composition",
+  "Centered taskbar, Start and approved Explorer layout",
+  "Rounded clipping, shadows, blur and previews",
+  "Desktop appearance shortcut interaction"
+ ],
+ "earlier_failures_preserved": true,
+ "published": false
+}

@@ -1,0 +1,41 @@
+{
+ "run": "m0-2026-10-07-05",
+ "elf_sha256": "662468936e23143595d5c019794c060b3e2da6cfa0695f307d2120b83ca7f506",
+ "process": "payload through websrv/elfldr, no title running",
+ "modes": {
+  "fsguest": {
+   "lines": [
+    "M0 start mode=fsguest",
+    "M0 low_page at=10000000",
+    "M0 fsguest set=0 teb_self_read=0x10009000 want=0x10009000 restored=0 host_ok=1",
+    "M0 end"
+   ],
+   "ended": true
+  },
+  "sigpath": {
+   "lines": [
+    "M0 start mode=sigpath",
+    "M0 low_page at=10000000",
+    "M0 sigpath library=libkernel.sprx found=-1 handle=0",
+    "M0 sigpath library=libkernel_sys.sprx found=0 handle=1",
+    "M0 sigpath libkernel_sys.sprx sigaction=exported",
+    "M0 sigpath libkernel_sys.sprx _sigaction=exported",
+    "M0 sigpath libkernel_sys.sprx __sys_sigaction=absent",
+    "M0 sigpath libkernel_sys.sprx sigreturn=exported",
+    "M0 sigpath libkernel_sys.sprx __sys_sigreturn=absent",
+    "M0 sigpath libkernel_sys.sprx _sigreturn=absent",
+    "M0 sigpath libkernel_sys.sprx sysarch=exported",
+    "M0 sigpath libkernel_sys.sprx __sys_sysarch=absent",
+    "M0 sigpath libkernel_sys.sprx syscall=absent",
+    "M0 sigpath libkernel_sys.sprx __syscall=absent",
+    "M0 sigpath libkernel_sys.sprx sigaltstack=exported",
+    "M0 sigpath libkernel_sys.sprx __sys_sigaltstack=absent",
+    "M0 sigpath libkernel_sys.sprx _thr_sighandler=absent",
+    "M0 sigpath libkernel_sys.sprx thr_sighandler=absent",
+    "M0 sigpath library=libkernel_web.sprx found=-1 handle=0",
+    "M0 end"
+   ],
+   "ended": true
+  }
+ }
+}

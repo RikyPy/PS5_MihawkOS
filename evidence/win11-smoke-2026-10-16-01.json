@@ -1,0 +1,87 @@
+{
+  "battery": "win11-smoke-2026-10-16-01",
+  "expected_cases": [
+    "cursor-scheme64",
+    "theme-parts64",
+    "monospace64"
+  ],
+  "revision": "f3aa632b4a344d3e169a02d63e1895e648bea57e",
+  "dirty": true,
+  "cases": [
+    {
+      "case": "cursor-scheme64",
+      "run": "win11-smoke-2026-10-16-01-cursor-scheme64",
+      "runner_status": 0,
+      "seconds": 78.0,
+      "result": "finished",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "run_seconds": 28.0,
+      "launch_readiness": {
+        "ready": true,
+        "seconds": 0.241,
+        "settle_seconds": 0.0,
+        "census_seconds": 0.228,
+        "previous_cleanup_verified": false
+      },
+      "runner_overhead_seconds": 50.0,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 8,
+      "protocol_errors": 0
+    },
+    {
+      "case": "theme-parts64",
+      "run": "win11-smoke-2026-10-16-01-theme-parts64",
+      "runner_status": 0,
+      "seconds": 13.0,
+      "result": "finished",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "run_seconds": 12.3,
+      "launch_readiness": {
+        "ready": true,
+        "seconds": 0.16,
+        "settle_seconds": 0.0,
+        "census_seconds": 0.148,
+        "previous_cleanup_verified": true
+      },
+      "runner_overhead_seconds": 0.7,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 8,
+      "protocol_errors": 0
+    },
+    {
+      "case": "monospace64",
+      "run": "win11-smoke-2026-10-16-01-monospace64",
+      "runner_status": 0,
+      "seconds": 13.3,
+      "result": "exited",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "run_seconds": 12.7,
+      "launch_readiness": {
+        "ready": true,
+        "seconds": 0.144,
+        "settle_seconds": 0.0,
+        "census_seconds": 0.127,
+        "previous_cleanup_verified": true
+      },
+      "runner_overhead_seconds": 0.6,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 9,
+      "protocol_errors": 0
+    }
+  ],
+  "complete": true,
+  "seconds": 104.3,
+  "passed": true
+}

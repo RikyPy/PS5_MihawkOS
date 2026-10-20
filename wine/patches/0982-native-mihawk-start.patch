@@ -1,0 +1,35 @@
+Subject: [PATCH] explorer: use a native Start panel for Mihawk sessions
+
+Real local shortcuts and files use ShellExecuteEx; pins live in the user
+registry and recent files remain owned by the shell. Legacy sessions keep
+the upstream popup. Implementation is supplied from wine/ps5 at build time.
+
+diff --git a/programs/explorer/startmenu.c b/programs/explorer/startmenu.c
+--- a/programs/explorer/startmenu.c
++++ b/programs/explorer/startmenu.c
+@@ -27,6 +27,7 @@
+ #include "wine/list.h"
+ #include "explorer_private.h"
+ #include "resource.h"
++#include "pw_shell_style.h"
+ 
+ WINE_DEFAULT_DEBUG_CHANNEL(explorer);
+ 
+@@ -452,6 +453,8 @@
+     TPMPARAMS tpm;
+     WCHAR label[64];
+ 
++    if (pw_shell_enabled()) { pw_shell_start(hwnd); return; }
++
+     destroy_menus();
+ 
+     TRACE( "creating start menu\n" );
+diff --git a/programs/explorer/Makefile.in b/programs/explorer/Makefile.in
+--- a/programs/explorer/Makefile.in
++++ b/programs/explorer/Makefile.in
+@@ -10,4 +10,5 @@
+ 	explorer.c \
+ 	explorer.rc \
+ 	startmenu.c \
++	pw_shell_start.c \
+ 	systray.c

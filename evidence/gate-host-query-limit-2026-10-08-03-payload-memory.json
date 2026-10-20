@@ -1,0 +1,67 @@
+{
+ "run": "gate-host-query-limit-2026-10-08-03-payload-memory",
+ "what": "process-probe.exe",
+ "env": [
+  "PROTON_LAYOUT=launcher"
+ ],
+ "result": "finished",
+ "seconds": 8.2,
+ "probe_verdict": "PASS",
+ "clean_owner_restart": true,
+ "launcher_end_status": 0,
+ "initial_status": 0,
+ "closed_on_request": false,
+ "child_logs": [
+  "klog/gate-host-query-limit-2026-10-08-03-payload-memory-wine-child-368.log",
+  "klog/gate-host-query-limit-2026-10-08-03-payload-memory-wine-child-369.log",
+  "klog/gate-host-query-limit-2026-10-08-03-payload-memory-wine-child-370.log",
+  "klog/gate-host-query-limit-2026-10-08-03-payload-memory-wine-child-371.log",
+  "klog/gate-host-query-limit-2026-10-08-03-payload-memory-wine-child-372.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": true,
+ "bench": {},
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [],
+  "top": []
+ },
+ "shown": {
+  "frames": 0,
+  "per_10s": [],
+  "longest_gap_ms": 0
+ },
+ "broker": {
+  "local_offer": 8589934592,
+  "host_limit": 1073741824,
+  "refused": [],
+  "refused_count": 0,
+  "clients": [
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   }
+  ],
+  "host_peak": 0,
+  "local_peak": 0
+ }
+}

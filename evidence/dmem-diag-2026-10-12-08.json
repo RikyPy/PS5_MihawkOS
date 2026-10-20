@@ -1,0 +1,66 @@
+{
+ "telemetry_hold": null,
+ "launch_readiness": {
+  "ready": true,
+  "seconds": 0.147,
+  "settle_seconds": 0.0,
+  "census_seconds": 0.132,
+  "previous_cleanup_verified": true
+ },
+ "native_close_failures": [],
+ "run": "dmem-diag-2026-10-12-08",
+ "what": "C:\\windows\\system32\\mihawk.exe",
+ "env": [
+  "PROTON_LAYOUT=launcher",
+  "WINE_PS5_WINDOW_SURFACES=1"
+ ],
+ "result": "timed out",
+ "seconds": 221.7,
+ "probe_verdict": null,
+ "clean_owner_restart": false,
+ "launcher_end_status": null,
+ "initial_status": null,
+ "closed_on_request": false,
+ "child_logs": [],
+ "exit_stall": false,
+ "stop_requested": "no return before the watchdog",
+ "returned_to_launcher": false,
+ "passed": false,
+ "bench": {},
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [],
+  "top": []
+ },
+ "shown": {
+  "frames": 0,
+  "per_10s": [],
+  "longest_gap_ms": 0
+ },
+ "broker": {
+  "local_offer": null,
+  "host_limit": null,
+  "windows": null,
+  "refused": [],
+  "refused_count": 0,
+  "clients": [],
+  "wedged": false,
+  "failure_reasons": [],
+  "host_peak": null,
+  "local_peak": null
+ },
+ "pacing": null,
+ "captures": [],
+ "cleanup_verified": false,
+ "hooks_removed": false,
+ "semantics_passed": false,
+ "window_pixels": [],
+ "host_dmem": {
+  "made": 0,
+  "freed": 0,
+  "refused": 1,
+  "free_failed": 1,
+  "passed": false
+ }
+}

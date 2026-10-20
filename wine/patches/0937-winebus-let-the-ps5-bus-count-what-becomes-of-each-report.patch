@@ -1,0 +1,63 @@
+From df5a3e8304342b5be7ffca37f705bdc341682301 Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Tue, 6 Oct 2026 18:36:19 -0400
+Subject: [PATCH] winebus: let the PS5 bus count what becomes of each report
+
+A Windows program in a helper did not react to the DualSense in the runs
+without a +hid trace (three runs of 2026-10-06,
+record removed from the tree; in git history), and did with one: the
+trace hides the fault. To find where a press stops without changing the
+timing, the bus notes, through pw_wine_input_note in the helper's sink,
+each report it queues to Wine's HID stack, each it holds back while its
+device is not started, and each device it creates and removes. The helper's
+loader prints the counts every 10 s. An atomic increment per report.
+---
+ dlls/winebus.sys/bus_ps5.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/dlls/winebus.sys/bus_ps5.c b/dlls/winebus.sys/bus_ps5.c
+index abbb553..000968d 100644
+--- a/dlls/winebus.sys/bus_ps5.c
++++ b/dlls/winebus.sys/bus_ps5.c
+@@ -18,6 +18,9 @@ static struct ps5_device *device;
+ static int stopping;
+ static pthread_mutex_t device_lock = PTHREAD_MUTEX_INITIALIZER;
+ static int (*read_pad)(unsigned char *);
++/* The helper's count of what became of each report (pw_wine_input_note, wine/ps5/pw_wine_sink.h in PS5_Proton):
++ * queued 0, held back while the device is not started 1, device created 2, removed 3. */
++static void (*note)(int);
+ static struct list events = LIST_INIT(events);
+ 
+ /* USB report 1: six axes, counter, hat, 15 buttons and vendor payload.
+@@ -82,6 +85,7 @@ NTSTATUS ps5_bus_init(void *args)
+     thread_is_terminating = dlsym(RTLD_DEFAULT, "ps5_thread_is_terminating");
+     fprintf(stderr, "wine-ps5: bus thread %s ps5_thread_is_terminating\n", thread_is_terminating ? "found" : "has no");
+     read_pad = dlsym(RTLD_DEFAULT, "pw_wine_dualsense");
++    note = dlsym(RTLD_DEFAULT, "pw_wine_input_note");
+     return read_pad ? STATUS_SUCCESS : STATUS_NOT_SUPPORTED;
+ }
+ NTSTATUS ps5_bus_wait(void *args)
+@@ -108,14 +112,20 @@ NTSTATUS ps5_bus_wait(void *args)
+             if (!(device = raw_device_create(&vtbl, sizeof(*device))))
+             { pthread_mutex_unlock(&device_lock); return STATUS_NO_MEMORY; }
+             bus_event_queue_device_created(&events, &device->base, &desc);
++            if (note) note(2);
+         }
+         else if (!connected && device)
+         {
+             bus_event_queue_device_removed(&events, &device->base);
+             device = NULL; /* device_remove releases the bus ownership reference */
++            if (note) note(3);
+         }
+         else if (device && __atomic_load_n(&device->started, __ATOMIC_ACQUIRE))
++        {
+             bus_event_queue_input_report(&events, &device->base, report, sizeof(report));
++            if (note) note(0);
++        }
++        else if (device && note) note(1);
+         pthread_mutex_unlock(&device_lock);
+         if (bus_event_queue_pop(&events, event)) return STATUS_PENDING;
+     }
+-- 
+2.56.0
+

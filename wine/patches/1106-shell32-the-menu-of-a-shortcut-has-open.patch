@@ -1,0 +1,48 @@
+From: PS5_Proton <local>
+Subject: [PATCH] shell32: the menu of a shortcut has Open
+
+The item menu takes its verbs from the file type's "shell" key, and lnkfile has none (Windows opens a shortcut by itself), so the menu of every
+shortcut on the desktop had Cut, Copy, Create Link, Delete, Rename and Properties but no Open (desktop-items-2026-10-12-03, picture 1). A shortcut
+without verbs now gets Open, the default one; ShellExecuteEx resolves a .lnk whatever the registry says (a double click already did).
+---
+diff --git a/dlls/shell32/shlview_cmenu.c b/dlls/shell32/shlview_cmenu.c
+--- a/dlls/shell32/shlview_cmenu.c
++++ b/dlls/shell32/shlview_cmenu.c
+@@ -1260,7 +1260,7 @@
+     return wcsdup(verb);
+ }
+ 
+-static void build_verb_list(ContextMenu *menu)
++static void build_registry_verb_list(ContextMenu *menu)
+ {
+     HKEY type_key, shell_key;
+     size_t verb_capacity;
+@@ -1330,6 +1330,28 @@
+     RegCloseKey(type_key);
+ }
+ 
++/* A shortcut has no "shell" key in the registry (Windows' shell opens it by itself), so the menu of one had no Open: the desktop's
++ * shortcuts, the commonest thing on it, were offered Cut, Copy and Delete. Open is the shell's own verb for them: ShellExecuteEx resolves a
++ * .lnk whatever the registry says. */
++static void build_verb_list(ContextMenu *menu)
++{
++    build_registry_verb_list(menu);
++    if (menu->verb_count || !menu->cidl || wcscmp(menu->filetype, L"lnkfile")) return;
++
++    if (!(menu->verbs = malloc(sizeof(*menu->verbs)))) return;
++    menu->verbs[0].verb = wcsdup(L"open");
++    menu->verbs[0].desc = shell_get_resource_string(IDS_VERB_OPEN);
++    if (!menu->verbs[0].verb || !menu->verbs[0].desc)
++    {
++        free(menu->verbs[0].verb);
++        free(menu->verbs[0].desc);
++        free(menu->verbs);
++        menu->verbs = NULL;
++        return;
++    }
++    menu->verb_count = 1;
++}
++
+ HRESULT ItemMenu_Constructor(IShellFolder *parent, LPCITEMIDLIST pidl, const LPCITEMIDLIST *apidl, UINT cidl,
+     REFIID riid, void **pObj)
+ {

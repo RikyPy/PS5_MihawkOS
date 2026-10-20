@@ -1,0 +1,65 @@
+{
+  "run": "prefix-13",
+  "layout": "launcher",
+  "entry": "proton-prefix-test",
+  "package_sha256": "ec6af1ea0367d16dde6639a89a080a524cebc4d4bedfe00ed0cac4b865a918d8",
+  "probe_sha256": "3fc1925eacafa39ab63f2e2e066555af1b507dd23e3d589f6dbbf989200e560f",
+  "passed": true,
+  "deployed": true,
+  "runner_status": 0,
+  "result": "finished",
+  "probe_verdict": "PASS",
+  "seconds": 88.3,
+  "returned_to_launcher": true,
+  "probe_lines": [
+    "OpenSCManager answered (error 0)",
+    "msiexec exit code 0",
+    "msiexec installed the package: yes",
+    "services listed 22",
+    "system32 has its modules: yes",
+    "the installed program exit code 0",
+    "the installed program ran: yes",
+    "the package's program is in Program Files: yes",
+    "the registry names a Windows version: yes",
+    "the service control manager lists services: yes",
+    "the user's application data folder exists: yes"
+  ],
+  "probe_passed": true,
+  "helpers": [
+    "C:\\\\Program Files\\\\7-Zip\\\\7z.exe",
+    "C:\\\\windows\\\\mono\\\\mono-2.0\\\\support\\\\installinf-x86_64.exe",
+    "C:\\\\windows\\\\system32\\\\conhost.exe",
+    "C:\\\\windows\\\\system32\\\\control.exe",
+    "C:\\\\windows\\\\system32\\\\iexplore.exe",
+    "C:\\\\windows\\\\system32\\\\msiexec.exe",
+    "C:\\\\windows\\\\system32\\\\ntoskrnl.exe",
+    "C:\\\\windows\\\\system32\\\\plugplay.exe",
+    "C:\\\\windows\\\\system32\\\\rundll32.exe",
+    "C:\\\\windows\\\\system32\\\\services.exe",
+    "C:\\\\windows\\\\system32\\\\svchost.exe",
+    "C:\\\\windows\\\\system32\\\\wineboot.exe",
+    "C:\\\\windows\\\\system32\\\\winedevice.exe",
+    "C:\\\\windows\\\\system32\\\\winemenubuilder.exe",
+    "Z:\\\\data\\\\ps5proton\\\\games\\\\proton-prefix-test\\\\prefix-probe.exe"
+  ],
+  "prefix": {
+    "files": 3977,
+    "bytes": 573392710
+  },
+  "prefix_registry": [
+    "system.reg",
+    "user.reg",
+    "userdef.reg"
+  ],
+  "console_idle_before_removal": true,
+  "removed": {
+    "game": {
+      "files": 4,
+      "folders": 1
+    },
+    "prefix": {
+      "files": 3977,
+      "folders": 623
+    }
+  }
+}

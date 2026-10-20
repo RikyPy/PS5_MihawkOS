@@ -1,0 +1,33 @@
+From 1b3bf67d10ebb59dd2b44a877617838066c2eb24 Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Fri, 2 Oct 2026 21:00:19 -0400
+Subject: [PATCH] win32u: use the GPU quad for PS5 OpenGL presentation
+
+The SDK color blitter accepts only identical UNORM formats on its GPU path. Present the PS5 screen through the existing gamma shader, including its identity ramp, to avoid a full-screen software format conversion.
+---
+ dlls/win32u/opengl.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/dlls/win32u/opengl.c b/dlls/win32u/opengl.c
+index 3fc0893..7c8dd62 100644
+--- a/dlls/win32u/opengl.c
++++ b/dlls/win32u/opengl.c
+@@ -982,7 +982,14 @@ static void blit_framebuffer_surface( struct framebuffer_surface *surface )
+     /* the target default framebuffer should be swapped after. We are always presenting framebuffer's surface
+      * front while the color attachment textures are swapped on framebuffer surface swap before blit. */
+     funcs->p_glDrawBuffer( GL_BACK );
+-    if (surface->base.read_fbo == surface->base.draw_fbo && !needs_gamma)
++    if (surface->base.read_fbo == surface->base.draw_fbo && !needs_gamma
++#ifdef WINE_PS5_OPENGL
++        /* The SDK's format-converting blit falls back to a CPU pixel loop.
++         * Wine's existing textured quad keeps presentation on the GPU. */
++        && !(surface->target && surface->target->funcs == &ps5_screen_funcs &&
++             ctx->gamma_program && ctx->gamma_ramp)
++#endif
++       )
+     {
+         if (is_srgb_format( surface->internalformat ))
+             funcs->p_glEnable( GL_FRAMEBUFFER_SRGB );
+-- 
+2.55.0
+

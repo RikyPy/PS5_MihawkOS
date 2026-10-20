@@ -1,0 +1,16 @@
+{
+  "benchmark": "readiness-benchmark-2026-10-08-01",
+  "user_report": "Internet access for the console is blocked at router level.",
+  "review_policy": "User requests setting network failures aside for now; continue the battery and preserve measured results.",
+  "diagnostic_limit": "IPv6 loopback bind failure is local. Router WAN filtering alone is not established as its cause.",
+  "network_related_cases": [
+    "dnsapi32",
+    "dnsapi64",
+    "network-adapters32",
+    "network-adapters64",
+    "socket-options32",
+    "socket-options64",
+    "launcher-tls"
+  ],
+  "source_changed": false
+}

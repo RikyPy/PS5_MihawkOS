@@ -1,0 +1,150 @@
+From: PS5_Proton <local>
+Subject: [PATCH] explorer: File Explorer as the prototype draws it
+
+The approved Windows 11 prototype (PS5_Proton prototypes/windows11-shell) draws File Explorer as Windows 11 does: a
+48-pixel title bar of Mica Alt with the tab and the caption buttons, the address row, the command bar, the navigation
+pane, Home and the status bar. Wine's browser window with PS5_Proton's earlier decoration (patch 0983) had a classic
+caption, a combo box address bar and a row of text buttons. The drawing and the state live in PS5_Proton's
+pw_shell_explorer.h (wine/ps5), included here; this patch hands it the window:
+
+- Every message of a Mihawk Explorer window goes to pw_explorer_message first; the earlier per-message decoration is
+  gone. The window's state is one pointer (explorer_info.ui).
+- Without a folder on the command line Explorer starts on Home, as Windows 11's does, and browses nothing until asked.
+- The window's title is the location's name and " - File Explorer" (pw_explorer_title), not the bare name.
+- Ctrl+L, Alt+D, Alt+arrows and F5 go to the window wherever the focus is (pw_explorer_key).
+- update_path_box does nothing without a path box (the Mihawk window has none).
+- The browser control has no border (EBO_NOBORDER, set before IExplorerBrowser_Initialize, which decides it): the
+  prototype's items sit straight on the window.
+---
+diff --git a/programs/explorer/explorer.c b/programs/explorer/explorer.c
+index ba2bff4..46d81b2 100644
+--- a/programs/explorer/explorer.c
++++ b/programs/explorer/explorer.c
+@@ -71,12 +71,10 @@ typedef struct
+     IShellWindows *sw;
+     LONG sw_cookie;
+     BOOL mihawk;
+-    int mihawk_location;
+     struct pw_shell_style mihawk_style;
+-    HWND mihawk_nav[3], mihawk_commands[8], mihawk_links[7];
+     HMODULE mihawk_resources;
+-    HICON mihawk_icons[18], mihawk_small_icon, mihawk_large_icon;
+-    HIMAGELIST mihawk_icon_images;
++    HICON mihawk_small_icon, mihawk_large_icon;
++    struct pw_explorer *ui;
+ } explorer_info;
+ 
+ enum
+@@ -173,6 +171,7 @@ static void update_path_box(explorer_info *info)
+     LPITEMIDLIST desktop_pidl;
+     IEnumIDList *ids;
+ 
++    if (!info->path_box) return;
+     SendMessageW(info->path_box,CB_RESETCONTENT,0,0);
+     SHGetDesktopFolder(&desktop);
+     IShellFolder_QueryInterface(desktop,&IID_IPersistFolder2,(void**)&persist);
+@@ -300,7 +299,7 @@ static HRESULT WINAPI IExplorerBrowserEventsImpl_fnOnNavigationComplete(IExplore
+             hres = StrRetToStrW(&strret, child_pidl, &name);
+         if (SUCCEEDED(hres))
+         {
+-            SetWindowTextW(This->info->main_window, name);
++            if (!This->info->mihawk) SetWindowTextW(This->info->main_window, name);
+             CoTaskMemFree(name);
+         }
+ 
+@@ -486,8 +485,10 @@ static void make_explorer_window(parameters_struct *params)
+     fs.fFlags = FWF_AUTOARRANGE;
+ 
+     SetRect(&rect, 0, 0, default_width, default_height);
++    /* The browser decides its border when it is created. */
++    if (info->mihawk) IExplorerBrowser_SetOptions(info->browser, EBO_NOBORDER);
+     IExplorerBrowser_Initialize(info->browser,info->main_window,&rect,&fs);
+-    IExplorerBrowser_SetOptions(info->browser,info->mihawk ? 0 : EBO_SHOWFRAMES);
++    IExplorerBrowser_SetOptions(info->browser,info->mihawk ? EBO_NOBORDER : EBO_SHOWFRAMES);
+     SetWindowLongPtrW(info->main_window,EXPLORER_INFO_INDEX,(LONG_PTR)info);
+ 
+     if (info->mihawk) { pw_explorer_create(info); goto toolbar_done; }
+@@ -549,9 +550,12 @@ toolbar_done:
+     events = make_explorer_events(info);
+     IExplorerBrowser_Advise(info->browser,events,&info->advise_cookie);
+ 
+-    folder = get_starting_shell_folder(path);
+-    IExplorerBrowser_BrowseToObject(info->browser, (IUnknown *)folder, SBSP_ABSOLUTE);
+-    IShellFolder_Release(folder);
++    if (!info->mihawk || !pw_explorer_start(info, path))
++    {
++        folder = get_starting_shell_folder(path);
++        IExplorerBrowser_BrowseToObject(info->browser, (IUnknown *)folder, SBSP_ABSOLUTE);
++        IShellFolder_Release(folder);
++    }
+     free(path);
+ 
+     ShowWindow(info->main_window,SW_SHOWDEFAULT);
+@@ -560,14 +564,7 @@ toolbar_done:
+ 
+     while (GetMessageW(&msg, NULL, 0, 0))
+     {
+-        if (info->mihawk)
+-        {
+-            if (msg.message == WM_KEYDOWN && msg.wParam == 'L' && GetKeyState(VK_CONTROL) < 0)
+-            { HWND edit = (HWND)SendMessageW(info->path_box, CBEM_GETEDITCONTROL, 0, 0); SetFocus(edit); SendMessageW(edit, EM_SETSEL, 0, -1); continue; }
+-            /* The shell view owns Return/Escape, label editing and selection.
+-             * Only use dialog traversal for Tab between our native controls. */
+-            if (msg.message == WM_KEYDOWN && msg.wParam == VK_TAB && IsDialogMessageW(info->main_window, &msg)) continue;
+-        }
++        if (info->mihawk && pw_explorer_key(info, &msg)) continue;
+         TranslateMessage(&msg);
+         DispatchMessageW(&msg);
+     }
+@@ -729,6 +726,11 @@ static LRESULT CALLBACK explorer_wnd_proc(HWND hwnd, UINT uMsg, WPARAM wParam, L
+     TRACE( "(hwnd=%p,uMsg=%u,wParam=%Ix,lParam=%Ix)\n", hwnd, uMsg, wParam, lParam );
+     if(info)
+         browser = info->browser;
++    if (info && info->mihawk)
++    {
++        LRESULT result;
++        if (pw_explorer_message(info, hwnd, uMsg, wParam, lParam, &result)) return result;
++    }
+     switch(uMsg)
+     {
+     case WM_DESTROY:
+@@ -752,39 +754,7 @@ static LRESULT CALLBACK explorer_wnd_proc(HWND hwnd, UINT uMsg, WPARAM wParam, L
+         do_exit(wParam);
+     case WM_NOTIFY:
+         return explorer_on_notify(info,(NMHDR*)lParam);
+-    case WM_TIMER:
+-        if (info && info->mihawk && wParam == 0x4d45) pw_explorer_selection(info);
+-        break;
+-    case WM_SYSCOLORCHANGE:
+-        if (info && info->mihawk) pw_explorer_refresh(info);
+-        return DefWindowProcW(hwnd,uMsg,wParam,lParam);
+-    case WM_THEMECHANGED:
+-    case WM_SETTINGCHANGE:
+-        if (info && info->mihawk)
+-        { pw_shell_style_load(&info->mihawk_style); pw_explorer_icons(info); EnumChildWindows(hwnd, pw_shell_set_font, (LPARAM)info->mihawk_style.font); pw_explorer_refresh(info); }
+-        return DefWindowProcW(hwnd,uMsg,wParam,lParam);
+-    case WM_GETMINMAXINFO:
+-        if (info && info->mihawk) { ((MINMAXINFO *)lParam)->ptMinTrackSize.x = PW_APPEARANCE_EXPLORER_MIN_WIDTH; ((MINMAXINFO *)lParam)->ptMinTrackSize.y = PW_APPEARANCE_EXPLORER_MIN_HEIGHT; }
+-        break;
+-    case WM_DRAWITEM:
+-        if (info && info->mihawk) { pw_explorer_draw(info, (DRAWITEMSTRUCT *)lParam); return TRUE; }
+-        break;
+-    case WM_PAINT:
+-        if (info && info->mihawk)
+-        {
+-            PAINTSTRUCT paint; RECT r; HDC dc = BeginPaint(hwnd, &paint);
+-            GetClientRect(hwnd, &r); pw_shell_fill(dc, &paint.rcPaint, info->mihawk_style.surface);
+-            r.top = 95; r.bottom = 96; pw_shell_fill(dc, &r, info->mihawk_style.line);
+-            GetClientRect(hwnd, &r); r.left = 164; r.right = 165; r.top = 96; pw_shell_fill(dc, &r, info->mihawk_style.line);
+-            EndPaint(hwnd, &paint); return 0;
+-        }
+-        return DefWindowProcW(hwnd,uMsg,wParam,lParam);
+-    case WM_ERASEBKGND:
+-        if (info && info->mihawk) return 1;
+-        return DefWindowProcW(hwnd,uMsg,wParam,lParam);
+     case WM_COMMAND:
+-        if (info && info->mihawk && LOWORD(wParam) >= PW_EXPLORER_NAV && LOWORD(wParam) < PW_EXPLORER_LINK + 7)
+-        { pw_explorer_command(info, LOWORD(wParam)); break; }
+         if(HIWORD(wParam)==BN_CLICKED)
+         {
+             switch(LOWORD(wParam))

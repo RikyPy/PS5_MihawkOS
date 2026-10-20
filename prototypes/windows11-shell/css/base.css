@@ -1,0 +1,136 @@
+/* Base: font faces, resets, layers, materials and browser surfaces themed from tokens.
+   Owned by the foundation; surface modules add their own files and never restyle these. */
+
+@font-face { font-family: "Proton UI"; src: url("../../../themes/windows11/fonts/upstream/selawk.ttf") format("truetype"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Proton UI"; src: url("../../../themes/windows11/fonts/upstream/selawksl.ttf") format("truetype"); font-weight: 350; font-display: swap; }
+@font-face { font-family: "Proton UI"; src: url("../../../themes/windows11/fonts/upstream/selawkl.ttf") format("truetype"); font-weight: 300; font-display: swap; }
+@font-face { font-family: "Proton UI"; src: url("../../../themes/windows11/fonts/upstream/selawksb.ttf") format("truetype"); font-weight: 600; font-display: swap; }
+@font-face { font-family: "Proton UI"; src: url("../../../themes/windows11/fonts/upstream/selawkb.ttf") format("truetype"); font-weight: 700; font-display: swap; }
+/* Cascadia Mono (OFL, Microsoft, release v2407.24; assets/fonts/cascadia): Terminal's face, and Notepad's where Consolas is absent. */
+@font-face { font-family: "Cascadia Mono"; src: local("Cascadia Mono"), url("../assets/fonts/cascadia/CascadiaMono.woff2") format("woff2"); font-weight: 200 700; font-display: swap; }
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--wallpaper-fallback);
+  color: var(--TextFillColorPrimary);
+  font: var(--type-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: default;
+  touch-action: none;
+}
+
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: default; }
+img, svg { display: block; }
+[hidden] { display: none !important; }
+
+/* Text selection, caret and focus are part of the design (WinUI focus visual: 2 px outer,
+   1 px inner). */
+::selection { background: var(--AccentFillColorDefault); color: var(--TextOnAccent); }
+input, textarea { caret-color: var(--TextFillColorPrimary); user-select: text; -webkit-user-select: text; }
+:focus { outline: none; }
+:focus-visible {
+  outline: 2px solid var(--FocusStrokeColorOuter);
+  outline-offset: 1px;
+  box-shadow: 0 0 0 1px var(--FocusStrokeColorInner) inset;
+}
+
+/* Windows 11 overlay scrollbars: thin at rest, wider on hover. */
+* { scrollbar-width: thin; scrollbar-color: var(--ControlStrongFillColorDefault) transparent; }
+::-webkit-scrollbar { width: 12px; height: 12px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--ControlStrongFillColorDefault);
+  border: 4px solid transparent;
+  border-radius: 6px;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover { border-width: 3px; }
+
+.icon { display: inline-flex; align-items: center; justify-content: center; flex: none; color: inherit; }
+.icon svg, .icon img { width: 100%; height: 100%; }
+.icon-missing { outline: 1px dashed var(--SystemFillColorCritical); }
+
+/* Layers, bottom to top. Every module mounts into its layer; nothing else sets z-index
+   across layers. */
+#wallpaper { position: fixed; inset: 0; z-index: 0; background: var(--wallpaper, var(--wallpaper-fallback)); transition: background var(--dur-normal) var(--ease-in); }
+/* --taskbar-reserve: the strip the work area leaves for the taskbar (the taskbar sets it to 0 when it auto-hides). */
+#desktop   { position: fixed; inset: 0 0 var(--taskbar-reserve, var(--taskbar-height)) 0; z-index: 1; }
+#windows   { position: fixed; inset: 0 0 var(--taskbar-reserve, var(--taskbar-height)) 0; z-index: 2; pointer-events: none; }
+#windows > * { pointer-events: auto; }
+#taskbar   { position: fixed; left: 0; right: 0; bottom: 0; height: var(--taskbar-height); z-index: 3; }
+#flyouts   { position: fixed; inset: 0; z-index: 4; pointer-events: none; }
+#overlays  { position: fixed; inset: 0; z-index: 5; pointer-events: none; }
+#menus     { position: fixed; inset: 0; z-index: 6; pointer-events: none; }
+#tooltips  { position: fixed; inset: 0; z-index: 7; pointer-events: none; }
+#flyouts > *, #overlays > *, #menus > * { pointer-events: auto; }
+
+/* Materials. Use these classes rather than re-deriving the recipes.
+   Mica, top to bottom: tint, luminosity layer (keeps the blurred wallpaper's hue, replaces its
+   lightness), blurred wallpaper. */
+.mica {
+  background:
+    linear-gradient(var(--mica-tint), var(--mica-tint)),
+    linear-gradient(var(--mica-luminosity), var(--mica-luminosity)),
+    var(--mica-image, var(--wallpaper-fallback)) center / cover fixed;
+  background-blend-mode: normal, luminosity, normal;
+}
+.mica-alt {
+  background:
+    linear-gradient(var(--mica-alt-tint), var(--mica-alt-tint)),
+    linear-gradient(var(--mica-alt-luminosity), var(--mica-alt-luminosity)),
+    var(--mica-image, var(--wallpaper-fallback)) center / cover fixed;
+  background-blend-mode: normal, luminosity, normal;
+}
+.acrylic {
+  position: relative;
+  background-color: var(--acrylic-default);
+  -webkit-backdrop-filter: var(--acrylic-blur);
+  backdrop-filter: var(--acrylic-blur);
+}
+.acrylic-base {
+  position: relative;
+  background-color: var(--acrylic-base);
+  -webkit-backdrop-filter: var(--acrylic-blur);
+  backdrop-filter: var(--acrylic-blur);
+}
+.acrylic::before, .acrylic-base::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--noise);
+  opacity: var(--acrylic-noise-opacity);
+  pointer-events: none;
+  mix-blend-mode: overlay;
+}
+/* Settings > Personalization > Colors > Transparency effects: off makes materials solid. */
+[data-transparency="off"] .acrylic { background-color: var(--SolidBackgroundFillColorQuarternary); backdrop-filter: none; -webkit-backdrop-filter: none; }
+[data-transparency="off"] .acrylic-base { background-color: var(--SolidBackgroundFillColorBase); backdrop-filter: none; -webkit-backdrop-filter: none; }
+[data-transparency="off"] .mica, [data-transparency="off"] .mica-alt { background: var(--mica-inactive); }
+
+/* Flyout surface: acrylic, 8 px radius, flyout stroke and elevation 32. */
+.surface-flyout {
+  border-radius: var(--radius-overlay);
+  border: 1px solid var(--SurfaceStrokeColorFlyout);
+  box-shadow: var(--shadow-flyout);
+  background-clip: padding-box;
+}
+
+/* Animation effects off: every surface lands in its final state at once (no delayed pop-in). */
+[data-animations="off"] *, [data-animations="off"] *::before, [data-animations="off"] *::after {
+  transition-duration: 0ms !important;
+  transition-delay: 0ms !important;
+  animation-duration: 0ms !important;
+  animation-delay: 0ms !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 0ms !important; transition-delay: 0ms !important; animation-duration: 0ms !important; animation-delay: 0ms !important; }
+}

@@ -1,0 +1,288 @@
+{
+ "thread": {
+  "console_result": "finished",
+  "context": {
+   "arch": "x86_64",
+   "batch_header_sha256": "29b29d960f4c6cb1517812814c85353c99197bbeb068470d44d62fefefbf3dd1",
+   "test_sha256": "c2e71af335ea435cb969d1436290b45cde8717d46a6e5f1696ca70e80cb8d936",
+   "wine_revision": "7e893751d256bfe062fd1d159375f024dedfa696"
+  },
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "run": "wt-x86_64-ntdll-batch-1791425168256790268",
+  "seconds": 28.5,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 49,
+   "todo": 0
+  },
+  "todo_lines": 0
+ },
+ "virtual": {
+  "console_result": "finished",
+  "context": {
+   "arch": "x86_64",
+   "batch_header_sha256": "29b29d960f4c6cb1517812814c85353c99197bbeb068470d44d62fefefbf3dd1",
+   "test_sha256": "c2e71af335ea435cb969d1436290b45cde8717d46a6e5f1696ca70e80cb8d936",
+   "wine_revision": "7e893751d256bfe062fd1d159375f024dedfa696"
+  },
+  "failure_count": 47,
+  "failures": [
+   {
+    "file": "virtual.c",
+    "line": 445,
+    "text": "Unexpected count 4."
+   },
+   {
+    "file": "virtual.c",
+    "line": 446,
+    "text": "Unexpected address 0000001001600000."
+   },
+   {
+    "file": "virtual.c",
+    "line": 2547,
+    "text": "Unexpected status c0000018."
+   },
+   {
+    "file": "virtual.c",
+    "line": 2550,
+    "text": "Unexpected size 0000000000000FFF."
+   },
+   {
+    "file": "virtual.c",
+    "line": 2551,
+    "text": "Got addr 0000001001621001, addr1 0000001001620000."
+   },
+   {
+    "file": "virtual.c",
+    "line": 2556,
+    "text": "Unexpected status c0000018."
+   },
+   {
+    "file": "virtual.c",
+    "line": 2558,
+    "text": "Unexpected size 0000000000000FFF."
+   },
+   {
+    "file": "virtual.c",
+    "line": 2559,
+    "text": "Got addr 0000001001620001, addr1 0000001001620000."
+   },
+   {
+    "file": "virtual.c",
+    "line": 2564,
+    "text": "Unexpected status c0000018."
+   },
+   {
+    "file": "virtual.c",
+    "line": 2570,
+    "text": "Unexpected status 00000000."
+   },
+   {
+    "file": "virtual.c",
+    "line": 2574,
+    "text": "Unexpected status 00000000."
+   },
+   {
+    "file": "virtual.c",
+    "line": 2589,
+    "text": "Unexpected status c00000a0."
+   },
+   {
+    "file": "virtual.c",
+    "line": 2593,
+    "text": "Unexpected status c00000a0."
+   },
+   {
+    "file": "virtual.c",
+    "line": 1078,
+    "text": "unexpected guard_size 4000, expected 1000, 2000 or 3000"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1125,
+    "text": "unexpected guard_size 4000, expected 1000, 2000 or 3000"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1187,
+    "text": "unexpected RegionSize 2000, expected 4000"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1234,
+    "text": "unexpected RegionSize 2000, expected 1000"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1078,
+    "text": "unexpected guard_size 4000, expected 1000, 2000 or 3000"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1125,
+    "text": "unexpected guard_size 4000, expected 1000, 2000 or 3000"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1187,
+    "text": "unexpected RegionSize 2000, expected 4000"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1234,
+    "text": "unexpected RegionSize 2000, expected 1000"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1078,
+    "text": "unexpected guard_size 4000, expected 1000, 2000 or 3000"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1078,
+    "text": "unexpected guard_size 4000, expected 1000, 2000 or 3000"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1078,
+    "text": "unexpected guard_size 4000, expected 1000, 2000 or 3000"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1078,
+    "text": "unexpected guard_size 4000, expected 1000, 2000 or 3000"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1078,
+    "text": "unexpected guard_size 4000, expected 1000, 2000 or 3000"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1078,
+    "text": "unexpected guard_size 4000, expected 1000, 2000 or 3000"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1078,
+    "text": "unexpected guard_size 4000, expected 1000, 2000 or 3000"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1078,
+    "text": "unexpected guard_size 4000, expected 1000, 2000 or 3000"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1078,
+    "text": "unexpected guard_size 4000, expected 1000, 2000 or 3000"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1078,
+    "text": "unexpected guard_size 4000, expected 1000, 2000 or 3000"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1078,
+    "text": "unexpected guard_size 4000, expected 1000, 2000 or 3000"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1078,
+    "text": "unexpected guard_size 4000, expected 1000, 2000 or 3000"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1078,
+    "text": "unexpected guard_size 4000, expected 1000, 2000 or 3000"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1078,
+    "text": "unexpected guard_size 4000, expected 1000, 2000 or 3000"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1078,
+    "text": "unexpected guard_size 4000, expected 1000, 2000 or 3000"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1078,
+    "text": "unexpected guard_size 4000, expected 1000, 2000 or 3000"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1078,
+    "text": "unexpected guard_size 4000, expected 1000, 2000 or 3000"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1078,
+    "text": "unexpected guard_size 4000, expected 1000, 2000 or 3000"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1078,
+    "text": "unexpected guard_size 4000, expected 1000, 2000 or 3000"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1078,
+    "text": "unexpected guard_size 4000, expected 1000, 2000 or 3000"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1078,
+    "text": "unexpected guard_size 4000, expected 1000, 2000 or 3000"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1078,
+    "text": "unexpected guard_size 4000, expected 1000, 2000 or 3000"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1729,
+    "text": "ReadProcessMemory failed"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1730,
+    "text": "ReadProcessMemory didn't read all data (0)"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1734,
+    "text": "ReadProcessMemory failed"
+   },
+   {
+    "file": "virtual.c",
+    "line": 1735,
+    "text": "ReadProcessMemory didn't read all data (0)"
+   }
+  ],
+  "guarded": null,
+  "last_line": "winetest-batch: end virtual 49",
+  "run": "wt-x86_64-ntdll-batch-1791425168256790268",
+  "seconds": 28.5,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 49,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 2498,
+   "todo": 110
+  },
+  "todo_lines": 110
+ }
+}

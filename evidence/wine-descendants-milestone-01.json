@@ -1,0 +1,253 @@
+{
+  "scope": "Experimental headless PE64 descendants through the original owning title and shared wineserver",
+  "protocol": "0x50573502",
+  "session_gate": "WINE_PS5_CHILDREN=1",
+  "windows_environment_gate": "WINE_PS5_DESCENDANTS=1",
+  "console_cases": [
+    {
+      "run": "wine-descendants-chain-01",
+      "passed": true,
+      "native_children": 4,
+      "native_deletions": 4,
+      "post_launch_fault_records": 0,
+      "windows_handles": [
+        {
+          "before": 12,
+          "after": 12
+        }
+      ],
+      "broker_requests": 2,
+      "descendant_node_verdicts": 3,
+      "runtime": {
+        "ntdll": "562b9f4b74cfe0e33d99f0ae59ad39d2c2d2bf71dcd5217b3ef6db3b457365f6",
+        "wineserver": "9dc0637c4ba021ecacd43fc1f299c9842846f41d661bb6386e7b1dfbb7b3471d"
+      }
+    },
+    {
+      "run": "wine-descendants-parent-exit-01",
+      "passed": true,
+      "native_children": 4,
+      "native_deletions": 4,
+      "post_launch_fault_records": 0,
+      "windows_handles": [
+        {
+          "before": 12,
+          "after": 12
+        }
+      ],
+      "broker_requests": 2,
+      "descendant_node_verdicts": 3,
+      "runtime": {
+        "ntdll": "df1e9c5aaa0d99ac2d517d6daba0f2c2af9e59b75ff44e7d2aa954d0950d4c7f",
+        "wineserver": "9dc0637c4ba021ecacd43fc1f299c9842846f41d661bb6386e7b1dfbb7b3471d"
+      }
+    },
+    {
+      "run": "wine-descendants-repeat-01",
+      "passed": true,
+      "native_children": 13,
+      "native_deletions": 13,
+      "post_launch_fault_records": 0,
+      "windows_handles": [
+        {
+          "before": 12,
+          "after": 12
+        },
+        {
+          "before": 14,
+          "after": 14
+        },
+        {
+          "before": 14,
+          "after": 14
+        },
+        {
+          "before": 14,
+          "after": 14
+        }
+      ],
+      "broker_requests": 8,
+      "descendant_node_verdicts": 12,
+      "runtime": {
+        "ntdll": "df1e9c5aaa0d99ac2d517d6daba0f2c2af9e59b75ff44e7d2aa954d0950d4c7f",
+        "wineserver": "9dc0637c4ba021ecacd43fc1f299c9842846f41d661bb6386e7b1dfbb7b3471d"
+      }
+    },
+    {
+      "run": "wine-broker-basic-01",
+      "passed": true,
+      "native_children": 2,
+      "native_deletions": 2,
+      "post_launch_fault_records": 0,
+      "windows_handles": [
+        {
+          "before": 12,
+          "after": 14
+        },
+        {
+          "before": 14,
+          "after": 14
+        }
+      ],
+      "broker_requests": 0,
+      "descendant_node_verdicts": null,
+      "runtime": {
+        "ntdll": "df1e9c5aaa0d99ac2d517d6daba0f2c2af9e59b75ff44e7d2aa954d0950d4c7f",
+        "wineserver": "9dc0637c4ba021ecacd43fc1f299c9842846f41d661bb6386e7b1dfbb7b3471d"
+      }
+    },
+    {
+      "run": "wine-broker-suspended-01",
+      "passed": true,
+      "native_children": 2,
+      "native_deletions": 2,
+      "post_launch_fault_records": 0,
+      "windows_handles": [
+        {
+          "before": 12,
+          "after": 14
+        },
+        {
+          "before": 14,
+          "after": 14
+        }
+      ],
+      "broker_requests": 0,
+      "descendant_node_verdicts": null,
+      "runtime": {
+        "ntdll": "df1e9c5aaa0d99ac2d517d6daba0f2c2af9e59b75ff44e7d2aa954d0950d4c7f",
+        "wineserver": "9dc0637c4ba021ecacd43fc1f299c9842846f41d661bb6386e7b1dfbb7b3471d"
+      }
+    },
+    {
+      "run": "wine-broker-terminate-01",
+      "passed": true,
+      "native_children": 2,
+      "native_deletions": 2,
+      "post_launch_fault_records": 0,
+      "windows_handles": [
+        {
+          "before": 12,
+          "after": 14
+        },
+        {
+          "before": 14,
+          "after": 14
+        }
+      ],
+      "broker_requests": 0,
+      "descendant_node_verdicts": null,
+      "runtime": {
+        "ntdll": "df1e9c5aaa0d99ac2d517d6daba0f2c2af9e59b75ff44e7d2aa954d0950d4c7f",
+        "wineserver": "9dc0637c4ba021ecacd43fc1f299c9842846f41d661bb6386e7b1dfbb7b3471d"
+      }
+    },
+    {
+      "run": "wine-broker-repeat-01",
+      "passed": true,
+      "native_children": 5,
+      "native_deletions": 5,
+      "post_launch_fault_records": 0,
+      "windows_handles": [
+        {
+          "before": 12,
+          "after": 14
+        },
+        {
+          "before": 14,
+          "after": 14
+        },
+        {
+          "before": 14,
+          "after": 14
+        },
+        {
+          "before": 14,
+          "after": 14
+        },
+        {
+          "before": 14,
+          "after": 14
+        }
+      ],
+      "broker_requests": 0,
+      "descendant_node_verdicts": null,
+      "runtime": {
+        "ntdll": "df1e9c5aaa0d99ac2d517d6daba0f2c2af9e59b75ff44e7d2aa954d0950d4c7f",
+        "wineserver": "9dc0637c4ba021ecacd43fc1f299c9842846f41d661bb6386e7b1dfbb7b3471d"
+      }
+    },
+    {
+      "run": "wine-broker-parent-exit-01",
+      "passed": true,
+      "native_children": 2,
+      "native_deletions": 2,
+      "post_launch_fault_records": 0,
+      "windows_handles": [],
+      "broker_requests": 0,
+      "descendant_node_verdicts": null,
+      "runtime": {
+        "ntdll": "df1e9c5aaa0d99ac2d517d6daba0f2c2af9e59b75ff44e7d2aa954d0950d4c7f",
+        "wineserver": "9dc0637c4ba021ecacd43fc1f299c9842846f41d661bb6386e7b1dfbb7b3471d"
+      }
+    },
+    {
+      "run": "wine-broker-disabled-01",
+      "passed": true,
+      "native_children": 0,
+      "native_deletions": 0,
+      "post_launch_fault_records": 0,
+      "windows_handles": [
+        {
+          "before": 11,
+          "after": 11
+        },
+        {
+          "before": 13,
+          "after": 13
+        },
+        {
+          "before": 13,
+          "after": 13
+        },
+        {
+          "before": 13,
+          "after": 13
+        }
+      ],
+      "broker_requests": 0,
+      "descendant_node_verdicts": null,
+      "runtime": {
+        "ntdll": "df1e9c5aaa0d99ac2d517d6daba0f2c2af9e59b75ff44e7d2aa954d0950d4c7f",
+        "wineserver": "9dc0637c4ba021ecacd43fc1f299c9842846f41d661bb6386e7b1dfbb7b3471d"
+      }
+    }
+  ],
+  "host_baseline": "process-host-descendants-regression-02.json",
+  "host_cases_passed": 8,
+  "transport_and_thread_tests": "2 passed with AddressSanitizer and UndefinedBehaviorSanitizer; LeakSanitizer disabled",
+  "restored_launcher": "wine-broker-restored-launcher-01.json",
+  "restored_launcher_frames": 120,
+  "restored_launcher_fps": 59.9,
+  "production_restored": true,
+  "passed": true,
+  "source_sha256": {
+    "wine/ps5/pw_wine_process.c": "b4c1f1d67ab3239a8b2f0823ec81e3df6a4f13909684d16e00a1e9cdc05541bf",
+    "wine/ps5/pw_wine_process.h": "afe017fb1959c887f692e8e8f25e1e3b5fd04cf6cbf928b4aa94f0db80bc84ce",
+    "wine/ps5/pw_wine_process_io.c": "5060d9d84fb8b0fab0d2b1641137cfdde0344f8c87afcca4a21928bd23fb2c0c",
+    "wine/ps5/pw_wine_process_io.h": "a6c2199190bd802205bca32dffc67f1f3e1a440c8b3f9f7f7662fa80d049c1dc",
+    "wine/patches/0926-ntdll-ps5-broker-descendant-spawning.patch": "57fb947935f4178616a4ce3faeb753acd370fa737d691a86bf73d18c0322713f",
+    "tests/process-probe.c": "1eeb1df1ec90ac9768a696651e76d87b9d199be18978b26909b08014986575f1"
+  },
+  "not_proven": [
+    "Child graphics/audio/input",
+    "Concurrent descendant requests and saturation",
+    "Fault-injected timeout/cancellation cleanup",
+    "General Wine/Proton process conformance"
+  ],
+  "notes": [
+    "Initial chain predates final errno-preservation fix; subsequent descendant and regression runs use final adapter.",
+    "Host regression attempt 01 failed before PE startup because sandbox denied a Unix socket; retained as evidence.",
+    "No new spawning payload; existing elevated-title/kstuff/owned-root service setup used."
+  ]
+}

@@ -1,0 +1,120 @@
+From: PS5_Proton <local>
+Subject: [PATCH] ntdll: PS5: no wired memory, no unmapped pool chunk, and the client library's protection through Wine
+
+The console hung tearing down memory Wine did not make wired, inside space Wine held ("unwire timeout at 0xc80000000",
+late-library 2026-10-15; the earlier emulator experiment (removed) 2026-10-13/14). An audit of every host memory call a helper makes found three more ways
+Wine could wire memory, unmap a bare reservation of GiBs, or change protection behind the direct-memory engine:
+
+NtLockVirtualMemory wired the range with mlock. The engine later lays a reservation over its runs, converts them to JIT
+memory or unmaps them, none of which unlocks first, and a lock reaches a GPU mapping placed in the range too. On PS5 it
+returns success without wiring (direct memory is never paged out; VirtualLock only pins), and NtUnlockVirtualMemory
+unwires nothing.
+
+The address pool's give-back unmapped its chunk, max(16 MiB, the size asked), for map_view's own retry: a bare
+reservation of GiBs could be unmapped after the GPU had started. It is kept reserved now, as every release inside the
+engine is (patch 1128), and map_view's search takes it as a reserved area. Only the pool that could not be made a view at
+virtual_init is still unmapped.
+
+MEM_RESET called madvise(MADV_DONTNEED), whose effect on direct memory, JIT memory or a GPU mapping in the view is not
+measured; it keeps the pages (MEM_RESET only allows discarding them). the client library's trampoline setup changed the
+protection of the client library's .text with the kernel's mprotect, behind the engine and Wine's host-protection cache, and
+asked execute, which a payload's kernel drops: it goes through NtProtectVirtualMemory.
+
+Host: tests/test_crash_replays.c runs the pool give-back and the lock against tests/fake_ps5_kernel.c with the real
+engine (no unmap of the chunk, no wired run torn down). Console: not run.
+---
+diff --git a/dlls/ntdll/unix/loader.c b/dlls/ntdll/unix/loader.c
+index c33d15f..52690ae 100644
+--- a/dlls/ntdll/unix/loader.c
++++ b/dlls/ntdll/unix/loader.c
+@@ -1360,8 +1360,19 @@ static NTSTATUS steamclient_setup_trampolines( void *args )
+         if (memcmp(src_sec[i].Name, ".text", 5)) continue;
+         addr = (void *)(((UINT_PTR)src_mod + src_sec[i].VirtualAddress) & ~page_mask);
+         size = (src_sec[i].Misc.VirtualSize + page_mask) & ~page_mask;
++#ifdef __PROSPERO__
++        {
++            /* Through Wine's own protection change, never the kernel's directly: the direct-memory engine and Wine's
++             * host-protection cache follow it, and execute comes from JIT memory at the first execute (a payload's
++             * kernel drops it from mprotect, exec-grant-measure-2026-10-14-01). */
++            ULONG old;
++            NtProtectVirtualMemory( NtCurrentProcess(), &addr, &size,
++                                    noexec_cached ? PAGE_READONLY : PAGE_EXECUTE_READWRITE, &old );
++        }
++#else
+         if (noexec_cached) mprotect(addr, size, PROT_READ);
+         else mprotect(addr, size, PROT_READ|PROT_WRITE|PROT_EXEC);
++#endif
+     }
+ 
+     src_exp = get_module_data_dir( src_mod, IMAGE_FILE_EXPORT_DIRECTORY, NULL );
+diff --git a/dlls/ntdll/unix/virtual.c b/dlls/ntdll/unix/virtual.c
+index 2db805e..5aa9474 100644
+--- a/dlls/ntdll/unix/virtual.c
++++ b/dlls/ntdll/unix/virtual.c
+@@ -2185,7 +2185,7 @@ static void remove_reserved_area( void *addr, size_t size )
+ 
+ 
+ #ifdef __PROSPERO__
+-/* Set while the address pool gives a chunk back: that one is unmapped, for the system's own mappings. */
++/* Set while the address pool is given back whole because it could not be made a view (virtual_init): unmapped. */
+ static BOOL ps5_release_to_system;
+ #endif
+ 
+@@ -3178,7 +3178,9 @@ static BOOL ps5_pool_release( const void *start, const void *end, size_t size, s
+     if (reports++ < 16)
+         fprintf( stderr, "wine-ps5: address pool gives %#lx bytes at %p for a %#lx byte allocation (%#lx bytes left)\n",
+                  (unsigned long)chunk, view->base, (unsigned long)size, (unsigned long)(view->size - chunk) );
+-    ps5_release_to_system = TRUE;
++    /* Kept reserved, as every release inside the engine (unmap_area): the chunk is for map_view's own search, which
++     * takes it as a reserved area. It is the size asked for when that is larger than 16 MiB, and unmapping a bare
++     * reservation of GiBs once the GPU has started is what hung the console ("unwire timeout at 0xc80000000"). */
+     if (chunk == view->size) delete_view( view );
+     else
+     {
+@@ -3186,7 +3188,6 @@ static BOOL ps5_pool_release( const void *start, const void *end, size_t size, s
+         set_page_vprot( view->base, chunk, 0 );
+         remove_pages_from_view( view, view->base, chunk );
+     }
+-    ps5_release_to_system = FALSE;
+     return TRUE;
+ }
+ 
+@@ -6731,7 +6732,12 @@ static NTSTATUS allocate_virtual_memory( void **ret, SIZE_T *size_ptr, ULONG typ
+     else if (type & MEM_RESET)
+     {
+         if (!(view = find_view( base, size ))) status = STATUS_NOT_MAPPED_VIEW;
++#ifdef __PROSPERO__
++        /* MEM_RESET only allows the system to discard the pages. What the console's madvise does to direct memory,
++         * JIT memory or a GPU mapping placed in the view is not measured, so the pages are kept. */
++#else
+         else madvise( base, size, MADV_DONTNEED );
++#endif
+     }
+     else  /* commit the pages */
+     {
+@@ -7958,8 +7964,14 @@ NTSTATUS WINAPI NtLockVirtualMemory( HANDLE process, PVOID *addr, SIZE_T *size,
+     *size = ROUND_SIZE( *addr, *size, page_mask );
+     *addr = ROUND_ADDR( *addr, page_mask );
+ 
++#ifdef __PROSPERO__
++    /* Not wired: the direct-memory engine lays reservations over its runs, converts them to JIT memory and unmaps them
++     * without unlocking, and a lock reaches a GPU mapping placed in the range too; tearing down wired memory is what
++     * hung the console ("unwire timeout"). Direct memory is never paged out, and VirtualLock only pins pages. */
++#else
+     if (mlock( ROUND_ADDR( *addr, host_page_mask ), ROUND_SIZE( *addr, *size, host_page_mask ) ))
+         status = STATUS_ACCESS_DENIED;
++#endif
+     return status;
+ }
+ 
+@@ -7996,8 +8008,10 @@ NTSTATUS WINAPI NtUnlockVirtualMemory( HANDLE process, PVOID *addr, SIZE_T *size
+     *size = ROUND_SIZE( *addr, *size, page_mask );
+     *addr = ROUND_ADDR( *addr, page_mask );
+ 
++#ifndef __PROSPERO__  /* nothing was wired (NtLockVirtualMemory) */
+     if (munlock( ROUND_ADDR( *addr, host_page_mask ), ROUND_SIZE( *addr, *size, host_page_mask ) ))
+         status = STATUS_ACCESS_DENIED;
++#endif
+     return status;
+ }
+ 

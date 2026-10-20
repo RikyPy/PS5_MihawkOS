@@ -1,0 +1,21 @@
+{
+ "run": "wt-ntdll-sync",
+ "what": "ntdll_test.exe",
+ "env": [
+  "WINEDEBUG=err+all"
+ ],
+ "result": "finished",
+ "seconds": 5.4,
+ "probe_verdict": null,
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": true,
+ "bench": {},
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [],
+  "top": []
+ }
+}

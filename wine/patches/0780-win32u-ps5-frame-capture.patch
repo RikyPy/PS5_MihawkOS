@@ -1,0 +1,193 @@
+From 002a7c414330b0cb413c2b7f3bdb2c55ac097b0f Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Fri, 2 Oct 2026 20:12:35 -0400
+Subject: [PATCH] Add opt-in PS5 swapchain readback for rendering evidence
+
+Request a PPM capture with WINE_PS5_CAPTURE and a .request sidecar. Allocate transfer-source usage only for supported surfaces when opted in. Synchronize through present semaphores and a fence, restore the presentation layout, and preserve ordinary frames. Capture only single-swapchain RGBA/BGRA8 frames up to 4K. Console validation pending. SPDX-License-Identifier: LGPL-2.1-or-later
+---
+ dlls/win32u/vulkan.c | 148 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 148 insertions(+)
+
+diff --git a/dlls/win32u/vulkan.c b/dlls/win32u/vulkan.c
+index 7ee5d44..2cbd02c 100644
+--- a/dlls/win32u/vulkan.c
++++ b/dlls/win32u/vulkan.c
+@@ -190,6 +190,12 @@ struct swapchain
+     struct surface *surface;
+     VkExtent2D extents;
+ 
++#ifdef __PROSPERO__
++    VkExtent2D capture_extent;
++    VkFormat capture_format;
++    BOOL capture_enabled;
++#endif
++
+     /* fs hack data below */
+     UINT fshack_dpi;
+     VkExtent2D host_extents;
+@@ -3136,6 +3142,16 @@ static VkResult win32u_vkCreateSwapchainKHR( VkDevice client_device, const VkSwa
+                    create_info_host.imageFormat );
+     }
+ 
++#ifdef __PROSPERO__
++    if (getenv( "WINE_PS5_CAPTURE" ) && (capabilities.supportedUsageFlags & VK_IMAGE_USAGE_TRANSFER_SRC_BIT))
++    {
++        create_info_host.imageUsage |= VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
++        swapchain->capture_enabled = TRUE;
++        swapchain->capture_extent = create_info_host.imageExtent;
++        swapchain->capture_format = create_info_host.imageFormat;
++    }
++#endif
++
+     if ((res = device->p_vkCreateSwapchainKHR( device->host.device, &create_info_host, NULL, &host_swapchain )))
+     {
+         free( swapchain );
+@@ -3444,6 +3460,134 @@ static VkResult record_compute_cmd( struct vulkan_device *device, struct swapcha
+     return VK_SUCCESS;
+ }
+ 
++#ifdef __PROSPERO__
++/* Diagnostic readback requested by <WINE_PS5_CAPTURE>.request. This consumes
++ * the present semaphores in a copy submission and waits for its fence before
++ * presenting without waits. Normal frames never submit extra work. */
++static void ps5_capture_frame( struct vulkan_queue *queue, struct swapchain *swapchain,
++                               VkPresentInfoKHR *present )
++{
++    static unsigned int frames;
++    const char *path = getenv( "WINE_PS5_CAPTURE" );
++    struct vulkan_device *device = queue->device;
++    struct vulkan_physical_device *physical = device->physical_device;
++    VkDevice host = device->host.device;
++    VkBuffer buffer = VK_NULL_HANDLE;
++    VkDeviceMemory memory = VK_NULL_HANDLE;
++    VkCommandPool pool = VK_NULL_HANDLE;
++    VkFence fence = VK_NULL_HANDLE;
++    VkCommandBuffer command;
++    VkMemoryRequirements requirements;
++    VkPhysicalDeviceMemoryProperties properties;
++    VkImage *images = NULL;
++    VkPipelineStageFlags *stages = NULL;
++    VkExtent2D extent = swapchain->capture_extent;
++    VkBufferCreateInfo buffer_info = {.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
++        .size = (uint64_t)extent.width * extent.height * 4, .usage = VK_BUFFER_USAGE_TRANSFER_DST_BIT};
++    VkMemoryAllocateInfo allocation = {.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO};
++    VkCommandPoolCreateInfo pool_info = {.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
++        .flags = VK_COMMAND_POOL_CREATE_TRANSIENT_BIT, .queueFamilyIndex = queue->info.queueFamilyIndex};
++    VkCommandBufferAllocateInfo command_info = {.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
++        .level = VK_COMMAND_BUFFER_LEVEL_PRIMARY, .commandBufferCount = 1};
++    VkCommandBufferBeginInfo begin = {.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
++        .flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT};
++    VkFenceCreateInfo fence_info = {.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO};
++    VkImageMemoryBarrier barrier = {.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
++        .srcAccessMask = VK_ACCESS_MEMORY_WRITE_BIT, .dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT,
++        .oldLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, .newLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
++        .srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED, .dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
++        .subresourceRange = {VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1}};
++    VkBufferImageCopy copy = {.imageSubresource = {VK_IMAGE_ASPECT_COLOR_BIT, 0, 0, 1},
++        .imageExtent = {extent.width, extent.height, 1}};
++    VkSubmitInfo submit = {.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO, .commandBufferCount = 1};
++    uint32_t count = 0, type;
++    void *pixels = NULL;
++    unsigned char *row = NULL;
++    char request[1024];
++    FILE *file = NULL;
++    BOOL bgra = swapchain->capture_format == VK_FORMAT_B8G8R8A8_UNORM ||
++                swapchain->capture_format == VK_FORMAT_B8G8R8A8_SRGB;
++    BOOL ok = FALSE;
++    VkResult result = VK_ERROR_INITIALIZATION_FAILED;
++
++    if (!path || ++frames % 60 || present->swapchainCount != 1) return;
++    if (snprintf( request, sizeof(request), "%s.request", path ) >= sizeof(request) || unlink( request )) return;
++    if (!swapchain->capture_enabled || !extent.width || !extent.height || extent.width > 4096 || extent.height > 2160)
++        goto done;
++    if (!bgra && swapchain->capture_format != VK_FORMAT_R8G8B8A8_UNORM &&
++        swapchain->capture_format != VK_FORMAT_R8G8B8A8_SRGB) goto done;
++#define CAPTURE_CALL(call) do { if ((result = (call)) != VK_SUCCESS) goto done; } while (0)
++    CAPTURE_CALL( device->p_vkGetSwapchainImagesKHR( host, swapchain->obj.host.swapchain, &count, NULL ) );
++    if (!(images = calloc( count, sizeof(*images) ))) goto done;
++    CAPTURE_CALL( device->p_vkGetSwapchainImagesKHR( host, swapchain->obj.host.swapchain, &count, images ) );
++    if (present->pImageIndices[0] >= count) goto done;
++    barrier.image = images[present->pImageIndices[0]];
++    CAPTURE_CALL( device->p_vkCreateBuffer( host, &buffer_info, NULL, &buffer ) );
++    device->p_vkGetBufferMemoryRequirements( host, buffer, &requirements );
++    physical->instance->p_vkGetPhysicalDeviceMemoryProperties( physical->host.physical_device, &properties );
++    for (type = 0; type < properties.memoryTypeCount; type++)
++        if ((requirements.memoryTypeBits & (1u << type)) &&
++            (properties.memoryTypes[type].propertyFlags & (VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT)) ==
++            (VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT)) break;
++    if (type == properties.memoryTypeCount) goto done;
++    allocation.allocationSize = requirements.size;
++    allocation.memoryTypeIndex = type;
++    CAPTURE_CALL( device->p_vkAllocateMemory( host, &allocation, NULL, &memory ) );
++    CAPTURE_CALL( device->p_vkBindBufferMemory( host, buffer, memory, 0 ) );
++    CAPTURE_CALL( device->p_vkCreateCommandPool( host, &pool_info, NULL, &pool ) );
++    command_info.commandPool = pool;
++    CAPTURE_CALL( device->p_vkAllocateCommandBuffers( host, &command_info, &command ) );
++    CAPTURE_CALL( device->p_vkBeginCommandBuffer( command, &begin ) );
++    device->p_vkCmdPipelineBarrier( command, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT,
++                                   0, 0, NULL, 0, NULL, 1, &barrier );
++    device->p_vkCmdCopyImageToBuffer( command, barrier.image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, buffer, 1, &copy );
++    barrier.srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
++    barrier.dstAccessMask = 0;
++    barrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
++    barrier.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
++    device->p_vkCmdPipelineBarrier( command, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
++                                   0, 0, NULL, 0, NULL, 1, &barrier );
++    CAPTURE_CALL( device->p_vkEndCommandBuffer( command ) );
++    CAPTURE_CALL( device->p_vkCreateFence( host, &fence_info, NULL, &fence ) );
++    if (!(stages = calloc( max( present->waitSemaphoreCount, 1 ), sizeof(*stages) ))) goto done;
++    for (type = 0; type < present->waitSemaphoreCount; type++) stages[type] = VK_PIPELINE_STAGE_ALL_COMMANDS_BIT;
++    submit.waitSemaphoreCount = present->waitSemaphoreCount;
++    submit.pWaitSemaphores = present->pWaitSemaphores;
++    submit.pWaitDstStageMask = stages;
++    submit.pCommandBuffers = &command;
++    CAPTURE_CALL( device->p_vkQueueSubmit( queue->host.queue, 1, &submit, fence ) );
++    /* The semaphore waits belong to our submitted work now, even on device loss. */
++    present->waitSemaphoreCount = 0;
++    present->pWaitSemaphores = NULL;
++    CAPTURE_CALL( device->p_vkWaitForFences( host, 1, &fence, VK_TRUE, UINT64_MAX ) );
++    CAPTURE_CALL( device->p_vkMapMemory( host, memory, 0, VK_WHOLE_SIZE, 0, &pixels ) );
++    if (!(row = malloc( extent.width * 3 )) || !(file = fopen( path, "wb" ))) goto done;
++    if (fprintf( file, "P6\n%u %u\n255\n", extent.width, extent.height ) < 0) goto done;
++    for (uint32_t y = 0; y < extent.height; y++)
++    {
++        const unsigned char *source = (unsigned char *)pixels + (size_t)y * extent.width * 4;
++        for (uint32_t x = 0; x < extent.width; x++)
++        {
++            row[x*3] = source[x*4 + (bgra ? 2 : 0)];
++            row[x*3+1] = source[x*4+1];
++            row[x*3+2] = source[x*4 + (bgra ? 0 : 2)];
++        }
++        if (fwrite( row, 3, extent.width, file ) != extent.width) goto done;
++    }
++    ok = !fflush( file );
++done:
++    if (file) fclose( file );
++    if (pixels) device->p_vkUnmapMemory( host, memory );
++    if (fence) device->p_vkDestroyFence( host, fence, NULL );
++    if (pool) device->p_vkDestroyCommandPool( host, pool, NULL );
++    if (buffer) device->p_vkDestroyBuffer( host, buffer, NULL );
++    if (memory) device->p_vkFreeMemory( host, memory, NULL );
++    free( row ); free( images ); free( stages );
++    fprintf( stderr, "wine-ps5: capture %s %ux%u result=%d\n", ok ? "saved" : "failed", extent.width, extent.height, result );
++#undef CAPTURE_CALL
++}
++#endif
++
+ static VkResult win32u_vkQueuePresentKHR( VkQueue client_queue, const VkPresentInfoKHR *client_present_info )
+ {
+     static pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
+@@ -3536,6 +3680,10 @@ static VkResult win32u_vkQueuePresentKHR( VkQueue client_queue, const VkPresentI
+     }
+ 
+     pthread_mutex_lock( &lock );
++#ifdef __PROSPERO__
++    if (present_info->swapchainCount == 1)
++        ps5_capture_frame( queue, swapchain_from_handle( client_swapchains[0] ), present_info );
++#endif
+     res = device->p_vkQueuePresentKHR( queue->host.queue, present_info );
+     pthread_mutex_unlock( &lock );
+ 
+-- 
+2.55.0
+

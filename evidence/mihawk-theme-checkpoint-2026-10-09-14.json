@@ -1,0 +1,25 @@
+{
+ "branch": "mihawk-os",
+ "passed": true,
+ "build_fingerprint": "2c0ced39a91045cd0d1c773e8e216e3b3bdb826b83d0a01b377bfcf528f3ba4d",
+ "gate": "mihawk-theme-gate-2026-10-09-14",
+ "cases": 42,
+ "seconds": 1382.5,
+ "fault_records": 0,
+ "protocol_errors": 0,
+ "appearance_checks_per_arch": 1029,
+ "theme_receiver_checks_per_arch": 14,
+ "caption_pixels_per_part": 1320,
+ "caption_display_samples_per_variant": 24,
+ "sanitized_host_suites": 41,
+ "image_verdict_tests": 7,
+ "battery_runner_tests": 5,
+ "patches_replayed": 141,
+ "windows_reference": "unavailable",
+ "limits": [
+  "caption interaction states not fully qualified",
+  "cross-process HWND composition pending",
+  "centered taskbar/Start and Explorer restyling pending",
+  "opaque material fallback; no rounded clipping/blur claim"
+ ]
+}

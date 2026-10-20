@@ -1,0 +1,75 @@
+{
+  "what": "Resident Lapy owned-root service started for normal launches; two ordinary title launches through it",
+  "daemon_revision": "5b8397b9f2b5f12a7bc2f9c8745a00d1c2dd01ad",
+  "daemon_build_id": "7f67784682e58d0d0401bf5508ec9c15cf8f938152b4c2d41997d0c4bccb1478",
+  "daemon_elf_sha256": "3479be42ed69ef1b9dbbd1bbde9d0c5c443faaa4e1e59b219e6487ecf8695f7e",
+  "mode": "service, uncapped, target PPSA99170, log /data/ps5proton/logs/lapy-service.log",
+  "firmware": "10010000",
+  "records": 41,
+  "errors": [],
+  "service_baseline": {
+    "hold": "74",
+    "use": "73"
+  },
+  "before_each_request": [
+    {
+      "hold": "74",
+      "use": "73"
+    },
+    {
+      "hold": "74",
+      "use": "73"
+    }
+  ],
+  "requests": [
+    {
+      "pid": "200",
+      "completed": "0",
+      "error": "0",
+      "acknowledged": "1"
+    },
+    {
+      "pid": "204",
+      "completed": "1",
+      "error": "0",
+      "acknowledged": "1"
+    }
+  ],
+  "grants": [
+    {
+      "stage": "complete",
+      "error": "0",
+      "pid": "200",
+      "roots_moved": "1",
+      "cred_changed": "1",
+      "detached": "1",
+      "donors_reaped": "1"
+    },
+    {
+      "stage": "complete",
+      "error": "0",
+      "pid": "204",
+      "roots_moved": "1",
+      "cred_changed": "1",
+      "detached": "1",
+      "donors_reaped": "1"
+    }
+  ],
+  "client_results": [
+    {
+      "data_rw": "1",
+      "open_errno": "0"
+    },
+    {
+      "data_rw": "1",
+      "open_errno": "0"
+    }
+  ],
+  "donors_reaped": 5,
+  "title_runs": [
+    "evidence/startup-resident-01.json",
+    "evidence/startup-resident-02.json"
+  ],
+  "not_proven": "Counters after the second title exited (the service samples only before a request); behaviour across a console reboot (no boot hook; start again each boot); long-running stability.",
+  "capture": "klog/startup-resident-02/service.log"
+}

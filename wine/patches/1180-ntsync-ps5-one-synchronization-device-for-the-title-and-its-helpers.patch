@@ -1,0 +1,105 @@
+From: PS5_Proton <local>
+Subject: [PATCH] ntsync: one synchronization device for the title and its helpers
+
+Every program runs in a helper process by default, and a helper had no synchronization device: each SetEvent,
+ResetEvent and wait was a round trip to the title's server thread. A Direct3D 12 game in a helper made 40k to 634k server
+calls per 10 s, mostly event_op and select at 63 to 1600 us each, about 40 to 50 thread-seconds of waiting per 10 s,
+and drew 1 to 25 frames a second (PS5_Proton, 2026-10-16; record removed from the tree; in git history). The device (patch 0890) was the title's alone,
+its objects in the title's heap, and off since helpers became the default.
+
+Its objects now live in shared memory the memory helper makes (PS5_Proton src/pw_ntsync.h): the title formats the
+region named by WINE_PS5_NTSYNC_REGION before its server starts, and the server sends that descriptor to each helper
+when its first thread starts, as upstream sends the ntsync device. The helper maps it and joins; its threads then
+wait and signal there, woken across processes through a word each (umtx). A helper that cannot join stops at once:
+its waits would go to the server while the objects they name are in the device, and every one would fail.
+Opt-in while it is measured: the title makes the region only with WINE_PS5_NTSYNC=1; without it every wait goes
+to the server, as before.
+---
+diff --git a/dlls/ntdll/unix/server.c b/dlls/ntdll/unix/server.c
+--- a/dlls/ntdll/unix/server.c
++++ b/dlls/ntdll/unix/server.c
+@@ -1658,14 +1658,16 @@
+     {
+         /* The synchronization device lives in ntdll (wine/ps5_ntsync.h); the
+          * server creates and signals its objects through the same operations.
+-         * WINE_PS5_NTSYNC=1 turns it on; without it every wait goes to the server. */
+-        extern const struct ps5_ntsync_ops *pw_wine_ntsync_ops(void);
++         * Its objects are in shared memory the title's helpers map too
++         * (src/pw_ntsync.h), the descriptor in WINE_PS5_NTSYNC_REGION;
++         * without one (WINE_PS5_NTSYNC=1 asks the title for it) every wait goes to the server. */
++        extern const struct ps5_ntsync_ops *pw_wine_ntsync_start(void);
+         extern const struct ps5_ntsync_ops *ps5_ntsync;
+         void (*set_ntsync)( const struct ps5_ntsync_ops * ) = dlsym( module, "pw_wineserver_set_ntsync" );
+-        const char *enable = getenv( "WINE_PS5_NTSYNC" );
+-        if (set_ntsync && enable && !strcmp( enable, "1" ) && !getenv("WINE_PS5_CHILDREN"))
++        void (*set_region)( int ) = dlsym( module, "pw_wineserver_set_ntsync_region" );
++        if (set_ntsync && set_region && (ps5_ntsync = pw_wine_ntsync_start()))
+         {
+-            ps5_ntsync = pw_wine_ntsync_ops();
++            set_region( atoi( getenv( "WINE_PS5_NTSYNC_REGION" )));
+             set_ntsync( ps5_ntsync );
+         }
+     }
+@@ -2051,7 +2053,22 @@
+             else if (reply->inproc_device)
+             {
+ #ifdef __PROSPERO__
+-                inproc_device_fd = PS5_NTSYNC_DEVICE;   /* in-process: nothing in flight */
++                /* a helper: the title's server sent the device's region (bit 2);
++                 * a process whose waits went to the server while the others'
++                 * objects are in the device would fail every wait */
++                if (reply->inproc_device & 2)
++                {
++                    extern const struct ps5_ntsync_ops *pw_wine_ntsync_join( int region );
++                    obj_handle_t handle;
++                    int region = wine_server_receive_fd( &handle );
++                    if (handle != reply->inproc_device)
++                        fatal_error( "the synchronization device's region did not come with the reply\n" );
++                    if (ps5_ntsync) close( region );     /* a client in the title, which holds the device */
++                    else ps5_ntsync = pw_wine_ntsync_join( region );
++                }
++                if (!ps5_ntsync)
++                    fatal_error( "the title's synchronization device is not available in this process\n" );
++                inproc_device_fd = PS5_NTSYNC_DEVICE;
+ #else
+                 inproc_device_fd = wine_server_receive_fd( &handle );
+                 assert( handle == reply->inproc_device );
+diff --git a/server/inproc_sync.c b/server/inproc_sync.c
+--- a/server/inproc_sync.c
++++ b/server/inproc_sync.c
+@@ -60,6 +60,14 @@
+ {
+     ps5_ntsync = ops;
+ }
++
++/* The shared memory the device keeps its objects in (src/pw_ntsync.h), sent to
++ * each helper as it starts so its threads wait and signal there too. */
++int ps5_ntsync_region = -1;
++DECLSPEC_EXPORT void pw_wineserver_set_ntsync_region( int fd )
++{
++    ps5_ntsync_region = fd;
++}
+ #endif
+ 
+ int get_inproc_device_fd(void)
+diff --git a/server/thread.c b/server/thread.c
+--- a/server/thread.c
++++ b/server/thread.c
+@@ -2075,7 +2075,16 @@
+     else if ((fd = get_inproc_device_fd()) >= 0)
+     {
+         reply->inproc_device = get_process_id( process ) | 1;
+-#ifndef __PROSPERO__  /* the device is in-process: nothing to pass */
++#ifdef __PROSPERO__
++        /* the title holds the device; a helper maps its region, which follows
++         * the reply when bit 2 says so */
++        if (ps5_is_child_process( process ))
++        {
++            extern int ps5_ntsync_region;
++            reply->inproc_device |= 2;
++            send_client_fd( process, ps5_ntsync_region, reply->inproc_device );
++        }
++#else
+         send_client_fd( process, fd, reply->inproc_device );
+ #endif
+     }

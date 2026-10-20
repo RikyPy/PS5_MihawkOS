@@ -1,0 +1,42 @@
+{
+  "passed": false,
+  "metadata_checks_per_architecture": 23,
+  "total_checks_per_architecture": 24,
+  "remaining_failure": "Initial GetShellWindow assertion races actual Explorer registration; later shell-survival check passes. Five-second condition wait added for build06.",
+  "source_fingerprint": "c7a6334125c8585af93ecb50b0d8d555f30dfb067cd583d7accece7269c624f5",
+  "cases": [
+    {
+      "bits": 32,
+      "verdict_lines": [
+        "26665.127:0104:0108:warn:debugstr:OutputDebugStringA \"window-snapshot FAIL: live persistent shell error=2\\n\"",
+        "26679.174:0104:0108:warn:debugstr:OutputDebugStringA \"PS5_PROTON_WINDOW_SNAPSHOT FAIL checks=24 failures=1\\n\""
+      ],
+      "root": {
+        "sequence": "648",
+        "count": "17",
+        "overflow": "0",
+        "status": "0",
+        "hwnd": "0x10020",
+        "native_pid": "4178",
+        "windows_pid": "0xe8"
+      }
+    },
+    {
+      "bits": 64,
+      "verdict_lines": [
+        "26700.558:00fc:0100:warn:debugstr:OutputDebugStringA \"window-snapshot FAIL: live persistent shell error=2\\n\"",
+        "26704.052:00fc:0100:warn:debugstr:OutputDebugStringA \"PS5_PROTON_WINDOW_SNAPSHOT FAIL checks=24 failures=1\\n\""
+      ],
+      "root": {
+        "sequence": "593",
+        "count": "17",
+        "overflow": "0",
+        "status": "0",
+        "hwnd": "0x10020",
+        "native_pid": "4201",
+        "windows_pid": "0xe8"
+      }
+    }
+  ],
+  "scope": "Metadata and live root ownership, not composition"
+}

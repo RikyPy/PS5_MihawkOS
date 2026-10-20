@@ -1,0 +1,93 @@
+From 8cfe4029c3a2ba276c930b4517662ab60518dbd5 Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Tue, 6 Oct 2026 23:40:00 -0400
+Subject: [PATCH] winebus, hidclass: a program's devices are named by its
+ process
+
+On the PS5 every program runs its own HID stack (patch 0870), all on the
+title's one wineserver, and since patch 0941 every program's bus makes the
+DualSense at its start. A device object's name came from pointers that are
+the same in every program, so the second program to make the DualSense
+found the name taken (IoCreateDevice: STATUS_OBJECT_NAME_COLLISION). Its
+bus then made the device again every 8 ms for as long as it ran: 881
+refusals in memservice-gate-2026-10-06-launcher-render, where four
+programs ran at once. That program had no controller, and the parent's
+open handles moved under the probe's count, which failed the run.
+
+- winebus and hidclass put the process id in their device names.
+- The PS5 bus makes a device that was stopped without the bus again after
+  a second, not on every 8 ms loop.
+---
+ dlls/hidclass.sys/pnp.c    | 10 ++++++----
+ dlls/winebus.sys/bus_ps5.c |  8 +++++++-
+ dlls/winebus.sys/main.c    |  4 +++-
+ 3 files changed, 16 insertions(+), 6 deletions(-)
+
+diff --git a/dlls/hidclass.sys/pnp.c b/dlls/hidclass.sys/pnp.c
+index f453330..c510931 100644
+--- a/dlls/hidclass.sys/pnp.c
++++ b/dlls/hidclass.sys/pnp.c
+@@ -270,12 +270,14 @@ static NTSTATUS create_child_pdos( minidriver *minidriver, DEVICE_OBJECT *device
+ 
+     for (i = 0; i < fdo->device_desc.CollectionDescLength; ++i)
+     {
++        /* The process in the name, as winebus's devices: every program on the PS5 runs its own HID stack, all on
++         * one wineserver. */
+         if (fdo->device_desc.CollectionDescLength > 1)
+-            swprintf( pdo_name, ARRAY_SIZE(pdo_name), L"\\Device\\HID#%p&%p&%d", device->DriverObject,
+-                      fdo->base.hid.PhysicalDeviceObject, i );
++            swprintf( pdo_name, ARRAY_SIZE(pdo_name), L"\\Device\\HID#%x#%p&%p&%d", HandleToULong(PsGetCurrentProcessId()),
++                      device->DriverObject, fdo->base.hid.PhysicalDeviceObject, i );
+         else
+-            swprintf( pdo_name, ARRAY_SIZE(pdo_name), L"\\Device\\HID#%p&%p", device->DriverObject,
+-                      fdo->base.hid.PhysicalDeviceObject );
++            swprintf( pdo_name, ARRAY_SIZE(pdo_name), L"\\Device\\HID#%x#%p&%p", HandleToULong(PsGetCurrentProcessId()),
++                      device->DriverObject, fdo->base.hid.PhysicalDeviceObject );
+ 
+         RtlInitUnicodeString(&string, pdo_name);
+         if ((status = IoCreateDevice( device->DriverObject, sizeof(*pdo), &string, 0, 0, FALSE, &child_device )))
+diff --git a/dlls/winebus.sys/bus_ps5.c b/dlls/winebus.sys/bus_ps5.c
+index 54e05a0..85edaa2 100644
+--- a/dlls/winebus.sys/bus_ps5.c
++++ b/dlls/winebus.sys/bus_ps5.c
+@@ -103,6 +103,7 @@ NTSTATUS ps5_bus_wait(void *args)
+ {
+     struct bus_event *event = args;
+     static int was_connected;
++    static unsigned int waits;   /* bus loops (8 ms each) until the device is made again */
+     BYTE report[64];
+     int connected;
+     bus_event_cleanup(event);
+@@ -118,8 +119,13 @@ NTSTATUS ps5_bus_wait(void *args)
+          * looks for controllers at its start, and nothing would tell it of one that came or went later (device
+          * notifications need the plug-and-play service). A pad the title loses (the system menu takes it while
+          * open, or it is turned off) reads as released until it is back. */
+-        if (!device)
++        /* A device that was stopped without the bus (its creation refused, say) is made again after a second,
++         * not on every loop: two programs' buses whose devices had one name retried every 8 ms for good. */
++        if (!device && waits)
++            --waits;
++        else if (!device)
+         {
++            waits = 125;
+             struct device_desc desc = {.vid=0x054c, .pid=0x0ce6, .version=0x0100, .input=-1,
+                 .is_gamepad=TRUE, .is_hidraw=TRUE, .bus_type=BUS_TYPE_USB,
+                 .manufacturer={'S','o','n','y',' ','I','n','t','e','r','a','c','t','i','v','e',' ','E','n','t','e','r','t','a','i','n','m','e','n','t'},
+diff --git a/dlls/winebus.sys/main.c b/dlls/winebus.sys/main.c
+index c0c155a..6d1f61c 100644
+--- a/dlls/winebus.sys/main.c
++++ b/dlls/winebus.sys/main.c
+@@ -380,7 +380,9 @@ static DEVICE_OBJECT *bus_create_hid_device(struct device_desc *desc, UINT64 uni
+ 
+     TRACE("desc %s, unix_device %#I64x\n", debugstr_device_desc(desc), unix_device);
+ 
+-    swprintf(dev_name, ARRAY_SIZE(dev_name), L"\\Device\\WINEBUS#%p", unix_device);
++    /* The process in the name: on the PS5 every program runs its own bus (patch 0870), all on one wineserver, and
++     * the same device in two programs had the same name, so all but the first failed to create it. */
++    swprintf(dev_name, ARRAY_SIZE(dev_name), L"\\Device\\WINEBUS#%x#%p", HandleToULong(PsGetCurrentProcessId()), unix_device);
+     RtlInitUnicodeString(&nameW, dev_name);
+     status = IoCreateDevice(driver_obj, sizeof(struct device_extension), &nameW, 0, 0, FALSE, &device);
+     if (status)
+-- 
+2.56.0
+

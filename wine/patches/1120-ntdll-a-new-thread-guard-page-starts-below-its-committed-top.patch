@@ -1,0 +1,49 @@
+From: PS5_Proton <local>
+Subject: [PATCH] ntdll: a new thread's guard page starts below its committed top, as on Windows
+
+Wine commits a thread's whole stack and kept its only guard page at the bottom. Windows commits the top and puts the
+guard right below it, and the guard moves down a page at a time as the stack grows. A program that grows its stack ahead
+of use by touching the guard VirtualQuery reports (an emulator's thread start pre-grows 768 KiB that way: the emulator's .exe
++0xc9438c) hit Wine's last guard at once and got an unhandled STATUS_STACK_OVERFLOW: on the pinned Linux Wine the process
+ended there (exit 0xfd); on the console it survived only because winedbg attached, printed and let the thread run again.
+The guard now starts below max(commit, 64 KiB) of committed top; grow_thread_stack moves it down as before and still
+raises STATUS_STACK_OVERFLOW in the guaranteed space at the bottom. The pages below the guard stay committed.
+Proven on the pinned Wine on Linux with X11 (the user's PC): a Unity game in the earlier emulator experiment (removed) started, reached
+graphics and audio start-up and was played by the user; without the change it ended 2 s in.
+---
+diff --git a/dlls/ntdll/unix/virtual.c b/dlls/ntdll/unix/virtual.c
+--- a/dlls/ntdll/unix/virtual.c
++++ b/dlls/ntdll/unix/virtual.c
+@@ -5478,10 +5478,20 @@
+     /* setup no access guard page */
+     if (guard_page)
+     {
++        /* Windows commits the top of a new stack and puts the guard page right below it; touching the guard grows
++         * the stack a page at a time (grow_thread_stack) until the guaranteed space at the bottom. Wine commits the
++         * whole stack, and with the guard at the bottom a program that grows its stack ahead of use by touching the
++         * guard VirtualQuery shows it (an emulator pre-grows 768 KiB that way) hit the last guard at once and got an
++         * unhandled STATUS_STACK_OVERFLOW. The guard now starts where Windows puts it; the pages below stay committed. */
++        size_t commit = ROUND_SIZE( 0, max( commit_size, (SIZE_T)0x10000 ), host_page_mask );
++        char *guard = (char *)view->base + view->size - commit - host_page_size;
++
+         set_page_vprot( view->base, host_page_size, 0 );
+-        set_page_vprot( (char *)view->base + host_page_size, host_page_size,
+-                        VPROT_READ | VPROT_WRITE | VPROT_COMMITTED | VPROT_GUARD );
+-        mprotect_range( view->base, 2 * host_page_size , 0, 0 );
++        mprotect_range( view->base, host_page_size, 0, 0 );
++        if (guard <= (char *)view->base + host_page_size) guard = (char *)view->base + host_page_size;
++        set_page_vprot( guard, host_page_size, VPROT_READ | VPROT_WRITE | VPROT_COMMITTED | VPROT_GUARD );
++        mprotect_range( guard, host_page_size, 0, 0 );
++        stack->StackLimit = guard + host_page_size;
+     }
+     else
+     {
+@@ -5496,7 +5506,7 @@
+     stack->OldStackLimit = 0;
+     stack->DeallocationStack = view->base;
+     stack->StackBase = (char *)view->base + view->size;
+-    stack->StackLimit = (char *)view->base + (guard_page ? 2 * host_page_size : 0);
++    if (!guard_page) stack->StackLimit = view->base;
+ done:
+     server_leave_uninterrupted_section( &virtual_mutex, &sigset );
+     return status;

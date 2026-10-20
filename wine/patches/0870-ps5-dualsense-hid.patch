@@ -1,0 +1,430 @@
+From 9a1bc075afa8d20472ca954bfae6ffe1e4ebfaf1 Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Fri, 2 Oct 2026 21:30:20 -0400
+Subject: [PATCH] ps5: expose the native DualSense through an in-process HID
+ bus
+
+---
+ dlls/ntdll/loader.c                 |  16 ++++
+ dlls/ntoskrnl.exe/ntoskrnl.c        |  84 +++++++++++++++++-
+ dlls/ntoskrnl.exe/ntoskrnl.exe.spec |   2 +
+ dlls/ntoskrnl.exe/pnp.c             |  11 +++
+ dlls/winebus.sys/Makefile.in        |   1 +
+ dlls/winebus.sys/bus_ps5.c          | 121 ++++++++++++++++++++++++++++
+ dlls/winebus.sys/main.c             |   7 ++
+ dlls/winebus.sys/unix_private.h     |   4 +
+ dlls/winebus.sys/unixlib.c          |   3 +
+ dlls/winebus.sys/unixlib.h          |   3 +
+ 10 files changed, 250 insertions(+), 2 deletions(-)
+ create mode 100644 dlls/winebus.sys/bus_ps5.c
+
+diff --git a/dlls/ntdll/loader.c b/dlls/ntdll/loader.c
+index 52b6e70..b4477df 100644
+--- a/dlls/ntdll/loader.c
++++ b/dlls/ntdll/loader.c
+@@ -4633,6 +4633,7 @@ void loader_init( CONTEXT *context, void **entry )
+ {
+     static int attach_done;
+     NTSTATUS status;
++    BOOL ps5_hid_init = FALSE;
+     ULONG_PTR cookie, port = 0;
+     WINE_MODREF *wm;
+ 
+@@ -4651,6 +4652,7 @@ void loader_init( CONTEXT *context, void **entry )
+         ULONG heap_flags = HEAP_GROWABLE;
+         unsigned int i;
+ 
++        ps5_hid_init = TRUE;
+         peb->LdrData            = &ldr;
+         peb->FastPebLock        = &peb_lock;
+         peb->TlsBitmap          = &tls_bitmap;
+@@ -4802,6 +4804,20 @@ void loader_init( CONTEXT *context, void **entry )
+     }
+ 
+     RtlLeaveCriticalSection( &loader_section );
++    if (ps5_hid_init)
++    {
++        WCHAR enabled[4];
++        if (get_env(L"WINE_PS5_HID", enabled, sizeof(enabled)) && enabled[0] == L'1')
++        {
++            UNICODE_STRING name = RTL_CONSTANT_STRING(L"ntoskrnl.exe");
++            ANSI_STRING proc = RTL_CONSTANT_STRING("wine_ps5_hid_start");
++            NTSTATUS (CDECL *start)(void);
++            HMODULE module;
++            if (!(status = LdrLoadDll(NULL, 0, &name, &module)) &&
++                !(status = LdrGetProcedureAddress(module, &proc, 0, (void **)&start))) status = start();
++            WARN("[PS5 Proton] in-process HID initialization %#lx\n", status);
++        }
++    }
+ }
+ 
+ 
+diff --git a/dlls/ntoskrnl.exe/ntoskrnl.c b/dlls/ntoskrnl.exe/ntoskrnl.c
+index b3f4575..d729f35 100644
+--- a/dlls/ntoskrnl.exe/ntoskrnl.c
++++ b/dlls/ntoskrnl.exe/ntoskrnl.c
+@@ -26,6 +26,8 @@
+ #include "ntoskrnl_private.h"
+ #include "excpt.h"
+ #include "winreg.h"
++#include "winuser.h"
++#include "setupapi.h"
+ #include "ntsecapi.h"
+ #include "evntprov.h"
+ #include "ddk/csq.h"
+@@ -874,6 +876,7 @@ static const dispatch_func dispatch_funcs[] =
+ static void set_service_status( SERVICE_STATUS_HANDLE handle, DWORD state, DWORD accepted )
+ {
+     SERVICE_STATUS status;
++    if (!handle) return;
+     status.dwServiceType             = SERVICE_WIN32;
+     status.dwCurrentState            = state;
+     status.dwControlsAccepted        = accepted;
+@@ -918,6 +921,7 @@ static void unload_driver( struct wine_rb_entry *entry, void *context )
+ }
+ 
+ PEPROCESS PsInitialSystemProcess = NULL;
++static HANDLE ps5_pnp_ready;
+ 
+ /***********************************************************************
+  *           wine_ntoskrnl_main_loop   (Not a Windows API)
+@@ -935,6 +939,7 @@ NTSTATUS CDECL wine_ntoskrnl_main_loop( HANDLE stop_event )
+     request_thread = GetCurrentThreadId();
+ 
+     pnp_manager_start();
++    if (ps5_pnp_ready) SetEvent( ps5_pnp_ready );
+ 
+     handles[0] = stop_event;
+     handles[1] = manager;
+@@ -4108,8 +4113,13 @@ NTSTATUS WINAPI ZwLoadDriver( const UNICODE_STRING *service_name )
+ 
+     TRACE( "(%s)\n", debugstr_us(service_name) );
+ 
+-    if ((status = open_driver( service_name, (SC_HANDLE *)&service_handle )) != STATUS_SUCCESS)
+-        return status;
++    /* PS5 has one process and no service manager. Only the built-in HID
++     * transport drivers may use this path; ordinary drivers still use SCM. */
++    service_handle = NULL;
++    if (!(ps5_pnp_ready && (!wcsicmp(service_name->Buffer + wcslen(servicesW), L"winebus") ||
++                           !wcsicmp(service_name->Buffer + wcslen(servicesW), L"winehid"))))
++        if ((status = open_driver( service_name, (SC_HANDLE *)&service_handle )) != STATUS_SUCCESS)
++            return status;
+ 
+     if (!get_drv_name( &drv_name, service_name ))
+     {
+@@ -4713,3 +4723,73 @@ BOOL WINAPI DllMain( HINSTANCE inst, DWORD reason, LPVOID reserved )
+     }
+     return TRUE;
+ }
++
++/* The console runs the normal Wine HID stack in the game process. */
++static DWORD WINAPI ps5_device_thread(void *stop)
++{
++    return wine_ntoskrnl_main_loop(stop);
++}
++
++/* Milliseconds until the DualSense's HID interface is present (registered and enabled, as raw input and DirectInput
++ * find it), or -1 once limit_ms has passed without it. */
++static LONG ps5_wait_dualsense(DWORD limit_ms)
++{
++    static const GUID hid = {0x4d1e55b2, 0xf16f, 0x11cf, {0x88, 0xcb, 0x00, 0x11, 0x11, 0x00, 0x00, 0x30}};
++    DWORD start = GetTickCount();
++    for (;;)
++    {
++        HDEVINFO set = SetupDiGetClassDevsW(&hid, NULL, NULL, DIGCF_PRESENT | DIGCF_DEVICEINTERFACE);
++        SP_DEVINFO_DATA device = {sizeof(device)};
++        WCHAR id[200]; /* MAX_DEVICE_ID_LEN */
++        BOOL found = FALSE;
++        DWORD i;
++        for (i = 0; set != INVALID_HANDLE_VALUE && !found && SetupDiEnumDeviceInfo(set, i, &device); i++)
++            found = SetupDiGetDeviceInstanceIdW(set, &device, id, ARRAY_SIZE(id), NULL) &&
++                    !wcsnicmp(id, L"HID\\VID_054C&PID_0CE6", 21);
++        if (set != INVALID_HANDLE_VALUE) SetupDiDestroyDeviceInfoList(set);
++        if (found) return GetTickCount() - start;
++        if (GetTickCount() - start >= limit_ms) return -1;
++        Sleep(10);
++    }
++}
++
++NTSTATUS CDECL wine_ps5_hid_start(void)
++{
++    UNICODE_STRING service = RTL_CONSTANT_STRING(L"\\Registry\\Machine\\System\\CurrentControlSet\\Services\\winebus");
++    SP_DEVINFO_DATA device = {sizeof(device)};
++    HDEVINFO set;
++    HANDLE thread, stop;
++    HKEY key;
++    NTSTATUS status;
++    LONG waited = -1;
++    if (ps5_pnp_ready) return STATUS_SUCCESS;
++    ps5_pnp_ready = CreateEventW(NULL, TRUE, FALSE, NULL);
++    stop = CreateEventW(NULL, TRUE, FALSE, NULL);
++    if (!(thread = CreateThread(NULL, 0, ps5_device_thread, stop, 0, NULL))) return STATUS_NO_MEMORY;
++    CloseHandle(thread);
++    if (WaitForSingleObject(ps5_pnp_ready, 10000) != WAIT_OBJECT_0) return STATUS_IO_TIMEOUT;
++    if (!RegCreateKeyW(HKEY_LOCAL_MACHINE, L"System\\CurrentControlSet\\Services\\winebus", &key)) RegCloseKey(key);
++    if (!RegCreateKeyW(HKEY_LOCAL_MACHINE, L"System\\CurrentControlSet\\Services\\winehid", &key)) RegCloseKey(key);
++    /* Remove the duplicate root used by the first PS5 development build.
++     * winebus has one global FDO and must reuse Wine's canonical root. */
++    RegDeleteTreeW(HKEY_LOCAL_MACHINE, L"System\\CurrentControlSet\\Enum\\ROOT\\WINEBUS\\0000");
++    set = SetupDiCreateDeviceInfoList(NULL, NULL);
++    if (set == INVALID_HANDLE_VALUE) return STATUS_UNSUCCESSFUL;
++    if (!SetupDiCreateDeviceInfoW(set, L"ROOT\\WINE\\WINEBUS", &GUID_NULL, NULL, NULL, 0, &device) &&
++        !SetupDiOpenDeviceInfoW(set, L"ROOT\\WINE\\WINEBUS", NULL, 0, &device))
++    {
++        SetupDiDestroyDeviceInfoList(set);
++        return STATUS_UNSUCCESSFUL;
++    }
++    SetupDiSetDeviceRegistryPropertyW(set, &device, SPDRP_SERVICE, (BYTE *)L"winebus", sizeof(L"winebus"));
++    SetupDiRegisterDeviceInfo(set, &device, 0, NULL, NULL, NULL);
++    SetupDiDestroyDeviceInfoList(set);
++    status = ZwLoadDriver(&service);
++    /* The program starts once the controller is there, not beside it: Wine keeps its raw-input device list for 2 s,
++     * and a game may look for controllers only once, at its start. The PS5 bus creates the DualSense as soon as the
++     * title's page says the pad is connected; with no pad the wait ends after a second. */
++    if (!status) waited = ps5_wait_dualsense(1000);
++    MESSAGE("[PS5 Proton] HID bus start status %#lx; DualSense %s %ld ms\n", status,
++         waited >= 0 ? "ready after" : "not seen in", waited >= 0 ? waited : 1000L);
++    return status;
++}
+diff --git a/dlls/ntoskrnl.exe/ntoskrnl.exe.spec b/dlls/ntoskrnl.exe/ntoskrnl.exe.spec
+index 4426e50..58bd203 100644
+--- a/dlls/ntoskrnl.exe/ntoskrnl.exe.spec
++++ b/dlls/ntoskrnl.exe/ntoskrnl.exe.spec
+@@ -1715,3 +1715,5 @@
+ 
+ @ cdecl wine_ntoskrnl_main_loop(long)
+ @ cdecl wine_enumerate_root_devices(wstr)
++
++@ cdecl wine_ps5_hid_start()
+diff --git a/dlls/ntoskrnl.exe/pnp.c b/dlls/ntoskrnl.exe/pnp.c
+index 11a578a..f944f5a 100644
+--- a/dlls/ntoskrnl.exe/pnp.c
++++ b/dlls/ntoskrnl.exe/pnp.c
+@@ -294,6 +294,17 @@ static BOOL install_device_driver( DEVICE_OBJECT *device, HDEVINFO set, SP_DEVIN
+ 
+     SetupDiSetDeviceRegistryPropertyW( set, sp_device, SPDRP_HARDWAREID, (BYTE *)ids,
+             sizeof_multiszW( ids ) * sizeof(WCHAR) );
++    if (GetEnvironmentVariableW(L"WINE_PS5_HID", NULL, 0) &&
++        (!wcsnicmp(ids, L"WINEBUS\\VID_054C&PID_0CE6", 25) || !wcsnicmp(ids, L"HID\\VID_054C&PID_0CE6", 21)))
++    {
++        BOOL bus = !wcsnicmp(ids, L"WINEBUS", 7);
++        ExFreePool(ids);
++        SetupDiSetDeviceRegistryPropertyW(set, sp_device, SPDRP_CLASSGUID,
++            (BYTE *)L"{745a17a0-74d3-11d0-b6fe-00a0c90f57da}", sizeof(L"{745a17a0-74d3-11d0-b6fe-00a0c90f57da}"));
++        if (bus) SetupDiSetDeviceRegistryPropertyW(set, sp_device, SPDRP_SERVICE,
++            (BYTE *)L"winehid", sizeof(L"winehid"));
++        return SetupDiRegisterDeviceInfo(set, sp_device, 0, NULL, NULL, NULL);
++    }
+     ExFreePool( ids );
+ 
+     if ((status = get_device_id( device, BusQueryCompatibleIDs, &ids )) || !ids)
+diff --git a/dlls/winebus.sys/Makefile.in b/dlls/winebus.sys/Makefile.in
+index db32fae..39cd583 100644
+--- a/dlls/winebus.sys/Makefile.in
++++ b/dlls/winebus.sys/Makefile.in
+@@ -7,6 +7,7 @@ UNIX_CFLAGS  = $(UDEV_CFLAGS) $(SDL2_CFLAGS)
+ EXTRADLLFLAGS = -Wl,--subsystem,native
+ 
+ SOURCES = \
++	bus_ps5.c \
+ 	bus_iohid.c \
+ 	bus_sdl.c \
+ 	bus_udev.c \
+diff --git a/dlls/winebus.sys/bus_ps5.c b/dlls/winebus.sys/bus_ps5.c
+new file mode 100644
+index 0000000..3d96e64
+--- /dev/null
++++ b/dlls/winebus.sys/bus_ps5.c
+@@ -0,0 +1,121 @@
++/* SPDX-License-Identifier: LGPL-2.1-or-later
++ * Native PS5 DualSense transport for Wine's existing HID/PnP stack. */
++#if 0
++#pragma makedep unix
++#endif
++#include "config.h"
++#include <dlfcn.h>
++#include <unistd.h>
++#include <pthread.h>
++#include <string.h>
++#include "ntstatus.h"
++#define WIN32_NO_STATUS
++#include "unix_private.h"
++
++struct ps5_device { struct unix_device base; int started; };
++static struct ps5_device *device;
++static int stopping;
++static pthread_mutex_t device_lock = PTHREAD_MUTEX_INITIALIZER;
++static int (*read_pad)(unsigned char *);
++static struct list events = LIST_INIT(events);
++
++/* USB report 1: six axes, counter, hat, 15 buttons and vendor payload.
++ * The vendor payload retains DualSense's public USB layout for SDL HIDAPI. */
++static const BYTE descriptor[] = {
++    0x05,0x01, 0x09,0x05, 0xa1,0x01, 0x85,0x01,
++    0x15,0x00, 0x26,0xff,0x00, 0x75,0x08, 0x95,0x06,
++    0x09,0x30, 0x09,0x31, 0x09,0x32, 0x09,0x35, 0x09,0x33, 0x09,0x34, 0x81,0x02,
++    0x06,0x00,0xff, 0x09,0x20, 0x95,0x01, 0x81,0x02,
++    0x05,0x01, 0x09,0x39, 0x15,0x00, 0x25,0x07, 0x35,0x00, 0x46,0x3b,0x01,
++    0x65,0x14, 0x75,0x04, 0x95,0x01, 0x81,0x42,
++    0x65,0x00, 0x05,0x09, 0x19,0x01, 0x29,0x0f, 0x15,0x00, 0x25,0x01,
++    0x75,0x01, 0x95,0x0f, 0x81,0x02,
++    0x75,0x01, 0x95,0x0d, 0x81,0x03,
++    0x06,0x00,0xff, 0x09,0x21, 0x15,0x00, 0x26,0xff,0x00,
++    0x75,0x08, 0x95,0x34, 0x81,0x02,
++    0x85,0x02, 0x09,0x22, 0x95,0x2f, 0x91,0x02,
++    0x85,0x09, 0x09,0x23, 0x95,0x13, 0xb1,0x02,
++    0xc0
++};
++static void destroy(struct unix_device *iface) { }
++static NTSTATUS start(struct unix_device *iface)
++{
++    __atomic_store_n(&((struct ps5_device *)iface)->started, 1, __ATOMIC_RELEASE);
++    return STATUS_SUCCESS;
++}
++static void stop(struct unix_device *iface)
++{
++    pthread_mutex_lock(&device_lock);
++    if (device == (struct ps5_device *)iface) device = NULL;
++    __atomic_store_n(&((struct ps5_device *)iface)->started, 0, __ATOMIC_RELEASE);
++    pthread_mutex_unlock(&device_lock);
++}
++static NTSTATUS get_descriptor(struct unix_device *iface, BYTE *buffer, UINT length, UINT *out)
++{
++    *out = sizeof(descriptor);
++    if (length < sizeof(descriptor)) return STATUS_BUFFER_TOO_SMALL;
++    memcpy(buffer, descriptor, sizeof(descriptor));
++    return STATUS_SUCCESS;
++}
++static void unsupported(struct unix_device *iface, HID_XFER_PACKET *packet, IO_STATUS_BLOCK *io)
++{
++    io->Status = STATUS_NOT_SUPPORTED;
++    io->Information = 0;
++}
++static void feature(struct unix_device *iface, HID_XFER_PACKET *packet, IO_STATUS_BLOCK *io)
++{
++    /* A stable local virtual-device serial, not the user's hardware address. */
++    static const BYTE serial[20] = {9, 1, 0, 0, 0, 0, 2};
++    unsupported(iface, packet, io);
++    if (packet->reportId != 9) return;
++    if (packet->reportBufferLen < sizeof(serial)) { io->Status = STATUS_BUFFER_TOO_SMALL; return; }
++    memcpy(packet->reportBuffer, serial, sizeof(serial));
++    io->Information = sizeof(serial);
++    io->Status = STATUS_SUCCESS;
++}
++static const struct raw_device_vtbl vtbl = {destroy, start, stop, get_descriptor, unsupported, feature, unsupported};
++
++NTSTATUS ps5_bus_init(void *args)
++{
++    read_pad = dlsym(RTLD_DEFAULT, "pw_wine_dualsense");
++    return read_pad ? STATUS_SUCCESS : STATUS_NOT_SUPPORTED;
++}
++NTSTATUS ps5_bus_wait(void *args)
++{
++    struct bus_event *event = args;
++    BYTE report[64];
++    int connected;
++    bus_event_cleanup(event);
++    while (!__atomic_load_n(&stopping, __ATOMIC_ACQUIRE))
++    {
++        usleep(8000);
++        connected = read_pad(report);
++        pthread_mutex_lock(&device_lock);
++        if (connected && !device)
++        {
++            struct device_desc desc = {.vid=0x054c, .pid=0x0ce6, .version=0x0100, .input=-1,
++                .is_gamepad=TRUE, .is_hidraw=TRUE, .bus_type=BUS_TYPE_USB,
++                .manufacturer={'S','o','n','y',' ','I','n','t','e','r','a','c','t','i','v','e',' ','E','n','t','e','r','t','a','i','n','m','e','n','t'},
++                .product={'D','u','a','l','S','e','n','s','e',' ','W','i','r','e','l','e','s','s',' ','C','o','n','t','r','o','l','l','e','r'},
++                .serialnumber={'P','S','5','-','L','O','C','A','L','-','1'}};
++            if (!(device = raw_device_create(&vtbl, sizeof(*device))))
++            { pthread_mutex_unlock(&device_lock); return STATUS_NO_MEMORY; }
++            bus_event_queue_device_created(&events, &device->base, &desc);
++        }
++        else if (!connected && device)
++        {
++            bus_event_queue_device_removed(&events, &device->base);
++            device = NULL; /* device_remove releases the bus ownership reference */
++        }
++        else if (device && __atomic_load_n(&device->started, __ATOMIC_ACQUIRE))
++            bus_event_queue_input_report(&events, &device->base, report, sizeof(report));
++        pthread_mutex_unlock(&device_lock);
++        if (bus_event_queue_pop(&events, event)) return STATUS_PENDING;
++    }
++    return STATUS_SUCCESS;
++}
++NTSTATUS ps5_bus_stop(void *args)
++{
++    __atomic_store_n(&stopping, 1, __ATOMIC_RELEASE);
++    return STATUS_SUCCESS;
++}
+diff --git a/dlls/winebus.sys/main.c b/dlls/winebus.sys/main.c
+index 4bc9671..06d67b0 100644
+--- a/dlls/winebus.sys/main.c
++++ b/dlls/winebus.sys/main.c
+@@ -1378,6 +1378,12 @@ static NTSTATUS fdo_pnp_dispatch(DEVICE_OBJECT *device, IRP *irp)
+     case IRP_MN_START_DEVICE:
+         bus_options_init();
+ 
++        if (GetEnvironmentVariableW(L"WINE_PS5_HID", NULL, 0))
++        {
++            struct bus_main_params bus = {.name = L"PS5", .init_code = ps5_init, .wait_code = ps5_wait};
++            irp->IoStatus.Status = bus_main_thread_start(&bus);
++            break;
++        }
+         mouse_device_create();
+         keyboard_device_create();
+ 
+@@ -1391,6 +1397,7 @@ static NTSTATUS fdo_pnp_dispatch(DEVICE_OBJECT *device, IRP *irp)
+         irp->IoStatus.Status = STATUS_SUCCESS;
+         break;
+     case IRP_MN_REMOVE_DEVICE:
++        winebus_call(ps5_stop, NULL);
+         winebus_call(sdl_stop, NULL);
+         winebus_call(udev_stop, NULL);
+         winebus_call(iohid_stop, NULL);
+diff --git a/dlls/winebus.sys/unix_private.h b/dlls/winebus.sys/unix_private.h
+index ba36971..49c52fc 100644
+--- a/dlls/winebus.sys/unix_private.h
++++ b/dlls/winebus.sys/unix_private.h
+@@ -222,6 +222,10 @@ struct unix_device
+ extern void *raw_device_create(const struct raw_device_vtbl *vtbl, SIZE_T size);
+ extern void *hid_device_create(const struct hid_device_vtbl *vtbl, SIZE_T size);
+ 
++extern NTSTATUS ps5_bus_init(void *);
++extern NTSTATUS ps5_bus_wait(void *);
++extern NTSTATUS ps5_bus_stop(void *);
++
+ extern NTSTATUS sdl_bus_init(void *);
+ extern NTSTATUS sdl_bus_wait(void *);
+ extern NTSTATUS sdl_bus_stop(void *);
+diff --git a/dlls/winebus.sys/unixlib.c b/dlls/winebus.sys/unixlib.c
+index bd4351f..0769ad8 100644
+--- a/dlls/winebus.sys/unixlib.c
++++ b/dlls/winebus.sys/unixlib.c
+@@ -319,6 +319,9 @@ const unixlib_entry_t __wine_unix_call_funcs[] =
+     unix_device_set_output_report,
+     unix_device_get_feature_report,
+     unix_device_set_feature_report,
++    ps5_bus_init,
++    ps5_bus_wait,
++    ps5_bus_stop,
+ };
+ 
+ C_ASSERT(ARRAYSIZE(__wine_unix_call_funcs) == unix_funcs_count);
+diff --git a/dlls/winebus.sys/unixlib.h b/dlls/winebus.sys/unixlib.h
+index ad3b268..1d0f651 100644
+--- a/dlls/winebus.sys/unixlib.h
++++ b/dlls/winebus.sys/unixlib.h
+@@ -155,6 +155,9 @@ enum unix_funcs
+     device_set_output_report,
+     device_get_feature_report,
+     device_set_feature_report,
++    ps5_init,
++    ps5_wait,
++    ps5_stop,
+     unix_funcs_count,
+ };
+ 
+-- 
+2.56.0
+

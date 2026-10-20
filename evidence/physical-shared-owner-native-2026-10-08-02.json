@@ -1,0 +1,31 @@
+{
+ "name": "physical-shared-owner-native-2026-10-08-02",
+ "question": "Does physical shared backing preserve cross-process and alias coherence without charging touched pages to FMEM?",
+ "bytes": 8388608,
+ "source_sha256": "822588eec0b549d69113f8fb27b55f8469ab5028507c0d906383a92f67425b65",
+ "roles": [
+  {
+   "role": "producer",
+   "output": "physical-shared flexible_phase=baseline status=0 available=8393850880\nphysical-shared phase=baseline native=293 resident_status=0 resident_pages=214 direct_status=0x8002000c total=12280922112 largest_available=0\nphysical-shared create=12 errno=0\nphysical-shared flexible_phase=producer-held status=0 available=8385462272\nphysical-shared phase=producer-held native=293 resident_status=0 resident_pages=214 direct_status=0x8002000c total=12280922112 largest_available=0\nphysical-shared holding=20-seconds\nphysical-shared stage=reader-update okay=1 errno=12\nphysical-shared flexible_phase=released status=0 available=8393850880\nphysical-shared phase=released native=293 resident_status=0 resident_pages=214 direct_status=0x8002000c total=12280922112 largest_available=0\nPS5_PHYSICAL_SHARED PASS role=producer errno=12\n",
+   "passed": true
+  },
+  {
+   "role": "reader",
+   "output": "physical-shared flexible_phase=baseline status=0 available=8385462272\nphysical-shared phase=baseline native=294 resident_status=0 resident_pages=214 direct_status=0x8002000c total=12280922112 largest_available=0\nphysical-shared flexible_phase=reader-alias-held status=0 available=8385462272\nphysical-shared phase=reader-alias-held native=294 resident_status=0 resident_pages=214 direct_status=0x8002000c total=12280922112 largest_available=0\nphysical-shared stage=reader-map okay=1 errno=12\nphysical-shared flexible_phase=released status=0 available=8393850880\nphysical-shared phase=released native=294 resident_status=0 resident_pages=214 direct_status=0x8002000c total=12280922112 largest_available=0\nPS5_PHYSICAL_SHARED PASS role=reader errno=12\n",
+   "passed": true
+  }
+ ],
+ "passed": true,
+ "post_control": "ok procs app=32792 title=PPSA99170 count=1 pids=281",
+ "qualification": {
+  "cross_process_and_last_fd_lifetime_passed": true,
+  "flexible_pool_before_bytes": 8393850880,
+  "flexible_pool_held_bytes": 8385462272,
+  "flexible_pool_released_bytes": 8393850880,
+  "charge_bytes": 8388608,
+  "application_direct_pool_unchanged": true,
+  "capacity_qualified": false,
+  "production_backing_changed": false,
+  "environment": "onionHEN was loaded by the person before this test; no fresh boot is claimed."
+ }
+}

@@ -1,0 +1,28 @@
+From: PS5_Proton <local>
+Subject: [PATCH] ntdll: PS5: a 32-bit program's view of a section stays below its limit
+
+A launcher's 32-bit GPU process (the software renderer Chromium falls back to once the first GPU process is gone) was given a 5.8 MiB view of a
+section at 0x1002180000: NtMapViewOfSection has no way to name the 32-bit limit (wow64 turns an absent request into zero bits), and the console's
+map_view prefers its reserved area above 4 GiB. The code kept the low half, 0x02180000, and its first write there faulted (libcef.dll + 0x318E992, a
+row fill of 0x640 words). Every GPU process after the first died of it, six times, and Chromium ended the launcher: "GPU process isn't usable."
+Patch 0953 did the same for allocations and 0946 for images; this is the third path (2026-10-12, 11 sessions of libcef logs; record removed from the tree; in git history).
+---
+diff --git a/dlls/ntdll/unix/virtual.c b/dlls/ntdll/unix/virtual.c
+--- a/dlls/ntdll/unix/virtual.c
++++ b/dlls/ntdll/unix/virtual.c
+@@ -4327,6 +4327,15 @@
+ 
+     if ((res = server_get_unix_fd( handle, 0, &unix_handle, &needs_close, NULL, NULL ))) return res;
+ 
++#ifdef __PROSPERO__
++    /* A 32-bit program's view of a section stays below that program's limit. NtMapViewOfSection has no way to say so (wow64 gives it
++     * a zero-bits count, and a caller that asks for none gets none), and the console's map_view prefers its reserved area above
++     * 4 GiB: a launcher's 32-bit GPU process was given a 5.8 MiB view at 0x1002180000, kept the low half of the address and its
++     * first write faulted at 0x02180000, every GPU process after the first, until Chromium gave up ("GPU process isn't usable").
++     * (2026-10-12.) */
++    if (!base && user_space_wow_limit && (!limit_high || limit_high > user_space_wow_limit)) limit_high = user_space_wow_limit;
++#endif
++
+     server_enter_uninterrupted_section( &virtual_mutex, &sigset );
+ 
+ #ifdef __PROSPERO__

@@ -1,0 +1,44 @@
+{
+  "run": "lapy-elev-02",
+  "date": "2026-01-04",
+  "console": {
+    "firmware": "10.01",
+    "klog": "klog/lapy-elev-02.log (ignored)"
+  },
+  "what": "exit-probe.exe",
+  "elevation": {
+    "mechanism": "ps5_elevation_request (platform layer) -> /download0/elevate_proc -> PS5-Lapy-JB-Daemon",
+    "status": "ok",
+    "instances": 2,
+    "instances_note": "the game instance and the launcher instance it returns to",
+    "proof": "the client's own write/read/compare of /data/.lapy_probe_<pid> passed; the launcher then listed /data/ps5proton/games (8 entries)"
+  },
+  "daemon": {
+    "project": "PS5-Lapy-JB-Daemon",
+    "commit": "5b8397b",
+    "mode": "service",
+    "max_requests": 4,
+    "elf_sha256": "7cf52c9f6dec04278ce901049f5125da8a2fbf87e1b6c56d1dd6998acdff1a33",
+    "build_id": "1ae61bd176670d721f3d366c852edd97104eab4a8fbf6401e0b005c63c4f7403",
+    "sdk": "ps5-payload-sdk v0.40 release (zip sha256 617fb702df3551f709b2db0a014e618cf39334c9348395a9b005e6504d076a42); the last release whose kernel_get_ucred_attrs still returns uint64_t, which is what this daemon calls",
+    "logging_client": "prospero-win native/ps5log",
+    "console_validated_upstream": ["12.02"],
+    "delivery": "websrv (console :8080) POST /elfldr, fields elf/args/pipe"
+  },
+  "title": {
+    "eboot_sha256": "87f1cb302e7a50a6f028563aa239af497a1a6c26e25889f4cf95841ecb714c1d",
+    "change": "the /data request is made before platform_init, so the process is single-threaded when the daemon inspects it",
+    "legacy_elevator": "absent from this build"
+  },
+  "result": "finished",
+  "seconds": 7.2,
+  "launches": 1,
+  "probe_verdict": "PASS",
+  "title_exit": "ends: status 0",
+  "passed": true,
+  "open": [
+    "not clean: two payload processes (the daemon's donor children, released when the elevated game instance exec'd) faulted in user mode (SIGSEGV, fault address 0x1b0) and were coredumped during this run; upstream records the same signature for firmware it has not validated (its 6.02 note: donor processes faulted in user mode, every cycle functionally correct). The captures of the legacy path on 2026-10-04 show no fatal signals at all",
+    "the daemon's own ps5log events (daemon_start, target_state, target_preflight, reference counters) were not captured: this host is not reachable from the console, so dev.conf points at a console-local listener only to satisfy the daemon's logging gate",
+    "the root reference balance after these two elevations is therefore still unmeasured on 10.01"
+  ]
+}

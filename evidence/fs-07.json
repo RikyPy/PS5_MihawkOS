@@ -1,0 +1,59 @@
+{
+ "run": "fs-07",
+ "what": "fs-probe.exe",
+ "env": [
+  "FS_PROBE_HANDLES=1"
+ ],
+ "result": "finished",
+ "seconds": 12.8,
+ "probe_verdict": "PASS",
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": true,
+ "bench": {},
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [
+   {
+    "calls": 7689.0,
+    "per_s": 1510.0,
+    "avg_us": 508.9,
+    "selects": 1216.0,
+    "blocked": 402.0,
+    "block_avg_us": 8440.6,
+    "waits": 1213.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 808.0,
+    "delays": 0.0,
+    "yields": 0.0
+   }
+  ],
+  "top": [
+   {
+    "create_file": {
+     "count": 630,
+     "avg_us": 5070.7
+    },
+    "event_op": {
+     "count": 402,
+     "avg_us": 719.8
+    },
+    "close_handle": {
+     "count": 1651,
+     "avg_us": 55.3
+    },
+    "create_mapping": {
+     "count": 54,
+     "avg_us": 1087.7
+    },
+    "create_key": {
+     "count": 124,
+     "avg_us": 349.3
+    }
+   }
+  ]
+ }
+}

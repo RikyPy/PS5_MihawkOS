@@ -1,0 +1,22 @@
+{
+ "run": "glv-a2",
+ "what": "gl-vertex-probe.exe",
+ "env": [
+  "WINE_PS5_OPENGL=1",
+  "WINEDEBUG=warn+opengl,err+all"
+ ],
+ "result": "finished",
+ "seconds": 3.8,
+ "probe_verdict": null,
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": false,
+ "bench": {},
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [],
+  "top": []
+ }
+}

@@ -1,0 +1,17 @@
+{
+ "run": "late-library-host-2026-10-08-01",
+ "host_only": true,
+ "wine_revision": "7e893751d256bfe062fd1d159375f024dedfa696",
+ "source_sha256": "d14710b373c51d924e8baae631912385a64c35bcc270cc568a94ce0b389664a5",
+ "probe_sha256": "3c5c8672d424138966f426c548f4d835497ef7d4469f70727f139afcfd121807",
+ "seconds": 2.52,
+ "exit_code": 0,
+ "passed": true,
+ "diagnostics": [
+  "0024:warn:debugstr:OutputDebugStringA \"PS5_PROTON_LATE_LIBRARY_STAGE stage=reserve spans=5 bytes=1082317996032 error=0 passed=1\\n\"",
+  "0024:warn:debugstr:OutputDebugStringA \"PS5_PROTON_LATE_LIBRARY_STAGE stage=vulkan-1.dll spans=5 bytes=1082317996032 error=0 passed=1\\n\"",
+  "0024:warn:debugstr:OutputDebugStringA \"PS5_PROTON_LATE_LIBRARY_STAGE stage=uxtheme.dll spans=5 bytes=1082317996032 error=0 passed=1\\n\"",
+  "0024:warn:debugstr:OutputDebugStringA \"PS5_PROTON_LATE_LIBRARY_STAGE stage=release spans=5 bytes=1082317996032 error=0 passed=1\\n\"",
+  "0024:warn:debugstr:OutputDebugStringA \"PS5_PROTON_LATE_LIBRARY PASS\\n\""
+ ]
+}

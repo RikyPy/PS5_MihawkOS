@@ -1,0 +1,155 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Sun, 4 Oct 2026 11:45:00 -0400
+Subject: [PATCH] ntdll: on PS5, extend syscall arguments narrower than 32 bits
+
+A BOOLEAN (or a UCHAR) reaches a syscall as one byte of a 64-bit argument slot. The Windows x64 ABI
+leaves the other bytes undefined, and the PE side's clang stores only the byte for a stack argument
+(movb $0x0, 0x20(%rsp)) and sets only the low byte of a register one (movb $0x1, %r9b). The console's
+Unix side is built by clang for the System V ABI, which assumes such an argument arrives extended to
+32 bits: NtQueryDirectoryObject tests restart with testl %r8d, %r8d. With a stale byte above it,
+FALSE read as TRUE: kernelbase's GetLogicalDrives (a patched PE module since patch 0161, whose frame
+left one there) restarted the scan of \DosDevices on every call and looped forever, which ended
+kernel32's drive and path tests by the watchdog with no output. The same can happen to an event's
+initial state, a wait's alertable flag or NtQueryDirectoryFile's restart_scan, rarely and at random.
+
+loader.c builds, from the syscall list, a table by syscall id of the arguments narrower than 32 bits
+(36 ntdll syscalls, all of them BOOLEAN; win32u's WORD and BYTE ones are in their own table and are
+not covered here). The dispatcher reads it for each syscall; one with such arguments goes through a
+path built like trace_syscall's (the register arguments pushed beside the copied stack ones), which
+keeps only their low byte and then calls the syscall as usual. Every other syscall pays one load and
+a test. These calls are not traced by +syscall.
+---
+  dlls/ntdll/unix/loader.c        | 63 +++++++++++++++++++++++++++++++++++++++++
+  dlls/ntdll/unix/signal_x86_64.c | 35 ++++++++++++++++++++++-
+  2 files changed, 97 insertions(+), 1 deletion(-)
+
+diff --git a/dlls/ntdll/unix/loader.c b/dlls/ntdll/unix/loader.c
+index c836516..bd04427 100644
+--- a/dlls/ntdll/unix/loader.c
++++ b/dlls/ntdll/unix/loader.c
+@@ -160,6 +160,69 @@ SYSTEM_SERVICE_TABLE KeServiceDescriptorTable[4] =
+     { (ULONG_PTR *)syscalls, NULL, ARRAY_SIZE(syscalls), syscall_args }
+ };
+ 
++#ifdef __PROSPERO__
++/* A BOOLEAN (or another argument narrower than 32 bits) reaches a syscall as one byte of a 64-bit
++ * argument slot: the Windows ABI leaves the rest undefined, and the PE caller may store only the byte
++ * (movb $0x0, 0x20(%rsp)). The console's Unix side is built by clang for the System V ABI, which
++ * assumes such an argument arrives extended to 32 bits and tests the whole register; a stale byte
++ * above it turns FALSE into TRUE. kernelbase's GetLogicalDrives looped forever on it (restart=TRUE
++ * on every NtQueryDirectoryObject call, so the same first entry came back each time). The
++ * dispatcher (signal_x86_64.c) reads this table by syscall id, and for a syscall with such
++ * arguments extends them from their low byte before the call. Bit n is argument n + 1. */
++enum
++{
++#define SYSCALL_ENTRY(id,name,args) PS5_SYSCALL_##name = id,
++    ALL_SYSCALLS
++#undef SYSCALL_ENTRY
++};
++
++const UINT ps5_narrow_syscall_args[0x4000] =
++{
++    [PS5_SYSCALL_NtSetDebugFilterState] = 1u << 2,
++    [PS5_SYSCALL_NtQueryDefaultLocale] = 1u << 0,
++    [PS5_SYSCALL_NtSetDefaultLocale] = 1u << 0,
++    [PS5_SYSCALL_NtQueryDirectoryFile] = 1u << 8 | 1u << 10,
++    [PS5_SYSCALL_NtLockFile] = 1u << 8 | 1u << 9,
++    [PS5_SYSCALL_NtNotifyChangeDirectoryFile] = 1u << 8,
++    [PS5_SYSCALL_NtQueryEaFile] = 1u << 4 | 1u << 8,
++    [PS5_SYSCALL_NtNotifyChangeMultipleKeys] = 1u << 8 | 1u << 11,
++    [PS5_SYSCALL_NtNotifyChangeKey] = 1u << 6 | 1u << 9,
++    [PS5_SYSCALL_NtOpenThreadToken] = 1u << 2,
++    [PS5_SYSCALL_NtOpenThreadTokenEx] = 1u << 2,
++    [PS5_SYSCALL_NtDuplicateToken] = 1u << 3,
++    [PS5_SYSCALL_NtAdjustGroupsToken] = 1u << 1,
++    [PS5_SYSCALL_NtAdjustPrivilegesToken] = 1u << 1,
++    [PS5_SYSCALL_NtAccessCheckAndAuditAlarm] = 1u << 7,
++    [PS5_SYSCALL_NtAccessCheckByTypeAndAuditAlarm] = 1u << 12,
++    [PS5_SYSCALL_NtCloseObjectAuditAlarm] = 1u << 2,
++    [PS5_SYSCALL_NtContinue] = 1u << 1,
++    [PS5_SYSCALL_NtCreateEvent] = 1u << 4,
++    [PS5_SYSCALL_NtCreateMutant] = 1u << 3,
++    [PS5_SYSCALL_NtWaitForDebugEvent] = 1u << 1,
++    [PS5_SYSCALL_NtQueryDirectoryObject] = 1u << 3 | 1u << 4,
++    [PS5_SYSCALL_NtSetTimer] = 1u << 4,
++    [PS5_SYSCALL_NtWaitForMultipleObjects] = 1u << 3,
++    [PS5_SYSCALL_NtWaitForSingleObject] = 1u << 1,
++    [PS5_SYSCALL_NtSignalAndWaitForSingleObject] = 1u << 2,
++    [PS5_SYSCALL_NtDelayExecution] = 1u << 0,
++    [PS5_SYSCALL_NtSetTimerResolution] = 1u << 1,
++    [PS5_SYSCALL_NtWaitForKeyedEvent] = 1u << 2,
++    [PS5_SYSCALL_NtReleaseKeyedEvent] = 1u << 2,
++    [PS5_SYSCALL_NtRemoveIoCompletionEx] = 1u << 5,
++    [PS5_SYSCALL_NtAcceptConnectPort] = 1u << 3,
++    [PS5_SYSCALL_NtCommitTransaction] = 1u << 1,
++    [PS5_SYSCALL_NtRollbackTransaction] = 1u << 1,
++    [PS5_SYSCALL_NtInitiatePowerAction] = 1u << 3,
++    [PS5_SYSCALL_NtCreateThread] = 1u << 7,
++};
++
++void ps5_extend_syscall_args( UINT mask, ULONG_PTR *args )
++{
++    unsigned int i;
++    for (i = 0; mask; i++, mask >>= 1) if (mask & 1) args[i] &= 0xff;
++}
++#endif
++
+ static const char *ntsyscall_names[] =
+ {
+ #define SYSCALL_ENTRY(id,name,args) #name,
+diff --git a/dlls/ntdll/unix/signal_x86_64.c b/dlls/ntdll/unix/signal_x86_64.c
+index a5d6b90..0d84eb7 100644
+--- a/dlls/ntdll/unix/signal_x86_64.c
++++ b/dlls/ntdll/unix/signal_x86_64.c
+@@ -3616,7 +3616,17 @@ __ASM_GLOBAL_FUNC( __wine_syscall_dispatcher,
+                    "leaq 16(%r15),%rsi\n\t"        /* 7th argument */
+                    "cld\n\t"
+                    "rep; movsq\n"
+-                   "1:\ttestl $1,0x380(%r13)\n\t"  /* thread_data->syscall_trace */
++                   "1:\t"
++#ifdef __PROSPERO__
++                   /* arguments narrower than 32 bits are extended first (ps5_narrow_syscall_args, loader.c) */
++                   "movl 0x18(%rbp),%ecx\n\t"      /* frame->syscall_id */
++                   "andl $0x3fff,%ecx\n\t"
++                   "leaq " __ASM_NAME("ps5_narrow_syscall_args") "(%rip),%rdx\n\t"
++                   "movl (%rdx,%rcx,4),%edx\n\t"
++                   "testl %edx,%edx\n\t"
++                   "jnz " __ASM_LOCAL_LABEL("ps5_narrow_syscall") "\n\t"
++#endif
++                   "testl $1,0x380(%r13)\n\t"      /* thread_data->syscall_trace */
+                    "jnz " __ASM_LOCAL_LABEL("trace_syscall") "\n\t"
+                    "movq %r10,%rdi\n\t"            /* 1st argument */
+                    "movq %r11,%rsi\n\t"            /* 2nd argument */
+@@ -3753,6 +3763,29 @@ __ASM_GLOBAL_FUNC( __wine_syscall_dispatcher,
+ 
+                    /* pop rbp-based kernel stack cfi */
+                    __ASM_CFI("\t.cfi_restore_state\n")
++#ifdef __PROSPERO__
++                   /* as trace_syscall below: the six register arguments joined to the copied stack ones,
++                    * then extended where the table says (these calls are not traced) */
++                   __ASM_LOCAL_LABEL("ps5_narrow_syscall") ":\n\t"
++                   "pushq 8(%r15)\n\t"             /* 6th argument */
++                   "pushq (%r15)\n\t"              /* 5th argument */
++                   "pushq %r9\n\t"                 /* 4th argument */
++                   "pushq %r8\n\t"                 /* 3rd argument */
++                   "pushq %r11\n\t"                /* 2nd argument */
++                   "pushq %r10\n\t"                /* 1st argument */
++                   "movl %edx,%edi\n\t"            /* mask */
++                   "movq %rsp,%rsi\n\t"            /* args */
++                   "call " __ASM_NAME("ps5_extend_syscall_args") "\n\t"
++                   "popq %rdi\n\t"                 /* 1st argument */
++                   "popq %rsi\n\t"                 /* 2nd argument */
++                   "popq %rdx\n\t"                 /* 3rd argument */
++                   "popq %rcx\n\t"                 /* 4th argument */
++                   "popq %r8\n\t"                  /* 5th argument */
++                   "popq %r9\n\t"                  /* 6th argument */
++                   "callq *%r12\n\t"
++                   "leaq -0x98(%rbp),%rcx\n\t"
++                   "jmp " __ASM_LOCAL_LABEL("__wine_syscall_dispatcher_return") "\n"
++#endif
+                    __ASM_LOCAL_LABEL("trace_syscall") ":\n\t"
+                    "pushq 8(%r15)\n\t"             /* 6th argument */
+                    "pushq (%r15)\n\t"              /* 5th argument */
+-- 
+2.55.0

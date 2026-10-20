@@ -1,0 +1,81 @@
+From: PS5_Proton <local>
+Subject: [PATCH] server: PS5: register large anonymous sections for direct memory, release them with the section
+
+A large anonymous section (CreateFileMapping without a file, 256 MiB and more) was a sparse file on /data paged
+through a 64 MiB cache in each client. A program whose working set in one is larger thrashed the console's disk:
+The earlier emulator experiment (removed) (its guest memory is one 14.5 GiB section) evicted and flushed 60,000 to 77,000 pages a run,
+its own file reads took up to 2.3 s each, frames stopped for 25 s and the console went down
+(2026-10-14; record removed from the tree; in git history). On Windows that memory is RAM.
+
+The server now registers each such section with the title (pw_wineserver_set_dsection; the table is
+wine/ps5/pw_wine_dsection.c) under its backing file's identity and releases it when the mapping object is destroyed.
+Clients ask the title for the direct memory behind a page over their own channel (PW_CHILD_DSECTION), not through a
+server request, because the pager asks from a fault handler, which may interrupt a server call of the same thread.
+---
+diff --git a/server/mapping.c b/server/mapping.c
+--- a/server/mapping.c
++++ b/server/mapping.c
+@@ -169,6 +169,10 @@
+     struct shared_map   *shared;     /* temp file for shared PE mapping */
+     char                *exp_name;   /* export name (for PE image mapping) */
+     data_size_t          exp_len;    /* length of export name (for PE image mapping) */
++#ifdef __PROSPERO__
++    int                  ps5_dmem;   /* a direct-memory section, named by its backing file */
++    unsigned __int64     ps5_dev, ps5_ino;
++#endif
+ };
+ 
+ static void mapping_dump( struct object *obj, int verbose );
+@@ -443,6 +447,18 @@
+     ps5_shared_alloc = alloc;
+     ps5_shared_touch = touch;
+ }
++/* Large anonymous sections in direct memory (wine/ps5/pw_wine_dsection.h), kept by the title: registered under their
++ * backing file's identity when made (the file stays only as that identity; clients ask the title for the memory behind
++ * a page over their own channel), released when the section goes. Set before the server starts; without them a
++ * section keeps its file backing. */
++static int (*ps5_dsection_register)( unsigned __int64 dev, unsigned __int64 ino, unsigned __int64 size );
++static void (*ps5_dsection_release)( unsigned __int64 dev, unsigned __int64 ino );
++DECLSPEC_EXPORT void pw_wineserver_set_dsection( int (*reg)( unsigned __int64, unsigned __int64, unsigned __int64 ),
++                                                 void (*release)( unsigned __int64, unsigned __int64 ) )
++{
++    ps5_dsection_register = reg;
++    ps5_dsection_release = release;
++}
+ /* The pages of [from, to) the helper's, before the server writes them. 0 or -1; without a helper, grow only. */
+ static int ps5_touch( int unix_fd, file_pos_t from, file_pos_t to )
+ {
+@@ -1223,6 +1239,18 @@
+         if ((flags & SEC_RESERVE) && !(mapping->committed = create_ranges())) goto error;
+         mapping->size = round_size( mapping->size, page_mask );
+         if ((unix_fd = create_anonymous_mapping_fd( mapping->size )) == -1) goto error;
++#ifdef __PROSPERO__
++        {
++            struct stat st;
++            if (ps5_dsection_register && !fstat( unix_fd, &st ) &&
++                !ps5_dsection_register( st.st_dev, st.st_ino, mapping->size ))
++            {
++                mapping->ps5_dmem = 1;
++                mapping->ps5_dev = st.st_dev;
++                mapping->ps5_ino = st.st_ino;
++            }
++        }
++#endif
+         if (!(mapping->fd = create_anonymous_fd( &mapping_fd_ops, unix_fd, &mapping->obj,
+                                                  FILE_SYNCHRONOUS_IO_NONALERT ))) goto error;
+         allow_fd_caching( mapping->fd );
+@@ -1357,6 +1385,9 @@
+ {
+     struct mapping *mapping = (struct mapping *)obj;
+     assert( obj->ops == &mapping_ops );
++#ifdef __PROSPERO__
++    if (mapping->ps5_dmem && ps5_dsection_release) ps5_dsection_release( mapping->ps5_dev, mapping->ps5_ino );
++#endif
+     if (mapping->fd) release_object( mapping->fd );
+     if (mapping->committed) release_object( mapping->committed );
+     if (mapping->shared) release_object( mapping->shared );
+@@ -1911,3 +1942,4 @@
+ 
+     release_object( process );
+ }
++

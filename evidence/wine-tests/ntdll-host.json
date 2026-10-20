@@ -1,0 +1,2229 @@
+{
+ "atom": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "last_line": "0020:atom: 164064 tests executed (1 marked as todo, 0 as flaky, 0 failures), 0 skipped.",
+  "seconds": 3.9,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 164064,
+   "todo": 1
+  },
+  "todo_lines": 1
+ },
+ "change": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "last_line": "0020:change: 82 tests executed (0 marked as todo, 0 as flaky, 0 failures), 0 skipped.",
+  "seconds": 1.5,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 82,
+   "todo": 0
+  },
+  "todo_lines": 0
+ },
+ "directory": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "last_line": "0020:directory: 7885 tests executed (34 marked as todo, 0 as flaky, 0 failures), 1 skipped.",
+  "seconds": 1.3,
+  "skipped_lines": [
+   "directory.c:1243: Tests skipped: Wow64 redirection not supported"
+  ],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 1,
+   "tests": 7885,
+   "todo": 34
+  },
+  "todo_lines": 34
+ },
+ "env": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "last_line": "0020:env: 603 tests executed (0 marked as todo, 0 as flaky, 0 failures), 0 skipped.",
+  "seconds": 1.1,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 603,
+   "todo": 0
+  },
+  "todo_lines": 0
+ },
+ "error": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "last_line": "0020:error: 1448 tests executed (0 marked as todo, 0 as flaky, 0 failures), 0 skipped.",
+  "seconds": 1.2,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 1448,
+   "todo": 0
+  },
+  "todo_lines": 0
+ },
+ "exception": {
+  "exit_code": null,
+  "failure_count": 341,
+  "failures": [
+   {
+    "file": "exception.c",
+    "line": 9294,
+    "text": "CreateProcessA failed"
+   },
+   {
+    "file": "exception.c",
+    "line": 9297,
+    "text": "expected Wow64 process"
+   },
+   {
+    "file": "exception.c",
+    "line": 9304,
+    "text": "GetThreadContext failed"
+   },
+   {
+    "file": "exception.c",
+    "line": 9312,
+    "text": "SetThreadContext failed"
+   },
+   {
+    "file": "exception.c",
+    "line": 9370,
+    "text": "Wow64SetThreadContext failed with c0000008"
+   },
+   {
+    "file": "exception.c",
+    "line": 9375,
+    "text": "Wow64GetThreadContext failed with c0000008"
+   },
+   {
+    "file": "exception.c",
+    "line": 9388,
+    "text": "GetThreadContext failed"
+   },
+   {
+    "file": "exception.c",
+    "line": 2654,
+    "text": "flags = 40000201"
+   },
+   {
+    "file": "exception.c",
+    "line": 3071,
+    "text": "28: c0000005: Wrong parameter 1: ffffffffffffffff/fffffffffffffffc"
+   },
+   {
+    "file": "exception.c",
+    "line": 3071,
+    "text": "32: c0000005: Wrong parameter 0: 0/1"
+   },
+   {
+    "file": "exception.c",
+    "line": 3071,
+    "text": "32: c0000005: Wrong parameter 1: ffffffffffffffff/fffffffffffffffc"
+   },
+   {
+    "file": "exception.c",
+    "line": 6249,
+    "text": "couldn't find target frame in parent frames"
+   },
+   {
+    "file": "exception.c",
+    "line": 6318,
+    "text": "CreateWindowA failed, error 0x578."
+   },
+   {
+    "file": "exception.c",
+    "line": 4545,
+    "text": "failed to start C:\\windows\\syswow64\\cmd.exe err 2"
+   },
+   {
+    "file": "exception.c",
+    "line": 4548,
+    "text": "got 0xc0000008"
+   },
+   {
+    "file": "exception.c",
+    "line": 4550,
+    "text": "got ebp 55555555"
+   },
+   {
+    "file": "exception.c",
+    "line": 4551,
+    "text": "got ecx 55555555"
+   },
+   {
+    "file": "exception.c",
+    "line": 4552,
+    "text": "got edx 55555555"
+   },
+   {
+    "file": "exception.c",
+    "line": 4553,
+    "text": "got esi 55555555"
+   },
+   {
+    "file": "exception.c",
+    "line": 4554,
+    "text": "got edi 55555555"
+   },
+   {
+    "file": "exception.c",
+    "line": 4555,
+    "text": "got eflags 55555555"
+   },
+   {
+    "file": "exception.c",
+    "line": 4556,
+    "text": "got control word 55555555"
+   },
+   {
+    "file": "exception.c",
+    "line": 4558,
+    "text": "got SSE control word 5555"
+   },
+   {
+    "file": "exception.c",
+    "line": 4562,
+    "text": "got 0xc0000008"
+   },
+   {
+    "file": "exception.c",
+    "line": 4566,
+    "text": "wrong len 0"
+   },
+   {
+    "file": "exception.c",
+    "line": 4573,
+    "text": "wrong len 0"
+   },
+   {
+    "file": "exception.c",
+    "line": 4575,
+    "text": "esp is not at top of stack: 55555555 / 00000000"
+   },
+   {
+    "file": "exception.c",
+    "line": 4585,
+    "text": "wrong cpu reserved 00006FFFFFBC10DC / 0000000000000000"
+   },
+   {
+    "file": "exception.c",
+    "line": 4590,
+    "text": "wrong len 0"
+   },
+   {
+    "file": "exception.c",
+    "line": 4591,
+    "text": "wrong machine 006e"
+   },
+   {
+    "file": "exception.c",
+    "line": 4593,
+    "text": "RtlWow64GetCpuAreaInfo failed c000000d"
+   },
+   {
+    "file": "exception.c",
+    "line": 4602,
+    "text": "got context flags 0"
+   },
+   {
+    "file": "exception.c",
+    "line": 4603,
+    "text": "got eax 00000000 / 55555555"
+   },
+   {
+    "file": "exception.c",
+    "line": 4604,
+    "text": "got ebx 00000000 / 55555555"
+   },
+   {
+    "file": "exception.c",
+    "line": 4605,
+    "text": "got ecx 00000000 / 55555555"
+   },
+   {
+    "file": "exception.c",
+    "line": 4606,
+    "text": "got edx 00000000 / 55555555"
+   },
+   {
+    "file": "exception.c",
+    "line": 4607,
+    "text": "got ebp 00000000 / 55555555"
+   },
+   {
+    "file": "exception.c",
+    "line": 4608,
+    "text": "got esi 00000000 / 55555555"
+   },
+   {
+    "file": "exception.c",
+    "line": 4609,
+    "text": "got edi 00000000 / 55555555"
+   },
+   {
+    "file": "exception.c",
+    "line": 4610,
+    "text": "got cs 0000 / 55555555"
+   },
+   {
+    "file": "exception.c",
+    "line": 4611,
+    "text": "got ds 0000 / 55555555"
+   },
+   {
+    "file": "exception.c",
+    "line": 4612,
+    "text": "got es 0000 / 55555555"
+   },
+   {
+    "file": "exception.c",
+    "line": 4613,
+    "text": "got fs 0000 / 55555555"
+   },
+   {
+    "file": "exception.c",
+    "line": 4614,
+    "text": "got gs 0000 / 55555555"
+   },
+   {
+    "file": "exception.c",
+    "line": 4615,
+    "text": "got ss 0000 / 55555555"
+   },
+   {
+    "file": "exception.c",
+    "line": 4616,
+    "text": "got eflags 00000000 / 55555555"
+   },
+   {
+    "file": "exception.c",
+    "line": 4617,
+    "text": "got control word 00000000 / 55555555"
+   },
+   {
+    "file": "exception.c",
+    "line": 4619,
+    "text": "got SSE control word 0000 / 5555"
+   },
+   {
+    "file": "exception.c",
+    "line": 4626,
+    "text": "got 0xc0000008"
+   },
+   {
+    "file": "exception.c",
+    "line": 4628,
+    "text": "wrong len 0"
+   },
+   {
+    "file": "exception.c",
+    "line": 4639,
+    "text": "got 0xc0000008"
+   },
+   {
+    "file": "exception.c",
+    "line": 4642,
+    "text": "rsi is not zero 5555555555555555"
+   },
+   {
+    "file": "exception.c",
+    "line": 4643,
+    "text": "rdi is not zero 5555555555555555"
+   },
+   {
+    "file": "exception.c",
+    "line": 4644,
+    "text": "rbp is not zero 5555555555555555"
+   },
+   {
+    "file": "exception.c",
+    "line": 4645,
+    "text": "r8 is not zero 5555555555555555"
+   },
+   {
+    "file": "exception.c",
+    "line": 4646,
+    "text": "r9 is not zero 5555555555555555"
+   },
+   {
+    "file": "exception.c",
+    "line": 4647,
+    "text": "r10 is not zero 5555555555555555"
+   },
+   {
+    "file": "exception.c",
+    "line": 4648,
+    "text": "r11 is not zero 5555555555555555"
+   },
+   {
+    "file": "exception.c",
+    "line": 4649,
+    "text": "r12 is not zero 5555555555555555"
+   },
+   {
+    "file": "exception.c",
+    "line": 4650,
+    "text": "r13 is not zero 5555555555555555"
+   },
+   {
+    "file": "exception.c",
+    "line": 4651,
+    "text": "r14 is not zero 5555555555555555"
+   },
+   {
+    "file": "exception.c",
+    "line": 4652,
+    "text": "r15 is not zero 5555555555555555"
+   },
+   {
+    "file": "exception.c",
+    "line": 4653,
+    "text": "wrong mxcsr 55555555"
+   },
+   {
+    "file": "exception.c",
+    "line": 4654,
+    "text": "wrong control 00005555"
+   },
+   {
+    "file": "exception.c",
+    "line": 4657,
+    "text": "wrong ds 5555 / 55555555"
+   },
+   {
+    "file": "exception.c",
+    "line": 4658,
+    "text": "wrong es 5555 / 55555555"
+   },
+   {
+    "file": "exception.c",
+    "line": 4659,
+    "text": "wrong fs 5555 / 55555555"
+   },
+   {
+    "file": "exception.c",
+    "line": 4660,
+    "text": "wrong gs 5555 / 55555555"
+   },
+   {
+    "file": "exception.c",
+    "line": 4661,
+    "text": "wrong ss 5555 / 55555555"
+   },
+   {
+    "file": "exception.c",
+    "line": 4671,
+    "text": "rax is not zero 5555555555555555"
+   },
+   {
+    "file": "exception.c",
+    "line": 4672,
+    "text": "rbx is not zero 5555555555555555"
+   },
+   {
+    "file": "exception.c",
+    "line": 4673,
+    "text": "rsp is not at top of stack 5555555555555555 / 0000000000000000"
+   },
+   {
+    "file": "exception.c",
+    "line": 4675,
+    "text": "wrong flags 55555555"
+   },
+   {
+    "file": "exception.c",
+    "line": 4685,
+    "text": "got 0xc0000008"
+   },
+   {
+    "file": "exception.c",
+    "line": 11720,
+    "text": "Failed to create thread."
+   },
+   {
+    "file": "exception.c",
+    "line": 11731,
+    "text": "Got unexpected bret 0, GetLastError() 6."
+   },
+   {
+    "file": "exception.c",
+    "line": 11733,
+    "text": "Got unexpected Mask 0x4."
+   },
+   {
+    "file": "exception.c",
+    "line": 11734,
+    "text": "Got unexpected CompactionMask 8000000000000007, expected 8000000000000004."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 0."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 1."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 2."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 3."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 4."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 5."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 6."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 7."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 8."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 9."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 10."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 11."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 12."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 13."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 14."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 15."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 16."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 17."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 18."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 19."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 20."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 21."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 22."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 23."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 24."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 25."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 26."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 27."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 28."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 29."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 30."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 31."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 32."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 33."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 34."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 35."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 36."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 37."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 38."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 39."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 40."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 41."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 42."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 43."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 44."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 45."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 46."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 47."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 48."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 49."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 50."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 51."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 52."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 53."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 54."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 55."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 56."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 57."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 58."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 59."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 60."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 61."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 62."
+   },
+   {
+    "file": "exception.c",
+    "line": 11739,
+    "text": "Got unexpected value 0xcccccccc, i 63."
+   },
+   {
+    "file": "exception.c",
+    "line": 11745,
+    "text": "Got unexpected bret 0, GetLastError() 6."
+   },
+   {
+    "file": "exception.c",
+    "line": 11749,
+    "text": "Got unexpected bret 0, GetLastError() 6."
+   },
+   {
+    "file": "exception.c",
+    "line": 11750,
+    "text": "Got unexpected Mask 4."
+   },
+   {
+    "file": "exception.c",
+    "line": 11752,
+    "text": "Got unexpected CompactionMask 8000000000000007."
+   },
+   {
+    "file": "exception.c",
+    "line": 11761,
+    "text": "Got unexpected bret 0, GetLastError() 6."
+   },
+   {
+    "file": "exception.c",
+    "line": 11764,
+    "text": "Got unexpected bret 0, GetLastError() 6."
+   },
+   {
+    "file": "exception.c",
+    "line": 11766,
+    "text": "Got unexpected CompactionMask 8000000000000007."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 0."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 1."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 2."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 3."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 4."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 5."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 6."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 7."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 8."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 9."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 10."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 11."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 12."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 13."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 14."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 15."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 16."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 17."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 18."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 19."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 20."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 21."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 22."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 23."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 24."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 25."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 26."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 27."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 28."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 29."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 30."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 31."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 32."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 33."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 34."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 35."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 36."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 37."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 38."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 39."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 40."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 41."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 42."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 43."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 44."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 45."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 46."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 47."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 48."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 49."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 50."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 51."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 52."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 53."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 54."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 55."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 56."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 57."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 58."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 59."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 60."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 61."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 62."
+   },
+   {
+    "file": "exception.c",
+    "line": 11769,
+    "text": "Got unexpected value 0xcccccccc, i 63."
+   },
+   {
+    "file": "exception.c",
+    "line": 10768,
+    "text": "Got unexpected suspend count 4294967295."
+   },
+   {
+    "file": "exception.c",
+    "line": 10776,
+    "text": "Got unexpected suspend count 4294967295."
+   },
+   {
+    "file": "exception.c",
+    "line": 10778,
+    "text": "Got unexpected suspend count 4294967295."
+   },
+   {
+    "file": "exception.c",
+    "line": 11775,
+    "text": "Got unexpected bret 0, GetLastError() 6."
+   },
+   {
+    "file": "exception.c",
+    "line": 11779,
+    "text": "Got unexpected bret 0, GetLastError() 6."
+   },
+   {
+    "file": "exception.c",
+    "line": 10768,
+    "text": "Got unexpected suspend count 4294967295."
+   },
+   {
+    "file": "exception.c",
+    "line": 10776,
+    "text": "Got unexpected suspend count 4294967295."
+   },
+   {
+    "file": "exception.c",
+    "line": 10778,
+    "text": "Got unexpected suspend count 4294967295."
+   },
+   {
+    "file": "exception.c",
+    "line": 11785,
+    "text": "Got unexpected bret 0, GetLastError() 6."
+   },
+   {
+    "file": "exception.c",
+    "line": 11789,
+    "text": "Got unexpected value 0xcccccccc, i 0."
+   },
+   {
+    "file": "exception.c",
+    "line": 11789,
+    "text": "Got unexpected value 0xcccccccc, i 1."
+   },
+   {
+    "file": "exception.c",
+    "line": 11789,
+    "text": "Got unexpected value 0xcccccccc, i 2."
+   },
+   {
+    "file": "exception.c",
+    "line": 11789,
+    "text": "Got unexpected value 0xcccccccc, i 3."
+   },
+   {
+    "file": "exception.c",
+    "line": 10768,
+    "text": "Got unexpected suspend count 4294967295."
+   },
+   {
+    "file": "exception.c",
+    "line": 10776,
+    "text": "Got unexpected suspend count 4294967295."
+   },
+   {
+    "file": "exception.c",
+    "line": 10778,
+    "text": "Got unexpected suspend count 4294967295."
+   },
+   {
+    "file": "exception.c",
+    "line": 11796,
+    "text": "Got unexpected bret 0, GetLastError() 6."
+   },
+   {
+    "file": "exception.c",
+    "line": 11798,
+    "text": "Got unexpected Mask 0x4, supported_features."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 0."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 1."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 2."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 3."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 4."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 5."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 6."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 7."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 8."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 9."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 10."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 11."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 12."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 13."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 14."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 15."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 16."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 17."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 18."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 19."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 20."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 21."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 22."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 23."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 24."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 25."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 26."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 27."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 28."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 29."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 30."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 31."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 32."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 33."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 34."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 35."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 36."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 37."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 38."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 39."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 40."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 41."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 42."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 43."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 44."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 45."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 46."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 47."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 48."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 49."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 50."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 51."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 52."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 53."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 54."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 55."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 56."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 57."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 58."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 59."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 60."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 61."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 62."
+   },
+   {
+    "file": "exception.c",
+    "line": 11804,
+    "text": "Got unexpected value 0xcccccccc, i 63."
+   },
+   {
+    "file": "exception.c",
+    "line": 12271,
+    "text": "Failed to create thread: 5"
+   },
+   {
+    "file": "exception.c",
+    "line": 12273,
+    "text": "wait returned: 258"
+   },
+   {
+    "file": "exception.c",
+    "line": 12279,
+    "text": "Failed to get thread context: 6"
+   },
+   {
+    "file": "exception.c",
+    "line": 12284,
+    "text": "Failed to set thread context: 6"
+   },
+   {
+    "file": "exception.c",
+    "line": 12290,
+    "text": "Failed to set thread context: 6"
+   },
+   {
+    "file": "exception.c",
+    "line": 12294,
+    "text": "Failed to get thread context: 6"
+   },
+   {
+    "file": "exception.c",
+    "line": 12299,
+    "text": "Failed to set thread context: 6"
+   },
+   {
+    "file": "exception.c",
+    "line": 12303,
+    "text": "Failed to get thread context: 6"
+   },
+   {
+    "file": "exception.c",
+    "line": 12290,
+    "text": "Failed to set thread context: 6"
+   },
+   {
+    "file": "exception.c",
+    "line": 12294,
+    "text": "Failed to get thread context: 6"
+   },
+   {
+    "file": "exception.c",
+    "line": 12299,
+    "text": "Failed to set thread context: 6"
+   },
+   {
+    "file": "exception.c",
+    "line": 12303,
+    "text": "Failed to get thread context: 6"
+   },
+   {
+    "file": "exception.c",
+    "line": 12290,
+    "text": "Failed to set thread context: 6"
+   },
+   {
+    "file": "exception.c",
+    "line": 12294,
+    "text": "Failed to get thread context: 6"
+   },
+   {
+    "file": "exception.c",
+    "line": 12299,
+    "text": "Failed to set thread context: 6"
+   },
+   {
+    "file": "exception.c",
+    "line": 12303,
+    "text": "Failed to get thread context: 6"
+   },
+   {
+    "file": "exception.c",
+    "line": 12290,
+    "text": "Failed to set thread context: 6"
+   },
+   {
+    "file": "exception.c",
+    "line": 12294,
+    "text": "Failed to get thread context: 6"
+   },
+   {
+    "file": "exception.c",
+    "line": 12299,
+    "text": "Failed to set thread context: 6"
+   },
+   {
+    "file": "exception.c",
+    "line": 12303,
+    "text": "Failed to get thread context: 6"
+   },
+   {
+    "file": "exception.c",
+    "line": 12290,
+    "text": "Failed to set thread context: 6"
+   },
+   {
+    "file": "exception.c",
+    "line": 12294,
+    "text": "Failed to get thread context: 6"
+   },
+   {
+    "file": "exception.c",
+    "line": 12299,
+    "text": "Failed to set thread context: 6"
+   },
+   {
+    "file": "exception.c",
+    "line": 12303,
+    "text": "Failed to get thread context: 6"
+   },
+   {
+    "file": "exception.c",
+    "line": 12290,
+    "text": "Failed to set thread context: 6"
+   },
+   {
+    "file": "exception.c",
+    "line": 12294,
+    "text": "Failed to get thread context: 6"
+   },
+   {
+    "file": "exception.c",
+    "line": 12299,
+    "text": "Failed to set thread context: 6"
+   },
+   {
+    "file": "exception.c",
+    "line": 12303,
+    "text": "Failed to get thread context: 6"
+   },
+   {
+    "file": "exception.c",
+    "line": 12290,
+    "text": "Failed to set thread context: 6"
+   },
+   {
+    "file": "exception.c",
+    "line": 12294,
+    "text": "Failed to get thread context: 6"
+   },
+   {
+    "file": "exception.c",
+    "line": 12299,
+    "text": "Failed to set thread context: 6"
+   },
+   {
+    "file": "exception.c",
+    "line": 12303,
+    "text": "Failed to get thread context: 6"
+   },
+   {
+    "file": "exception.c",
+    "line": 12290,
+    "text": "Failed to set thread context: 6"
+   },
+   {
+    "file": "exception.c",
+    "line": 12294,
+    "text": "Failed to get thread context: 6"
+   },
+   {
+    "file": "exception.c",
+    "line": 12299,
+    "text": "Failed to set thread context: 6"
+   },
+   {
+    "file": "exception.c",
+    "line": 12303,
+    "text": "Failed to get thread context: 6"
+   },
+   {
+    "file": "exception.c",
+    "line": 12290,
+    "text": "Failed to set thread context: 6"
+   },
+   {
+    "file": "exception.c",
+    "line": 12294,
+    "text": "Failed to get thread context: 6"
+   },
+   {
+    "file": "exception.c",
+    "line": 12299,
+    "text": "Failed to set thread context: 6"
+   },
+   {
+    "file": "exception.c",
+    "line": 12303,
+    "text": "Failed to get thread context: 6"
+   },
+   {
+    "file": "exception.c",
+    "line": 12290,
+    "text": "Failed to set thread context: 6"
+   },
+   {
+    "file": "exception.c",
+    "line": 12294,
+    "text": "Failed to get thread context: 6"
+   },
+   {
+    "file": "exception.c",
+    "line": 12299,
+    "text": "Failed to set thread context: 6"
+   },
+   {
+    "file": "exception.c",
+    "line": 12303,
+    "text": "Failed to get thread context: 6"
+   },
+   {
+    "file": "exception.c",
+    "line": 12311,
+    "text": "Failed to restore thread context: 6"
+   },
+   {
+    "file": "exception.c",
+    "line": 12314,
+    "text": "wait returned: -1"
+   }
+  ],
+  "last_line": "exception.c:12314: Test failed: wait returned: -1",
+  "seconds": 300.1,
+  "skipped_lines": [
+   "exception.c:4869: Tests skipped: failed to test 32-bit context",
+   "exception.c:4870: Tests skipped: failed to test 64-bit context",
+   "exception.c:11694: Tests skipped: avx512 is not available, skipping test.",
+   "exception.c:11852: Tests skipped: avx512 is not available, skipping test."
+  ],
+  "status": "timeout",
+  "summary": null,
+  "todo_lines": 42
+ },
+ "file": {
+  "exit_code": 1,
+  "failure_count": 0,
+  "failures": [],
+  "last_line": "00f4:file: 2931 tests executed (116 marked as todo, 0 as flaky, 1 failure), 2 skipped.",
+  "seconds": 0.3,
+  "skipped_lines": [
+   "file.c:4075: Tests skipped: Not running on WoW64, skipping test.",
+   "file.c:4209: Tests skipped: Not running on WoW64, skipping test."
+  ],
+  "status": "complete",
+  "summary": {
+   "failures": 1,
+   "flaky": 0,
+   "skipped": 2,
+   "tests": 2931,
+   "todo": 116
+  },
+  "todo_lines": 116
+ },
+ "generated": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "last_line": "0144:generated: 0 tests executed (0 marked as todo, 0 as flaky, 0 failures), 0 skipped.",
+  "seconds": 0.1,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 0,
+   "todo": 0
+  },
+  "todo_lines": 0
+ },
+ "info": {
+  "exit_code": 4,
+  "failure_count": 0,
+  "failures": [],
+  "last_line": "014c:info: 4022 tests executed (19 marked as todo, 0 as flaky, 4 failures), 1 skipped.",
+  "seconds": 0.8,
+  "skipped_lines": [
+   "info.c:2960: Tests skipped: Unable to turn off noexec"
+  ],
+  "status": "complete",
+  "summary": {
+   "failures": 4,
+   "flaky": 0,
+   "skipped": 1,
+   "tests": 4022,
+   "todo": 19
+  },
+  "todo_lines": 19
+ },
+ "large_int": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "last_line": "01e8:large_int: 612 tests executed (0 marked as todo, 0 as flaky, 0 failures), 16 skipped.",
+  "seconds": 0.1,
+  "skipped_lines": [
+   "large_int.c:311: Tests skipped: Value ffffffff80000001 broken on 64-bit windows",
+   "large_int.c:311: Tests skipped: Value fffffffffffffffe broken on 64-bit windows",
+   "large_int.c:311: Tests skipped: Value ffffffffffffffff broken on 64-bit windows",
+   "large_int.c:311: Tests skipped: Value fffffffffffffffe broken on 64-bit windows",
+   "large_int.c:311: Tests skipped: Value ffffffffffffffff broken on 64-bit windows",
+   "large_int.c:311: Tests skipped: Value ffffffff80000001 broken on 64-bit windows",
+   "large_int.c:311: Tests skipped: Value fffffffffffffffe broken on 64-bit windows",
+   "large_int.c:311: Tests skipped: Value ffffffffffffffff broken on 64-bit windows",
+   "large_int.c:398: Tests skipped: Value ffffffff80000001 broken on 64-bit windows",
+   "large_int.c:398: Tests skipped: Value fffffffffffffffe broken on 64-bit windows",
+   "large_int.c:398: Tests skipped: Value ffffffffffffffff broken on 64-bit windows",
+   "large_int.c:398: Tests skipped: Value fffffffffffffffe broken on 64-bit windows",
+   "large_int.c:398: Tests skipped: Value ffffffffffffffff broken on 64-bit windows",
+   "large_int.c:398: Tests skipped: Value ffffffff80000001 broken on 64-bit windows",
+   "large_int.c:398: Tests skipped: Value fffffffffffffffe broken on 64-bit windows",
+   "large_int.c:398: Tests skipped: Value ffffffffffffffff broken on 64-bit windows"
+  ],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 16,
+   "tests": 612,
+   "todo": 0
+  },
+  "todo_lines": 0
+ },
+ "om": {
+  "exit_code": 6,
+  "failure_count": 6,
+  "failures": [
+   {
+    "file": "om.c",
+    "line": 2597,
+    "text": "expected STATUS_SUCCESS, got c0000033"
+   },
+   {
+    "file": "om.c",
+    "line": 2600,
+    "text": "NtQueryObject failed c0000008"
+   },
+   {
+    "file": "om.c",
+    "line": 2600,
+    "text": "unexpected len 0"
+   },
+   {
+    "file": "om.c",
+    "line": 2600,
+    "text": "unexpected len 0"
+   },
+   {
+    "file": "om.c",
+    "line": 2600,
+    "text": "wrong name (null)"
+   },
+   {
+    "file": "om.c",
+    "line": 3663,
+    "text": "got 0."
+   }
+  ],
+  "last_line": "01f0:om: 7729 tests executed (30 marked as todo, 0 as flaky, 6 failures), 1 skipped.",
+  "seconds": 0.1,
+  "skipped_lines": [
+   "om.c:3328: Tests skipped: no privileges, tests may be limited"
+  ],
+  "status": "complete",
+  "summary": {
+   "failures": 6,
+   "flaky": 0,
+   "skipped": 1,
+   "tests": 7729,
+   "todo": 30
+  },
+  "todo_lines": 30
+ },
+ "path": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "last_line": "01fc:path: 1011 tests executed (0 marked as todo, 0 as flaky, 0 failures), 0 skipped.",
+  "seconds": 0.1,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 1011,
+   "todo": 0
+  },
+  "todo_lines": 0
+ },
+ "pipe": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "last_line": "0204:pipe: 2431 tests executed (36 marked as todo, 0 as flaky, 0 failures), 0 skipped.",
+  "seconds": 4.0,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 2431,
+   "todo": 36
+  },
+  "todo_lines": 36
+ },
+ "port": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "last_line": "0238:port: 1 tests executed (1 marked as todo, 0 as flaky, 0 failures), 0 skipped.",
+  "seconds": 0.0,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 1,
+   "todo": 1
+  },
+  "todo_lines": 1
+ },
+ "reg": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "last_line": "0240:reg: 4102 tests executed (16 marked as todo, 0 as flaky, 0 failures), 0 skipped.",
+  "seconds": 0.1,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 4102,
+   "todo": 16
+  },
+  "todo_lines": 16
+ },
+ "rtl": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "last_line": "0248:rtl: 600072 tests executed (54 marked as todo, 0 as flaky, 0 failures), 0 skipped.",
+  "seconds": 0.3,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 600072,
+   "todo": 54
+  },
+  "todo_lines": 54
+ },
+ "rtlbitmap": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "last_line": "0278:rtlbitmap: 378 tests executed (0 marked as todo, 0 as flaky, 0 failures), 0 skipped.",
+  "seconds": 0.1,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 378,
+   "todo": 0
+  },
+  "todo_lines": 0
+ },
+ "rtlstr": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "last_line": "0280:rtlstr: 2178627 tests executed (3 marked as todo, 0 as flaky, 0 failures), 0 skipped.",
+  "seconds": 0.2,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 2178627,
+   "todo": 3
+  },
+  "todo_lines": 3
+ },
+ "string": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "last_line": "0288:string: 1974183 tests executed (0 marked as todo, 0 as flaky, 0 failures), 0 skipped.",
+  "seconds": 0.2,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 1974183,
+   "todo": 0
+  },
+  "todo_lines": 0
+ },
+ "sync": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "last_line": "0290:sync: 429 tests executed (1 marked as todo, 0 as flaky, 0 failures), 0 skipped.",
+  "seconds": 2.1,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 429,
+   "todo": 1
+  },
+  "todo_lines": 1
+ },
+ "thread": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "last_line": "039c:thread: 49 tests executed (0 marked as todo, 0 as flaky, 0 failures), 0 skipped.",
+  "seconds": 0.1,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 49,
+   "todo": 0
+  },
+  "todo_lines": 0
+ },
+ "threadpool": {
+  "exit_code": 1,
+  "failure_count": 0,
+  "failures": [],
+  "last_line": "03cc:threadpool: 4721 tests executed (1 marked as todo, 0 as flaky, 1 failure), 0 skipped.",
+  "seconds": 9.6,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 1,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 4721,
+   "todo": 1
+  },
+  "todo_lines": 1
+ },
+ "time": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "last_line": "04e0:time: 10657 tests executed (2 marked as todo, 0 as flaky, 0 failures), 0 skipped.",
+  "seconds": 0.1,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 10657,
+   "todo": 2
+  },
+  "todo_lines": 2
+ },
+ "unwind": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "last_line": "04e8:unwind: 455178 tests executed (2 marked as todo, 0 as flaky, 0 failures), 0 skipped.",
+  "seconds": 0.1,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 455178,
+   "todo": 2
+  },
+  "todo_lines": 2
+ },
+ "virtual": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "last_line": "04f0:virtual: 2336 tests executed (104 marked as todo, 0 as flaky, 0 failures), 0 skipped.",
+  "seconds": 0.1,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 2336,
+   "todo": 104
+  },
+  "todo_lines": 104
+ },
+ "wow64": {
+  "exit_code": 4,
+  "failure_count": 4,
+  "failures": [
+   {
+    "file": "wow64.c",
+    "line": 1466,
+    "text": "Failed to open version.dll"
+   },
+   {
+    "file": "wow64.c",
+    "line": 1469,
+    "text": "CreateFileMapping failed"
+   },
+   {
+    "file": "wow64.c",
+    "line": 1476,
+    "text": "NtMapViewOfSection returned c0000008"
+   },
+   {
+    "file": "wow64.c",
+    "line": 1482,
+    "text": "NtMapViewOfSection returned c0000008"
+   }
+  ],
+  "last_line": "05d8:wow64: 1016 tests executed (0 marked as todo, 0 as flaky, 4 failures), 1 skipped.",
+  "seconds": 0.4,
+  "skipped_lines": [
+   "wow64.c:1335: Tests skipped: NtSetLdtEntries not supported"
+  ],
+  "status": "complete",
+  "summary": {
+   "failures": 4,
+   "flaky": 0,
+   "skipped": 1,
+   "tests": 1016,
+   "todo": 0
+  },
+  "todo_lines": 0
+ }
+}

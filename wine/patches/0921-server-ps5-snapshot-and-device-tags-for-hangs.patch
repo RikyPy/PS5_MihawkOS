@@ -1,0 +1,391 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Sun, 4 Oct 2026 19:30:00 -0400
+Subject: [PATCH] server: on PS5, a snapshot of every thread's wait for a game that does not end
+
+With the in-process synchronization device on (patch 0890, WINE_PS5_NTSYNC=1), a .NET game's close froze
+in four runs of six: after WM_CLOSE no frame, no server request, and only the audio mixer (which
+needs neither the server nor the device) kept running. Without the device it never froze. To see
+where the threads are, the title asks for a snapshot when a game has not ended 10 s after its close:
+
+- pw_wineserver_snapshot (exported through ntdll as pw_wine_server_snapshot) prints the wait
+  watchdog's snapshot (patch 0680) once, from the calling thread under the server lock. Each thread's
+  line now carries its kernel thread id and the device number of its own sync object, so the
+  device's dump of blocked waits can be read against it. A lock that is not free within the given
+  time is reported with the kernel thread that holds it and how often it was taken meanwhile.
+- The server records which kernel thread holds its lock, at every place the lock is taken or
+  released (the main loop and client threads running requests, patch 0918).
+- get_inproc_sync_fd tells the device what a number stands for (the object's type, and the thread or
+  process id, else the handle), through a new note operation in ps5_ntsync_ops.
+- The watchdog's guest-stack lines read the WoW64 CPU area only in a WoW64 process: a 64-bit
+  process keeps its own data in that TLS slot, and a thread blocked in the device is silent long
+  enough to reach that code.
+---
+  dlls/ntdll/unix/server.c  | 16 +++++++++++++
+  include/wine/ps5_ntsync.h |  2 ++
+  server/fd.c               | 28 ++++++++++++++++++++++
+  server/inproc_sync.c      | 42 ++++++++++++++++++++++++++++++++-
+  server/request.c          |  9 ++++++-
+  server/request.h          |  6 +++++
+  server/thread.c           | 60 +++++++++++++++++++++++++++++++++++++++++++----
+  7 files changed, 156 insertions(+), 7 deletions(-)
+
+diff --git a/dlls/ntdll/unix/server.c b/dlls/ntdll/unix/server.c
+index d7b2e6f..98837cd 100644
+--- a/dlls/ntdll/unix/server.c
++++ b/dlls/ntdll/unix/server.c
+@@ -1567,6 +1567,8 @@ static void (*unregister_server_thread)( long tid );
+ static int (*flush_server)( unsigned int timeout_ms );
+ /* and ends every process on request, for a game that does not close */
+ static int (*terminate_server)( void );
++/* and prints what every thread waits on, for a game that hangs */
++static int (*snapshot_server)( unsigned int wait_ms );
+ 
+ /***********************************************************************
+  *           pw_wine_server_flush
+@@ -1590,6 +1592,19 @@ DECLSPEC_EXPORT int pw_wine_server_terminate(void)
+     return terminate_server ? terminate_server() : -1;
+ }
+ 
++/***********************************************************************
++ *           pw_wine_server_snapshot
++ *
++ * For the title, when a game does not end: the in-process server prints each
++ * thread's server wait, message queue, last request and device number, from
++ * the calling thread under the server lock, waiting at most wait_ms for it
++ * (a lock held longer is reported with its holder). 0 when printed.
++ */
++DECLSPEC_EXPORT int pw_wine_server_snapshot( unsigned int wait_ms )
++{
++    return snapshot_server ? snapshot_server( wait_ms ) : -1;
++}
++
+ /***********************************************************************
+  *           connect_inprocess_server
+  *
+@@ -1633,6 +1648,7 @@ static int connect_inprocess_server(void)
+     unregister_server_thread = dlsym( module, "pw_wine_thread_unregister" );
+     flush_server = dlsym( module, "pw_wineserver_flush" );
+     terminate_server = dlsym( module, "pw_wineserver_terminate" );
++    snapshot_server = dlsym( module, "pw_wineserver_snapshot" );
+     {
+         /* The synchronization device lives in ntdll (wine/ps5_ntsync.h); the
+          * server creates and signals its objects through the same operations.
+diff --git a/include/wine/ps5_ntsync.h b/include/wine/ps5_ntsync.h
+index f2b366d..c5cf3e8 100644
+--- a/include/wine/ps5_ntsync.h
++++ b/include/wine/ps5_ntsync.h
+@@ -86,6 +86,8 @@ struct ps5_ntsync_ops
+     /* timeout: absolute ns (UINT64_MAX: none) on CLOCK_REALTIME or CLOCK_MONOTONIC */
+     int (*wait)( int all, const int *objects, uint32_t count, uint32_t owner, int alert,
+                  uint64_t timeout, int realtime, uint32_t *index );
++    /* what an object is (the server's type and id or handle), for the device's dump */
++    int (*note)( int object, const char *tag );
+ };
+ 
+ /* NULL when the device is off: the code then takes its server paths. */
+diff --git a/server/fd.c b/server/fd.c
+index 58f8d9e..643489d 100644
+--- a/server/fd.c
++++ b/server/fd.c
+@@ -33,6 +33,10 @@
+ #include <stdlib.h>
+ #include <stdint.h>
+ #include <poll.h>
++#ifdef HAVE_PTHREAD_NP_H
++# include <pthread.h>
++# include <pthread_np.h>
++#endif
+ #ifdef HAVE_LINUX_MAJOR_H
+ #include <linux/major.h>
+ #endif
+@@ -360,11 +364,29 @@ static const timeout_t user_shared_data_timeout = 16 * 10000;
+  * pw_wineserver_call_direct, request.c) under this lock, which the server
+  * thread holds except while it sleeps in kqueue/epoll. */
+ pthread_mutex_t inprocess_server_mutex = PTHREAD_MUTEX_INITIALIZER;
++unsigned int inprocess_server_holder, inprocess_server_locks;
+ int inprocess_direct_ok;      /* the main loop sleeps in kqueue/epoll: clients may run requests */
+ int inprocess_wake_fd = -1;   /* written to wake the sleeping main loop */
+ static timeout_t inprocess_sleep_until;   /* monotonic time the main loop sleeps until, 0 when awake */
+ static unsigned int poll_users_epoch;     /* bumped when poll users are removed or change events */
+ 
++/* The holder is a kernel thread id, which the snapshot matches to the
++ * threads' unix ids. Read without the lock, so stored atomically. */
++void inprocess_server_locked(void)
++{
++#ifdef HAVE_PTHREAD_GETTHREADID_NP
++    __atomic_store_n( &inprocess_server_holder, (unsigned int)pthread_getthreadid_np(), __ATOMIC_RELAXED );
++#else
++    __atomic_store_n( &inprocess_server_holder, 1, __ATOMIC_RELAXED );
++#endif
++    __atomic_store_n( &inprocess_server_locks, inprocess_server_locks + 1, __ATOMIC_RELAXED );
++}
++
++void inprocess_server_unlocking(void)
++{
++    __atomic_store_n( &inprocess_server_holder, 0, __ATOMIC_RELAXED );
++}
++
+ /* a client thread added a timeout: wake the main loop if it sleeps past it */
+ static void inprocess_timeout_added( abstime_t when )
+ {
+@@ -382,6 +404,7 @@ static unsigned int inprocess_sleep( int timeout, const struct timespec *ts )
+     if (timeout == -1) inprocess_sleep_until = TIMEOUT_INFINITE;
+     else if (ts) inprocess_sleep_until = monotonic_time + ts->tv_sec * TICKS_PER_SEC + ts->tv_nsec / 100;
+     else inprocess_sleep_until = monotonic_time + (timeout_t)timeout * 10000;
++    inprocess_server_unlocking();
+     pthread_mutex_unlock( &inprocess_server_mutex );
+     return poll_users_epoch;
+ }
+@@ -392,6 +415,7 @@ static unsigned int inprocess_sleep( int timeout, const struct timespec *ts )
+ static int inprocess_wake( unsigned int epoch )
+ {
+     pthread_mutex_lock( &inprocess_server_mutex );
++    inprocess_server_locked();
+     inprocess_sleep_until = 0;
+     return epoch == poll_users_epoch;
+ }
+@@ -1084,6 +1108,7 @@ void main_loop(void)
+ 
+ #ifdef WINE_INPROCESS_SERVER
+     pthread_mutex_lock( &inprocess_server_mutex );
++    inprocess_server_locked();
+ #endif
+     set_current_time();
+     server_start_time = current_time;
+@@ -1102,11 +1127,13 @@ void main_loop(void)
+         if (!active_users) break;  /* last user removed by a timeout */
+ 
+ #ifdef WINE_INPROCESS_SERVER
++        inprocess_server_unlocking();
+         pthread_mutex_unlock( &inprocess_server_mutex );
+ #endif
+         ret = poll( pollfd, nb_users, timeout );
+ #ifdef WINE_INPROCESS_SERVER
+         pthread_mutex_lock( &inprocess_server_mutex );
++        inprocess_server_locked();
+ #endif
+         set_current_time();
+ 
+@@ -1123,6 +1150,7 @@ void main_loop(void)
+         }
+     }
+ #ifdef WINE_INPROCESS_SERVER
++    inprocess_server_unlocking();
+     pthread_mutex_unlock( &inprocess_server_mutex );
+ #endif
+ }
+diff --git a/server/inproc_sync.c b/server/inproc_sync.c
+index d2ad739..02f8e28 100644
+--- a/server/inproc_sync.c
++++ b/server/inproc_sync.c
+@@ -30,6 +30,7 @@
+ 
+ #include "file.h"
+ #include "handle.h"
++#include "process.h"
+ #include "request.h"
+ #include "thread.h"
+ #include "user.h"
+@@ -377,6 +378,41 @@ static int get_obj_inproc_sync( struct object *obj, int *type )
+ 
+ #endif /* NTSYNC_IOC_EVENT_READ */
+ 
++#if defined(__PROSPERO__) && defined(NTSYNC_IOC_EVENT_READ)
++/* Tell the device what a number stands for, so a dump of its blocked waits
++ * names what each thread waits on: the object's type, and the thread or
++ * process id, else the handle the number was first asked for. */
++static void ps5_note_sync( int fd, struct object *obj, obj_handle_t handle )
++{
++    const struct unicode_str *name = &obj->ops->type->name;
++    char tag[24];
++    unsigned int i, used;
++
++    for (i = used = 0; i < name->len / sizeof(WCHAR) && used < 12; i++)
++        tag[used++] = name->str[i] < 0x80 ? (char)name->str[i] : '?';
++    if (obj->ops->type == &thread_type)
++        snprintf( tag + used, sizeof(tag) - used, " %04x", ((struct thread *)obj)->id );
++    else if (obj->ops->type == &process_type)
++        snprintf( tag + used, sizeof(tag) - used, " pid %04x", ((struct process *)obj)->id );
++    else
++        snprintf( tag + used, sizeof(tag) - used, " h%x", handle );
++    ps5_ntsync->note( fd, tag );
++}
++
++/* The device number of a thread's own sync object (what a wait on the
++ * thread's handle waits for), or -1, for the server's snapshot. */
++int ps5_object_device_number( struct object *sync )
++{
++    if (!sync || sync->ops != &inproc_sync_ops) return -1;
++    return ((struct inproc_sync *)sync)->fd;
++}
++#elif defined(__PROSPERO__)
++int ps5_object_device_number( struct object *sync )
++{
++    return -1;
++}
++#endif
++
+ DECL_HANDLER(get_inproc_sync_fd)
+ {
+     struct object *obj;
+@@ -390,7 +426,11 @@ DECL_HANDLER(get_inproc_sync_fd)
+     else if (do_fsync()) reply->fsync_shm_idx = fsync_grab_shm_idx( fd );
+ #ifdef __PROSPERO__
+     /* the client holds its own reference to the number, as it would a descriptor */
+-    else reply->fsync_shm_idx = ps5_ntsync->ref( fd );
++    else
++    {
++        reply->fsync_shm_idx = ps5_ntsync->ref( fd );
++        if (ps5_ntsync->note) ps5_note_sync( fd, obj, req->handle );
++    }
+ #else
+     else send_client_fd( current->process, fd, req->handle );
+ #endif
+diff --git a/server/request.c b/server/request.c
+index c322de1..1978038 100644
+--- a/server/request.c
++++ b/server/request.c
+@@ -389,12 +389,17 @@ static void lock_server_for_client(void)
+ 
+     for (i = 0; i < 200; i++)
+     {
+-        if (!pthread_mutex_trylock( &inprocess_server_mutex )) return;
++        if (!pthread_mutex_trylock( &inprocess_server_mutex ))
++        {
++            inprocess_server_locked();
++            return;
++        }
+ #if defined(__i386__) || defined(__x86_64__)
+         __asm__ __volatile__( "pause" );
+ #endif
+     }
+     pthread_mutex_lock( &inprocess_server_mutex );
++    inprocess_server_locked();
+ }
+ 
+ /* Run a request on the calling thread, which is the client thread tid of
+@@ -427,6 +432,7 @@ DECLSPEC_EXPORT int pw_wineserver_call_direct( unsigned int tid, client_ptr_t te
+     lock_server_for_client();
+     if (!inprocess_direct_ok || !(thread = get_thread_from_id( tid )))
+     {
++        inprocess_server_unlocking();
+         pthread_mutex_unlock( &inprocess_server_mutex );
+         return 1;
+     }
+@@ -473,6 +479,7 @@ DECLSPEC_EXPORT int pw_wineserver_call_direct( unsigned int tid, client_ptr_t te
+         thread->req_data = NULL;
+     }
+     release_object( thread );
++    inprocess_server_unlocking();
+     pthread_mutex_unlock( &inprocess_server_mutex );
+     return ret;
+ }
+diff --git a/server/request.h b/server/request.h
+index 741fab0..b79d2a1 100644
+--- a/server/request.h
++++ b/server/request.h
+@@ -69,6 +69,12 @@ extern const char *inprocess_nls_dir;
+ extern pthread_mutex_t inprocess_server_mutex;
+ extern int inprocess_direct_ok;
+ extern int inprocess_wake_fd;
++/* who holds the lock and how often it was taken, for the snapshot of a game
++ * that hangs (pw_wineserver_snapshot): called right after taking it and right
++ * before releasing it */
++extern unsigned int inprocess_server_holder, inprocess_server_locks;
++extern void inprocess_server_locked(void);
++extern void inprocess_server_unlocking(void);
+ #endif
+ extern void open_master_socket(void);
+ extern void close_master_socket( timeout_t timeout );
+diff --git a/server/thread.c b/server/thread.c
+index dec6851..a02e818 100644
+--- a/server/thread.c
++++ b/server/thread.c
+@@ -1194,7 +1194,11 @@ static int ps5_peek( int probe[2], unsigned int address, void *out, size_t size
+     return read( probe[0], out, size ) == (ssize_t)size;
+ }
+ 
+-static void wait_watchdog( void *arg )
++#ifdef __PROSPERO__
++extern int ps5_object_device_number( struct object *sync );
++#endif
++
++static void wait_snapshot(void)
+ {
+     struct thread *thread;
+     struct thread_wait *wait;
+@@ -1203,13 +1207,23 @@ static void wait_watchdog( void *arg )
+     fprintf( stderr, "wine-ps5: wait snapshot\n" );
+     LIST_FOR_EACH_ENTRY( thread, &thread_list, struct thread, entry )
+     {
+-        fprintf( stderr, "wine-ps5: thread tid=%04x suspend=%d/%d state=%d waiting=%d last_req=%d age_ms=%lld\n",
+-                 thread->id, thread->suspend, thread->process->suspend, thread->state, thread->wait != NULL,
++        /* unix: the kernel thread, as the device and the lock holders name it;
++         * sync: the device number a wait on this thread's handle waits for */
++        fprintf( stderr, "wine-ps5: thread tid=%04x unix=%x sync=#%x suspend=%d/%d state=%d waiting=%d last_req=%d age_ms=%lld\n",
++                 thread->id, thread->unix_tid,
++#ifdef __PROSPERO__
++                 ps5_object_device_number( thread->sync ),
++#else
++                 -1,
++#endif
++                 thread->suspend, thread->process->suspend, thread->state, thread->wait != NULL,
+                  thread->ps5_last_req, (long long)((monotonic_time - thread->ps5_last_req_time) / 10000) );
+         /* Silent outside any wait for over a second: where its i386 code is,
+          * from the WoW64 CPU area (TEB64 TlsSlots[WOW64_TLS_CPURESERVED]).
+-         * The server runs in the game's process, so it can read it. */
+-        if (!thread->wait && thread->teb && monotonic_time - thread->ps5_last_req_time > TICKS_PER_SEC)
++         * The server runs in the game's process, so it can read it. A 64-bit
++         * process keeps its own data in that slot. */
++        if (is_wow64_process( thread->process ) && !thread->wait && thread->teb &&
++            monotonic_time - thread->ps5_last_req_time > TICKS_PER_SEC)
+         {
+             const unsigned char *cpu = *(unsigned char * const *)(ULONG_PTR)(thread->teb + 0x1480 + 8);
+             if (cpu && *(const unsigned short *)(cpu + 2) == 0x14c /* IMAGE_FILE_MACHINE_I386 */)
+@@ -1274,9 +1288,45 @@ static void wait_watchdog( void *arg )
+             }
+         }
+     }
++}
++
++static void wait_watchdog( void *arg )
++{
++    wait_snapshot();
+     add_timeout_user( -2 * TICKS_PER_SEC, wait_watchdog, NULL );
+ }
+ 
++#ifdef WINE_INPROCESS_SERVER
++/* For the title, when a game does not end: the watchdog's snapshot once, from
++ * the calling thread under the server lock. A lock not free within wait_ms is
++ * reported with the kernel thread that holds it and how often it was taken
++ * meanwhile (0: stuck), and nothing is read. 0 when printed. */
++DECLSPEC_EXPORT int pw_wineserver_snapshot( unsigned int wait_ms )
++{
++    const unsigned int locks = __atomic_load_n( &inprocess_server_locks, __ATOMIC_RELAXED );
++    unsigned int waited;
++
++    for (waited = 0; pthread_mutex_trylock( &inprocess_server_mutex ); waited++)
++    {
++        if (waited >= wait_ms)
++        {
++            fprintf( stderr, "wine-ps5: snapshot: the server lock is held by unix=%x, taken %u times in %u ms; "
++                     "not read\n", __atomic_load_n( &inprocess_server_holder, __ATOMIC_RELAXED ),
++                     __atomic_load_n( &inprocess_server_locks, __ATOMIC_RELAXED ) - locks, wait_ms );
++            return -1;
++        }
++        usleep( 1000 );
++    }
++    inprocess_server_locked();
++    set_current_time();
++    fprintf( stderr, "wine-ps5: snapshot: server lock taken after %u ms\n", waited );
++    wait_snapshot();
++    inprocess_server_unlocking();
++    pthread_mutex_unlock( &inprocess_server_mutex );
++    return 0;
++}
++#endif
++
+ static void start_wait_watchdog(void)
+ {
+     static int started;

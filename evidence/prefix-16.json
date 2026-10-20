@@ -1,0 +1,39 @@
+{
+  "run": "prefix-16",
+  "layout": "title",
+  "entry": "proton-prefix-test",
+  "package_sha256": "ec6af1ea0367d16dde6639a89a080a524cebc4d4bedfe00ed0cac4b865a918d8",
+  "probe_sha256": "3fc1925eacafa39ab63f2e2e066555af1b507dd23e3d589f6dbbf989200e560f",
+  "passed": false,
+  "deployed": true,
+  "runner_status": 1,
+  "result": "finished",
+  "probe_verdict": null,
+  "seconds": 4.4,
+  "returned_to_launcher": true,
+  "probe_lines": [],
+  "probe_passed": false,
+  "helpers": [
+    "Z:\\\\data\\\\ps5proton\\\\games\\\\proton-prefix-test\\\\prefix-probe.exe"
+  ],
+  "prefix": {
+    "files": 10,
+    "bytes": 328834
+  },
+  "prefix_registry": [
+    "system.reg",
+    "user.reg",
+    "userdef.reg"
+  ],
+  "console_idle_before_removal": true,
+  "removed": {
+    "game": {
+      "files": 4,
+      "folders": 1
+    },
+    "prefix": {
+      "files": 10,
+      "folders": 31
+    }
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "battery": "shell64-flaky-2026-10-11-04",
+  "expected_cases": [
+    "shell64"
+  ],
+  "revision": "4f44afc811ca7d74e871eb06b91036361d3bb43e",
+  "dirty": true,
+  "cases": [
+    {
+      "case": "shell64",
+      "run": "shell64-flaky-2026-10-11-04-shell64",
+      "runner_status": 0,
+      "seconds": 41.2,
+      "result": "finished",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "run_seconds": 34.9,
+      "launch_readiness": {
+        "ready": true,
+        "seconds": 0.149,
+        "settle_seconds": 0.0,
+        "census_seconds": 0.134,
+        "previous_cleanup_verified": true
+      },
+      "runner_overhead_seconds": 6.3,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 13,
+      "protocol_errors": 0
+    }
+  ],
+  "complete": true,
+  "seconds": 41.2,
+  "passed": true
+}

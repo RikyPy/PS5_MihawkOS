@@ -1,0 +1,112 @@
+{
+ "run": "wt-ntdll-batch",
+ "what": "ntdll_test.exe",
+ "env": [
+  "WINEDEBUG=err+all",
+  "WINETEST_FILE_TIMEOUT=60"
+ ],
+ "result": "finished",
+ "seconds": 14.8,
+ "probe_verdict": null,
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": true,
+ "bench": {},
+ "steady": {
+  "server": {
+   "calls": 10112.0,
+   "per_s": 1994.0,
+   "avg_us": 5.2,
+   "selects": 2725.0,
+   "blocked": 742.0,
+   "block_avg_us": 18171.3,
+   "waits": 2232.0,
+   "handles_avg": 1.28,
+   "wait_all": 0.0,
+   "polled": 1476.0,
+   "delays": 218.0,
+   "yields": 6.0,
+   "intervals": 1
+  }
+ },
+ "intervals": {
+  "frames": [],
+  "server": [
+   {
+    "calls": 12325.0,
+    "per_s": 2432.0,
+    "avg_us": 212.3,
+    "selects": 2049.0,
+    "blocked": 539.0,
+    "block_avg_us": 17042.2,
+    "waits": 1953.0,
+    "handles_avg": 1.27,
+    "wait_all": 0.0,
+    "polled": 1098.0,
+    "delays": 15.0,
+    "yields": 3.0
+   },
+   {
+    "calls": 10112.0,
+    "per_s": 1994.0,
+    "avg_us": 5.2,
+    "selects": 2725.0,
+    "blocked": 742.0,
+    "block_avg_us": 18171.3,
+    "waits": 2232.0,
+    "handles_avg": 1.28,
+    "wait_all": 0.0,
+    "polled": 1476.0,
+    "delays": 218.0,
+    "yields": 6.0
+   }
+  ],
+  "top": [
+   {
+    "create_file": {
+     "count": 1174,
+     "avg_us": 1015.7
+    },
+    "close_handle": {
+     "count": 3054,
+     "avg_us": 237.3
+    },
+    "event_op": {
+     "count": 583,
+     "avg_us": 764.4
+    },
+    "create_mapping": {
+     "count": 60,
+     "avg_us": 957.1
+    },
+    "send_hardware_message": {
+     "count": 526,
+     "avg_us": 94.1
+    }
+   },
+   {
+    "send_hardware_message": {
+     "count": 625,
+     "avg_us": 16.1
+    },
+    "select": {
+     "count": 2835,
+     "avg_us": 2.2
+    },
+    "close_handle": {
+     "count": 2362,
+     "avg_us": 2.2
+    },
+    "create_event": {
+     "count": 1911,
+     "avg_us": 2.1
+    },
+    "event_op": {
+     "count": 698,
+     "avg_us": 5.6
+    }
+   }
+  ]
+ }
+}

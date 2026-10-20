@@ -1,0 +1,413 @@
+From: PS5_Proton <local>
+Subject: [PATCH] ntdll: PS5: stores beside read-only 4 KiB pages run through a 4 KiB MMU
+
+Patch 1122 holds a 16 KiB host page read-only when its four Windows pages disagree on write, and steps each store a
+4 KiB page allows: two signals, 86 us a store (vmp-tracker-2026-10-14-03); a Unity game in the earlier emulator experiment (removed) ran at 2.0-2.4
+fps (2026-10-15; record removed from the tree; in git history). The former patch 1123 reported the read-only neighbours to the program as written
+before the store: 56.1 fps, but the emulator then uploaded stale guest bytes over images the GPU drew (white glyph blocks,
+2026-10-15). A false report is wrong for any program that tracks writes: 1123 is removed, and with it
+the PS5NOTIF mark that dispatch_exception continued, the report state per thread, the NtProtectVirtualMemory hook and
+WINE_PS5_NEIGHBOUR_REPORTS.
+
+Such a store now starts a run of the 4 KiB MMU (wine/ps5/pw_wine_mmu4k.h, docs/MMU4K.md) on the faulting thread: in
+1122's branch of virtual_handle_fault, under the virtual mutex, ps5_mmu4k_wanted takes an alias of the host page's
+direct memory (wine/ps5/pw_wine_alias.h) and a run stack, and segv_handler points the thread at the engine's start on
+that stack with Wine's asynchronous signals and SIGQUIT blocked in uc_sigmask, then returns. The run executes the
+program's instructions one at a time, the CPU running each in a slot with only its memory operand rewritten: a store
+to a plain 4 KiB page of a held host page goes through the alias; a store that touches a protected page is never run,
+the run ends before it and the instruction faults natively, so the program's handler sees the old bytes, RIP at the
+store and its registers. A slot fault comes back to the run first in the SIGSEGV, SIGBUS, SIGILL and SIGFPE handlers;
+the run ends with a ud2 whose handler gives the program its registers and mask back and resumes it, or makes of a
+write at the address the engine names what Wine's path makes of it with no run: 1122's step for a run that could not
+move, an access violation at the first protected byte for a store straddling into a protected page (as a 4 KiB MMU
+reports it). classify also names each 4 KiB page's execute right, so a run fetches code only where a CPU with 4 KiB
+pages would. The ops a run calls first repair a null %fs (patch 0590's measurement). Only the program's own 64-bit
+faults start runs: not in a system call or a handler, under its trap flag or a hardware breakpoint, or in WoW64.
+
+The engine is on in a helper (one JIT object of slots; a title has none, so titles keep 1122's step) unless
+WINE_PS5_MMU4K=0, for A/B runs; __wine_ps5_mmu4k_init logs which. The first run's end checks the thread ran with
+SIGQUIT blocked and turns runs off if not: the console's ucontext is not laid out as the SDK's header says
+(UCONTEXT_MC), and uc_sigmask's place is unmeasured. Census: runs, insns, exits, stepfall and the alias module's
+counters through __wine_ps5_mmu4k_stats (native/proton_wine_child.c).
+
+Host: tests/test_pw_wine_mmu4k.c runs generated programs natively on the PC's 4 KiB pages and through the engine with
+this glue's Linux twin, and requires the same faults, registers, vector state and memory; tests/test_crash_replays.c
+holds every release of direct memory forgetting its aliases first. Console probes: tests/vm-protect-probe.c --truth,
+--speed, --contention, --rearm and tests/section-view-probe.c (docs/MMU4K.md section 12). Console: not yet run.
+---
+diff --git a/dlls/ntdll/unix/signal_x86_64.c b/dlls/ntdll/unix/signal_x86_64.c
+index 3ce1274..ea15d80 100644
+--- a/dlls/ntdll/unix/signal_x86_64.c
++++ b/dlls/ntdll/unix/signal_x86_64.c
+@@ -93,6 +93,9 @@ extern void _thread_set_tsd_base(uint64_t);
+ #include "wine/asm.h"
+ #include "unix_private.h"
+ #include "wine/debug.h"
++#ifdef __PROSPERO__
++#include "pw_wine_mmu4k.h"
++#endif
+ 
+ WINE_DEFAULT_DEBUG_CHANNEL(unwind);
+ WINE_DECLARE_DEBUG_CHANNEL(seh);
+@@ -2876,6 +2879,168 @@ static inline BOOL check_invalid_gsbase( ucontext_t *ucontext )
+ }
+ 
+ 
++#ifdef __PROSPERO__
++/* The 4 KiB MMU's glue (docs/MMU4K.md sections 3 and 4.4; the engine is wine/ps5/pw_wine_mmu4k.h). A write a 4 KiB
++ * page allows, refused because read-only pages share its host page, starts a run on the faulting thread when
++ * virtual_handle_fault asks for one (ps5_mmu4k_page): the handler points the thread at the engine's start on a run
++ * stack with Wine's asynchronous signals and SIGQUIT blocked, and returns. A fault in the run's slots comes back here
++ * first (ps5_mmu4k_signal); the run ends with a ud2 that gives the program its registers and signal mask back. */
++static BOOL ps5_mmu4k_off;  /* a run did not run with its signal mask: none starts again */
++
++/* A run's ops start here: a thread can come back from a signal handler with a null %fs (PW_RESTORE_FS), and libkernel
++ * reaches its thread through %fs:0x10. The TEB through %gs, never through NtCurrentTeb (pthread_getspecific). */
++void signal_ps5_fs_repair(void)
++{
++    struct amd64_thread_data *thread_data;
++    TEB *teb;
++    WORD sel;
++
++    __asm__ volatile( "movw %%fs,%0" : "=r" (sel) );
++    if (sel) return;
++    __asm__ volatile( "movq %%gs:0x30,%0" : "=r" (teb) );
++    thread_data = (struct amd64_thread_data *)((struct ntdll_thread_data *)&teb->GdiTebBatch)->cpu_data;
++    sysarch( AMD64_SET_FSBASE, &thread_data->pthread_teb );
++}
++
++static void ps5_regs_get( ucontext_t *ucontext, PwWineMmu4kRegs *regs )
++{
++    regs->gpr[0] = RAX_sig(ucontext);  regs->gpr[1] = RCX_sig(ucontext);
++    regs->gpr[2] = RDX_sig(ucontext);  regs->gpr[3] = RBX_sig(ucontext);
++    regs->gpr[4] = RSP_sig(ucontext);  regs->gpr[5] = RBP_sig(ucontext);
++    regs->gpr[6] = RSI_sig(ucontext);  regs->gpr[7] = RDI_sig(ucontext);
++    regs->gpr[8] = R8_sig(ucontext);   regs->gpr[9] = R9_sig(ucontext);
++    regs->gpr[10] = R10_sig(ucontext); regs->gpr[11] = R11_sig(ucontext);
++    regs->gpr[12] = R12_sig(ucontext); regs->gpr[13] = R13_sig(ucontext);
++    regs->gpr[14] = R14_sig(ucontext); regs->gpr[15] = R15_sig(ucontext);
++    regs->rip = RIP_sig(ucontext);
++    regs->rflags = EFL_sig(ucontext);
++}
++
++static void ps5_regs_set( ucontext_t *ucontext, const PwWineMmu4kRegs *regs )
++{
++    RAX_sig(ucontext) = regs->gpr[0];  RCX_sig(ucontext) = regs->gpr[1];
++    RDX_sig(ucontext) = regs->gpr[2];  RBX_sig(ucontext) = regs->gpr[3];
++    RSP_sig(ucontext) = regs->gpr[4];  RBP_sig(ucontext) = regs->gpr[5];
++    RSI_sig(ucontext) = regs->gpr[6];  RDI_sig(ucontext) = regs->gpr[7];
++    R8_sig(ucontext) = regs->gpr[8];   R9_sig(ucontext) = regs->gpr[9];
++    R10_sig(ucontext) = regs->gpr[10]; R11_sig(ucontext) = regs->gpr[11];
++    R12_sig(ucontext) = regs->gpr[12]; R13_sig(ucontext) = regs->gpr[13];
++    R14_sig(ucontext) = regs->gpr[14]; R15_sig(ucontext) = regs->gpr[15];
++    RIP_sig(ucontext) = regs->rip;
++    EFL_sig(ucontext) = regs->rflags;
++}
++
++/* Only a fault of the program's own 64-bit code may start a run: not inside a system call or a handler, not under
++ * its own trap flag or a hardware breakpoint (a run would pass them by), not in a WoW64 thread. */
++static BOOL ps5_fault_is_own( ucontext_t *ucontext )
++{
++    return !ps5_mmu4k_off && CS_sig(ucontext) == cs64_sel && !(EFL_sig(ucontext) & 0x100) &&
++           !is_inside_syscall( RSP_sig(ucontext) ) && !is_inside_signal_stack( (void *)RSP_sig(ucontext) ) &&
++           !(amd64_thread_data()->dr7 & 0xff) && !NtCurrentTeb()->WowTebOffset;
++}
++
++/* The run virtual_handle_fault asked for: the program's registers into the run, the thread to the engine's start. */
++static void ps5_mmu4k_enter( ucontext_t *ucontext )
++{
++    struct ntdll_thread_data *data = ntdll_get_thread_data();
++    PwWineMmu4kRegs regs;
++    PwWineMmu4kRun *run;
++    int i;
++
++    ps5_regs_get( ucontext, &regs );
++    run = pw_wine_mmu4k_enter( data->ps5_mmu4k_stack, &regs, (ULONG_PTR)data->ps5_mmu4k_page,
++                               (ULONG_PTR)data->ps5_mmu4k_addr );
++    data->ps5_mmu4k_page = NULL;
++    if (!run)  /* never with a stack the fault took; the store runs again, and every later one steps */
++    {
++        pw_wine_mmu4k_stack_give( data->ps5_mmu4k_stack );
++        ps5_mmu4k_off = TRUE;
++        ERR_(seh)( "mmu4k: off: a run was refused\n" );
++        return;
++    }
++    data->ps5_mmu4k_run = run;
++    data->ps5_mmu4k_mask = ucontext->uc_sigmask;
++    for (i = 1; i < NSIG; i++) if (sigismember( &server_block_set, i )) sigaddset( &ucontext->uc_sigmask, i );
++    sigaddset( &ucontext->uc_sigmask, SIGQUIT );  /* quit_handler ends a thread outside a syscall at once */
++    ps5_regs_set( ucontext, &regs );
++}
++
++/* The end of a write fault Wine resolved: a run starts, or 1122's step traps after the one instruction. */
++static void ps5_fault_resolved( ucontext_t *ucontext )
++{
++    struct ntdll_thread_data *data = ntdll_get_thread_data();
++
++    if (data->ps5_mmu4k_page) ps5_mmu4k_enter( ucontext );
++    else if (data->ps5_step_tf == 2)  /* this fault opened the instruction's first page */
++    {
++        data->ps5_step_tf = (EFL_sig(ucontext) & 0x100) != 0;
++        EFL_sig(ucontext) |= 0x100;
++    }
++    leave_handler( ucontext );
++}
++
++/* A signal on a thread in a run (SIGSEGV, SIGBUS, SIGILL, SIGFPE): TRUE when the run took it. A fault in a slot or a
++ * guarded routine goes back into the run; the exit trap gives the program its registers and mask back and resumes it,
++ * or makes of a write at the address the engine names what Wine's path makes of it with no run (1122's step for a run
++ * that could not move, the straddle rule's access violation). */
++static BOOL ps5_mmu4k_signal( int signal, siginfo_t *siginfo, ucontext_t *ucontext )
++{
++    struct ntdll_thread_data *data = ntdll_get_thread_data();
++    EXCEPTION_RECORD rec = { 0 };
++    struct xcontext context;
++    PwWineMmu4kRegs regs;
++    ULONG_PTR address = 0;
++    sigset_t now;
++    int action;
++
++    if (!data->ps5_mmu4k_run) return FALSE;
++    ps5_regs_get( ucontext, &regs );
++    action = pw_wine_mmu4k_signal( data->ps5_mmu4k_run, signal, (ULONG_PTR)siginfo->si_addr, &regs, &address );
++    if (action == PW_WINE_MMU4K_NOT_OURS)
++    {
++        static int logged;
++        if (!logged++) ERR_(seh)( "mmu4k: fault in the engine: signal %d at %p, address %p\n", signal,
++                                  (void *)RIP_sig(ucontext), siginfo->si_addr );
++        return FALSE;
++    }
++    ps5_regs_set( ucontext, &regs );
++    if (action == PW_WINE_MMU4K_RECOVER)
++    {
++        leave_handler( ucontext );
++        return TRUE;
++    }
++    data->ps5_mmu4k_run = NULL;
++    /* The console's ucontext is not laid out as the SDK's header says (UCONTEXT_MC): the run must have had SIGQUIT
++     * blocked through uc_sigmask, or no run starts again. */
++    if (!ps5_mmu4k_off && (pthread_sigmask( SIG_BLOCK, NULL, &now ) || !sigismember( &now, SIGQUIT )))
++    {
++        ps5_mmu4k_off = TRUE;
++        ERR_(seh)( "mmu4k: off: a run did not have its signal mask\n" );
++    }
++    ucontext->uc_sigmask = data->ps5_mmu4k_mask;
++    if (action == PW_WINE_MMU4K_RESUME)
++    {
++        leave_handler( ucontext );
++        return TRUE;
++    }
++    rec.ExceptionCode = EXCEPTION_ACCESS_VIOLATION;
++    rec.ExceptionAddress = (void *)RIP_sig(ucontext);
++    rec.NumberParameters = 2;
++    rec.ExceptionInformation[0] = EXCEPTION_WRITE_FAULT;
++    rec.ExceptionInformation[1] = address;
++    data->ps5_fault_own = FALSE;
++    if (!virtual_handle_fault( &rec, (void *)RSP_sig(ucontext) ))
++    {
++        ps5_fault_resolved( ucontext );
++        return TRUE;
++    }
++    save_context( &context, ucontext );
++    setup_raise_exception( ucontext, &rec, &context );
++    return TRUE;
++}
++#endif
++
++
+ /**********************************************************************
+  *		segv_handler
+  *
+@@ -2888,6 +3053,9 @@ static void segv_handler( int signal, siginfo_t *siginfo, void *sigcontext )
+     struct xcontext context;
+     void *steamclient_addr = NULL;
+ 
++#ifdef __PROSPERO__
++    if (ps5_mmu4k_signal( signal, siginfo, ucontext )) return;
++#endif
+     rec.ExceptionAddress = (void *)RIP_sig(ucontext);
+     save_context( &context, ucontext );
+ 
+@@ -2929,18 +3097,18 @@ static void segv_handler( int signal, siginfo_t *siginfo, void *sigcontext )
+         rec.NumberParameters = 2;
+         rec.ExceptionInformation[0] = (ERROR_sig(ucontext) >> 1) & 0x09;
+         rec.ExceptionInformation[1] = (ULONG_PTR)siginfo->si_addr;
++#ifdef __PROSPERO__
++        ntdll_get_thread_data()->ps5_fault_own = ps5_fault_is_own( ucontext );
++#endif
+         if (!virtual_handle_fault( &rec, (void *)RSP_sig(ucontext) ) || check_invalid_gsbase( ucontext ))
+         {
+ #ifdef __PROSPERO__
+-            /* The fault opened a host page for this one instruction: trap after it to close the page again. */
+-            struct ntdll_thread_data *data = ntdll_get_thread_data();
+-            if (data->ps5_step_tf == 2)  /* this fault opened the instruction's first page */
+-            {
+-                data->ps5_step_tf = (EFL_sig(ucontext) & 0x100) != 0;
+-                EFL_sig(ucontext) |= 0x100;
+-            }
+-#endif
++            /* A run of the 4 KiB MMU starts, or the fault opened a host page for this one instruction: trap after it
++             * to close the page again. */
++            ps5_fault_resolved( ucontext );
++#else
+             leave_handler( ucontext );
++#endif
+             return;
+         }
+         if (rec.ExceptionCode == EXCEPTION_ACCESS_VIOLATION &&
+@@ -3036,6 +3204,9 @@ static void fpe_handler( int signal, siginfo_t *siginfo, void *sigcontext )
+     EXCEPTION_RECORD rec = { .ExceptionAddress = (void *)RIP_sig(ucontext) };
+     struct xcontext context;
+ 
++#ifdef __PROSPERO__
++    if (ps5_mmu4k_signal( signal, siginfo, ucontext )) return;
++#endif
+     save_context( &context, sigcontext );
+ 
+     switch (siginfo->si_code)
+diff --git a/dlls/ntdll/unix/unix_private.h b/dlls/ntdll/unix/unix_private.h
+index f8a3789..76b0d12 100644
+--- a/dlls/ntdll/unix/unix_private.h
++++ b/dlls/ntdll/unix/unix_private.h
+@@ -123,6 +123,12 @@ struct ntdll_thread_data
+     struct { void *address; ULONG64 conversions; } ps5_granted; /* the fault last run again because the host allowed it */
+     void                     *ps5_step_page[2]; /* host pages opened for the instruction being stepped */
+     int                       ps5_step_tf;     /* the program had the trap flag set itself; 2 until the handler looks */
++    void                     *ps5_mmu4k_run;   /* the 4 KiB MMU run this thread is in (wine/ps5/pw_wine_mmu4k.h), or NULL */
++    void                     *ps5_mmu4k_page;  /* virtual_handle_fault: segv_handler starts a run for this host page, */
++    void                     *ps5_mmu4k_addr;  /* the store at this address, */
++    int                       ps5_mmu4k_stack; /* on this run stack */
++    BOOL                      ps5_fault_own;   /* the program's own fault, which may start a run (segv_handler) */
++    sigset_t                  ps5_mmu4k_mask;  /* the program's signal mask, given back when its run ends */
+ #endif
+ };
+ 
+@@ -335,6 +341,7 @@ extern void virtual_init_user_shared_data(void);
+ extern NTSTATUS virtual_handle_fault( EXCEPTION_RECORD *rec, void *stack );
+ #ifdef __PROSPERO__
+ extern BOOL virtual_ps5_step_done(void);
++extern void signal_ps5_fs_repair(void);
+ #endif
+ extern unsigned int virtual_locked_server_call( void *req_ptr );
+ extern ssize_t virtual_locked_read( int fd, void *addr, size_t size );
+diff --git a/dlls/ntdll/unix/virtual.c b/dlls/ntdll/unix/virtual.c
+index a3bc47f..2e42a2e 100644
+--- a/dlls/ntdll/unix/virtual.c
++++ b/dlls/ntdll/unix/virtual.c
+@@ -101,6 +101,8 @@
+ #include "wine/debug.h"
+ #ifdef __PROSPERO__
+ #include "pw_wine_section_ps5.h"
++#include "pw_wine_alias.h"
++#include "pw_wine_mmu4k.h"
+ #endif
+ 
+ WINE_DEFAULT_DEBUG_CHANNEL(virtual);
+@@ -226,6 +228,7 @@ extern int __wine_ps5_dmem_check( void *base, size_t size );
+ typedef int (*pw_wine_vm_owned_query)( const void *, void **, void ** );
+ extern int __wine_ps5_vm_gap( const void *, const void *, pw_wine_vm_owned_query, void **, void ** );
+ extern int pw_wine_vm_step_slot( void *const slots[2], const void *page );
++extern int __wine_ps5_mmu4k_init( const PwWineMmu4kOps *ops );
+ #define host_mmap __wine_ps5_mmap
+ #define host_munmap __wine_ps5_munmap
+ #define host_mprotect __wine_ps5_mprotect
+@@ -4788,6 +4791,69 @@ static unsigned int ps5_host_page_prot( uintptr_t addr )
+ {
+     return get_host_page_unix_prot( (const void *)addr, 0, 0 );
+ }
++
++/* The 4 KiB MMU's view of Wine (docs/MMU4K.md, wine/ps5/pw_wine_mmu4k.h): a run calls these on its own stack right
++ * after a sigreturn, so each first repairs a null %fs (signal_ps5_fs_repair, P5). classify, under the virtual mutex:
++ * bit i of plain is a 4 KiB page the run may store into, what the kernel would let through when the host page is
++ * writable (the store goes to the program's address), and only a read-write page that is not write-copy when it is
++ * held read-only for its neighbours (the store goes through the alias of the direct memory, a private copy never).
++ * Bit i of exec is a 4 KiB page the run may fetch code from, as the CPU with 4 KiB pages would. */
++static int ps5_mmu4k_classify( void *context, uintptr_t host_page, PwWineMmu4kPage *out )
++{
++    char *base = (char *)host_page;
++    unsigned int i;
++
++    signal_ps5_fs_repair();
++    if (!find_view( base, 0 )) return -1;
++    out->host_page = host_page;
++    out->kernel_write = (get_host_page_unix_prot( base, 0, 0 ) & PROT_WRITE) != 0;
++    out->plain = out->exec = 0;
++    for (i = 0; i < host_page_size / page_size; i++)
++    {
++        BYTE vprot = get_page_vprot( base + i * page_size );
++        if ((get_unix_prot( vprot ) & PROT_WRITE) && (out->kernel_write || !(vprot & VPROT_WRITECOPY)))
++            out->plain |= 1 << i;
++        if (get_unix_prot( vprot ) & PROT_EXEC) out->exec |= 1 << i;
++    }
++    out->alias_delta = 0;
++    if (!out->kernel_write && out->plain)
++    {
++        uintptr_t alias = pw_wine_alias_get( host_page );
++        if (alias) out->alias_delta = (intptr_t)(alias - host_page);
++    }
++    out->generation = pw_wine_alias_generation();  /* after the get, which may give a window back */
++    return 0;
++}
++
++static void ps5_mmu4k_lock( void *context )
++{
++    signal_ps5_fs_repair();
++    mutex_lock( &virtual_mutex );
++}
++
++static void ps5_mmu4k_unlock( void *context )
++{
++    signal_ps5_fs_repair();
++    mutex_unlock( &virtual_mutex );
++}
++
++static const PwWineMmu4kOps ps5_mmu4k_ops = { NULL, ps5_mmu4k_classify, ps5_mmu4k_lock, ps5_mmu4k_unlock };
++
++/* Under the virtual mutex, for a write a 4 KiB page allows in a host page held read-only for its neighbours (patch
++ * 1122's branch of virtual_handle_fault): TRUE with a run stack taken and the thread told to start a run there
++ * (segv_handler's ps5_fault_resolved, docs/MMU4K.md section 4.5); FALSE leaves 1122's step. */
++static BOOL ps5_mmu4k_wanted( struct ntdll_thread_data *data, char *page, void *addr )
++{
++    int stack;
++
++    if (!pw_wine_mmu4k_ready() || !data->ps5_fault_own || data->ps5_step_page[0] || data->ps5_mmu4k_run ||
++        !pw_wine_alias_get( (uintptr_t)page ) || (stack = pw_wine_mmu4k_stack_take()) < 0)
++        return FALSE;
++    data->ps5_mmu4k_page = page;
++    data->ps5_mmu4k_addr = addr;
++    data->ps5_mmu4k_stack = stack;
++    return TRUE;
++}
+ #endif
+ 
+ /***********************************************************************
+@@ -4859,6 +4925,7 @@ void virtual_init(void)
+     wine_rb_init( &views_tree, compare_view );
+ #ifdef __PROSPERO__
+     __wine_ps5_section_init( (uintptr_t)host_addr_space_limit, ps5_host_page_prot );
++    __wine_ps5_mmu4k_init( &ps5_mmu4k_ops );  /* on in a helper unless WINE_PS5_MMU4K=0; one log line either way */
+ #endif
+ 
+     free_ranges[0].base = (void *)0;
+@@ -6047,8 +6114,9 @@ NTSTATUS virtual_handle_fault( EXCEPTION_RECORD *rec, void *stack )
+         }
+     }
+     /* A write this page allows, refused because its host page holds read-only pages too (get_host_page_unix_prot):
+-     * the host page is opened for the one instruction; the single-step trap closes it (virtual_ps5_step_done). An
+-     * evicted page of a shared section is mapped first, opened. */
++     * a run of the 4 KiB MMU executes it and what follows with the stores to such pages through an alias
++     * (ps5_mmu4k_wanted); else the host page is opened for the one instruction and the single-step trap closes it
++     * (virtual_ps5_step_done). An evicted page of a shared section is mapped first, opened. */
+     if (ret == STATUS_ACCESS_VIOLATION && err == EXCEPTION_WRITE_FAULT &&
+         (get_unix_prot( get_page_vprot( addr ) ) & PROT_WRITE) &&
+         !(get_host_page_unix_prot( page, 0, 0 ) & PROT_WRITE))
+@@ -6058,7 +6126,8 @@ NTSTATUS virtual_handle_fault( EXCEPTION_RECORD *rec, void *stack )
+         /* The slot holding this page if another thread closed it before the instruction ran (wine/ps5/pw_wine_vm.h). */
+         int slot = pw_wine_vm_step_slot( data->ps5_step_page, page ), mapped = -1;
+ 
+-        if (slot >= 0 &&
++        if (ps5_mmu4k_wanted( data, page, addr )) ret = STATUS_SUCCESS;
++        else if (slot >= 0 &&
+             (mapped = __wine_ps5_section_fault( (uintptr_t)addr, open, PROT_WRITE,
+                                                 (PwWineSectionRetry *)&data->ps5_section_retry, 1 )) ==
+             PW_WINE_SECTION_RETRY)

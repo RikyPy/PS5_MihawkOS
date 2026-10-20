@@ -1,0 +1,196 @@
+From: PS5_Proton
+Subject: [PATCH] server: use retained layered coverage for native hit-testing
+
+The alpha probe renders correctly but transparent pixels still receive clicks.
+Publish the Wine surface's binary coverage to the owning HWND lifetime, through
+a bounded request; keep application regions unchanged. Reuse authoritative
+server hit-testing and preserve old coverage on validation/allocation failure.
+
+--- a/server/protocol.def
++++ b/server/protocol.def
+@@ -4368,3 +4368,17 @@
+ @REQ(set_desktop_work_area)
+     struct rectangle rect;
+ @END
++
++/* Native retained-surface coverage for Wine's own hit-testing. Does not replace
++ * the application-visible window region. Only the owning process may publish. */
++@REQ(ps5_set_window_input_shape)
++    user_handle_t window;
++    object_id_t generation;
++    unsigned int mode;      /* 0 clear, 1 coverage bitmap, 2 fully transparent */
++    unsigned int width;
++    unsigned int height;
++    unsigned int stride;
++    int left;
++    int top;
++    VARARG(mask,bytes);
++@END
+--- a/server/window.c
++++ b/server/window.c
+@@ -64,6 +64,9 @@
+     struct object    obj;             /* object header */
+ #ifdef __PROSPERO__
+     uint64_t         ps5_generation;
++    unsigned char   *ps5_input_shape;
++    unsigned int     ps5_input_mode, ps5_input_width, ps5_input_height, ps5_input_stride;
++    int              ps5_input_left, ps5_input_top;
+ #endif
+     struct window   *parent;          /* parent window */
+     user_handle_t    owner;           /* owner of this window */
+@@ -161,6 +164,7 @@
+ /* Only Wine's server thread/lock touches window objects. Broker readers copy
+  * this independent bounded record; they never traverse mutable Wine lists. */
+ static uint64_t ps5_window_generation;
++static size_t ps5_input_shape_bytes;
+ static int ps5_windows_dirty = 1;
+ static pthread_mutex_t ps5_snapshot_mutex = PTHREAD_MUTEX_INITIALIZER;
+ static PwWindowSnapshot ps5_snapshot;
+@@ -333,6 +337,8 @@
+ {
+     struct window *win = (struct window *)obj;
+ #ifdef __PROSPERO__
++    ps5_input_shape_bytes -= (size_t)win->ps5_input_stride * win->ps5_input_height;
++    free(win->ps5_input_shape);
+     ps5_windows_dirty = 1;
+ #endif
+ 
+@@ -844,6 +850,9 @@
+     if (!(win = alloc_object( &window_ops ))) goto failed;
+ #ifdef __PROSPERO__
+     win->ps5_generation = ++ps5_window_generation;
++    win->ps5_input_shape = NULL;
++    win->ps5_input_mode = win->ps5_input_width = win->ps5_input_height = win->ps5_input_stride = 0;
++    win->ps5_input_left = win->ps5_input_top = 0;
+     ps5_windows_dirty = 1;
+ #endif
+     win->parent         = parent ? (struct window *)grab_object( parent ) : NULL;
+@@ -1124,6 +1133,17 @@
+     if (win->win_region &&
+         !point_in_region( win->win_region, *x - win->window_rect.left, *y - win->window_rect.top ))
+         return 0;  /* not in window region */
++#ifdef __PROSPERO__
++    if (win->ex_style & WS_EX_LAYERED)
++    {
++        int64_t sx=(int64_t)*x-win->visible_rect.left-win->ps5_input_left;
++        int64_t sy=(int64_t)*y-win->visible_rect.top-win->ps5_input_top;
++        if(win->ps5_input_mode==2)return 0;
++        if(win->ps5_input_mode==1 &&
++           (sx<0 || sy<0 || sx>=win->ps5_input_width || sy>=win->ps5_input_height ||
++            !(win->ps5_input_shape[(size_t)sy*win->ps5_input_stride+(size_t)sx/8]&(0x80u>>(sx%8)))))return 0;
++    }
++#endif
+     return 1;
+ }
+ 
+@@ -3474,3 +3494,40 @@
+     }
+     else set_win32_error( ERROR_INVALID_WINDOW_HANDLE );
+ }
++
++/* Coverage belongs to the server's HWND lifetime, not to the title's picker.
++ * Bound the bitmap and total storage; allocation/replacement is transactional. */
++DECL_HANDLER(ps5_set_window_input_shape)
++{
++#ifdef __PROSPERO__
++    struct window *win=get_window(req->window);
++    unsigned char *next=NULL;
++    size_t bytes=0,old_bytes;
++    if(!win)return;
++    if(!win->thread || win->thread->process!=current->process || win->ps5_generation!=req->generation)
++    { set_error(STATUS_ACCESS_DENIED);return; }
++    if(req->mode>2) {set_error(STATUS_INVALID_PARAMETER);return;}
++    if(req->mode==1)
++    {
++        if(!req->width || req->width>2176 || !req->height || req->height>1408 ||
++           req->stride!=(req->width+31)/32*4)
++        {set_error(STATUS_INVALID_PARAMETER);return;}
++        bytes=(size_t)req->stride*req->height;
++    }
++    else if(req->width || req->height || req->stride || req->left || req->top)
++    {set_error(STATUS_INVALID_PARAMETER);return;}
++    if(get_req_data_size()!=bytes || (req->mode && !(win->ex_style&WS_EX_LAYERED)))
++    {set_error(STATUS_INVALID_PARAMETER);return;}
++    old_bytes=(size_t)win->ps5_input_stride*win->ps5_input_height;
++    if(bytes>(32u<<20)-ps5_input_shape_bytes+old_bytes)
++    {set_error(STATUS_NO_MEMORY);return;}
++    if(bytes && !(next=memdup(get_req_data(),bytes)))return;
++    free(win->ps5_input_shape);
++    ps5_input_shape_bytes=ps5_input_shape_bytes-old_bytes+bytes;
++    win->ps5_input_shape=next;win->ps5_input_mode=req->mode;
++    win->ps5_input_width=req->width;win->ps5_input_height=req->height;win->ps5_input_stride=req->stride;
++    win->ps5_input_left=req->left;win->ps5_input_top=req->top;
++#else
++    set_error(STATUS_NOT_IMPLEMENTED);
++#endif
++}
+--- a/dlls/win32u/ps5drv.c
++++ b/dlls/win32u/ps5drv.c
+@@ -85,6 +85,9 @@
+     UINT32 *pixels;         /* retained GDI pixels, independent of paint order */
+     UINT width, height;
+     BYTE opacity;          /* UpdateLayeredWindow constant factor, separate from surface alpha */
++    BOOL input_shape_valid;
++    UINT input_shape_mode;
++    RECT input_shape_rect;
+ };
+ 
+ static int (*present_frame)( const void *bgra, UINT width, UINT height, UINT stride );
+@@ -317,6 +320,32 @@
+     present_screen();
+ }
+ 
++static BOOL ps5_publish_input_shape(struct ps5_window *window, const RECT *rect,
++                                     UINT width, UINT height, UINT opacity,
++                                     const void *shape, UINT stride, size_t bytes, BOOL changed)
++{
++    BOOL layered=get_window_long(window->hwnd,GWL_EXSTYLE)&WS_EX_LAYERED;
++    UINT mode=!layered ? 0 : !opacity ? 2 : shape ? 1 : 0;
++    BOOL okay;
++    NTSTATUS status;
++    if(window->input_shape_valid && window->input_shape_mode==mode &&
++       EqualRect(&window->input_shape_rect,rect) && !changed)return TRUE;
++    SERVER_START_REQ(ps5_set_window_input_shape)
++    {
++        req->window=wine_server_user_handle(window->hwnd);
++        req->generation=window->generation;req->mode=mode;
++        req->width=mode==1 ? width : 0;req->height=mode==1 ? height : 0;
++        req->stride=mode==1 ? stride : 0;
++        req->left=mode==1 ? rect->left : 0;req->top=mode==1 ? rect->top : 0;
++        if(mode==1)wine_server_add_data(req,shape,bytes);
++        status=wine_server_call(req);okay=!status;
++    }
++    SERVER_END_REQ;
++    if(!okay) ERR("input shape publish failed status=%#x mode=%u bytes=%lu\n",status,mode,(unsigned long)bytes);
++    if(okay) {window->input_shape_valid=TRUE;window->input_shape_mode=mode;window->input_shape_rect=*rect;}
++    return okay;
++}
++
+ static BOOL ps5_surface_flush( struct window_surface *surface, const RECT *rect, const RECT *dirty,
+                                const BITMAPINFO *color_info, const void *color_bits, BOOL shape_changed,
+                                const BITMAPINFO *shape_info, const void *shape_bits )
+@@ -349,6 +378,8 @@
+             okay = !present_window( (UINT)(UINT_PTR)window->hwnd, window->generation,
+                                     color_bits, width, height, width * 4, rect->left, rect->top,
+                                     surface->alpha_mask, opacity, shape_bits, shape_stride, shape_bytes );
++            if (okay) okay = ps5_publish_input_shape(window,rect,width,height,opacity,
++                                                     shape_bits,shape_stride,shape_bytes,shape_changed);
+             goto done;
+         }
+         if (window->width != width || window->height != height)
+@@ -478,6 +509,7 @@
+         window = &windows[window_count++];
+         window->hwnd = hwnd;
+         window->opacity = 255;
++        window->input_shape_valid = FALSE;
+         window->generation = generation;
+         window->shown = FALSE;
+     }
+@@ -489,6 +521,7 @@
+         {
+             drop_window( (UINT)(UINT_PTR)hwnd );
+             window->generation = generation;
++            window->input_shape_valid = FALSE;
+         }
+         /* a window just shown may have painted before it had this surface */
+         repaint = shown && !window->shown;

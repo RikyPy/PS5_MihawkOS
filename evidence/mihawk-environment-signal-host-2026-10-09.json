@@ -1,0 +1,88 @@
+{
+  "original_failure": "Unchanged 400-timed-signal stress failed its positive-deferral assertion; a repeat passed with only one deferred signal. Preserve klog/mihawk-environment-all-host-2026-10-09.log.",
+  "fix": "Host-only mutex interposition injects one real signal after device entry. A startup handshake completes before timed stress. Runtime source unchanged.",
+  "test_sha256": "0bd6d6c03ef29dc0667300d4bd392f3bf9657e96794e2f719387aeab97e83a0b",
+  "runs": [
+    {
+      "run": 1,
+      "seconds": 1.296,
+      "returncode": 0,
+      "deferred": 2,
+      "raised": 2,
+      "passed": true
+    },
+    {
+      "run": 2,
+      "seconds": 1.087,
+      "returncode": 0,
+      "deferred": 4,
+      "raised": 4,
+      "passed": true
+    },
+    {
+      "run": 3,
+      "seconds": 1.058,
+      "returncode": 0,
+      "deferred": 3,
+      "raised": 3,
+      "passed": true
+    },
+    {
+      "run": 4,
+      "seconds": 1.137,
+      "returncode": 0,
+      "deferred": 4,
+      "raised": 4,
+      "passed": true
+    },
+    {
+      "run": 5,
+      "seconds": 1.247,
+      "returncode": 0,
+      "deferred": 1,
+      "raised": 1,
+      "passed": true
+    },
+    {
+      "run": 6,
+      "seconds": 1.428,
+      "returncode": 0,
+      "deferred": 2,
+      "raised": 2,
+      "passed": true
+    },
+    {
+      "run": 7,
+      "seconds": 1.521,
+      "returncode": 0,
+      "deferred": 3,
+      "raised": 3,
+      "passed": true
+    },
+    {
+      "run": 8,
+      "seconds": 1.33,
+      "returncode": 0,
+      "deferred": 1,
+      "raised": 1,
+      "passed": true
+    },
+    {
+      "run": 9,
+      "seconds": 1.281,
+      "returncode": 0,
+      "deferred": 2,
+      "raised": 2,
+      "passed": true
+    },
+    {
+      "run": 10,
+      "seconds": 1.31,
+      "returncode": 0,
+      "deferred": 4,
+      "raised": 4,
+      "passed": true
+    }
+  ],
+  "passed": true
+}

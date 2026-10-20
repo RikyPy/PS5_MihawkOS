@@ -1,0 +1,38 @@
+From 99bb52e92f23735c1b33e5c27295c920757ce864 Mon Sep 17 00:00:00 2001
+From: prospero-win <prospero-win@invalid>
+Date: Tue, 29 Sep 2026 23:10:00 +0200
+Subject: [PATCH] win32u: Start window surfaces black on the PS5.
+
+win32u fills a new window surface with white. The PS5 driver shows a
+window as soon as its surface is flushed, and a game window that
+Direct3D draws into is never painted: Warcraft III showed a white
+rectangle while it loaded, before its intro. On the PS5 a new surface
+starts black, as a full-screen window looks on a real display.
+
+Rebased onto 1c7859662533 for PS5_Proton (see wine/patches/README.md).
+---
+ dlls/win32u/dce.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/dlls/win32u/dce.c b/dlls/win32u/dce.c
+index 6dbf3be..b0b436e 100644
+--- a/dlls/win32u/dce.c
++++ b/dlls/win32u/dce.c
+@@ -551,7 +551,14 @@ W32KAPI struct window_surface *window_surface_create( UINT size, const struct wi
+ 
+     pthread_mutex_init( &surface->mutex, NULL );
+ 
++#ifdef WINE_PS5_USER_DRIVER
++    /* The PS5 shows a window as soon as it is flushed, and a game's window
++     * that Direct3D draws into is never painted: black, as a full-screen
++     * window shows on a real display, rather than a white rectangle. */
++    memset( window_surface_get_color( surface, info ), 0, info->bmiHeader.biSizeImage );
++#else
+     memset( window_surface_get_color( surface, info ), 0xff, info->bmiHeader.biSizeImage );
++#endif
+ 
+     TRACE( "created surface %p for hwnd %p rect %s\n", surface, hwnd, wine_dbgstr_rect( &surface->rect ) );
+     return surface;
+-- 
+2.55.0
+

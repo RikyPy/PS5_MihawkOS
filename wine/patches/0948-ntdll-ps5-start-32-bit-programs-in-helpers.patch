@@ -1,0 +1,53 @@
+From d121873c596032d564af4e0e862cd182d710dcd6 Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Wed, 7 Oct 2026 18:32:29 -0400
+Subject: [PATCH] ntdll: PS5: start 32-bit programs in helpers.
+
+A helper process runs one Windows program; NtCreateUserProcess started
+one only for an AMD64 image, so a 32-bit program could start no other
+program, and wineboot could not run the 32-bit rundll32 that sets up a
+prefix's WoW64 side. An i386 image now starts too when WINEARCH=wow64,
+which the title sets and helpers inherit, says the runtime has the i386
+modules: the helper then runs it under WoW64 as the first process does.
+---
+ dlls/ntdll/unix/process.c | 14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
+
+diff --git a/dlls/ntdll/unix/process.c b/dlls/ntdll/unix/process.c
+index 3165a9a..0d70fd4 100644
+--- a/dlls/ntdll/unix/process.c
++++ b/dlls/ntdll/unix/process.c
+@@ -739,6 +739,16 @@ static BOOL ps5_ends_with( const UNICODE_STRING *path, const WCHAR *name )
+            (count == length || path->Buffer[count - length - 1] == '\\');
+ }
+ 
++/* A helper runs an AMD64 image, or an i386 one under WoW64 when WINEARCH=wow64 says the runtime has the i386
++ * modules (the title sets it; helpers inherit it): see PS5_Proton's docs/IA32_DESIGN.md, M4 step 2. */
++static BOOL ps5_child_machine( USHORT machine )
++{
++    const char *arch = getenv( "WINEARCH" );
++
++    if (machine == IMAGE_FILE_MACHINE_AMD64) return TRUE;
++    return machine == IMAGE_FILE_MACHINE_I386 && arch && !strcmp( arch, "wow64" );
++}
++
+ static BOOL ps5_descendants_enabled( const UNICODE_STRING *child )
+ {
+     static const WCHAR services[] = {'s','e','r','v','i','c','e','s','.','e','x','e',0};
+@@ -844,11 +854,11 @@ NTSTATUS WINAPI NtCreateUserProcess( HANDLE *process_handle_ptr, HANDLE *thread_
+         goto done;
+     }
+ #ifdef __PROSPERO__
+-    /* Experimental Sony service loader: only PE64, explicitly enabled. */
++    /* Experimental Sony service loader: PE64 and, under WoW64, PE32, explicitly enabled. */
+     if (!getenv("WINE_PS5_CHILDREN") || strcmp(getenv("WINE_PS5_CHILDREN"), "1") ||
+         (getenv("WINE_PS5_CHILD") && !getenv("WINE_PS5_INITIAL_CLIENT") &&
+          !ps5_descendants_enabled( &params->ImagePathName )) || debug ||
+-        pe_info.machine != IMAGE_FILE_MACHINE_AMD64 || (machine && machine != IMAGE_FILE_MACHINE_AMD64))
++        !ps5_child_machine( pe_info.machine ) || (machine && !ps5_child_machine( machine )))
+     {
+         status = STATUS_NOT_SUPPORTED;
+         goto done;
+-- 
+2.56.0
+

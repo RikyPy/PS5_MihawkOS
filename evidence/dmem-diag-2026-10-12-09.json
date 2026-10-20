@@ -1,0 +1,25 @@
+{
+ "run": "dmem-diag-2026-10-12-09",
+ "what": "C:\\windows\\system32\\mihawk.exe",
+ "env": [
+  "PROTON_LAYOUT=launcher",
+  "WINE_PS5_WINDOW_SURFACES=1"
+ ],
+ "passed": false,
+ "result": "runner_error",
+ "error": "The console is not idle; run refused",
+ "loaded": false,
+ "probe_verdict": null,
+ "stop_requested": null,
+ "cleanup_verified": false,
+ "hooks_removed": false,
+ "semantics_passed": false,
+ "window_pixels": [],
+ "host_dmem": {
+  "made": 0,
+  "freed": 0,
+  "refused": 1,
+  "free_failed": 1,
+  "passed": false
+ }
+}

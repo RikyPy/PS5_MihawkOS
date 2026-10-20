@@ -1,0 +1,48 @@
+Subject: [PATCH] comctl32: refresh implicit list-view background on system colour change
+
+Creation copies COLOR_WINDOW into an owned brush. Refresh that default when
+the system palette changes, while keeping every explicit LVM_SETBKCOLOR value
+and transparent-background request untouched. No shell or title condition.
+
+--- a/dlls/comctl32/listview.c
++++ b/dlls/comctl32/listview.c
+@@ -292,6 +292,7 @@
+ 
+   /* colors */
+   HBRUSH hBkBrush;
++  BOOL default_background;
+   COLORREF clrBk;
+   COLORREF clrText;
+   COLORREF clrTextBk;
+@@ -8081,6 +8082,8 @@
+ {
+     TRACE("color %lx\n", color);
+ 
++    infoPtr->default_background = FALSE;
++
+     if(infoPtr->clrBk != color) {
+ 	if (infoPtr->clrBk != CLR_NONE) DeleteObject(infoPtr->hBkBrush);
+ 	infoPtr->clrBk = color;
+@@ -9586,6 +9589,7 @@
+   infoPtr->clrText = CLR_DEFAULT;
+   infoPtr->clrTextBk = CLR_DEFAULT;
+   LISTVIEW_SetBkColor(infoPtr, comctl32_color.clrWindow);
++  infoPtr->default_background = TRUE;
+ 
+   /* set default values */
+   infoPtr->nFocusedItem = -1;
+@@ -11916,6 +11920,14 @@
+ 
+   case WM_SYSCOLORCHANGE:
+     COMCTL32_RefreshSysColors();
++    /* Only the implicit default follows the system palette. Explicit colours,
++     * including a caller deliberately choosing white, remain caller-owned. */
++    if (infoPtr->default_background)
++    {
++        LISTVIEW_SetBkColor(infoPtr, comctl32_color.clrWindow);
++        infoPtr->default_background = TRUE;
++    }
++    InvalidateRect(hwnd, NULL, TRUE);
+     return 0;
+ 
+ /*	case WM_TIMER: */

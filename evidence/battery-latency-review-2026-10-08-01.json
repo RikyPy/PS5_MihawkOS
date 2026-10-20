@@ -1,0 +1,30 @@
+{
+  "review": "battery-latency-2026-10-08-01",
+  "gate_cases": 37,
+  "launch_gap_seconds": 60,
+  "settle_seconds": 8,
+  "pacing_floor_between_first_and_last_launch_seconds": 2160,
+  "font32": {
+    "actual_run_seconds": 12.4,
+    "case_seconds": 13.0
+  },
+  "font64": {
+    "actual_run_seconds": 11.3,
+    "case_seconds": 59.1
+  },
+  "memory_class_probe_fixed_hold_seconds": 156,
+  "source_sha256": {
+    "tools/console_guard.py": "1553aadcafc587b0a59ecbc173bf98df2d8612650d57547b62df3de93589032d",
+    "tools/run-console.py": "6de2dea0556a31755e9455f59ebc94c4937220c3da043e4a77efebe818657f1d",
+    "tools/run-battery.py": "544e2cbeebbb8c1324cbdbe161782b9fd9a2fbb8cc8a5b3a99624490dc9674c1",
+    "tests/memory-class-probe.c": "27c379818e89269833d60339c76fd808ff20a4dbf3591fad5ed0b4017abf37a3"
+  },
+  "proposed_order": [
+    "Replace fixed pacing with verified idle/helper/broker readiness; preserve outage refusal.",
+    "Use phase/census acknowledgement instead of fixed memory holds.",
+    "Batch short probes as isolated children within one owner session; retain separate owner/prefix/lifecycle checks.",
+    "Keep named verdicts and all mandatory commit checks."
+  ],
+  "implemented": false,
+  "notes": "Timing analysis only. The exact production gate is in progress; no runner change during that batch."
+}

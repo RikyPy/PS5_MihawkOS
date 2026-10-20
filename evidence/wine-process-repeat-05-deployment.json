@@ -1,0 +1,153 @@
+{
+  "case": "repeat",
+  "loader": {
+    "sdk_revision": "611893fc25ef3e138f5bc2c90d829d8b58174cd2",
+    "converter_revision": "ab37acd506305ba3e575435e3ae9a351cfaf7cf4",
+    "converter_sha256": "614377a0e37006e1454c67f228fc370a2f785c060205cb9f0264f27af04b5f18",
+    "recipe_sha256": "5db0755a420c3c69be688d39e789a87a6d1792cb1ceec9b9fc21ceeeb1f526d6",
+    "sources": {
+      "native/proton_wine_child.c": "907b7b813848e3fb73262b95e627ce226f875b5b1b010a794050840fae6aabf2",
+      "src/pw_wine_start.c": "52bdf039228ca13e9931fc7f7097b196ece76868990b6ea44588990714bf22e2",
+      "wine/ps5/pw_wine_prx.c": "67b8393fca62a72a7aaf53a409c9a34684dd7704037bf194066e5173808c16a2",
+      "wine/ps5/pw_wine_process.h": "79e515b12259cfee3f8bff436416946ab6ce013336a8da64a7d4ec0b4fa380c4",
+      "src/pw_wine_start.h": "f450215176a5bf7b898728ab0a84cbd6b8a3bfd497a4996ee4f590aab95c6ed7",
+      "wine/ps5/pw_wine_prx.h": "82e4cf6b56377bb3ca9e007bd78a3302633fa8675e77d5b507823829959f9bb0"
+    },
+    "preload_mask": "0x8000000000000002",
+    "ps5-pie.ld": "fbc52518761b58b703a2225c847c5f44a81523cd0e751755adf890ae0f0dd74c",
+    "app-symbols.map": "470ce72a27a7be8e35dd7a25b485faa733d61570bdaf24d3c75bb4e3e3c63cf7",
+    "identity": "318fedcc312fea79bd5d032208c5c44be41b5439698d5f0ec2c6b7f8be204106",
+    "sha256": "280bdd01dc19a12037da2483a8b761ebecf4774517666108f9f1b2127099fd8b"
+  },
+  "runtime": {
+    "ntdll": "3cb65e3f43d7214a5beaa3194210630ea7c70092f438e0942414ff935ef764b5",
+    "wineserver": "9dc0637c4ba021ecacd43fc1f299c9842846f41d661bb6386e7b1dfbb7b3471d"
+  },
+  "passed": true,
+  "production_restored": true,
+  "helper_removed": true,
+  "status": "complete",
+  "deployed_modules": [
+    "ntdll",
+    "wineserver"
+  ],
+  "helper_uploaded": true,
+  "probe_uploaded": true,
+  "deployment_verified": true,
+  "probe_sha256": "ce96a7b2931fa4395d91eb6e35ed4571043c7ab1dff6d4180ac749c884d68bfe",
+  "patch_sha256": "2767c06d7ca2d2355275e644fe22f0045b713e90ab5f7946da7c3b22af5712a1",
+  "adapter_sha256": {
+    "pw_wine_process.c": "ecb406b2805d9176e2c6ac9714787c180f112617c8526909d7cc0d49392b1bd1",
+    "pw_wine_process.h": "79e515b12259cfee3f8bff436416946ab6ce013336a8da64a7d4ec0b4fa380c4",
+    "pw_wine_threads.c": "9fb82ed67f775782a8ec9d9d0dbaf0837adb004cc1241ceebf6f58e60bbe38a0",
+    "pw_wine_threads.h": "a28177375ad16666504b3d05cb285c8f23634b800c2e4bd9b3c20ead21722d30"
+  },
+  "runner_status": 0,
+  "post_launch_fault_records": 0,
+  "native_descriptor_samples": [
+    {
+      "stage": "before_spawn",
+      "count": 41,
+      "limit": 12555
+    },
+    {
+      "stage": "before_spawn",
+      "count": 100,
+      "limit": 12555
+    },
+    {
+      "stage": "closed",
+      "count": 101,
+      "limit": 12555
+    },
+    {
+      "stage": "before_spawn",
+      "count": 100,
+      "limit": 12555
+    },
+    {
+      "stage": "closed",
+      "count": 101,
+      "limit": 12555
+    },
+    {
+      "stage": "before_spawn",
+      "count": 100,
+      "limit": 12555
+    },
+    {
+      "stage": "closed",
+      "count": 101,
+      "limit": 12555
+    },
+    {
+      "stage": "before_spawn",
+      "count": 100,
+      "limit": 12555
+    },
+    {
+      "stage": "closed",
+      "count": 101,
+      "limit": 12555
+    }
+  ],
+  "windows_handle_samples": [
+    {
+      "before": 12,
+      "after": 14
+    },
+    {
+      "before": 14,
+      "after": 14
+    },
+    {
+      "before": 14,
+      "after": 14
+    },
+    {
+      "before": 14,
+      "after": 14
+    },
+    {
+      "before": 14,
+      "after": 14
+    }
+  ],
+  "native_children": [
+    {
+      "pid": 424,
+      "service_id": 436308481
+    },
+    {
+      "pid": 427,
+      "service_id": 436308497
+    },
+    {
+      "pid": 430,
+      "service_id": 436308513
+    },
+    {
+      "pid": 433,
+      "service_id": 436308529
+    },
+    {
+      "pid": 436,
+      "service_id": 436308545
+    }
+  ],
+  "native_child_deletions": [
+    424,
+    427,
+    430,
+    433,
+    436
+  ],
+  "child_logs": [
+    "wine-child-424.log",
+    "wine-child-427.log",
+    "wine-child-430.log",
+    "wine-child-433.log",
+    "wine-child-436.log"
+  ],
+  "probe_removed": true
+}

@@ -1,0 +1,29 @@
+{
+  "route": "websrv",
+  "build": {
+    "program": "space",
+    "elf_bytes": 118384,
+    "elf_sha256": "d8ac87240efbaa2e17f87772f9ac72a56507a32098e2c3d973896439818dac9d"
+  },
+  "started": "2026-10-18T22:07:32Z",
+  "passed": true,
+  "send": {
+    "sent": 118384,
+    "reply": "HTTP/1.1 200 OK"
+  },
+  "klog_line": "mihawkos-space: done",
+  "space_lines": [
+    "call=statfs path=/data result=0 errno=0 bsize=65536 bavail=28349329 blocks=29906703 type=nullfs from=/user/data",
+    "call=statfs path=/data/ps5proton result=0 errno=0 bsize=65536 bavail=28349329 blocks=29906703 type=nullfs from=/user/data",
+    "call=statfs path=/mnt/usb0 result=0 errno=0 bsize=32768 bavail=473851 blocks=483456 type=exfatfs from=/dev/da1s1",
+    "call=statfs path=/mnt/usb1 result=0 errno=0 bsize=16384 bavail=106 blocks=128 type=tmpfs from=tmpfs",
+    "call=statvfs path=/data result=0 errno=0 frsize=65536 bavail=28349329",
+    "call=statvfs path=/data/ps5proton result=0 errno=0 frsize=65536 bavail=28349329",
+    "call=statvfs path=/mnt/usb0 result=0 errno=0 frsize=32768 bavail=473851",
+    "call=statvfs path=/mnt/usb1 result=0 errno=0 frsize=16384 bavail=106",
+    "done"
+  ],
+  "seconds_to_line": 0.1,
+  "intact": true,
+  "capture": "klog/probe-space-payload-2026-10-18-02.log"
+}

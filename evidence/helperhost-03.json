@@ -1,0 +1,33 @@
+{
+  "run": "helperhost-03",
+  "step": "memory",
+  "elf_sha256": "fe12bbf5ba6dbdceb81ed3f8a730f88ddd3348652fa58f2bde58f8a80011dfe3",
+  "started": "2026-10-05T22:58:06",
+  "lines": [
+    "helperhostprobe pid=4425 uid=1 euid=0 gid=1 argc=1",
+    "  argv[0]=memory",
+    "memory: direct 0 MiB in all; flexible available 8159 MiB (status 0)",
+    "runtime: stat ntdll.prx -> 0 errno=0 size=899519",
+    "runtime: open -> 12 errno=0, first bytes 54 14 f5 ee (4 read)",
+    "memory: about to map and touch 64 MiB",
+    "memory: about to map and touch 128 MiB",
+    "memory: about to map and touch 192 MiB",
+    "memory: about to map and touch 256 MiB",
+    "memory: about to map and touch 320 MiB",
+    "memory: about to map and touch 384 MiB",
+    "memory: about to map and touch 448 MiB",
+    "memory: about to map and touch 512 MiB",
+    "memory: about to map and touch 576 MiB",
+    "memory: about to map and touch 640 MiB",
+    "memory: about to map and touch 704 MiB",
+    "memory: about to map and touch 768 MiB",
+    "memory: about to map and touch 832 MiB",
+    "memory: about to map and touch 896 MiB",
+    "memory: about to map and touch 960 MiB",
+    "memory: about to map and touch 1024 MiB",
+    "memory: largest anonymous block mapped, touched and released: 1024 MiB",
+    "helperhostprobe done"
+  ],
+  "finished": true,
+  "console_after": "answers"
+}

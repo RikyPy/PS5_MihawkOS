@@ -1,0 +1,65 @@
+{
+ "telemetry_hold": null,
+ "launch_readiness": {
+  "ready": true,
+  "seconds": 0.143,
+  "settle_seconds": 0.0,
+  "census_seconds": 0.13,
+  "previous_cleanup_verified": true
+ },
+ "native_close_failures": [],
+ "run": "direct-syscall-pro-2026-10-10-01",
+ "what": "direct-syscall64-probe.exe",
+ "env": [
+  "WINE_PS5_DIRECT_SYSCALLS=1",
+  "WINEDEBUG=warn+all,+seh"
+ ],
+ "result": "finished",
+ "seconds": 4.9,
+ "probe_verdict": null,
+ "clean_owner_restart": false,
+ "launcher_end_status": 0,
+ "initial_status": null,
+ "closed_on_request": false,
+ "child_logs": [],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": false,
+ "bench": {},
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [],
+  "top": []
+ },
+ "shown": {
+  "frames": 0,
+  "per_10s": [],
+  "longest_gap_ms": 0
+ },
+ "broker": {
+  "local_offer": 8589934592,
+  "host_limit": 1073741824,
+  "windows": {
+   "presents": 0,
+   "effect_bytes": 0,
+   "mica_builds": 0,
+   "thumbnail_builds": 0,
+   "compositions": 0,
+   "compose_avg_us": 0,
+   "compose_max_us": 0
+  },
+  "refused": [],
+  "refused_count": 0,
+  "clients": [],
+  "wedged": false,
+  "failure_reasons": [],
+  "host_peak": 0,
+  "local_peak": 0
+ },
+ "pacing": null,
+ "captures": [],
+ "cleanup_verified": false,
+ "hooks_removed": true
+}

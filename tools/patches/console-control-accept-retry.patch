@@ -1,0 +1,21 @@
+--- a/payload/ps5vkctl/main.c
++++ b/payload/ps5vkctl/main.c
+@@ -526,6 +526,7 @@
+         return 1;
+     }
+     log_line("ps5vkctl: listening");
++    unsigned accept_failures=0;
+     for (;;)
+     {
+         const int client = accept(server, NULL, NULL);
+@@ -534,8 +535,10 @@
+             if (errno == EINTR)
+                 continue;
+             log_line("ps5vkctl: accept failed: %s", strerror(errno));
++            if (++accept_failures <= 8) { usleep(10000); continue; }
+             break;
+         }
++        accept_failures=0;
+         const int leaving = serve_client(client);
+         close(client);
+         if (leaving != 0)

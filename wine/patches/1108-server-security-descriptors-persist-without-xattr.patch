@@ -1,0 +1,146 @@
+From: PS5_Proton <local>
+Subject: [PATCH] server: security descriptors are kept in a file of the prefix where there are no extended attributes
+
+Wine keeps a file's descriptor in the extended attribute user.wine.sd. The console's file system has none, so a DACL that was set came back as the one
+made from the mode. Blizzard's Agent sets 10,500 descriptors and reads each back (the advapi trace of 2026-10-12), found them unchanged, set them again at every
+start and marked the game unplayable: Permissions check failure (2123), the game shows Update. On the console xattr_fget and xattr_fset now answer for
+that attribute from a table keyed by the file's device and number, kept in memory and in the file .pw-security of the server's directory (a record appended at each set,
+read when the first is asked for). The first record for a file wins nothing: the last one does.
+---
+diff --git a/server/file.c b/server/file.c
+--- a/server/file.c
++++ b/server/file.c
+@@ -256,9 +256,121 @@
+ }
+ #endif
+ 
++
++#ifdef __PROSPERO__
++/* The console's file system has no extended attributes, which is where Wine keeps a file's security descriptor: a descriptor that was set
++ * (Blizzard's Agent sets 10,500 of them and reads each back to see that it took) came back as the one made from the mode, and the Agent
++ * set them again at every start and marked the game unplayable (error 2123, the game: Update). The descriptors are kept here instead,
++ * by the file's device and number, in memory and in the file .pw-security of the prefix (appended to when one is set, read when the
++ * first is asked for), and xattr_fget/xattr_fset below answer from them. */
++struct pw_sd_record { dev_t dev; ino_t ino; unsigned int length; struct pw_sd_record *next; unsigned char bytes[1]; };
++
++static struct pw_sd_record *pw_sd_buckets[4096];
++static int pw_sd_loaded, pw_sd_fd = -1;
++
++static unsigned int pw_sd_hash( dev_t dev, ino_t ino ) { return (unsigned int)((ino * 2654435761u) ^ (dev * 40503u)) & 4095; }
++
++static struct pw_sd_record *pw_sd_find( dev_t dev, ino_t ino )
++{
++    struct pw_sd_record *record;
++    for (record = pw_sd_buckets[pw_sd_hash( dev, ino )]; record; record = record->next)
++        if (record->dev == dev && record->ino == ino) return record;
++    return NULL;
++}
++
++static void pw_sd_remember( dev_t dev, ino_t ino, const void *bytes, unsigned int length )
++{
++    struct pw_sd_record *record = pw_sd_find( dev, ino ), **link;
++
++    if (record && record->length == length && !memcmp( record->bytes, bytes, length )) return;
++    if (record)
++    {
++        for (link = &pw_sd_buckets[pw_sd_hash( dev, ino )]; *link != record; link = &(*link)->next) ;
++        *link = record->next;
++        free( record );
++    }
++    if (!(record = malloc( sizeof(*record) + length ))) return;
++    record->dev = dev;
++    record->ino = ino;
++    record->length = length;
++    memcpy( record->bytes, bytes, length );
++    record->next = pw_sd_buckets[pw_sd_hash( dev, ino )];
++    pw_sd_buckets[pw_sd_hash( dev, ino )] = record;
++}
++
++static void pw_sd_load( void )
++{
++    unsigned char header[20];
++    int fd;
++
++    pw_sd_loaded = 1;
++    /* the server's own directory is the prefix (it saves the registry there too) */
++    if ((fd = open( ".pw-security", O_RDONLY )) == -1) return;
++    while (read( fd, header, sizeof(header) ) == sizeof(header))
++    {
++        unsigned long long dev, ino;
++        unsigned int length;
++        unsigned char *bytes;
++
++        memcpy( &dev, header, 8 );
++        memcpy( &ino, header + 8, 8 );
++        memcpy( &length, header + 16, 4 );
++        if (!length || length > 65536 || !(bytes = malloc( length ))) break;
++        if (read( fd, bytes, length ) != (ssize_t)length) { free( bytes ); break; }
++        pw_sd_remember( (dev_t)dev, (ino_t)ino, bytes, length );
++        free( bytes );
++    }
++    close( fd );
++}
++
++static int pw_sd_get( int fd, void *value, size_t size )
++{
++    struct stat st;
++    struct pw_sd_record *record;
++
++    if (!pw_sd_loaded) pw_sd_load();
++    if (fstat( fd, &st ) == -1) return -1;
++    if (!(record = pw_sd_find( st.st_dev, st.st_ino ))) { errno = ENOENT; return -1; }
++    if (record->length > size) { errno = ERANGE; return -1; }
++    memcpy( value, record->bytes, record->length );
++    return record->length;
++}
++
++static int pw_sd_set( int fd, const void *value, size_t size )
++{
++    struct stat st;
++    unsigned char header[20];
++    unsigned long long dev, ino;
++    unsigned int length = size;
++
++    if (!pw_sd_loaded) pw_sd_load();
++    if (fstat( fd, &st ) == -1) return -1;
++    if (pw_sd_find( st.st_dev, st.st_ino ) && !memcmp( pw_sd_find( st.st_dev, st.st_ino )->bytes, value, size ) &&
++        pw_sd_find( st.st_dev, st.st_ino )->length == size) return 0;
++    pw_sd_remember( st.st_dev, st.st_ino, value, size );
++    if (pw_sd_fd == -1)
++    {
++        pw_sd_fd = open( ".pw-security", O_WRONLY | O_CREAT | O_APPEND, 0644 );
++    }
++    if (pw_sd_fd != -1)
++    {
++        dev = st.st_dev;
++        ino = st.st_ino;
++        memcpy( header, &dev, 8 );
++        memcpy( header + 8, &ino, 8 );
++        memcpy( header + 16, &length, 4 );
++        if (write( pw_sd_fd, header, sizeof(header) ) != sizeof(header) || write( pw_sd_fd, value, size ) != (ssize_t)size)
++            return -1;
++    }
++    return 0;
++}
++#endif
++
+ static int xattr_fget( int filedes, const char *name, void *value, size_t size )
+ {
+-#if defined(XATTR_ADDITIONAL_OPTIONS)
++#if defined(__PROSPERO__)
++    return strcmp( name, WINE_XATTR_SD ) ? (errno = ENOENT, -1) : pw_sd_get( filedes, value, size );
++#elif defined(XATTR_ADDITIONAL_OPTIONS)
+     return fgetxattr( filedes, name, value, size, 0, 0 );
+ #elif defined(HAVE_SYS_XATTR_H) || defined(HAVE_ATTR_XATTR_H)
+     return fgetxattr( filedes, name, value, size );
+@@ -274,7 +386,9 @@
+ 
+ static int xattr_fset( int filedes, const char *name, void *value, size_t size )
+ {
+-#if defined(XATTR_ADDITIONAL_OPTIONS)
++#if defined(__PROSPERO__)
++    return strcmp( name, WINE_XATTR_SD ) ? (errno = EOPNOTSUPP, -1) : pw_sd_set( filedes, value, size );
++#elif defined(XATTR_ADDITIONAL_OPTIONS)
+     return fsetxattr( filedes, name, value, size, 0, 0 );
+ #elif defined(HAVE_SYS_XATTR_H) || defined(HAVE_ATTR_XATTR_H)
+     return fsetxattr( filedes, name, value, size, 0 );

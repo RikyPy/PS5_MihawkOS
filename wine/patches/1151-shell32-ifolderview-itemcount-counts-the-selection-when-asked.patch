@@ -1,0 +1,26 @@
+From: PS5_Proton <local>
+Subject: [PATCH] shell32: IFolderView::ItemCount counts the selection when asked
+
+FolderView_ItemCount answered every item for SVGIO_SELECTION, so File Explorer's commands (PS5_Proton
+pw_shell_explorer.h, Cut, Copy, Rename, Delete) and its status bar ("5 items selected") took a folder with nothing
+selected for one with every item selected (console capture explorer-2026-10-16-02, Documents). The list view
+counts its selected items itself; SVGIO_ALLVIEW and other flags keep today's answer.
+---
+diff --git a/dlls/shell32/shlview.c b/dlls/shell32/shlview.c
+index e82084b..b610875 100644
+--- a/dlls/shell32/shlview.c
++++ b/dlls/shell32/shlview.c
+@@ -3033,10 +3033,11 @@ static HRESULT WINAPI FolderView_ItemCount(IFolderView2 *iface, UINT flags, int
+ 
+     TRACE("(%p)->(%u %p)\n", This, flags, items);
+ 
+-    if (flags != SVGIO_ALLVIEW)
++    if ((flags & SVGIO_TYPE_MASK) != SVGIO_ALLVIEW && (flags & SVGIO_TYPE_MASK) != SVGIO_SELECTION)
+         FIXME("some flags unsupported, %x\n", flags & ~SVGIO_ALLVIEW);
+ 
+-    *items = SendMessageW(This->hWndList, LVM_GETITEMCOUNT, 0, 0);
++    *items = SendMessageW(This->hWndList, (flags & SVGIO_TYPE_MASK) == SVGIO_SELECTION ? LVM_GETSELECTEDCOUNT
++                          : LVM_GETITEMCOUNT, 0, 0);
+ 
+     return S_OK;
+ }

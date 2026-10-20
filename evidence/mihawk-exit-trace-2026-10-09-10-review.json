@@ -1,0 +1,22 @@
+{
+  "run": "mihawk-exit-trace-2026-10-09-10",
+  "build_fingerprint": "800c03186c823eae4305a07e986021ab5894bc53d6965f7108388907f487a92f",
+  "passed": false,
+  "classification": "incomplete diagnostic; service outage, crash unconfirmed",
+  "observed": {
+    "readiness_passed": true,
+    "control_launch_reported": true,
+    "probe_children_native_ready": 8,
+    "control_query": "timed out",
+    "live_ftp_trace_read": "timed out",
+    "finalized_runner_record": false,
+    "job_stopped_locally": true
+  },
+  "user_clarification": "Payloads were not loaded before process-probe.",
+  "limits": [
+    "The payload-readiness timing conflicts with the recorded successful launch; no controlled reproduction or crash is inferred.",
+    "No independent confirmation of a second crash or new full reboot since this outage.",
+    "Target comparison initially compared the configured shared host to an absent project PS5_HOST key; this was corrected. The shared host is distinct from the unused Original target, and systemd has no host override."
+  ],
+  "next": "Wait for restored services and boot evidence required by the guard; retrieve existing lifecycle and per-PID logs before any new launch."
+}

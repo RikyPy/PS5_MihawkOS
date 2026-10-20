@@ -1,0 +1,209 @@
+/* Desktop (js/desktop.js): icons on the wallpaper, rubber band, drag copy, drop description,
+   inline rename, and the Create Shortcut wizard.
+   The plates, label and rename box are the desktop ListView's own colours: they sit on the
+   wallpaper and stay the same in light and dark, so they are local tokens here rather than
+   WinUI theme resources. The rubber band is the system Highlight colour (COLOR_HIGHLIGHT
+   #0078D7), which does not follow the accent. */
+
+.desk, .desk-ghost {
+  --desk-label: #ffffff;
+  --desk-label-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7), 0 0 2px rgba(0, 0, 0, 0.45);
+  --desk-hot-fill: rgba(255, 255, 255, 0.1);
+  --desk-hot-stroke: rgba(255, 255, 255, 0.2);
+  --desk-sel-fill: rgba(204, 232, 255, 0.32);
+  --desk-sel-stroke: rgba(204, 232, 255, 0.5);
+  --desk-sel-hot-fill: rgba(204, 232, 255, 0.42);
+  --desk-sel-hot-stroke: rgba(204, 232, 255, 0.65);
+  --desk-sel-inactive-fill: rgba(255, 255, 255, 0.16);
+  --desk-focus-stroke: rgba(255, 255, 255, 0.75);
+  --desk-edit-fill: #ffffff;
+  --desk-edit-text: #000000;
+  --desk-edit-stroke: rgba(0, 0, 0, 0.6);
+  --desk-band: rgb(0, 120, 215);
+}
+
+.desk {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  outline: none;
+}
+.desk:focus-visible { outline: none; box-shadow: none; }
+.desk.icons-hidden .desk-item { display: none; }
+.desk.refreshing .desk-item { visibility: hidden; }
+
+/* ---------- item: plate, icon, label ---------- */
+.desk-item {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: calc(var(--desk-cell-w, 75px) - 2px);
+  padding: 2px 1px 3px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-control);
+  /* Leaving fades the plate out (a sweep leaves a short trail); arriving is near-instant. */
+  transition: background-color var(--dur-normal) var(--ease-in), border-color var(--dur-normal) var(--ease-in);
+}
+.desk-item:hover {
+  background-color: var(--desk-hot-fill);
+  border-color: var(--desk-hot-stroke);
+  transition-duration: var(--dur-faster);
+}
+.desk-item.sel,
+.desk-item.drop {
+  background-color: var(--desk-sel-fill);
+  border-color: var(--desk-sel-stroke);
+}
+.desk-item.sel:hover {
+  background-color: var(--desk-sel-hot-fill);
+  border-color: var(--desk-sel-hot-stroke);
+}
+/* The desktop is not the active surface: selection stays, dimmed and without a border. */
+.desk:not(:focus-within) .desk-item.sel {
+  background-color: var(--desk-sel-inactive-fill);
+  border-color: transparent;
+}
+.desk:not(:focus-within) .desk-item.sel:hover {
+  background-color: var(--desk-sel-hot-fill);
+  border-color: var(--desk-sel-hot-stroke);
+}
+/* Keyboard focus cue, shown only after keyboard use (as Windows hides focus rectangles). */
+.desk.kbd:focus-within .desk-item.focus { border-color: var(--desk-focus-stroke); }
+
+/* The focused selected item shows its whole name, over the icons below it. */
+.desk-item.sel.focus, .desk-item.renaming { z-index: 1; }
+
+.desk-icon {
+  position: relative;
+  flex: none;
+  width: var(--desk-icon, 48px);
+  height: var(--desk-icon, 48px);
+}
+.desk-icon > .icon:first-child { width: 100%; height: 100%; }
+.desk-item.cut .desk-icon { opacity: 0.5; }
+.desk-badge { position: absolute; left: 0; bottom: 0; }
+
+.desk-label {
+  max-width: 100%;
+  margin-top: 2px;
+  padding: 0 1px;
+  font: var(--type-caption);
+  color: var(--desk-label);
+  text-shadow: var(--desk-label-shadow);
+  text-align: center;
+  overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+}
+.desk-item.sel.focus .desk-label {
+  display: block;
+  -webkit-line-clamp: unset;
+  line-clamp: none;
+  overflow: visible;
+}
+
+/* ---------- inline rename: the label becomes an edit box the width of the label ---------- */
+.desk-rename {
+  display: block;
+  width: 100%;
+  min-height: 18px;
+  margin: 1px 0 0;
+  padding: 0 1px;
+  border: 1px solid var(--desk-edit-stroke);
+  border-radius: 0;
+  background: var(--desk-edit-fill);
+  color: var(--desk-edit-text);
+  caret-color: var(--desk-edit-text);
+  font: var(--type-caption);
+  text-align: center;
+  resize: none;
+  overflow: hidden;
+  outline: none;
+}
+.desk-rename:focus-visible { outline: none; box-shadow: none; }
+.desk-rename::selection { background: var(--SystemAccentColor); color: var(--TextOnAccentFillColorSelectedText); }
+
+/* ---------- rubber band ---------- */
+.desk-band {
+  position: absolute;
+  z-index: 2;
+  border: 1px solid var(--desk-band);
+  background: color-mix(in srgb, var(--desk-band) 30%, transparent);
+  pointer-events: none;
+}
+
+/* ---------- drag: translucent copy, drop description, no-drop cursor ---------- */
+.desk-ghost {
+  position: fixed;
+  left: 0;
+  top: 0;
+  opacity: 0.6;
+  will-change: transform;
+}
+.desk-ghost .desk-item { transition: none; }
+.desk-dd {
+  position: fixed;
+  left: 0;
+  top: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px 4px 5px;
+  border: 1px solid var(--SurfaceStrokeColorFlyout);
+  border-radius: var(--radius-control);
+  background: var(--SolidBackgroundFillColorQuarternary);
+  box-shadow: var(--shadow-8);
+  color: var(--TextFillColorPrimary);
+  font: var(--type-caption);
+  white-space: nowrap;
+}
+.desk-dd-icon { color: var(--AccentTextFillColorTertiary); }
+.desk-dd-insert { color: var(--AccentTextFillColorPrimary); }
+html.desk-dragging, html.desk-dragging * { cursor: var(--cursor-arrow) !important; }
+html.desk-nodrop, html.desk-nodrop * { cursor: var(--cursor-unavailable) !important; }
+
+/* ---------- dialogs (classic Win32: 9 pt text, white page on the dialog face) ---------- */
+.desk-dialog {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--SolidBackgroundFillColorBase);
+  color: var(--TextFillColorPrimary);
+  font: var(--type-caption);
+}
+.desk-dialog-foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px;
+}
+.desk-dialog-foot .btn { min-width: 80px; }
+.desk-dialog .textbox { font: var(--type-caption); }
+
+.desk-wizard-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 20px 32px;
+  background: var(--SolidBackgroundFillColorQuarternary);
+  border-bottom: 1px solid var(--DividerStrokeColorDefault);
+  overflow: auto;
+}
+.desk-wizard-main p { margin: 0 0 8px; color: var(--TextFillColorPrimary); }
+.desk-wizard-title {
+  margin: 0 0 16px;
+  font: 400 15px/20px var(--font-ui);
+  color: var(--AccentTextFillColorPrimary);
+}
+.desk-wizard-label { margin-top: 8px; }
+.desk-wizard-main .textbox { width: 100%; margin-bottom: 8px; }
+.desk-wizard-error { color: var(--SystemFillColorCritical); }
+
+@media (max-width: 480px) {
+  .desk-wizard-main { padding: 16px; }
+}

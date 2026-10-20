@@ -1,0 +1,42 @@
+{
+ "arch": "i386",
+ "dll": "ntdll",
+ "known_limitations": [],
+ "missing": [],
+ "new_failures": [
+  "virtual: virtual.c:159: NtAllocateVirtualMemory with 8 zero_bits returned c0000005",
+  "virtual: virtual.c:159: NtAllocateVirtualMemory with 9 zero_bits returned c0000005",
+  "virtual: virtual.c:159: NtAllocateVirtualMemory with 10 zero_bits returned c0000005",
+  "virtual: virtual.c:159: NtAllocateVirtualMemory with 11 zero_bits returned c0000005",
+  "virtual: virtual.c:159: NtAllocateVirtualMemory with 12 zero_bits returned c0000005",
+  "virtual: virtual.c:159: NtAllocateVirtualMemory with 13 zero_bits returned c0000005",
+  "virtual: virtual.c:159: NtAllocateVirtualMemory with 14 zero_bits returned c0000005",
+  "virtual: virtual.c:159: NtAllocateVirtualMemory with 15 zero_bits returned c0000005",
+  "virtual: virtual.c:445: Unexpected count 4.",
+  "virtual: virtual.c:446: Unexpected address 014C0000.",
+  "virtual: virtual.c:2547: Unexpected status c0000018.",
+  "virtual: virtual.c:2550: Unexpected size 00000FFF.",
+  "virtual: virtual.c:2551: Got addr 014E1001, addr1 014E0000.",
+  "virtual: virtual.c:2556: Unexpected status c0000018.",
+  "virtual: virtual.c:2558: Unexpected size 00000FFF.",
+  "virtual: virtual.c:2559: Got addr 014E0001, addr1 014E0000.",
+  "virtual: virtual.c:2564: Unexpected status c0000018.",
+  "virtual: virtual.c:2570: Unexpected status 00000000.",
+  "virtual: virtual.c:2574: Unexpected status 00000000.",
+  "virtual: virtual.c:2589: Unexpected status c00000a0.",
+  "virtual: virtual.c:2593: Unexpected status c00000a0."
+ ],
+ "passed": false,
+ "selected_tests": [
+  "virtual",
+  "thread"
+ ],
+ "skipped_checks": [],
+ "totals": {
+  "complete": 1,
+  "timeout": 1
+ },
+ "unfinished": [
+  "virtual: host=complete, console=timeout"
+ ]
+}

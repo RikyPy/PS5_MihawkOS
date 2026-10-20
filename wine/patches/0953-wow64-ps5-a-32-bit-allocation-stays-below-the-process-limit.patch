@@ -1,0 +1,40 @@
+From fe8b506f807854e2f52e287bfc0d4b11e5b9289b Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Wed, 7 Oct 2026 20:47:51 -0400
+Subject: [PATCH] wow64: PS5: a 32-bit allocation stays below the process's
+ limit.
+
+A 32-bit caller's own address requirements (an alignment, say) came
+through with no highest address, so the 64-bit side had no limit for
+them; wow64 added the process's limit only when there were no
+requirements at all. Upstream's search finds low memory first anyway.
+The console's allocator prefers its reserved area above 4 GiB: in a
+32-bit game 51 aligned allocations (NtAllocateVirtualMemoryEx with one
+requirement) landed at 0x10xxxxxxxx, the game kept the low half of the
+address, and its first write faulted at 0x43400000 (PS5_Proton
+2026-10-07; record removed from the tree; in git history).
+
+No highest address is now the 32-bit process's own limit, as on
+Windows.
+---
+ dlls/wow64/virtual.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/dlls/wow64/virtual.c b/dlls/wow64/virtual.c
+index b4778a8..ad50ee0 100644
+--- a/dlls/wow64/virtual.c
++++ b/dlls/wow64/virtual.c
+@@ -120,6 +120,10 @@ static NTSTATUS mem_extended_parameters_32to64( MEM_EXTENDED_PARAMETER **ret_par
+         req->LowestStartingAddress = ULongToPtr( req32->LowestStartingAddress );
+         req->HighestEndingAddress  = ULongToPtr( req32->HighestEndingAddress );
+         req->Alignment             = req32->Alignment;
++        /* PS5: no highest address is the 32-bit process's own limit, as on Windows. Upstream's search finds low
++         * memory first anyway; the console's prefers its area above 4 GiB, and a 32-bit game's aligned
++         * allocations landed there, truncated (PS5_Proton, 2026-10-07). */
++        if (!req->HighestEndingAddress && set_limit) req->HighestEndingAddress = (void *)highest_user_address;
+     }
+     else if (set_limit)
+     {
+-- 
+2.56.0
+

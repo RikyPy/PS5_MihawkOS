@@ -1,0 +1,53 @@
+{
+ "run": "shared-section-validation-2026-10-08-01",
+ "source_fingerprint": "d83e6ae652fd1108cb2da79d9c8692d08e86aa45677e73e1c519d7ac76d35bad",
+ "host_tests": {
+  "passed": 3,
+  "sanitizers": [
+   "address",
+   "undefined",
+   "leak"
+  ],
+  "cases": [
+   "test_pw_memory_file",
+   "test_pw_memory_helper",
+   "test_pw_wine_section"
+  ]
+ },
+ "host_windows_oracle": "section-view-host-2026-10-08-05",
+ "native_console_pager": "section-pager-native-2026-10-08-02",
+ "windows_console_probe": "section-view-console-2026-10-08-01",
+ "gate": "gate-shared-section-2026-10-08-01",
+ "gate_pending": false,
+ "dead_cells_retested": false,
+ "dead_cells_acceptance_passed": false,
+ "build_attempts": [
+  {
+   "run": "section-production-build-2026-10-08-01",
+   "passed": false,
+   "failure": "new native thread-data type names and unlisted shim header"
+  },
+  {
+   "run": "section-production-build-2026-10-08-02",
+   "passed": false,
+   "failure": "Wine makedep cannot resolve external header through CFLAGS"
+  },
+  {
+   "run": "section-production-build-2026-10-08-03",
+   "passed": false,
+   "failure": "Wine makedep requires global headers listed or adjacent to the including source"
+  },
+  {
+   "run": "section-production-build-2026-10-08-04",
+   "passed": true,
+   "superseded": "expanded fixed-placeholder test"
+  },
+  {
+   "run": "section-production-build-2026-10-08-05",
+   "passed": true,
+   "exact_production_build": true
+  }
+ ],
+ "gate_passed": true,
+ "gate_cases": 26
+}

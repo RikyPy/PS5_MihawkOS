@@ -1,0 +1,35 @@
+{
+  "name": "first-install-unattended-2026-10-19-03",
+  "launch_readiness": {
+    "ready": true,
+    "seconds": 0.167,
+    "settle_seconds": 0.0,
+    "census_seconds": 0.155,
+    "previous_cleanup_verified": false
+  },
+  "milestones": [
+    "[MihawkOS] elevation: ok (filesystem access)",
+    "[MihawkOS] setup: unattended (scripted presses, real engine)",
+    "[MihawkOS] setup: step 0",
+    "[MihawkOS] setup: starts at step 0 (record done=0 runtime=1 prefix=0 returning=0), 9 languages, language en-US",
+    "[MihawkOS] setup: step 1",
+    "[MihawkOS] setup: language en-US",
+    "[MihawkOS] setup: step 2",
+    "[MihawkOS] setup: step 5",
+    "[MihawkOS] setup: the first Mihawk OS session starts",
+    "[MihawkOS] restart: to=mihawk-os cycle=0 reason=setup-prepare eboot=/app0/eboot.bin",
+    "[MihawkOS] elevation: ok (filesystem access)",
+    "[MihawkOS] Mihawk: desktop session; Explorer is its root, the title supervises it",
+    "[MihawkOS] setup: the first session; it ends 5 s after the prefix is made"
+  ],
+  "stop_lines": [],
+  "launches": [
+    "prepare"
+  ],
+  "install_skipped": true,
+  "storage_errors": 0,
+  "hooks_removed": false,
+  "passed": false,
+  "capture": "klog/first-install-unattended-2026-10-19-03",
+  "finding": "The first session made the prefix about 1 minute in (.update-timestamp written 18:30) but never ended: wineboot writes the stamp through msvcrt in text mode, '1734871457 wow64\\r\\n', and native/proton_wine.cpp stripped only LF, so the ' wow64' check never matched. 0 stop lines in klog, title-last.log and the flight recorder. Fix: pw_setup_prefix_made() strips CR too (test_pw_setup). Hooks left: setup-unattended, setup-preparing and the Done test-run.txt."
+}

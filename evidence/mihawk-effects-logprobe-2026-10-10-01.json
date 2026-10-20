@@ -1,0 +1,37 @@
+{
+  "battery": "mihawk-effects-logprobe-2026-10-10-01",
+  "expected_cases": [
+    "window-effects64"
+  ],
+  "revision": "628168a69cf4b01f326f30c18d26eceb4cbaf8c4",
+  "dirty": true,
+  "cases": [
+    {
+      "case": "window-effects64",
+      "run": "mihawk-effects-logprobe-2026-10-10-01-window-effects64",
+      "runner_status": 0,
+      "seconds": 32.4,
+      "result": "finished",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "run_seconds": 25.6,
+      "launch_readiness": {
+        "ready": true,
+        "seconds": 0.163,
+        "settle_seconds": 0.0,
+        "census_seconds": 0.138,
+        "previous_cleanup_verified": true
+      },
+      "runner_overhead_seconds": 6.8,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 13,
+      "protocol_errors": 0
+    }
+  ],
+  "complete": true,
+  "seconds": 32.4,
+  "passed": true
+}

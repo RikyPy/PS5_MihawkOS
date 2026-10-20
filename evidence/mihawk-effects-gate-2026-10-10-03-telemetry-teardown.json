@@ -1,0 +1,181 @@
+{
+ "telemetry_hold": {
+  "pid": 4059,
+  "native_states": [
+   {
+    "pid": 4058,
+    "status": -1,
+    "errno": 3,
+    "absent": 1
+   },
+   {
+    "pid": 4059,
+    "status": -1,
+    "errno": 3,
+    "absent": 1
+   },
+   {
+    "pid": 4060,
+    "status": -1,
+    "errno": 3,
+    "absent": 1
+   },
+   {
+    "pid": 4061,
+    "status": -1,
+    "errno": 3,
+    "absent": 1
+   },
+   {
+    "pid": 4062,
+    "status": -1,
+    "errno": 3,
+    "absent": 1
+   },
+   {
+    "pid": 4063,
+    "status": -1,
+    "errno": 3,
+    "absent": 1
+   },
+   {
+    "pid": 4064,
+    "status": -1,
+    "errno": 3,
+    "absent": 1
+   },
+   {
+    "pid": 4065,
+    "status": -1,
+    "errno": 3,
+    "absent": 1
+   },
+   {
+    "pid": 4066,
+    "status": -1,
+    "errno": 3,
+    "absent": 1
+   }
+  ],
+  "absence_elapsed_seconds": 12.341,
+  "passed": true
+ },
+ "launch_readiness": {
+  "ready": true,
+  "seconds": 0.183,
+  "settle_seconds": 0.0,
+  "census_seconds": 0.169,
+  "previous_cleanup_verified": true
+ },
+ "native_close_failures": [],
+ "run": "mihawk-effects-gate-2026-10-10-03-telemetry-teardown",
+ "what": "C:\\window-probe.exe",
+ "env": [
+  "PROTON_LAYOUT=launcher",
+  "WINETEST_TELEMETRY_HOLD=1"
+ ],
+ "result": "finished",
+ "seconds": 11.8,
+ "probe_verdict": null,
+ "clean_owner_restart": true,
+ "launcher_end_status": 0,
+ "initial_status": 0,
+ "closed_on_request": true,
+ "child_logs": [
+  "klog/mihawk-effects-gate-2026-10-10-03-telemetry-teardown-wine-child-4058.log",
+  "klog/mihawk-effects-gate-2026-10-10-03-telemetry-teardown-wine-child-4059.log",
+  "klog/mihawk-effects-gate-2026-10-10-03-telemetry-teardown-wine-child-4060.log",
+  "klog/mihawk-effects-gate-2026-10-10-03-telemetry-teardown-wine-child-4061.log",
+  "klog/mihawk-effects-gate-2026-10-10-03-telemetry-teardown-wine-child-4062.log",
+  "klog/mihawk-effects-gate-2026-10-10-03-telemetry-teardown-wine-child-4063.log",
+  "klog/mihawk-effects-gate-2026-10-10-03-telemetry-teardown-wine-child-4064.log",
+  "klog/mihawk-effects-gate-2026-10-10-03-telemetry-teardown-wine-child-4065.log",
+  "klog/mihawk-effects-gate-2026-10-10-03-telemetry-teardown-wine-child-4066.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": "telemetry worker hold observed",
+ "returned_to_launcher": true,
+ "passed": true,
+ "bench": {},
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   }
+  ],
+  "top": []
+ },
+ "shown": {
+  "frames": 0,
+  "per_10s": [],
+  "longest_gap_ms": 0
+ },
+ "broker": {
+  "local_offer": 8589934592,
+  "host_limit": 1073741824,
+  "refused": [],
+  "refused_count": 0,
+  "clients": [
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": 4059,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   }
+  ],
+  "wedged": false,
+  "failure_reasons": [],
+  "host_peak": 2113536,
+  "local_peak": 0
+ },
+ "captures": [],
+ "cleanup_verified": true,
+ "hooks_removed": true
+}

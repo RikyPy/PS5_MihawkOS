@@ -1,0 +1,95 @@
+Subject: [PATCH] explorer: retain native focus and process application identity
+
+Carry focus from a replaced browser view into its successor. Taskbar buttons
+use the actual executable resource when Wine cannot marshal a foreign HICON;
+cached icon copies are freed with the button. Explorer embeds the existing
+owned folder icon. Dynamic foreign WM_SETICON changes remain unsupported.
+
+--- a/programs/explorer/systray.c
++++ b/programs/explorer/systray.c
+@@ -106,6 +106,8 @@
+     BOOL        visible;
+     HWND        tooltip;
+     WCHAR       title[256];
++    HICON       application_icon;
++    BOOL        icon_loaded;
+ };
+ 
+ static struct list taskbar_buttons = LIST_INIT( taskbar_buttons );
+@@ -949,10 +951,33 @@
+     if (overflow) icon = taskbar_more[taskbar_dark];
+     else if (win && win->hwnd)
+     {
+-        DWORD_PTR result = 0;
+-        if (SendMessageTimeoutW(win->hwnd, WM_GETICON, ICON_BIG, 0, SMTO_ABORTIFHUNG | SMTO_BLOCK, 50, &result) && result)
+-            icon = (HICON)result;
+-        else if (GetClassLongPtrW(win->hwnd, GCLP_HICON)) icon = (HICON)GetClassLongPtrW(win->hwnd, GCLP_HICON);
++        DWORD_PTR result = 0; DWORD pid;
++        GetWindowThreadProcessId(win->hwnd, &pid);
++        /* Wine cannot marshal HICON in cross-process WM_GETICON. Use the real
++         * process image's embedded icon there; cache and own only that copy. */
++        if (pid == GetCurrentProcessId())
++        {
++            if (SendMessageTimeoutW(win->hwnd, WM_GETICON, ICON_BIG, 0, SMTO_ABORTIFHUNG | SMTO_BLOCK, 50, &result) && result)
++                icon = (HICON)result;
++            else if (GetClassLongPtrW(win->hwnd, GCLP_HICON)) icon = (HICON)GetClassLongPtrW(win->hwnd, GCLP_HICON);
++        }
++        else
++        {
++            if (!win->icon_loaded)
++            {
++                WCHAR path[MAX_PATH]; DWORD length = ARRAY_SIZE(path); SHFILEINFOW file;
++                HANDLE process = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, pid);
++                if (process)
++                {
++                    if (QueryFullProcessImageNameW(process, 0, path, &length) &&
++                        SHGetFileInfoW(path, 0, &file, sizeof(file), SHGFI_ICON | SHGFI_LARGEICON))
++                        win->application_icon = file.hIcon;
++                    CloseHandle(process);
++                }
++                win->icon_loaded = TRUE;
++            }
++            if (win->application_icon) icon = win->application_icon;
++        }
+     }
+     if (!icon) icon = LoadIconW(NULL, (LPCWSTR)IDI_APPLICATION); /* Borrowed system fallback. */
+     if (start)
+@@ -1271,6 +1296,7 @@
+     list_remove( &win->entry );
+     if (win->tooltip) DestroyWindow(win->tooltip);
+     DestroyWindow( win->button );
++    if (win->application_icon) DestroyIcon(win->application_icon);
+     free( win );
+ }
+ 
+--- a/programs/explorer/explorer.rc
++++ b/programs/explorer/explorer.rc
+@@ -47,3 +47,6 @@
+ 
+ /* @makedep: explorer.manifest */
+ 1 RT_MANIFEST explorer.manifest
++
++/* Shared owned application identity, also extracted by another process. */
++1 ICON mihawk-folder.ico
+--- a/dlls/shell32/ebrowser.c
++++ b/dlls/shell32/ebrowser.c
+@@ -343,7 +343,8 @@
+     IShellBrowser *psb = &This->IShellBrowser_iface;
+     IShellFolder *psf;
+     IShellView *psv;
+-    HWND hwnd_new;
++    HWND hwnd_new, focus = GetFocus();
++    BOOL had_focus = This->hwnd_sv && (focus == This->hwnd_sv || IsChild(This->hwnd_sv, focus));
+     HRESULT hr;
+ 
+     TRACE("%p, %p\n", This, psi);
+@@ -370,6 +371,9 @@
+                 This->psv = psv;
+                 This->hwnd_sv = hwnd_new;
+                 events_ViewCreated(This, psv);
++                /* Destroying the old view clears keyboard focus. Transfer it
++                 * only when that view owned it, never steal it from host chrome. */
++                if (had_focus) SetFocus(hwnd_new);
+             }
+             else
+             {

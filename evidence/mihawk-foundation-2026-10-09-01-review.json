@@ -1,0 +1,115 @@
+{
+  "branch": "mihawk-os",
+  "implemented": [
+    "shared default prefix for new entries",
+    "explicit additional prefix IDs",
+    "legacy folders retained",
+    "real Wine Explorer session on Default desktop",
+    "PE64 starter waits for normal shell logout",
+    "persistent child-process session gate with displayed-pixel checks"
+  ],
+  "host": {
+    "prefix_policy": "PASS",
+    "launcher_ui": "PASS",
+    "battery_runner_checks": 5,
+    "display_verdict_checks": 4,
+    "old_shell_only_captures_rejected": true
+  },
+  "baseline_session": {
+    "record": "evidence/mihawk-session-2026-10-09-03.json",
+    "semantics": "PASS",
+    "parent_checks": 16,
+    "child_checks_each": 6,
+    "architectures": [
+      64,
+      32
+    ],
+    "seconds": 39.1,
+    "normal_logout": true,
+    "stop_requested": false,
+    "displayed_application_windows": "FAIL: captures show shell background despite foreground PID"
+  },
+  "presentation_fix": {
+    "record": "evidence/mihawk-display-2026-10-09-01.json",
+    "passed": true,
+    "seconds": 39.1,
+    "display_pixels": [
+      {
+        "capture": "klog/mihawk-display-2026-10-09-01-capture-01.png",
+        "architecture": 64,
+        "actual": [
+          30,
+          110,
+          210
+        ],
+        "expected": [
+          30,
+          110,
+          210
+        ],
+        "passed": true
+      },
+      {
+        "capture": "klog/mihawk-display-2026-10-09-01-capture-02.png",
+        "architecture": 32,
+        "actual": [
+          30,
+          180,
+          70
+        ],
+        "expected": [
+          30,
+          180,
+          70
+        ],
+        "passed": true
+      },
+      {
+        "capture": "klog/mihawk-display-2026-10-09-01-capture-03.png",
+        "window": "File Explorer",
+        "light_pixels": 559551,
+        "passed": true
+      }
+    ],
+    "normal_logout": true,
+    "cleanup_verified": true
+  },
+  "migration_performed": false,
+  "boot_default_changed": false,
+  "complete_gate_passed": false,
+  "code_committed": false,
+  "published": false,
+  "build_fingerprint": "ddb07cb1ddbd288ecbd0c8c010624ac75c92c854e686c4d1551e34e58d56943c",
+  "limits": [
+    "Native launcher remains default",
+    "Existing prefixes and game data are not migrated",
+    "Taskbar and application windows are still separate process frames, not a complete desktop composition",
+    "Windows 11 taskbar and Explorer styling are not implemented"
+  ],
+  "focused_regressions": {
+    "record": "evidence/mihawk-focused-2026-10-09-01.json",
+    "passed": [
+      "graphics-teardown",
+      "input32",
+      "input64",
+      "desktop-session"
+    ],
+    "failed": [
+      "desktop-overlap"
+    ],
+    "overlap_detail": "First three pixel captures pass; last requested at 8 seconds precedes front close at 10 seconds and still shows green. Harness repeat will request after close and redraw retained frame through pointer movement; expected pixels unchanged."
+  },
+  "qualification_repeat": {
+    "record": "evidence/mihawk-final-focused-2026-10-09-01.json",
+    "passed": true,
+    "cases": [
+      "desktop-overlap",
+      "desktop-session"
+    ],
+    "seconds": 75.5,
+    "overlap_pixels": "3 green front frames, then blue retained background after close; wallpaper pixels unchanged",
+    "session_pixels": "PE64 blue, PE32 green, real C: File Explorer",
+    "normal_logout": true,
+    "cleanup_verified": true
+  }
+}

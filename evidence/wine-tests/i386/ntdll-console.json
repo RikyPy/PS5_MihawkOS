@@ -1,0 +1,161 @@
+{
+ "thread": {
+  "context": {
+   "arch": "i386",
+   "batch_header_sha256": "29b29d960f4c6cb1517812814c85353c99197bbeb068470d44d62fefefbf3dd1",
+   "test_sha256": "fe723960a05daacbea5cc67a4f235fd27175918ea955ebcd97028e6221889f51",
+   "wine_revision": "7e893751d256bfe062fd1d159375f024dedfa696"
+  },
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "run": "wt-i386-ntdll-batch-1791425088681545556",
+  "seconds": 6.8,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 49,
+   "todo": 0
+  },
+  "todo_lines": 0
+ },
+ "virtual": {
+  "context": {
+   "arch": "i386",
+   "batch_header_sha256": "29b29d960f4c6cb1517812814c85353c99197bbeb068470d44d62fefefbf3dd1",
+   "test_sha256": "fe723960a05daacbea5cc67a4f235fd27175918ea955ebcd97028e6221889f51",
+   "wine_revision": "7e893751d256bfe062fd1d159375f024dedfa696"
+  },
+  "failure_count": 23,
+  "failures": [
+   {
+    "file": "virtual.c",
+    "line": 159,
+    "text": "NtAllocateVirtualMemory with 8 zero_bits returned c0000005"
+   },
+   {
+    "file": "virtual.c",
+    "line": 159,
+    "text": "NtAllocateVirtualMemory with 9 zero_bits returned c0000005"
+   },
+   {
+    "file": "virtual.c",
+    "line": 159,
+    "text": "NtAllocateVirtualMemory with 10 zero_bits returned c0000005"
+   },
+   {
+    "file": "virtual.c",
+    "line": 159,
+    "text": "NtAllocateVirtualMemory with 11 zero_bits returned c0000005"
+   },
+   {
+    "file": "virtual.c",
+    "line": 159,
+    "text": "NtAllocateVirtualMemory with 12 zero_bits returned c0000005"
+   },
+   {
+    "file": "virtual.c",
+    "line": 159,
+    "text": "NtAllocateVirtualMemory with 13 zero_bits returned c0000005"
+   },
+   {
+    "file": "virtual.c",
+    "line": 159,
+    "text": "NtAllocateVirtualMemory with 14 zero_bits returned c0000005"
+   },
+   {
+    "file": "virtual.c",
+    "line": 159,
+    "text": "NtAllocateVirtualMemory with 15 zero_bits returned c0000005"
+   },
+   {
+    "file": "virtual.c",
+    "line": 445,
+    "text": "Unexpected count 4."
+   },
+   {
+    "file": "virtual.c",
+    "line": 446,
+    "text": "Unexpected address 014C0000."
+   },
+   {
+    "file": "virtual.c",
+    "line": 2547,
+    "text": "Unexpected status c0000018."
+   },
+   {
+    "file": "virtual.c",
+    "line": 2550,
+    "text": "Unexpected size 00000FFF."
+   },
+   {
+    "file": "virtual.c",
+    "line": 2551,
+    "text": "Got addr 014E1001, addr1 014E0000."
+   },
+   {
+    "file": "virtual.c",
+    "line": 2556,
+    "text": "Unexpected status c0000018."
+   },
+   {
+    "file": "virtual.c",
+    "line": 2558,
+    "text": "Unexpected size 00000FFF."
+   },
+   {
+    "file": "virtual.c",
+    "line": 2559,
+    "text": "Got addr 014E0001, addr1 014E0000."
+   },
+   {
+    "file": "virtual.c",
+    "line": 2564,
+    "text": "Unexpected status c0000018."
+   },
+   {
+    "file": "virtual.c",
+    "line": 2570,
+    "text": "Unexpected status 00000000."
+   },
+   {
+    "file": "virtual.c",
+    "line": 2574,
+    "text": "Unexpected status 00000000."
+   },
+   {
+    "file": "virtual.c",
+    "line": 2589,
+    "text": "Unexpected status c00000a0."
+   },
+   {
+    "file": "virtual.c",
+    "line": 2593,
+    "text": "Unexpected status c00000a0."
+   },
+   {
+    "file": "virtual.c",
+    "line": 2646,
+    "text": "Unexpected old_prot 0."
+   },
+   {
+    "file": "virtual.c",
+    "line": 2653,
+    "text": "Unexpected old_prot 0."
+   }
+  ],
+  "guarded": null,
+  "hung": "still running after 120 s; the program ended itself",
+  "last_line": "winetest-batch: timeout virtual 120",
+  "run": "wt-i386-ntdll-batch-1791424857323003685",
+  "seconds": 141.4,
+  "skipped_lines": [],
+  "status": "timeout",
+  "summary": null,
+  "todo_lines": 18
+ }
+}

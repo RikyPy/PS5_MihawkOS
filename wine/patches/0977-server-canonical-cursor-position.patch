@@ -1,0 +1,101 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+Subject: [PATCH] server: Publish canonical desktop cursor coordinates coherently
+
+SetCursorPos and SendInput already update Wine's real input desktop, but the
+native cursor cache only changed after title injection. Publish from the
+canonical position update and input-desktop switch. Native threads still read
+only one atomic copied pair, never Wine object pointers.
+
+diff --git a/server/queue.c b/server/queue.c
+--- a/server/queue.c
++++ b/server/queue.c
+@@ -45,6 +45,9 @@
+ #include "process.h"
+ #include "request.h"
+ #include "user.h"
++#ifdef __PROSPERO__
++#include "pw_wine_cursor.h"
++#endif
+ 
+ #define QS_DRIVER       0x80000000
+ #define QS_HARDWARE     0x40000000
+@@ -575,6 +578,17 @@
+     return updated;
+ }
+ 
++#ifdef __PROSPERO__
++static PwWineCursor ps5_cursor;
++/* Called only by the server thread. Native readers receive copied coordinates. */
++void ps5_cursor_note( struct desktop *desktop )
++{
++    if (!desktop) pw_wine_cursor_store( &ps5_cursor, 0, 0 );
++    else if ((desktop->winstation->flags & WSF_VISIBLE) && desktop->winstation->input_desktop == desktop)
++        pw_wine_cursor_store( &ps5_cursor, desktop->shared->cursor.x, desktop->shared->cursor.y );
++}
++#endif
++
+ static int update_desktop_cursor_pos( struct desktop *desktop, user_handle_t win, int x, int y )
+ {
+     desktop_shm_t *desktop_shm = desktop->shared;
+@@ -592,6 +606,10 @@
+         shared->cursor.last_change = time;
+     }
+     SHARED_WRITE_END;
++
++#ifdef __PROSPERO__
++    ps5_cursor_note( desktop );
++#endif
+ 
+     if (!win || !is_window_visible( win ) || is_window_transparent( win ))
+         win = shallow_window_from_point( desktop, x, y );
+@@ -3463,7 +3481,6 @@
+  * owns it. type 1 key (code: virtual key), 2 relative mouse motion (x, y), 3 mouse button (code 0 left, 1 right,
+  * 2 middle), 4 close: WM_CLOSE to the foreground window, as a user closing it would. The cursor it leaves is kept
+  * for pw_wineserver_cursor. */
+-static int ps5_cursor_x, ps5_cursor_y;
+ /* The same authoritative input desktop used by hardware injection. */
+ struct desktop *ps5_hardware_desktop(void) { return get_hardware_input_desktop(0); }
+ 
+@@ -3512,16 +3529,13 @@
+             post_message( desktop->foreground_input->shared->active, WM_CLOSE, 0, 0 );
+         break;
+     }
+-    __atomic_store_n( &ps5_cursor_x, desktop->shared->cursor.x, __ATOMIC_RELAXED );
+-    __atomic_store_n( &ps5_cursor_y, desktop->shared->cursor.y, __ATOMIC_RELAXED );
+     release_object( desktop );
+ }
+ 
+-/* Where the injected input left the cursor, for the title to draw it over whatever process's frame it shows. */
++/* The selected desktop's canonical position, including SetCursorPos/SendInput and hardware input. */
+ DECLSPEC_EXPORT void pw_wineserver_cursor( int *x, int *y )
+ {
+-    *x = __atomic_load_n( &ps5_cursor_x, __ATOMIC_RELAXED );
+-    *y = __atomic_load_n( &ps5_cursor_y, __ATOMIC_RELAXED );
++    pw_wine_cursor_read( &ps5_cursor, x, y );
+ }
+ #endif
+ 
+diff --git a/server/winstation.c b/server/winstation.c
+--- a/server/winstation.c
++++ b/server/winstation.c
+@@ -236,6 +236,10 @@
+ }
+ 
+ /* changes the winstation current input desktop and update its input time */
++#ifdef __PROSPERO__
++extern void ps5_cursor_note( struct desktop *desktop );
++#endif
++
+ int set_input_desktop( struct winstation *winstation, struct desktop *new_desktop )
+ {
+     struct desktop *old_desktop = winstation->input_desktop;
+@@ -259,6 +263,9 @@
+             set_rawinput_process( thread->process, 1 );
+     }
+ 
++#ifdef __PROSPERO__
++    ps5_cursor_note( new_desktop );
++#endif
+     return 1;
+ }
+ 

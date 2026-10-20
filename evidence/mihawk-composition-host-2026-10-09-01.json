@@ -1,0 +1,53 @@
+{
+  "host_sanitized_suites": 46,
+  "host_sanitized_passed": true,
+  "wine_patch_replay": {
+    "clean": 144,
+    "conflicts": 0,
+    "untested": 0
+  },
+  "image_verdict_tests": 7,
+  "battery_runner_tests": 5,
+  "session_runner_tests": 4,
+  "composition_runner_tests": 1,
+  "composition_runner_assertions": [
+    "complete exact-pixel set",
+    "duplicate log records deduplicated",
+    "missing capture fails",
+    "missing sample fails",
+    "probe sample failure fails",
+    "wrong displayed pixels fail"
+  ],
+  "paired_PE_probes_compile": true,
+  "physical_extent_reference": {
+    "evidence": "evidence/physical-shared-contract-2026-10-08-01.json",
+    "stat_size_passed": true,
+    "full_contract_passed": false,
+    "scope": "Physical descriptor extent passes; byte I/O, private maps and shrink remain unsupported."
+  },
+  "scope": "Host ownership/retention/geometry and protocol checks. No independent-window console rendering claim.",
+  "production_build": {
+    "passed": true,
+    "source_fingerprint": "9314a1c6587e56a0aad6d531fda4f11d6129a162e8eaaf69b24400427692ed9f",
+    "staged_files": 4354,
+    "log": "klog/mihawk-composition-build-2026-10-09-01.log",
+    "superseded_before_console_probe": true,
+    "reason": "Diagnostic parks the actual cursor outside sample points before capture, so pointer pixels cannot be mistaken for surface corruption."
+  },
+  "current_production_build": {
+    "passed": true,
+    "source_fingerprint": "9e68484ce4282f3570a8aaafe33e9baa3a1e380840074005a48a029132c8a5aa",
+    "staged_files": 4354,
+    "log": "klog/mihawk-composition-build-2026-10-09-02.log",
+    "superseded_after_focused_run": true,
+    "reason": "Both console probes pass 14/14 and offline captured pixels pass; paths were omitted from run evidence without a timed pad script. Fix the shared recorder and initialize the real Explorer wallpaper."
+  },
+  "wallpaper_oracle": "evidence/mihawk-wallpaper-host-oracle-2026-10-09-01.json",
+  "latest_production_build": {
+    "passed": true,
+    "source_fingerprint": "94111f67b346b946dcca33109ad12b36c8b57da60a49a7175f3bd527f18d5573",
+    "staged_files": 4356,
+    "log": "klog/mihawk-composition-build-2026-10-09-03.log"
+  },
+  "focused_console": "evidence/mihawk-composition-focused-2026-10-09-03.json"
+}

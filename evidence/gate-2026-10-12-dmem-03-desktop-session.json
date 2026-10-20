@@ -1,0 +1,243 @@
+{
+ "telemetry_hold": null,
+ "launch_readiness": {
+  "ready": true,
+  "seconds": 0.162,
+  "settle_seconds": 0.0,
+  "census_seconds": 0.146,
+  "previous_cleanup_verified": true
+ },
+ "native_close_failures": [],
+ "run": "gate-2026-10-12-dmem-03-desktop-session",
+ "what": "profile mihawk-os",
+ "env": [],
+ "result": "finished",
+ "seconds": 18.5,
+ "probe_verdict": "PASS",
+ "clean_owner_restart": true,
+ "launcher_end_status": 0,
+ "initial_status": 0,
+ "closed_on_request": false,
+ "child_logs": [
+  "klog/gate-2026-10-12-dmem-03-desktop-session-wine-child-4263.log",
+  "klog/gate-2026-10-12-dmem-03-desktop-session-wine-child-4264.log",
+  "klog/gate-2026-10-12-dmem-03-desktop-session-wine-child-4265.log",
+  "klog/gate-2026-10-12-dmem-03-desktop-session-wine-child-4266.log",
+  "klog/gate-2026-10-12-dmem-03-desktop-session-wine-child-4267.log",
+  "klog/gate-2026-10-12-dmem-03-desktop-session-wine-child-4268.log",
+  "klog/gate-2026-10-12-dmem-03-desktop-session-wine-child-4269.log",
+  "klog/gate-2026-10-12-dmem-03-desktop-session-wine-child-4270.log",
+  "klog/gate-2026-10-12-dmem-03-desktop-session-wine-child-4271.log",
+  "klog/gate-2026-10-12-dmem-03-desktop-session-wine-child-4272.log",
+  "klog/gate-2026-10-12-dmem-03-desktop-session-wine-child-4273.log",
+  "klog/gate-2026-10-12-dmem-03-desktop-session-wine-child-4274.log",
+  "klog/gate-2026-10-12-dmem-03-desktop-session-wine-child-4275.log",
+  "klog/gate-2026-10-12-dmem-03-desktop-session-wine-child-4276.log",
+  "klog/gate-2026-10-12-dmem-03-desktop-session-wine-child-4277.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": true,
+ "bench": {},
+ "steady": {
+  "server": {
+   "calls": 0.0,
+   "per_s": 0.0,
+   "avg_us": 0.0,
+   "selects": 0.0,
+   "blocked": 0.0,
+   "block_avg_us": 0.0,
+   "waits": 0.0,
+   "handles_avg": 0.0,
+   "wait_all": 0.0,
+   "polled": 0.0,
+   "delays": 0.0,
+   "yields": 0.0,
+   "intervals": 1
+  }
+ },
+ "intervals": {
+  "frames": [],
+  "server": [
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   }
+  ],
+  "top": []
+ },
+ "shown": {
+  "frames": 86,
+  "per_10s": [
+   1,
+   85
+  ],
+  "longest_gap_ms": 2132
+ },
+ "broker": {
+  "local_offer": 8589934592,
+  "host_limit": 1073741824,
+  "windows": {
+   "presents": 97,
+   "effect_bytes": 388800,
+   "mica_builds": 10,
+   "thumbnail_builds": 0,
+   "compositions": 94,
+   "compose_avg_us": 2458,
+   "compose_max_us": 8545
+  },
+  "refused": [],
+  "refused_count": 0,
+  "clients": [
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": 4275,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": 4276,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": 4277,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": 4264,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": 4273,
+    "frames": 0,
+    "submissions": 0
+   }
+  ],
+  "wedged": false,
+  "failure_reasons": [],
+  "host_peak": 6340608,
+  "local_peak": 0
+ },
+ "pacing": null,
+ "captures": [
+  "klog/gate-2026-10-12-dmem-03-desktop-session-capture-01.png",
+  "klog/gate-2026-10-12-dmem-03-desktop-session-capture-02.png",
+  "klog/gate-2026-10-12-dmem-03-desktop-session-capture-03.png"
+ ],
+ "pad_script": [
+  "# The probe requests each displayed capture after the actual child/browser is ready."
+ ],
+ "cleanup_verified": true,
+ "hooks_removed": true,
+ "session_passed": true,
+ "display_pixels": [
+  {
+   "capture": "klog/gate-2026-10-12-dmem-03-desktop-session-capture-01.png",
+   "architecture": 64,
+   "actual": [
+    30,
+    110,
+    210
+   ],
+   "expected": [
+    30,
+    110,
+    210
+   ],
+   "passed": true
+  },
+  {
+   "capture": "klog/gate-2026-10-12-dmem-03-desktop-session-capture-02.png",
+   "architecture": 32,
+   "actual": [
+    30,
+    180,
+    70
+   ],
+   "expected": [
+    30,
+    180,
+    70
+   ],
+   "passed": true
+  },
+  {
+   "capture": "klog/gate-2026-10-12-dmem-03-desktop-session-capture-03.png",
+   "window": "File Explorer",
+   "light_pixels": 556248,
+   "passed": true
+  }
+ ]
+}

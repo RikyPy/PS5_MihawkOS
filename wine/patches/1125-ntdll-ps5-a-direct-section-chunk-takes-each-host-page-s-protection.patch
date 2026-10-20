@@ -1,0 +1,62 @@
+From: PS5_Proton <local>
+Subject: [PATCH] ntdll: PS5: a direct-section chunk takes each host page's protection
+
+A large anonymous section in direct memory (patch 1121) was paged through the 64 MiB clock cache 16 KiB at a time,
+like a file: a first touch of a large buffer faulted every host page, and any failed answer from the title marked the
+whole view failed, so every later access was STATUS_IN_PAGE_ERROR and the earlier emulator experiment (removed) ended (a HashLink game's census, record removed from the tree; in git history:
+1,886 section faults, 60 evictions). The pager now maps a direct view a 2 MiB chunk at a time and keeps the chunk
+until the view goes (wine/ps5/pw_wine_section.c, host-tested in tests/test_pw_wine_section_dmem.c). Each host page of
+the chunk takes what mprotect_range would give it (ps5_host_page_prot: get_host_page_unix_prot from patch 1122), asked
+under the virtual mutex as the chunk is mapped. An answer that failed for now (the memory helper busy, ETIMEDOUT and
+the like) is PW_WINE_SECTION_RETRY: nothing changed and the access runs again, three times in a row at most; on the
+write path of patch 1122 the write then runs again rather than opening a page that is not mapped. Not yet run on the
+console.
+---
+diff --git a/dlls/ntdll/unix/virtual.c b/dlls/ntdll/unix/virtual.c
+index b3713f8..4626be1 100644
+--- a/dlls/ntdll/unix/virtual.c
++++ b/dlls/ntdll/unix/virtual.c
+@@ -4641,6 +4641,15 @@ static void *alloc_virtual_heap( SIZE_T size )
+     return anon_mmap_alloc( size, PROT_READ | PROT_WRITE );
+ }
+ 
++#ifdef __PROSPERO__
++/* What mprotect_range gives the host page at addr: a direct-memory section's chunk takes it when the pager maps the
++ * chunk whole (wine/ps5/pw_wine_section.h). Asked under the virtual mutex. */
++static unsigned int ps5_host_page_prot( uintptr_t addr )
++{
++    return get_host_page_unix_prot( (const void *)addr, 0, 0 );
++}
++#endif
++
+ /***********************************************************************
+  *           virtual_init
+  */
+@@ -4709,7 +4718,7 @@ void virtual_init(void)
+     pages_vprot = (void *)((char *)view_block_start + 2 * view_block_size);
+     wine_rb_init( &views_tree, compare_view );
+ #ifdef __PROSPERO__
+-    __wine_ps5_section_init( (uintptr_t)host_addr_space_limit );
++    __wine_ps5_section_init( (uintptr_t)host_addr_space_limit, ps5_host_page_prot );
+ #endif
+ 
+     free_ranges[0].base = (void *)0;
+@@ -5820,12 +5829,14 @@ NTSTATUS virtual_handle_fault( EXCEPTION_RECORD *rec, void *stack )
+         struct ntdll_thread_data *data = ntdll_get_thread_data();
+         int open = get_unix_prot( get_host_page_vprot( page ) );
+         /* The slot holding this page if another thread closed it before the instruction ran (wine/ps5/pw_wine_vm.h). */
+-        int slot = pw_wine_vm_step_slot( data->ps5_step_page, page );
++        int slot = pw_wine_vm_step_slot( data->ps5_step_page, page ), mapped = -1;
+ 
+         if (slot >= 0 &&
+-            __wine_ps5_section_fault( (uintptr_t)addr, open, PROT_WRITE,
+-                                      (PwWineSectionRetry *)&data->ps5_section_retry, 1 ) >= 0 &&
+-            !mprotect_exec( page, host_page_size, open ))
++            (mapped = __wine_ps5_section_fault( (uintptr_t)addr, open, PROT_WRITE,
++                                                (PwWineSectionRetry *)&data->ps5_section_retry, 1 )) ==
++            PW_WINE_SECTION_RETRY)
++            ret = STATUS_SUCCESS;  /* a direct-memory chunk the title could not give yet: the write runs again */
++        else if (slot >= 0 && mapped >= 0 && !mprotect_exec( page, host_page_size, open ))
+         {
+             /* The instruction's first open: the signal handler sets the trap flag, keeping the program's own. */
+             if (!data->ps5_step_page[0]) data->ps5_step_tf = 2;

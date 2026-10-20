@@ -1,0 +1,106 @@
+From 533af2af3ec37a80809f2305eced2a86e5020e59 Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Tue, 6 Oct 2026 19:29:36 -0400
+Subject: [PATCH] server: make the memory the title shares with its clients in
+ the memory helper
+
+The in-process server runs in the title, and every anonymous section it
+makes for a client, its session memory and its user shared data are memory
+the title made and every client maps. The system can close the title from
+its menu while the clients, payload processes, still run. Deleting the
+title's budget then found that memory still held, and the console panicked:
+"FMEM leak is detected in cnt 1" for many pages of one object
+(2026-10-06; record removed from the tree; in git history).
+
+The title now starts a memory helper, a helper process, before the server,
+and gives the server two calls (pw_wineserver_set_shared_memory). An
+anonymous section's object comes from the helper. The session memory, as
+it is set and whenever it grows, and the user shared data page are written
+through by the helper before the server writes them, so their pages are the
+helper's. Without a helper the server makes its own, as before, and says so.
+---
+ server/mapping.c | 39 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 39 insertions(+)
+
+diff --git a/server/mapping.c b/server/mapping.c
+index f7043df..1eab25f 100644
+--- a/server/mapping.c
++++ b/server/mapping.c
+@@ -429,6 +429,30 @@ static int create_temp_file( file_pos_t size )
+     return fd;
+ }
+ 
++#ifdef __PROSPERO__
++/* Shared memory the title's server makes for its clients is made by the title's memory helper, a helper process,
++ * so that none of it is the title's: the system can close the title while its helpers still run, and memory the
++ * title made that a helper still mapped panicked the console when the title's budget was deleted ("FMEM leak is
++ * detected", 2026-10-06). alloc gives a new object's descriptor or -1; touch grows fd to
++ * `to` bytes if needed and writes through [from, to) in the helper, before the server writes there. Both are the
++ * title's (pw_ps5_shared_alloc, pw_ps5_shared_touch) and set before the server starts. */
++static int (*ps5_shared_alloc)( size_t bytes );
++static int (*ps5_shared_touch)( int fd, size_t from, size_t to );
++DECLSPEC_EXPORT void pw_wineserver_set_shared_memory( int (*alloc)( size_t ), int (*touch)( int, size_t, size_t ) )
++{
++    ps5_shared_alloc = alloc;
++    ps5_shared_touch = touch;
++}
++/* The pages of [from, to) the helper's, before the server writes them. 0 or -1; without a helper, grow only. */
++static int ps5_touch( int unix_fd, file_pos_t from, file_pos_t to )
++{
++    static int logged;
++    if (ps5_shared_touch && !ps5_shared_touch( unix_fd, from, to )) return 0;
++    if (ps5_shared_touch && !logged++) fprintf( stderr, "wine-ps5: the memory helper did not write through a server page: errno %d\n", errno );
++    return grow_file( unix_fd, to ) ? 0 : -1;
++}
++#endif
++
+ /* create the unix fd behind an anonymous mapping */
+ static int create_anonymous_mapping_fd( file_pos_t size )
+ {
+@@ -448,6 +472,11 @@ static int create_anonymous_mapping_fd( file_pos_t size )
+         set_error( STATUS_INVALID_PARAMETER );
+         return -1;
+     }
++    if (ps5_shared_alloc && (fd = ps5_shared_alloc( length )) != -1)
++    {
++        if (!logged++) fprintf( stderr, "wine-ps5: anonymous mappings in shared memory from the memory helper\n" );
++        return fd;
++    }
+     if ((fd = shm_open( SHM_ANON, O_RDWR, 0600 )) != -1)
+     {
+         if (!ftruncate( fd, length ))
+@@ -1421,6 +1450,9 @@ void set_session_mapping( struct mapping *mapping )
+     struct session_block *block;
+     void *tmp;
+ 
++#ifdef __PROSPERO__
++    ps5_touch( unix_fd, 0, size );
++#endif
+     if (!(block = mem_alloc( sizeof(*block) ))) return;
+     if ((tmp = mmap( NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, unix_fd, 0 )) == MAP_FAILED)
+     {
+@@ -1450,7 +1482,11 @@ static struct session_block *grow_session_mapping( mem_size_t needed )
+     assert( new_size > old_size );
+ 
+     unix_fd = get_unix_fd( session_mapping->fd );
++#ifdef __PROSPERO__
++    if (ps5_touch( unix_fd, old_size, new_size )) return NULL;
++#else
+     if (!grow_file( unix_fd, new_size )) return NULL;
++#endif
+ 
+     if (!(block = mem_alloc( sizeof(*block) ))) return NULL;
+     if ((tmp = mmap( NULL, new_size - old_size, PROT_READ | PROT_WRITE, MAP_SHARED, unix_fd, old_size )) == MAP_FAILED)
+@@ -1567,6 +1603,9 @@ struct object *create_user_data_mapping( struct object *root, const struct unico
+      * syscall dispatcher pointer that follows the structure at 0x7ffe1000 */
+     if (!(mapping = create_mapping( root, name, attr, round_size( sizeof(KUSER_SHARED_DATA), host_page_mask ),
+                                     SEC_COMMIT, 0, FILE_READ_DATA | FILE_WRITE_DATA, sd ))) return NULL;
++#ifdef __PROSPERO__
++    ps5_touch( get_unix_fd( mapping->fd ), 0, mapping->size );
++#endif
+     ptr = mmap( NULL, mapping->size, PROT_WRITE, MAP_SHARED, get_unix_fd( mapping->fd ), 0 );
+     if (ptr != MAP_FAILED) user_shared_data = ptr;
+     return &mapping->obj;
+-- 
+2.56.0
+

@@ -1,0 +1,65 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GloriousEggroll <gloriouseggroll@gmail.com>
+Date: Tue, 9 Jun 2026 16:00:33 -0600
+Subject: [PATCH] audio: smooth decoded media playback
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Update Pulse, MMDevAPI, XAudio2, and Microsoft audio decoder behavior used by the replacement media pipeline.
+
+This covers the audio regressions chased during the session:
+
+- Sky: Children of the Light's in-game theater stream no longer drops into mostly-silent bursts.
+
+- Grandia HD's movie audio can play without the crackling/stutter that was traced to output/logging pressure.
+
+- Underdog Detective [神都不良探] gets decoded video audio without needing stale winetricks overrides.
+
+- The Medium keeps the corrected AAC channel-layout path for C001_51.mp4 without adding a SteamGameId hack.
+
+- Warhammer 40,000: Dakka Squadron keeps audio/video media type negotiation working without the old fake-AAC game branch.
+
+- Kirikiri-engine titles from the removed SteamGameId list use general WMA/AAC decoder behavior instead of forcing the input subtype/tag to PCM.
+
+The Pulse changes keep timer and buffer accounting stable when video playback is producing decoded audio in small bursts.
+
+This version intentionally does not reintroduce DualSense mono/haptic reconnect paths; those endpoints are now treated as removed on unplug and newly created on plug-in.
+
+Imported from GE-Proton (proton-ge-custom patches/ge-video-rework) for PS5_Proton.
+Rebase note: The winepulse.drv/pulse.c hunk is left out: the console has no PulseAudio driver
+(neither build configures winepulse; audio is wineps5).
+---
+ dlls/msauddecmft/msauddecmft.c |  6 ++-
+ dlls/winepulse.drv/pulse.c     | 86 +++++++++++++++++++++++++++-------
+ 2 files changed, 74 insertions(+), 18 deletions(-)
+
+diff --git a/dlls/msauddecmft/msauddecmft.c b/dlls/msauddecmft/msauddecmft.c
+index 6723895..9928ddf 100644
+--- a/dlls/msauddecmft/msauddecmft.c
++++ b/dlls/msauddecmft/msauddecmft.c
+@@ -34,13 +34,14 @@ WINE_DEFAULT_DEBUG_CHANNEL(dmo);
+ #include "initguid.h"
+ 
+ DEFINE_MEDIATYPE_GUID(MFAudioFormat_RAW_AAC,WAVE_FORMAT_RAW_AAC1);
++DEFINE_MEDIATYPE_GUID(MFAudioFormat_ADPCM,WAVE_FORMAT_ADPCM);
+ static const GUID CLSID_WineAudioDecoder = {0x480b1517,0xc8e9,0x4eaf,{0xb0,0x06,0xe6,0x30,0x07,0x18,0xd8,0x5d}};
+ 
+ static HRESULT WINAPI audio_decoder_factory_CreateInstance(IClassFactory *iface, IUnknown *outer,
+         REFIID riid, void **out)
+ {
+-    static const GUID CLSID_GStreamerAudioDecoder = {0x480b1517,0xc8e9,0x4eae,{0xb0,0x06,0xe6,0x30,0x07,0x18,0xd8,0x5d}};
+-    return CoCreateInstance(&CLSID_GStreamerAudioDecoder, outer, CLSCTX_INPROC_SERVER, riid, out);
++    static const GUID CLSID_WineDMOAudioDecoder = {0x480b1517,0xc8e9,0x4eae,{0xb0,0x06,0xe6,0x30,0x07,0x18,0xd8,0x5d}};
++    return CoCreateInstance(&CLSID_WineDMOAudioDecoder, outer, CLSCTX_INPROC_SERVER, riid, out);
+ }
+ 
+ static HRESULT WINAPI aac_decoder_factory_CreateInstance(IClassFactory *iface, IUnknown *outer,
+@@ -125,6 +126,7 @@ HRESULT WINAPI DllRegisterServer(void)
+     {
+         {MFMediaType_Audio, MFAudioFormat_Vorbis},
+         {MFMediaType_Audio, MFAudioFormat_Opus},
++        {MFMediaType_Audio, MFAudioFormat_ADPCM},
+     };
+     MFT_REGISTER_TYPE_INFO audio_decoder_mft_outputs[] =
+     {

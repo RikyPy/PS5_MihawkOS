@@ -1,0 +1,199 @@
+{
+ "description": "The Mihawk pointer scheme: original artwork in the shape language of the Windows pointer scheme (white fill, 1 px black outline, pointer shadow), 32x32 at 96 DPI. No Microsoft cursor file was copied, traced or converted.",
+ "source": "PS5_Proton-design prototypes/windows11-shell/assets/cursors (written by its make-cursors.mjs, 2026-10-15), copied unchanged",
+ "license": "GPL-3.0-or-later (this repository)",
+ "renderer": "ImageMagick 7.1.2-32 Q16-HDRI with librsvg 2.62.3 (the icon builder pin)",
+ "frame_jiffies": 5,
+ "scheme_name": "Mihawk",
+ "scheme": {
+  "Arrow": {
+   "svg": [
+    "arrow.svg"
+   ],
+   "hotspot": [
+    1,
+    1
+   ],
+   "file": "mihawk_arrow.cur"
+  },
+  "Help": {
+   "svg": [
+    "help.svg"
+   ],
+   "hotspot": [
+    1,
+    1
+   ],
+   "file": "mihawk_help.cur"
+  },
+  "Hand": {
+   "svg": [
+    "link.svg"
+   ],
+   "hotspot": [
+    8,
+    1
+   ],
+   "file": "mihawk_link.cur"
+  },
+  "IBeam": {
+   "svg": [
+    "text.svg"
+   ],
+   "hotspot": [
+    16,
+    16
+   ],
+   "file": "mihawk_text.cur"
+  },
+  "Crosshair": {
+   "svg": [
+    "precision.svg"
+   ],
+   "hotspot": [
+    16,
+    16
+   ],
+   "file": "mihawk_precision.cur"
+  },
+  "No": {
+   "svg": [
+    "unavailable.svg"
+   ],
+   "hotspot": [
+    16,
+    16
+   ],
+   "file": "mihawk_unavailable.cur"
+  },
+  "SizeNS": {
+   "svg": [
+    "resize-ns.svg"
+   ],
+   "hotspot": [
+    16,
+    16
+   ],
+   "file": "mihawk_resize_ns.cur"
+  },
+  "SizeWE": {
+   "svg": [
+    "resize-ew.svg"
+   ],
+   "hotspot": [
+    16,
+    16
+   ],
+   "file": "mihawk_resize_ew.cur"
+  },
+  "SizeNWSE": {
+   "svg": [
+    "resize-nwse.svg"
+   ],
+   "hotspot": [
+    16,
+    16
+   ],
+   "file": "mihawk_resize_nwse.cur"
+  },
+  "SizeNESW": {
+   "svg": [
+    "resize-nesw.svg"
+   ],
+   "hotspot": [
+    16,
+    16
+   ],
+   "file": "mihawk_resize_nesw.cur"
+  },
+  "SizeAll": {
+   "svg": [
+    "move.svg"
+   ],
+   "hotspot": [
+    16,
+    16
+   ],
+   "file": "mihawk_move.cur"
+  },
+  "AppStarting": {
+   "svg": [
+    "working-00.svg",
+    "working-01.svg",
+    "working-02.svg",
+    "working-03.svg",
+    "working-04.svg",
+    "working-05.svg",
+    "working-06.svg",
+    "working-07.svg",
+    "working-08.svg",
+    "working-09.svg",
+    "working-10.svg",
+    "working-11.svg"
+   ],
+   "hotspot": [
+    1,
+    1
+   ],
+   "file": "mihawk_working.ani"
+  },
+  "Wait": {
+   "svg": [
+    "busy-00.svg",
+    "busy-01.svg",
+    "busy-02.svg",
+    "busy-03.svg",
+    "busy-04.svg",
+    "busy-05.svg",
+    "busy-06.svg",
+    "busy-07.svg",
+    "busy-08.svg",
+    "busy-09.svg",
+    "busy-10.svg",
+    "busy-11.svg"
+   ],
+   "hotspot": [
+    16,
+    16
+   ],
+   "file": "mihawk_busy.ani"
+  }
+ },
+ "sha256": {
+  "arrow.svg": "c1645e7cd930ac2e6c3b6e173202742effe104411c93df1e1d86eb37d52cd67e",
+  "busy-00.svg": "dcc64dcd2e9912cd0664c69f2d07d560a75eaff8a42da139557b4c3d5226595c",
+  "busy-01.svg": "185974e8f2e4ad5690e502284bd4499bd69aef3a3dc8fd622a5b71c5482ca423",
+  "busy-02.svg": "25fb857f7add6252313a01b102acc55f13fe3833fb44442f4eb7e40235c55066",
+  "busy-03.svg": "82a6316c75b85723bf433f109156bee4e4eabf7a46f5375e56a04218c2aaffb3",
+  "busy-04.svg": "fb9861adb9071d9d50d69d43f67c21f3584657e5e63055f6982babb533bcb8ef",
+  "busy-05.svg": "0a2d659c703a3fcd481a593fabb686c0a4c8951381a7a95999ee8b339a23d9a9",
+  "busy-06.svg": "8bd33778e06c4eaa1ec7efc2d50baa3359af52ce1707d189603631b4c1452fad",
+  "busy-07.svg": "3a6ecb93805e9e04cece3d46ef853bd3fae9c9e144b10707f59e38abd19c3cbe",
+  "busy-08.svg": "a191bdae5a04dacb7d23989451b9992d5eb63de8bc6aefc07dd28c46dbda3b18",
+  "busy-09.svg": "79caecd3b06ec5ad0e8b649413cf312c7197df8502f63f1fa44431ffdd0df3e1",
+  "busy-10.svg": "9c1adb6586cfbcdb19b0b1d0f4293f093c124d658d59c51018de20677c92b615",
+  "busy-11.svg": "963c1604a8f9b9581fd5342d15ed50283da7c784c8fa56ca3210ab3fb129c569",
+  "help.svg": "e4d860f120c21ec76d94643169cb993200a7a5a46ad0da44f6d6090b4c88b0a3",
+  "link.svg": "6779b2aa35b705b8f4b062126a4371ff3f624fb94f9277b8d956588c80ce5f3c",
+  "move.svg": "786522e841e5310fc421c4622ee5cded934c07898b17683151e5852dfc47ca7c",
+  "precision.svg": "9e00462b503c04df9eb2fd9ff43cfe2d41c41edcfc351fed678a7cb86062f075",
+  "resize-ew.svg": "130867cbbde12761c8b53092dacbd9224290695e6cde38045298d764eaabe320",
+  "resize-nesw.svg": "d792d18f51f81d403f81f164e506a0beb8f43caf32d55f2b6a1adf1d6886d327",
+  "resize-ns.svg": "5962a60c54790511c0e6d0879aa071c47d77c86e02a56405b9836606470408e8",
+  "resize-nwse.svg": "779d347453b54e9f720a1d35eba9962c7a8b27de0028fc61efd5be21b389f3f4",
+  "text.svg": "b756813a91f0c8043dc6c998a50ed39e55a6ef46c5a10df64d9d5bc4892409a1",
+  "unavailable.svg": "a6f6a02b4a50075d04f51a84a4a081461f22811df50a71c62a1625e13704f1ec",
+  "working-00.svg": "dfb51529faab6e1706b03200e8a61556c836b4e399daef59f3b2c7647916d903",
+  "working-01.svg": "d783c23894d78979a5d9e3ff06745e90340f64067580cb2f20324e1278ee1338",
+  "working-02.svg": "90427c17067742036d948719fd6583ed74356c0f2a1ca3e187a2d615bc9f67a8",
+  "working-03.svg": "6970c77292bb0a04ef8b8b03eb2c50f4781ee2d8574f4edfb214bc0c5399d20e",
+  "working-04.svg": "095672fe434f8f1a3288466d5073cd5a9cfd8b1489ce5fab4718047a1d90944f",
+  "working-05.svg": "e4a6900bccbc6d03fe88f0f0b7a6378a827c3072bc5f9bb740b07a4625813d56",
+  "working-06.svg": "3487a6db6f54b9022a966fd2adb01ec946b0e572ec40d9863f1ee361178b1f5d",
+  "working-07.svg": "67991af67b999253d4c0eb42459d07035fb874b43bfbb30b308ca7ced0ec2c82",
+  "working-08.svg": "1db5630b131d75bb726fbdf717ef54f24ed16b9dc052923948ad75aabbd2c384",
+  "working-09.svg": "9f3959229ee757b738bd60930e8925b711a9c5615b1046b4fb0dda2a3c66d1d8",
+  "working-10.svg": "deee969f6c54e80ef8cb4aa52f10364081187422bef14c8b986ffaf66901977c",
+  "working-11.svg": "b5fefcbe55bb5dcd4241ec24d42b29796eec8bbfa32cd35a45ccdc9d10ae59c9"
+ }
+}

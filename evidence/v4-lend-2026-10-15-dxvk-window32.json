@@ -1,0 +1,1342 @@
+{
+ "telemetry_hold": null,
+ "launch_readiness": {
+  "ready": true,
+  "seconds": 0.138,
+  "settle_seconds": 0.0,
+  "census_seconds": 0.127,
+  "previous_cleanup_verified": true
+ },
+ "native_close_failures": [],
+ "run": "v4-lend-2026-10-15-dxvk-window32",
+ "what": "C:\\windows\\system32\\mihawk.exe",
+ "env": [
+  "PROTON_LAYOUT=launcher",
+  "WINE_PS5_WINDOW_SURFACES=1",
+  "PROTON_STOP_TERMINATE=0"
+ ],
+ "result": "finished",
+ "seconds": 34.6,
+ "probe_verdict": "PASS",
+ "clean_owner_restart": true,
+ "launcher_end_status": 0,
+ "initial_status": 0,
+ "closed_on_request": false,
+ "child_logs": [
+  "klog/v4-lend-2026-10-15-dxvk-window32-wine-child-1630.log",
+  "klog/v4-lend-2026-10-15-dxvk-window32-wine-child-1631.log",
+  "klog/v4-lend-2026-10-15-dxvk-window32-wine-child-1632.log",
+  "klog/v4-lend-2026-10-15-dxvk-window32-wine-child-1633.log",
+  "klog/v4-lend-2026-10-15-dxvk-window32-wine-child-1634.log",
+  "klog/v4-lend-2026-10-15-dxvk-window32-wine-child-1635.log",
+  "klog/v4-lend-2026-10-15-dxvk-window32-wine-child-1636.log",
+  "klog/v4-lend-2026-10-15-dxvk-window32-wine-child-1637.log",
+  "klog/v4-lend-2026-10-15-dxvk-window32-wine-child-1638.log",
+  "klog/v4-lend-2026-10-15-dxvk-window32-wine-child-1639.log",
+  "klog/v4-lend-2026-10-15-dxvk-window32-wine-child-1640.log",
+  "klog/v4-lend-2026-10-15-dxvk-window32-wine-child-1641.log",
+  "klog/v4-lend-2026-10-15-dxvk-window32-wine-child-1642.log"
+ ],
+ "child_logs_missing": [],
+ "session_logs_status": 0,
+ "storage_errors": 0,
+ "stop_terminate": "0",
+ "injected_fault": null,
+ "exec_protection": {
+  "refused": 0,
+  "conversions": 484,
+  "converted_kib": 73840,
+  "convert_failed": 0,
+  "exec_refused": 0,
+  "grant_retries": 0,
+  "modules": 43,
+  "sdk_refused": 0
+ },
+ "foreign_mappings": {
+  "found": 0,
+  "skipped_unmaps": 0,
+  "refused_maps": 0,
+  "query_failed": 0,
+  "holes": 0,
+  "hole_list": []
+ },
+ "helper_sched": {
+  "helpers": [
+   {
+    "kind": "memory",
+    "mode": "rr",
+    "main_tid": "101711",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xea00",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xea00",
+    "service": "0",
+    "program": "700",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "1/700",
+    "now_kernel": "10/700"
+   },
+   {
+    "kind": "program",
+    "mode": "rr",
+    "main_tid": "102333",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xea00",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xea00",
+    "service": "0",
+    "program": "700",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "1/700",
+    "now_kernel": "10/700"
+   },
+   {
+    "kind": "program",
+    "mode": "rr",
+    "main_tid": "101625",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xea00",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xea00",
+    "service": "0",
+    "program": "700",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "1/700",
+    "now_kernel": "10/700"
+   },
+   {
+    "kind": "program",
+    "mode": "rr",
+    "main_tid": "102382",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xea00",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xea00",
+    "service": "0",
+    "program": "700",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "1/700",
+    "now_kernel": "10/700"
+   },
+   {
+    "kind": "program",
+    "mode": "rr",
+    "main_tid": "100270",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xea00",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xea00",
+    "service": "0",
+    "program": "700",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "1/700",
+    "now_kernel": "10/700"
+   },
+   {
+    "kind": "program",
+    "mode": "rr",
+    "main_tid": "101690",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xea00",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xea00",
+    "service": "0",
+    "program": "700",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "1/700",
+    "now_kernel": "10/700"
+   },
+   {
+    "kind": "program",
+    "mode": "rr",
+    "main_tid": "102394",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xea00",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xea00",
+    "service": "0",
+    "program": "700",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "1/700",
+    "now_kernel": "10/700"
+   },
+   {
+    "kind": "program",
+    "mode": "rr",
+    "main_tid": "101781",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xea00",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xea00",
+    "service": "0",
+    "program": "700",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "1/700",
+    "now_kernel": "10/700"
+   },
+   {
+    "kind": "program",
+    "mode": "rr",
+    "main_tid": "102425",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xea00",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xea00",
+    "service": "0",
+    "program": "700",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "1/700",
+    "now_kernel": "10/700"
+   },
+   {
+    "kind": "program",
+    "mode": "rr",
+    "main_tid": "101705",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xea00",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xea00",
+    "service": "0",
+    "program": "700",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "1/700",
+    "now_kernel": "10/700"
+   },
+   {
+    "kind": "program",
+    "mode": "rr",
+    "main_tid": "101767",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xea00",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xea00",
+    "service": "0",
+    "program": "700",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "1/700",
+    "now_kernel": "10/700"
+   },
+   {
+    "kind": "program",
+    "mode": "rr",
+    "main_tid": "101609",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xea00",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xea00",
+    "service": "0",
+    "program": "700",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "1/700",
+    "now_kernel": "10/700"
+   },
+   {
+    "kind": "program",
+    "mode": "rr",
+    "main_tid": "101579",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xea00",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xea00",
+    "service": "0",
+    "program": "700",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "1/700",
+    "now_kernel": "10/700"
+   }
+  ],
+  "workers": [
+   {
+    "worker": "3/700",
+    "worker_kernel": "2/700",
+    "worker_cpus": "0xea00",
+    "status": "0",
+    "inherit": "3/700",
+    "inherit_kernel": "2/700",
+    "inherit_cpus": "0xea00"
+   },
+   {
+    "worker": "3/700",
+    "worker_kernel": "2/700",
+    "worker_cpus": "0xea00",
+    "status": "0",
+    "inherit": "3/700",
+    "inherit_kernel": "2/700",
+    "inherit_cpus": "0xea00"
+   },
+   {
+    "worker": "3/700",
+    "worker_kernel": "2/700",
+    "worker_cpus": "0xea00",
+    "status": "0",
+    "inherit": "3/700",
+    "inherit_kernel": "2/700",
+    "inherit_cpus": "0xea00"
+   },
+   {
+    "worker": "3/700",
+    "worker_kernel": "2/700",
+    "worker_cpus": "0xea00",
+    "status": "0",
+    "inherit": "3/700",
+    "inherit_kernel": "2/700",
+    "inherit_cpus": "0xea00"
+   },
+   {
+    "worker": "3/700",
+    "worker_kernel": "2/700",
+    "worker_cpus": "0xea00",
+    "status": "0",
+    "inherit": "3/700",
+    "inherit_kernel": "2/700",
+    "inherit_cpus": "0xea00"
+   },
+   {
+    "worker": "3/700",
+    "worker_kernel": "2/700",
+    "worker_cpus": "0xea00",
+    "status": "0",
+    "inherit": "3/700",
+    "inherit_kernel": "2/700",
+    "inherit_cpus": "0xea00"
+   },
+   {
+    "worker": "3/700",
+    "worker_kernel": "2/700",
+    "worker_cpus": "0xea00",
+    "status": "0",
+    "inherit": "3/700",
+    "inherit_kernel": "2/700",
+    "inherit_cpus": "0xea00"
+   },
+   {
+    "worker": "3/700",
+    "worker_kernel": "2/700",
+    "worker_cpus": "0xea00",
+    "status": "0",
+    "inherit": "3/700",
+    "inherit_kernel": "2/700",
+    "inherit_cpus": "0xea00"
+   },
+   {
+    "worker": "3/700",
+    "worker_kernel": "2/700",
+    "worker_cpus": "0xea00",
+    "status": "0",
+    "inherit": "3/700",
+    "inherit_kernel": "2/700",
+    "inherit_cpus": "0xea00"
+   },
+   {
+    "worker": "3/700",
+    "worker_kernel": "2/700",
+    "worker_cpus": "0xea00",
+    "status": "0",
+    "inherit": "3/700",
+    "inherit_kernel": "2/700",
+    "inherit_cpus": "0xea00"
+   },
+   {
+    "worker": "3/700",
+    "worker_kernel": "2/700",
+    "worker_cpus": "0xea00",
+    "status": "0",
+    "inherit": "3/700",
+    "inherit_kernel": "2/700",
+    "inherit_cpus": "0xea00"
+   },
+   {
+    "worker": "3/700",
+    "worker_kernel": "2/700",
+    "worker_cpus": "0xea00",
+    "status": "0",
+    "inherit": "3/700",
+    "inherit_kernel": "2/700",
+    "inherit_cpus": "0xea00"
+   }
+  ],
+  "program_threads": {
+   "set": 19,
+   "failed": 0
+  },
+  "census": null,
+  "census_processes": 0,
+  "row": null,
+  "scheduled": {
+   "ok": true,
+   "reasons": []
+  }
+ },
+ "helpers_ended": {
+  "why": null,
+  "count": 0,
+  "signals": {},
+  "gone_ms": {},
+  "still_there": [],
+  "after_kill": null,
+  "stalled": null,
+  "recorder_rows": "process rows from kern.proc (the title's own: state=3 pri=10/0 cpu=13 threads=17)"
+ },
+ "memory_helper_slowest": {
+  "census": 55,
+  "alloc": 3,
+  "shared": 0,
+  "touch": 1,
+  "dmem": 3,
+  "grant": 0,
+  "free": 2,
+  "stall": 0
+ },
+ "memory_helper": {
+  "dead": [],
+  "stall_tests": 0,
+  "sections_mib": [],
+  "given_back": 0,
+  "lost": 0,
+  "gave_back_lines": 0
+ },
+ "assertion": false,
+ "chunk_maps": null,
+ "mapped_mib": null,
+ "ask_failures_max": null,
+ "misplaced_max": null,
+ "rep_step_us": null,
+ "exec_rewrites_us": null,
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": true,
+ "bench": {},
+ "steady": {
+  "server": {
+   "calls": 0.0,
+   "per_s": 0.0,
+   "avg_us": 0.0,
+   "selects": 0.0,
+   "blocked": 0.0,
+   "block_avg_us": 0.0,
+   "waits": 0.0,
+   "handles_avg": 0.0,
+   "wait_all": 0.0,
+   "polled": 0.0,
+   "delays": 0.0,
+   "yields": 0.0,
+   "intervals": 4
+  }
+ },
+ "intervals": {
+  "frames": [],
+  "server": [
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   }
+  ],
+  "top": []
+ },
+ "shown": {
+  "frames": 565,
+  "per_10s": [
+   1,
+   78,
+   486
+  ],
+  "longest_gap_ms": 2695
+ },
+ "broker": {
+  "local_offer": 8589934592,
+  "host_limit": 1073741824,
+  "windows": {
+   "presents": 828,
+   "effect_bytes": 0,
+   "mica_builds": 0,
+   "thumbnail_builds": 0,
+   "compositions": 819,
+   "compose_avg_us": 2629,
+   "compose_max_us": 3181
+  },
+  "refused": [],
+  "refused_count": 0,
+  "clients": [
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": 1641,
+    "frames": 277,
+    "submissions": 555
+   },
+   {
+    "pid": 1642,
+    "frames": 49,
+    "submissions": 99
+   },
+   {
+    "pid": 1631,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": 1639,
+    "frames": 362,
+    "submissions": 726
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   }
+  ],
+  "wedged": false,
+  "failure_reasons": [],
+  "host_peak": 37961728,
+  "local_peak": 21823488
+ },
+ "pacing": {
+  "windows": [
+   {
+    "cookie": 9,
+    "pid": 1639,
+    "route": "composed",
+    "final": false,
+    "refused": "not-fullscreen",
+    "direct": 0.0,
+    "composed": 187.0,
+    "seconds": 10.1,
+    "frames": 187.0,
+    "hidden": 0.0,
+    "fps": 18.5,
+    "mean": 54.31,
+    "p50": 17.0,
+    "p95": 923.95,
+    "p99": 923.95,
+    "max": 923.95,
+    "over20": 81.0,
+    "over34": 13.0,
+    "present_avg": 31.88,
+    "present_max": 694.65
+   },
+   {
+    "cookie": 11,
+    "pid": 1641,
+    "route": "composed",
+    "final": false,
+    "refused": "not-fullscreen",
+    "direct": 0.0,
+    "composed": 251.0,
+    "seconds": 10.4,
+    "frames": 251.0,
+    "hidden": 0.0,
+    "fps": 24.2,
+    "mean": 41.43,
+    "p50": 33.25,
+    "p95": 33.75,
+    "p99": 2054.48,
+    "max": 2054.48,
+    "over20": 128.0,
+    "over34": 6.0,
+    "present_avg": 31.74,
+    "present_max": 686.37
+   },
+   {
+    "cookie": 11,
+    "pid": 1641,
+    "route": "composed",
+    "final": true,
+    "refused": "not-fullscreen",
+    "direct": 0.0,
+    "composed": 26.0,
+    "seconds": 0.8,
+    "frames": 26.0,
+    "hidden": 0.0,
+    "fps": 31.4,
+    "mean": 18.69,
+    "p50": 16.75,
+    "p95": 33.5,
+    "p99": 33.5,
+    "max": 33.28,
+    "over20": 4.0,
+    "over34": 0.0,
+    "present_avg": 17.38,
+    "present_max": 32.65
+   },
+   {
+    "cookie": 12,
+    "pid": 1642,
+    "route": "composed",
+    "final": true,
+    "refused": "no-window",
+    "direct": 0.0,
+    "composed": 49.0,
+    "seconds": 2.3,
+    "frames": 49.0,
+    "hidden": 0.0,
+    "fps": 21.1,
+    "mean": 43.55,
+    "p50": 33.5,
+    "p95": 33.75,
+    "p99": 681.12,
+    "max": 681.12,
+    "over20": 38.0,
+    "over34": 2.0,
+    "present_avg": 41.29,
+    "present_max": 679.97
+   },
+   {
+    "cookie": 9,
+    "pid": 1639,
+    "route": "composed",
+    "final": true,
+    "refused": "not-fullscreen",
+    "direct": 0.0,
+    "composed": 175.0,
+    "seconds": 9.3,
+    "frames": 175.0,
+    "hidden": 0.0,
+    "fps": 18.7,
+    "mean": 47.83,
+    "p50": 22.75,
+    "p95": 1178.39,
+    "p99": 1178.39,
+    "max": 1178.39,
+    "over20": 88.0,
+    "over34": 13.0,
+    "present_avg": 32.75,
+    "present_max": 673.73
+   }
+  ],
+  "clients": {
+   "9": {
+    "pid": 1639,
+    "route": "composed",
+    "routes": {
+     "composed": 362
+    },
+    "windows": 2,
+    "seconds": 19.4,
+    "frames": 362,
+    "hidden": 0,
+    "direct": 0,
+    "composed": 362,
+    "refused": [
+     "not-fullscreen"
+    ],
+    "fps": 18.7,
+    "p50_median_ms": 19.875,
+    "p95_worst_ms": 1178.39,
+    "p99_worst_ms": 1178.39,
+    "max_ms": 1178.39,
+    "over20": 169,
+    "over34": 26,
+    "present_avg_ms": 32.3,
+    "present_max_ms": 694.65
+   },
+   "11": {
+    "pid": 1641,
+    "route": "composed",
+    "routes": {
+     "composed": 277
+    },
+    "windows": 2,
+    "seconds": 11.2,
+    "frames": 277,
+    "hidden": 0,
+    "direct": 0,
+    "composed": 277,
+    "refused": [
+     "not-fullscreen"
+    ],
+    "fps": 24.7,
+    "p50_median_ms": 25.0,
+    "p95_worst_ms": 33.75,
+    "p99_worst_ms": 2054.48,
+    "max_ms": 2054.48,
+    "over20": 132,
+    "over34": 6,
+    "present_avg_ms": 30.39,
+    "present_max_ms": 686.37
+   },
+   "12": {
+    "pid": 1642,
+    "route": "composed",
+    "routes": {
+     "composed": 49
+    },
+    "windows": 1,
+    "seconds": 2.3,
+    "frames": 49,
+    "hidden": 0,
+    "direct": 0,
+    "composed": 49,
+    "refused": [
+     "no-window"
+    ],
+    "fps": 21.3,
+    "p50_median_ms": 33.5,
+    "p95_worst_ms": 33.75,
+    "p99_worst_ms": 681.12,
+    "max_ms": 681.12,
+    "over20": 38,
+    "over34": 2,
+    "present_avg_ms": 41.29,
+    "present_max_ms": 679.97
+   }
+  }
+ },
+ "captures": [
+  "klog/v4-lend-2026-10-15-dxvk-window32-capture-01.png",
+  "klog/v4-lend-2026-10-15-dxvk-window32-capture-02.png",
+  "klog/v4-lend-2026-10-15-dxvk-window32-capture-03.png",
+  "klog/v4-lend-2026-10-15-dxvk-window32-capture-04.png",
+  "klog/v4-lend-2026-10-15-dxvk-window32-capture-05.png",
+  "klog/v4-lend-2026-10-15-dxvk-window32-capture-06.png"
+ ],
+ "cleanup_verified": true,
+ "hooks_removed": true,
+ "semantics_passed": true,
+ "window_pixels": [
+  {
+   "capture": "klog/v4-lend-2026-10-15-dxvk-window32-capture-01.png",
+   "number": 1,
+   "pixels": [
+    {
+     "phase": "gpu-controls",
+     "point": [
+      1801,
+      102
+     ],
+     "expected": [
+      255,
+      255,
+      255
+     ],
+     "actual": [
+      255,
+      255,
+      255
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-controls",
+     "point": [
+      304,
+      439
+     ],
+     "expected": [
+      30,
+      180,
+      70
+     ],
+     "actual": [
+      30,
+      180,
+      70
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-controls",
+     "point": [
+      634,
+      319
+     ],
+     "expected": [
+      240,
+      180,
+      30
+     ],
+     "actual": [
+      240,
+      180,
+      30
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-controls",
+     "point": [
+      754,
+      409
+     ],
+     "expected": [
+      220,
+      50,
+      60
+     ],
+     "actual": [
+      220,
+      50,
+      60
+     ],
+     "passed": true
+    }
+   ],
+   "desktop_background": [
+    11,
+    52,
+    142
+   ],
+   "expected_background": [
+    11,
+    52,
+    142
+   ],
+   "passed": true
+  },
+  {
+   "capture": "klog/v4-lend-2026-10-15-dxvk-window32-capture-02.png",
+   "number": 2,
+   "pixels": [
+    {
+     "phase": "gpu-modal",
+     "point": [
+      1801,
+      102
+     ],
+     "expected": [
+      255,
+      255,
+      255
+     ],
+     "actual": [
+      255,
+      255,
+      255
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-modal",
+     "point": [
+      304,
+      439
+     ],
+     "expected": [
+      30,
+      110,
+      210
+     ],
+     "actual": [
+      30,
+      110,
+      210
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-modal",
+     "point": [
+      634,
+      319
+     ],
+     "expected": [
+      240,
+      180,
+      30
+     ],
+     "actual": [
+      240,
+      180,
+      30
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-modal",
+     "point": [
+      754,
+      409
+     ],
+     "expected": [
+      220,
+      50,
+      60
+     ],
+     "actual": [
+      220,
+      50,
+      60
+     ],
+     "passed": true
+    }
+   ],
+   "desktop_background": [
+    11,
+    52,
+    142
+   ],
+   "expected_background": [
+    11,
+    52,
+    142
+   ],
+   "passed": true
+  },
+  {
+   "capture": "klog/v4-lend-2026-10-15-dxvk-window32-capture-03.png",
+   "number": 3,
+   "pixels": [
+    {
+     "phase": "gpu-resize-hidden",
+     "point": [
+      1801,
+      102
+     ],
+     "expected": [
+      255,
+      255,
+      255
+     ],
+     "actual": [
+      255,
+      255,
+      255
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-resize-hidden",
+     "point": [
+      204,
+      389
+     ],
+     "expected": [
+      30,
+      110,
+      210
+     ],
+     "actual": [
+      30,
+      110,
+      210
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-resize-hidden",
+     "point": [
+      534,
+      269
+     ],
+     "expected": [
+      240,
+      180,
+      30
+     ],
+     "actual": [
+      240,
+      180,
+      30
+     ],
+     "passed": true
+    }
+   ],
+   "desktop_background": [
+    11,
+    52,
+    142
+   ],
+   "expected_background": [
+    11,
+    52,
+    142
+   ],
+   "passed": true
+  },
+  {
+   "capture": "klog/v4-lend-2026-10-15-dxvk-window32-capture-04.png",
+   "number": 4,
+   "pixels": [
+    {
+     "phase": "gpu-restored",
+     "point": [
+      1801,
+      102
+     ],
+     "expected": [
+      255,
+      255,
+      255
+     ],
+     "actual": [
+      255,
+      255,
+      255
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-restored",
+     "point": [
+      204,
+      389
+     ],
+     "expected": [
+      30,
+      180,
+      70
+     ],
+     "actual": [
+      30,
+      180,
+      70
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-restored",
+     "point": [
+      534,
+      269
+     ],
+     "expected": [
+      240,
+      180,
+      30
+     ],
+     "actual": [
+      240,
+      180,
+      30
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-restored",
+     "point": [
+      654,
+      359
+     ],
+     "expected": [
+      30,
+      110,
+      210
+     ],
+     "actual": [
+      30,
+      110,
+      210
+     ],
+     "passed": true
+    }
+   ],
+   "desktop_background": [
+    11,
+    52,
+    142
+   ],
+   "expected_background": [
+    11,
+    52,
+    142
+   ],
+   "passed": true
+  },
+  {
+   "capture": "klog/v4-lend-2026-10-15-dxvk-window32-capture-05.png",
+   "number": 5,
+   "pixels": [
+    {
+     "phase": "gpu-child-exited",
+     "point": [
+      1801,
+      102
+     ],
+     "expected": [
+      255,
+      255,
+      255
+     ],
+     "actual": [
+      255,
+      255,
+      255
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-child-exited",
+     "point": [
+      204,
+      389
+     ],
+     "expected": [
+      220,
+      50,
+      60
+     ],
+     "actual": [
+      220,
+      50,
+      60
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-child-exited",
+     "point": [
+      534,
+      269
+     ],
+     "expected": [
+      240,
+      180,
+      30
+     ],
+     "actual": [
+      240,
+      180,
+      30
+     ],
+     "passed": true
+    }
+   ],
+   "desktop_background": [
+    11,
+    52,
+    142
+   ],
+   "expected_background": [
+    11,
+    52,
+    142
+   ],
+   "passed": true
+  },
+  {
+   "capture": "klog/v4-lend-2026-10-15-dxvk-window32-capture-06.png",
+   "number": 6,
+   "pixels": [
+    {
+     "phase": "gpu-into-owner",
+     "point": [
+      1801,
+      102
+     ],
+     "expected": [
+      255,
+      255,
+      255
+     ],
+     "actual": [
+      255,
+      255,
+      255
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-into-owner",
+     "point": [
+      314,
+      549
+     ],
+     "expected": [
+      30,
+      180,
+      70
+     ],
+     "actual": [
+      30,
+      180,
+      70
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-into-owner",
+     "point": [
+      534,
+      269
+     ],
+     "expected": [
+      240,
+      180,
+      30
+     ],
+     "actual": [
+      240,
+      180,
+      30
+     ],
+     "passed": true
+    }
+   ],
+   "desktop_background": [
+    11,
+    52,
+    142
+   ],
+   "expected_background": [
+    11,
+    52,
+    142
+   ],
+   "passed": true
+  }
+ ]
+}

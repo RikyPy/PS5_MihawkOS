@@ -1,0 +1,59 @@
+{
+ "run": "wt-ntdll-info",
+ "what": "ntdll_test.exe",
+ "env": [
+  "WINEDEBUG=err+all"
+ ],
+ "result": "finished",
+ "seconds": 12.6,
+ "probe_verdict": null,
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": true,
+ "bench": {},
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [
+   {
+    "calls": 8619.0,
+    "per_s": 1700.0,
+    "avg_us": 22.7,
+    "selects": 1790.0,
+    "blocked": 582.0,
+    "block_avg_us": 13034.5,
+    "waits": 1788.0,
+    "handles_avg": 1.32,
+    "wait_all": 0.0,
+    "polled": 1154.0,
+    "delays": 0.0,
+    "yields": 0.0
+   }
+  ],
+  "top": [
+   {
+    "create_mapping": {
+     "count": 54,
+     "avg_us": 1159.4
+    },
+    "close_handle": {
+     "count": 2171,
+     "avg_us": 13.3
+    },
+    "select": {
+     "count": 1793,
+     "avg_us": 14.5
+    },
+    "create_event": {
+     "count": 1740,
+     "avg_us": 14.2
+    },
+    "event_op": {
+     "count": 579,
+     "avg_us": 19.1
+    }
+   }
+  ]
+ }
+}

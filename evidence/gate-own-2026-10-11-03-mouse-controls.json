@@ -1,0 +1,175 @@
+{
+ "telemetry_hold": null,
+ "launch_readiness": {
+  "ready": true,
+  "seconds": 0.154,
+  "settle_seconds": 0.0,
+  "census_seconds": 0.143,
+  "previous_cleanup_verified": true
+ },
+ "native_close_failures": [],
+ "run": "gate-own-2026-10-11-03-mouse-controls",
+ "what": "mouse-controls32-probe.exe",
+ "env": [],
+ "result": "finished",
+ "seconds": 17.9,
+ "probe_verdict": "PASS",
+ "clean_owner_restart": true,
+ "launcher_end_status": 0,
+ "initial_status": 0,
+ "closed_on_request": false,
+ "child_logs": [
+  "klog/gate-own-2026-10-11-03-mouse-controls-wine-child-3734.log",
+  "klog/gate-own-2026-10-11-03-mouse-controls-wine-child-3735.log",
+  "klog/gate-own-2026-10-11-03-mouse-controls-wine-child-3736.log",
+  "klog/gate-own-2026-10-11-03-mouse-controls-wine-child-3737.log",
+  "klog/gate-own-2026-10-11-03-mouse-controls-wine-child-3738.log",
+  "klog/gate-own-2026-10-11-03-mouse-controls-wine-child-3739.log",
+  "klog/gate-own-2026-10-11-03-mouse-controls-wine-child-3740.log",
+  "klog/gate-own-2026-10-11-03-mouse-controls-wine-child-3741.log",
+  "klog/gate-own-2026-10-11-03-mouse-controls-wine-child-3742.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": true,
+ "bench": {},
+ "steady": {
+  "server": {
+   "calls": 0.0,
+   "per_s": 0.0,
+   "avg_us": 0.0,
+   "selects": 0.0,
+   "blocked": 0.0,
+   "block_avg_us": 0.0,
+   "waits": 0.0,
+   "handles_avg": 0.0,
+   "wait_all": 0.0,
+   "polled": 0.0,
+   "delays": 0.0,
+   "yields": 0.0,
+   "intervals": 1
+  }
+ },
+ "intervals": {
+  "frames": [],
+  "server": [
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   }
+  ],
+  "top": []
+ },
+ "shown": {
+  "frames": 4,
+  "per_10s": [
+   4
+  ],
+  "longest_gap_ms": 1326
+ },
+ "broker": {
+  "local_offer": 8589934592,
+  "host_limit": 1073741824,
+  "windows": {
+   "presents": 0,
+   "effect_bytes": 0,
+   "mica_builds": 0,
+   "thumbnail_builds": 0,
+   "compositions": 0,
+   "compose_avg_us": 0,
+   "compose_max_us": 0
+  },
+  "refused": [],
+  "refused_count": 0,
+  "clients": [
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": 3735,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   }
+  ],
+  "wedged": false,
+  "failure_reasons": [],
+  "host_peak": 2113536,
+  "local_peak": 0
+ },
+ "pacing": null,
+ "captures": [],
+ "pad_script": [
+  "# Begin when the probe has presented its window, not while Wine is starting.",
+  "anchor frame",
+  "1 touch 0 0 1",
+  "1.5 touch 500 400 1",
+  "3 r1",
+  "4 l1",
+  "5 r3"
+ ],
+ "cleanup_verified": true,
+ "hooks_removed": true,
+ "controls_mapping": {
+  "left": "r1",
+  "right": "l1",
+  "middle": "r3"
+ },
+ "controls_restored": true
+}

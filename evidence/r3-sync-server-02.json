@@ -1,0 +1,31 @@
+{
+ "run": "r3-sync-server-02",
+ "what": "sync-probe.exe",
+ "env": [],
+ "result": "finished",
+ "seconds": 8.1,
+ "probe_verdict": "PASS",
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": true,
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [],
+  "top": []
+ },
+ "bench": {
+  "wait50_ms": 50.0,
+  "event_round_trip_us": 36.913,
+  "set_reset_pair_us": 29.202,
+  "wait_signalled_us": 16.451,
+  "wait_any4_us": 16.618,
+  "wait_all4_us": 16.748,
+  "sem_release_wait_us": 31.3,
+  "mutex_take_release_us": 31.399,
+  "critsec_contended_us": 0.072,
+  "sleep0_us": 4.647,
+  "sleep1_us": 1107.158
+ }
+}

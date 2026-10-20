@@ -1,0 +1,31 @@
+{
+  "title": "PPSA99170",
+  "identity": "5c4360c511554bc1a9c0e0b31e7cda9a",
+  "frames_requested": 300,
+  "eboot_sha256": "791f5acd7e4200d50f1d0de6fa8dbff15b41e16bbfaeccd532d792b906b793be",
+  "fresh_identity_seen": true,
+  "shell_idle_after_run": true,
+  "title_finished_successfully": true,
+  "picture_and_log_check_passed": true,
+  "post_launch_fault_records": 0,
+  "elevation": [
+    "ok (filesystem access)",
+    "ok (filesystem access)"
+  ],
+  "sample": [
+    "starts",
+    "ok, 300 frames in 5.33 s, 59.9 fps after the first half"
+  ],
+  "probe": "exit-probe.exe",
+  "probe_passed": true,
+  "probe_records": [
+    "[PS5 Proton] PS5_PROTON_EXIT_PROBE PASS: exiting immediately",
+    "[PS5 Proton] Wine: 1756.551:0020:0024:warn:debugstr:OutputDebugStringA \"PS5_PROTON_EXIT_PROBE PASS: exiting immediately\\r\\n\"",
+    "[PS5 Proton] Wine: 1756.551:0020:0024:warn:seh:dispatch_exception \"PS5_PROTON_EXIT_PROBE PASS: exiting immediately\\r\\n\"",
+    "1756.551:0020:0024:warn:debugstr:OutputDebugStringA \"PS5_PROTON_EXIT_PROBE PASS: exiting immediately\\r\\n\"",
+    "1756.551:0020:0024:warn:seh:dispatch_exception \"PS5_PROTON_EXIT_PROBE PASS: exiting immediately\\r\\n\""
+  ],
+  "passed": true,
+  "capture": "klog/elevation-exit-01-title",
+  "forced_close": false
+}

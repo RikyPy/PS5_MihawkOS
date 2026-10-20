@@ -1,0 +1,23 @@
+{
+ "host_sanitized_suites": 47,
+ "host_sanitized_passed": true,
+ "wine_patch_replay": {
+  "clean": 145,
+  "conflicts": 0,
+  "untested": 0
+ },
+ "image_verdict_tests": 7,
+ "battery_runner_tests": 5,
+ "composition_runner_tests": 1,
+ "cursor_cache_checks": [
+  "initial position",
+  "signed limits",
+  "one million coherent publications under concurrent reading",
+  "final position"
+ ],
+ "wallpaper_oracle": "evidence/mihawk-wallpaper-host-oracle-2026-10-09-02.json",
+ "previous_gate": "evidence/mihawk-composition-gate-2026-10-09-03.json",
+ "unchanged_appearance_repeat": "evidence/mihawk-appearance-recheck-2026-10-09-01.json",
+ "code_committed": false,
+ "console_qualification_pending": true
+}

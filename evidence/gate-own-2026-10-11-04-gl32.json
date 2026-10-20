@@ -1,0 +1,139 @@
+{
+ "telemetry_hold": null,
+ "launch_readiness": {
+  "ready": true,
+  "seconds": 0.171,
+  "settle_seconds": 0.0,
+  "census_seconds": 0.16,
+  "previous_cleanup_verified": true
+ },
+ "native_close_failures": [],
+ "run": "gate-own-2026-10-11-04-gl32",
+ "what": "gl-vertex32-probe.exe",
+ "env": [
+  "PROTON_LAYOUT=launcher"
+ ],
+ "result": "finished",
+ "seconds": 13.5,
+ "probe_verdict": "PASS",
+ "clean_owner_restart": true,
+ "launcher_end_status": 0,
+ "initial_status": 0,
+ "closed_on_request": false,
+ "child_logs": [
+  "klog/gate-own-2026-10-11-04-gl32-wine-child-5343.log",
+  "klog/gate-own-2026-10-11-04-gl32-wine-child-5344.log",
+  "klog/gate-own-2026-10-11-04-gl32-wine-child-5345.log",
+  "klog/gate-own-2026-10-11-04-gl32-wine-child-5346.log",
+  "klog/gate-own-2026-10-11-04-gl32-wine-child-5347.log",
+  "klog/gate-own-2026-10-11-04-gl32-wine-child-5348.log",
+  "klog/gate-own-2026-10-11-04-gl32-wine-child-5349.log",
+  "klog/gate-own-2026-10-11-04-gl32-wine-child-5350.log",
+  "klog/gate-own-2026-10-11-04-gl32-wine-child-5351.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": true,
+ "bench": {},
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   }
+  ],
+  "top": []
+ },
+ "shown": {
+  "frames": 0,
+  "per_10s": [],
+  "longest_gap_ms": 0
+ },
+ "broker": {
+  "local_offer": null,
+  "host_limit": null,
+  "windows": {
+   "presents": 0,
+   "effect_bytes": 0,
+   "mica_builds": 0,
+   "thumbnail_builds": 0,
+   "compositions": 0,
+   "compose_avg_us": 0,
+   "compose_max_us": 0
+  },
+  "refused": [],
+  "refused_count": 0,
+  "clients": [],
+  "wedged": false,
+  "failure_reasons": [],
+  "host_peak": null,
+  "local_peak": null
+ },
+ "pacing": {
+  "windows": [
+   {
+    "cookie": 1,
+    "pid": 5344,
+    "route": "direct",
+    "final": true,
+    "refused": "none",
+    "direct": 0.0,
+    "composed": 0.0,
+    "seconds": 0.4,
+    "frames": 3.0,
+    "hidden": 0.0,
+    "fps": 8.5,
+    "mean": 15.43,
+    "p50": 4.0,
+    "p95": 27.0,
+    "p99": 27.0,
+    "max": 26.93,
+    "over20": 1.0,
+    "over34": 0.0,
+    "present_avg": 3.29,
+    "present_max": 3.31
+   }
+  ],
+  "clients": {
+   "1": {
+    "pid": 5344,
+    "route": "direct",
+    "routes": {
+     "direct": 3
+    },
+    "windows": 1,
+    "seconds": 0.4,
+    "frames": 3,
+    "hidden": 0,
+    "direct": 0,
+    "composed": 0,
+    "refused": [],
+    "fps": 7.5,
+    "p50_median_ms": 4.0,
+    "p95_worst_ms": 27.0,
+    "p99_worst_ms": 27.0,
+    "max_ms": 26.93,
+    "over20": 1,
+    "over34": 0,
+    "present_avg_ms": 3.29,
+    "present_max_ms": 3.31
+   }
+  }
+ },
+ "captures": [],
+ "cleanup_verified": true,
+ "hooks_removed": true
+}

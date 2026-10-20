@@ -1,0 +1,82 @@
+{
+ "run": "graphics-child-input-dxvk-02",
+ "what": "process-probe.exe",
+ "env": [
+  "WINE_PS5_CHILDREN=1",
+  "WINE_PS5_CHILD_METRICS=1",
+  "WINE_PS5_NTSYNC=0",
+  "WINE_PS5_SCHED=0",
+  "PROTON_LOADING_SCREEN=0",
+  "WINE_PS5_HID=0",
+  "WINE_PS5_OWNER_BOOTSTRAP=1",
+  "WINE_PS5_GPU_BROKER=1",
+  "PROTON_GPU_CAPTURE=1",
+  "PROTON_GPU_LOCAL=1"
+ ],
+ "result": "finished",
+ "seconds": 18.4,
+ "probe_verdict": "PASS",
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": true,
+ "bench": {},
+ "steady": {
+  "server": {
+   "calls": 0.0,
+   "per_s": 0.0,
+   "avg_us": 0.0,
+   "selects": 0.0,
+   "blocked": 0.0,
+   "block_avg_us": 0.0,
+   "waits": 0.0,
+   "handles_avg": 0.0,
+   "wait_all": 0.0,
+   "polled": 0.0,
+   "delays": 0.0,
+   "yields": 0.0,
+   "intervals": 1
+  }
+ },
+ "intervals": {
+  "frames": [],
+  "server": [
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   }
+  ],
+  "top": []
+ },
+ "pad_script": [
+  "# Forwarded input (docs/GRAPHICS_PROCESS_BROKER.md): the title's pad, as Windows child processes must see it.",
+  "# Triangle (XInput Y, 0x8000) held and the left stick half right, for the whole run.",
+  "0 triangle 120",
+  "0 lx 0.5 120"
+ ],
+ "captures": []
+}

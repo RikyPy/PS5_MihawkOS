@@ -1,0 +1,112 @@
+{
+  "battery": "cross-window-2026-10-10-02",
+  "expected_cases": [
+    "gpu-window32",
+    "gpu-window64",
+    "dxvk-window32",
+    "dxvk-window64"
+  ],
+  "revision": "652f6ed59852549ce73bc2d8c7b619ecfadb4381",
+  "dirty": true,
+  "cases": [
+    {
+      "case": "gpu-window32",
+      "run": "cross-window-2026-10-10-02-gpu-window32",
+      "runner_status": 0,
+      "seconds": 51.1,
+      "result": "finished",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "run_seconds": 47.7,
+      "launch_readiness": {
+        "ready": true,
+        "seconds": 0.148,
+        "settle_seconds": 0.0,
+        "census_seconds": 0.13,
+        "previous_cleanup_verified": false
+      },
+      "runner_overhead_seconds": 3.4,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 12,
+      "protocol_errors": 0
+    },
+    {
+      "case": "gpu-window64",
+      "run": "cross-window-2026-10-10-02-gpu-window64",
+      "runner_status": 0,
+      "seconds": 40.1,
+      "result": "finished",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "run_seconds": 36.7,
+      "launch_readiness": {
+        "ready": true,
+        "seconds": 0.146,
+        "settle_seconds": 0.0,
+        "census_seconds": 0.132,
+        "previous_cleanup_verified": true
+      },
+      "runner_overhead_seconds": 3.4,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 12,
+      "protocol_errors": 0
+    },
+    {
+      "case": "dxvk-window32",
+      "run": "cross-window-2026-10-10-02-dxvk-window32",
+      "runner_status": 0,
+      "seconds": 42.1,
+      "result": "finished",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "run_seconds": 38.7,
+      "launch_readiness": {
+        "ready": true,
+        "seconds": 0.147,
+        "settle_seconds": 0.0,
+        "census_seconds": 0.134,
+        "previous_cleanup_verified": true
+      },
+      "runner_overhead_seconds": 3.4,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 12,
+      "protocol_errors": 0
+    },
+    {
+      "case": "dxvk-window64",
+      "run": "cross-window-2026-10-10-02-dxvk-window64",
+      "runner_status": 0,
+      "seconds": 44.3,
+      "result": "finished",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "run_seconds": 38.3,
+      "launch_readiness": {
+        "ready": true,
+        "seconds": 0.145,
+        "settle_seconds": 0.0,
+        "census_seconds": 0.133,
+        "previous_cleanup_verified": true
+      },
+      "runner_overhead_seconds": 6.0,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 12,
+      "protocol_errors": 0
+    }
+  ],
+  "complete": true,
+  "seconds": 177.5,
+  "passed": true
+}

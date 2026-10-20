@@ -1,0 +1,469 @@
+From 79d363164e63facc1000ea436e9cff001d99d680 Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Sat, 3 Oct 2026 00:28:48 -0400
+Subject: [PATCH] ps5: run Wine's in-process synchronization on a device inside
+ the title
+
+Wine keeps events, mutexes and semaphores in a synchronization device when it
+has one (server/inproc_sync.c, the inproc paths of ntdll's sync.c, over
+Linux's /dev/ntsync), so waits, SetEvent, ReleaseSemaphore and ReleaseMutex
+never reach the server. Without one, every one of them is a round trip to
+the server thread over a socket pair on the PS5.
+
+The PS5 has no such device in its kernel, and needs none there: the server,
+ntdll and every Windows thread run in one process. PS5_Proton's
+src/pw_ntsync.c implements ntsync's documented semantics in that process,
+and include/wine/ps5_ntsync.h maps the ntsync requests Wine's code makes
+onto it, so that code runs unchanged: ntdll links the device and gives its
+operations to the in-process server (pw_wineserver_set_ntsync) when it
+connects. Objects are numbered where ntsync has descriptors; a number goes
+to a client in the reply field Proton's fsync uses, with a reference taken
+for it, and is released instead of closed. WINE_PS5_NTSYNC=1 turns the
+device on; without it the server keeps every object, as before.
+---
+ dlls/ntdll/unix/server.c  |  23 +++++
+ dlls/ntdll/unix/sync.c    |  19 ++++-
+ dlls/ntdll/unix/thread.c  |  11 +++
+ include/wine/ps5_ntsync.h | 174 ++++++++++++++++++++++++++++++++++++++
+ server/inproc_sync.c      |  32 +++++++
+ server/thread.c           |  13 +++
+ 6 files changed, 271 insertions(+), 1 deletion(-)
+ create mode 100644 include/wine/ps5_ntsync.h
+
+diff --git a/dlls/ntdll/unix/server.c b/dlls/ntdll/unix/server.c
+index 0fd8fc2..f051350 100644
+--- a/dlls/ntdll/unix/server.c
++++ b/dlls/ntdll/unix/server.c
+@@ -34,6 +34,9 @@
+ #ifdef WINE_INPROCESS_SERVER
+ #include <dlfcn.h>
+ #endif
++#ifdef __PROSPERO__
++#include "wine/ps5_ntsync.h"
++#endif
+ #include <errno.h>
+ #include <fcntl.h>
+ #ifdef HAVE_LWP_H
+@@ -1544,6 +1547,20 @@ static int connect_inprocess_server(void)
+         fatal_error( "%s has no pw_wineserver_connect\n", module_path );
+     register_server_thread = dlsym( module, "pw_wine_thread_register" );
+     flush_server = dlsym( module, "pw_wineserver_flush" );
++    {
++        /* The synchronization device lives in ntdll (wine/ps5_ntsync.h); the
++         * server creates and signals its objects through the same operations.
++         * WINE_PS5_NTSYNC=1 turns it on; without it every wait goes to the server. */
++        extern const struct ps5_ntsync_ops *pw_wine_ntsync_ops(void);
++        extern const struct ps5_ntsync_ops *ps5_ntsync;
++        void (*set_ntsync)( const struct ps5_ntsync_ops * ) = dlsym( module, "pw_wineserver_set_ntsync" );
++        const char *enable = getenv( "WINE_PS5_NTSYNC" );
++        if (set_ntsync && enable && !strcmp( enable, "1" ))
++        {
++            ps5_ntsync = pw_wine_ntsync_ops();
++            set_ntsync( ps5_ntsync );
++        }
++    }
+     if ((fd = connect_server( nls_dir )) == -1)
+         fatal_error( "the in-process server %s did not start\n", module_path );
+     TRACE( "connected to the in-process server %s\n", module_path );
+@@ -1864,7 +1881,9 @@ size_t server_init_process(void)
+         wine_server_set_reply( req, supported_machines, sizeof(supported_machines) );
+         if (!(ret = wine_server_call( req )))
+         {
++#ifndef __PROSPERO__
+             obj_handle_t handle;
++#endif
+             pid               = reply->pid;
+             tid               = reply->tid;
+             peb->SessionId    = reply->session_id;
+@@ -1878,8 +1897,12 @@ size_t server_init_process(void)
+             }
+             else if (reply->inproc_device)
+             {
++#ifdef __PROSPERO__
++                inproc_device_fd = PS5_NTSYNC_DEVICE;   /* in-process: nothing in flight */
++#else
+                 inproc_device_fd = wine_server_receive_fd( &handle );
+                 assert( handle == reply->inproc_device );
++#endif
+             }
+         }
+     }
+diff --git a/dlls/ntdll/unix/sync.c b/dlls/ntdll/unix/sync.c
+index 0217395..bcb0524 100644
+--- a/dlls/ntdll/unix/sync.c
++++ b/dlls/ntdll/unix/sync.c
+@@ -63,6 +63,12 @@
+ 
+ #ifdef __linux__
+ # include "ntsync_tmp.h"
++#elif defined(__PROSPERO__)
++/* The in-process device (wine/ps5_ntsync.h): pw_wine_ntsync_ops in
++ * PS5_Proton's wine/ps5, linked into ntdll, set at connection. */
++# include "wine/ps5_ntsync.h"
++# define ioctl ps5_ntsync_ioctl
++const struct ps5_ntsync_ops *ps5_ntsync;
+ #endif
+ 
+ #include "ntstatus.h"
+@@ -638,7 +644,11 @@ static void release_inproc_sync( struct inproc_sync *sync )
+     LONG ref = InterlockedDecrement( &sync->refcount );
+ 
+     assert( ref >= 0 );
++#ifdef __PROSPERO__
++    if (!ref) ps5_ntsync->release( fd );
++#else
+     if (!ref) close( fd );
++#endif
+ }
+ 
+ static struct inproc_sync *get_cached_inproc_sync( HANDLE handle )
+@@ -677,10 +687,14 @@ static NTSTATUS get_server_inproc_sync( HANDLE handle, struct inproc_sync *sync
+         req->handle = wine_server_obj_handle( handle );
+         if (!(ret = wine_server_call( req )))
+         {
+-            obj_handle_t fd_handle;
+             sync->refcount = 1;
++#ifdef __PROSPERO__
++            sync->fd = reply->fsync_shm_idx;   /* an object number, with its reference */
++#else
++            obj_handle_t fd_handle;
+             sync->fd = wine_server_receive_fd( &fd_handle );
+             assert( wine_server_ptr_handle(fd_handle) == handle );
++#endif
+             sync->access = reply->access;
+             sync->type = reply->type;
+             sync->closed = 0;
+@@ -910,6 +924,9 @@ int get_inproc_alert_fd(void)
+             if (!server_call_unlocked( req ))
+             {
+                 if (do_fsync()) data->alert_fd = fd = reply->fsync_shm_idx;
++#ifdef __PROSPERO__
++                else if (ps5_ntsync) data->alert_fd = fd = reply->fsync_shm_idx;
++#endif
+                 else
+                 {
+                     data->alert_fd = fd = wine_server_receive_fd( &token );
+diff --git a/dlls/ntdll/unix/thread.c b/dlls/ntdll/unix/thread.c
+index 347b949..33f9669 100644
+--- a/dlls/ntdll/unix/thread.c
++++ b/dlls/ntdll/unix/thread.c
+@@ -76,6 +76,9 @@
+ #include "wine/server.h"
+ #include "wine/debug.h"
+ #include "unix_private.h"
++#ifdef __PROSPERO__
++#include "wine/ps5_ntsync.h"
++#endif
+ 
+ WINE_DEFAULT_DEBUG_CHANNEL(thread);
+ WINE_DECLARE_DEBUG_CHANNEL(seh);
+@@ -1118,7 +1121,15 @@ static void contexts_from_server( CONTEXT *context, struct context_data server_c
+  */
+ static DECLSPEC_NORETURN void pthread_exit_wrapper( int status )
+ {
++#ifdef __PROSPERO__
++    {
++        extern const struct ps5_ntsync_ops *ps5_ntsync;
++        if (ps5_ntsync && ntdll_get_thread_data()->alert_fd > 0)
++            ps5_ntsync->release( ntdll_get_thread_data()->alert_fd );
++    }
++#else
+     close( ntdll_get_thread_data()->alert_fd );
++#endif
+     close( ntdll_get_thread_data()->wait_fd[0] );
+     close( ntdll_get_thread_data()->wait_fd[1] );
+     close( ntdll_get_thread_data()->reply_fd );
+diff --git a/include/wine/ps5_ntsync.h b/include/wine/ps5_ntsync.h
+new file mode 100644
+index 0000000..f2b366d
+--- /dev/null
++++ b/include/wine/ps5_ntsync.h
+@@ -0,0 +1,174 @@
++/*
++ * The in-process synchronization device of a PS5 title
++ *
++ * Copyright 2026 Mihawk
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA
++ */
++
++#ifndef __WINE_WINE_PS5_NTSYNC_H
++#define __WINE_WINE_PS5_NTSYNC_H
++
++/* Wine's in-process synchronization (server/inproc_sync.c, the inproc_*
++ * functions of dlls/ntdll/unix/sync.c) drives Linux's ntsync device with
++ * ioctls. A PS5 title has no such device, but the server and every thread
++ * are in one process, so the device is a library in it (PS5_Proton
++ * src/pw_ntsync.c): ntdll links it and hands its operations to the
++ * in-process server (pw_wineserver_set_ntsync). This header gives the code
++ * written for ntsync the same interface: the argument structures and
++ * request names it uses, and ps5_ntsync_ioctl, which runs a request through
++ * the operations and fails with -1 and errno like the ioctl. Object numbers
++ * stand where ntsync has descriptors; a number is passed to a client in the
++ * reply that carries Proton's fsync index, with a reference taken for it,
++ * and is released with ps5_ntsync->release rather than closed. */
++
++#include <errno.h>
++#include <stdint.h>
++
++#define PS5_NTSYNC_DEVICE 0x7ffffffe   /* the device's "descriptor"; never an object number */
++
++/* the Linux names the ntsync code uses for its fields */
++typedef uint32_t __u32;
++typedef uint64_t __u64;
++
++struct ntsync_sem_args { uint32_t count, max; };
++struct ntsync_mutex_args { uint32_t owner, count; };
++struct ntsync_event_args { uint32_t manual, signaled; };
++
++#define NTSYNC_WAIT_REALTIME 0x1
++struct ntsync_wait_args
++{
++    uint64_t timeout;
++    uint64_t objs;
++    uint32_t count, index, flags, owner, alert, pad;
++};
++#define NTSYNC_MAX_WAIT_COUNT 64
++
++enum
++{
++    NTSYNC_IOC_CREATE_SEM = 1, NTSYNC_IOC_WAIT_ANY, NTSYNC_IOC_WAIT_ALL, NTSYNC_IOC_CREATE_MUTEX,
++    NTSYNC_IOC_CREATE_EVENT, NTSYNC_IOC_SEM_RELEASE, NTSYNC_IOC_MUTEX_UNLOCK, NTSYNC_IOC_MUTEX_KILL,
++    NTSYNC_IOC_EVENT_SET, NTSYNC_IOC_EVENT_RESET, NTSYNC_IOC_EVENT_PULSE, NTSYNC_IOC_SEM_READ,
++    NTSYNC_IOC_MUTEX_READ, NTSYNC_IOC_EVENT_READ
++};
++/* ntsync's code tests for its device with this name */
++#define NTSYNC_IOC_EVENT_READ NTSYNC_IOC_EVENT_READ
++
++/* Every call returns 0, an object number, or a negative errno value. */
++struct ps5_ntsync_ops
++{
++    int (*create_semaphore)( uint32_t count, uint32_t max );
++    int (*create_mutex)( uint32_t owner, uint32_t count );
++    int (*create_event)( int manual, int signaled );
++    int (*ref)( int object );
++    int (*release)( int object );
++    int (*semaphore_release)( int object, uint32_t count, uint32_t *previous );
++    int (*semaphore_read)( int object, uint32_t *count, uint32_t *max );
++    int (*mutex_unlock)( int object, uint32_t owner, uint32_t *previous );
++    int (*mutex_kill)( int object, uint32_t owner );
++    int (*mutex_read)( int object, uint32_t *owner, uint32_t *count );
++    int (*event_set)( int object, uint32_t *previous );
++    int (*event_reset)( int object, uint32_t *previous );
++    int (*event_pulse)( int object, uint32_t *previous );
++    int (*event_read)( int object, uint32_t *manual, uint32_t *signaled );
++    /* timeout: absolute ns (UINT64_MAX: none) on CLOCK_REALTIME or CLOCK_MONOTONIC */
++    int (*wait)( int all, const int *objects, uint32_t count, uint32_t owner, int alert,
++                 uint64_t timeout, int realtime, uint32_t *index );
++};
++
++/* NULL when the device is off: the code then takes its server paths. */
++extern const struct ps5_ntsync_ops *ps5_ntsync;
++
++static inline int ps5_ntsync_ioctl( int fd, unsigned long request, void *arg )
++{
++    const struct ps5_ntsync_ops *ops = ps5_ntsync;
++    int ret;
++
++    if (!ops) { errno = ENODEV; return -1; }
++    switch (request)
++    {
++    case NTSYNC_IOC_CREATE_SEM:
++    {
++        const struct ntsync_sem_args *args = arg;
++        ret = ops->create_semaphore( args->count, args->max );
++        break;
++    }
++    case NTSYNC_IOC_CREATE_MUTEX:
++    {
++        const struct ntsync_mutex_args *args = arg;
++        ret = ops->create_mutex( args->owner, args->count );
++        break;
++    }
++    case NTSYNC_IOC_CREATE_EVENT:
++    {
++        const struct ntsync_event_args *args = arg;
++        ret = ops->create_event( args->manual, args->signaled );
++        break;
++    }
++    case NTSYNC_IOC_WAIT_ANY:
++    case NTSYNC_IOC_WAIT_ALL:
++    {
++        struct ntsync_wait_args *args = arg;
++        ret = ops->wait( request == NTSYNC_IOC_WAIT_ALL, (const int *)(uintptr_t)args->objs, args->count,
++                         args->owner, (int)args->alert, args->timeout, !!(args->flags & NTSYNC_WAIT_REALTIME),
++                         &args->index );
++        break;
++    }
++    case NTSYNC_IOC_SEM_RELEASE:
++        ret = ops->semaphore_release( fd, *(uint32_t *)arg, (uint32_t *)arg );
++        break;
++    case NTSYNC_IOC_MUTEX_UNLOCK:
++    {
++        struct ntsync_mutex_args *args = arg;
++        ret = ops->mutex_unlock( fd, args->owner, &args->count );
++        break;
++    }
++    case NTSYNC_IOC_MUTEX_KILL:
++        ret = ops->mutex_kill( fd, *(uint32_t *)arg );
++        break;
++    case NTSYNC_IOC_EVENT_SET:   ret = ops->event_set( fd, arg ); break;
++    case NTSYNC_IOC_EVENT_RESET: ret = ops->event_reset( fd, arg ); break;
++    case NTSYNC_IOC_EVENT_PULSE: ret = ops->event_pulse( fd, arg ); break;
++    case NTSYNC_IOC_SEM_READ:
++    {
++        struct ntsync_sem_args *args = arg;
++        ret = ops->semaphore_read( fd, &args->count, &args->max );
++        break;
++    }
++    case NTSYNC_IOC_MUTEX_READ:
++    {
++        struct ntsync_mutex_args *args = arg;
++        ret = ops->mutex_read( fd, &args->owner, &args->count );
++        break;
++    }
++    case NTSYNC_IOC_EVENT_READ:
++    {
++        struct ntsync_event_args *args = arg;
++        ret = ops->event_read( fd, &args->manual, &args->signaled );
++        break;
++    }
++    default:
++        ret = -EINVAL;
++        break;
++    }
++    if (ret < 0)
++    {
++        errno = -ret;
++        return -1;
++    }
++    return ret;
++}
++
++#endif  /* __WINE_WINE_PS5_NTSYNC_H */
+diff --git a/server/inproc_sync.c b/server/inproc_sync.c
+index 0bfe3cc..d2ad739 100644
+--- a/server/inproc_sync.c
++++ b/server/inproc_sync.c
+@@ -38,6 +38,8 @@
+ 
+ #ifdef __linux__
+ #include "ntsync_tmp.h"
++#elif defined(__PROSPERO__)
++#include "wine/ps5_ntsync.h"
+ #endif
+ 
+ #ifdef NTSYNC_IOC_EVENT_READ
+@@ -47,9 +49,30 @@
+ #include <sys/stat.h>
+ #include <unistd.h>
+ 
++#ifdef __PROSPERO__
++/* The device is a library in this process (wine/ps5_ntsync.h): ntdll hands
++ * its operations to the in-process server, or NULL to leave it off. */
++const struct ps5_ntsync_ops *ps5_ntsync;
++#define ioctl ps5_ntsync_ioctl
++
++DECLSPEC_EXPORT void pw_wineserver_set_ntsync( const struct ps5_ntsync_ops *ops )
++{
++    ps5_ntsync = ops;
++}
++#endif
++
+ int get_inproc_device_fd(void)
+ {
+     static int fd = -2;
++#ifdef __PROSPERO__
++    if (fd == -2)
++    {
++        fd = ps5_ntsync ? PS5_NTSYNC_DEVICE : -1;
++        fprintf( stderr, fd >= 0 ? "ntsync: up and running (in-process device).\n"
++                                 : "wineserver: using server-side synchronization.\n" );
++    }
++    return fd;
++#endif
+     if (fd == -2)
+     {
+         if (getenv( "PROTON_NO_NTSYNC" ) && atoi(getenv( "PROTON_NO_NTSYNC" )))
+@@ -264,7 +287,11 @@ static void inproc_sync_destroy( struct object *obj )
+     assert( obj->ops == &inproc_sync_ops );
+     list_remove( &sync->entry );
+     if (do_fsync()) fsync_free_shm_idx( sync->fd );
++#ifdef __PROSPERO__
++    else            ps5_ntsync->release( sync->fd );
++#else
+     else            close( sync->fd );
++#endif
+ }
+ 
+ void abandon_inproc_mutexes( thread_id_t tid )
+@@ -361,7 +388,12 @@ DECL_HANDLER(get_inproc_sync_fd)
+ 
+     if ((fd = get_obj_inproc_sync( obj, &reply->type )) < 0) set_error( STATUS_NOT_IMPLEMENTED );
+     else if (do_fsync()) reply->fsync_shm_idx = fsync_grab_shm_idx( fd );
++#ifdef __PROSPERO__
++    /* the client holds its own reference to the number, as it would a descriptor */
++    else reply->fsync_shm_idx = ps5_ntsync->ref( fd );
++#else
+     else send_client_fd( current->process, fd, req->handle );
++#endif
+ 
+     release_object( obj );
+ }
+diff --git a/server/thread.c b/server/thread.c
+index 70d9c1f..2995d53 100644
+--- a/server/thread.c
++++ b/server/thread.c
+@@ -59,6 +59,9 @@
+ #include "thread.h"
+ #include "request.h"
+ #include "user.h"
++#ifdef __PROSPERO__
++#include "wine/ps5_ntsync.h"
++#endif
+ #include "security.h"
+ 
+ #include "fsync.h"
+@@ -1948,7 +1951,9 @@ DECL_HANDLER(init_first_thread)
+     else if ((fd = get_inproc_device_fd()) >= 0)
+     {
+         reply->inproc_device = get_process_id( process ) | 1;
++#ifndef __PROSPERO__  /* the device is in-process: nothing to pass */
+         send_client_fd( process, fd, reply->inproc_device );
++#endif
+     }
+ }
+ 
+@@ -2589,9 +2594,17 @@ DECL_HANDLER(get_inproc_alert_fd)
+ 
+     if ((fd = get_inproc_sync_fd( current->alert_sync )) < 0) set_error( STATUS_INVALID_PARAMETER );
+     else if (do_fsync()) reply->fsync_shm_idx = fd;
++#ifdef __PROSPERO__
++    else
++    {
++        reply->handle = get_thread_id( current ) | 1; /* arbitrary token */
++        reply->fsync_shm_idx = ps5_ntsync->ref( fd );
++    }
++#else
+     else
+     {
+         reply->handle = get_thread_id( current ) | 1; /* arbitrary token */
+         send_client_fd( current->process, fd, reply->handle );
+     }
++#endif
+ }
+-- 
+2.56.0
+

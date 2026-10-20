@@ -1,0 +1,66 @@
+From: PS5_Proton
+Subject: [PATCH] uxtheme: refresh managed metrics after a theme resource upgrade
+
+A managed theme can change while its path and selected colour remain the
+same. Wine otherwise keeps the previous system metrics indefinitely. Opt
+in through a resource revision; refresh once per prefix/version and retain
+ordinary themes and user metrics when the revision is unchanged.
+
+--- a/dlls/uxtheme/system.c
++++ b/dlls/uxtheme/system.c
+@@ -418,13 +418,34 @@
+  *
+  * Change the current active theme
+  */
++/* Only managed themes opt into revision-aware system metrics. Ordinary themes
++ * retain Wine's preservation of user-adjusted metrics for an unchanged theme. */
++static BOOL managed_appearance_changed( PTHEME_FILE tf, WCHAR revision[65] )
++{
++    HRSRC resource = FindResourceW( tf->hTheme, L"PW_APPEARANCE_REVISION", L"TEXTFILE" );
++    const WCHAR *data;
++    WCHAR saved[65];
++    DWORD size = sizeof(saved);
++    unsigned int i;
++
++    revision[0] = 0;
++    if (!resource || SizeofResource( tf->hTheme, resource ) != sizeof(saved) ||
++        !(data = LockResource( LoadResource( tf->hTheme, resource ) )) || data[64]) return FALSE;
++    for (i = 0; i < 64; i++)
++        if (!((data[i] >= '0' && data[i] <= '9') || (data[i] >= 'a' && data[i] <= 'f'))) return FALSE;
++    memcpy( revision, data, sizeof(saved) );
++    return RegGetValueW( HKEY_CURRENT_USER, szThemeManager, L"ProtonAppearanceRevision", RRF_RT_REG_SZ,
++                        NULL, saved, &size ) || size != sizeof(saved) || wcscmp( saved, revision );
++}
++
+ HRESULT UXTHEME_SetActiveTheme(PTHEME_FILE tf)
+ {
+     BOOL ret, loaded_before = FALSE, same_theme = FALSE;
+     struct system_metrics metrics;
+     DWORD size;
+     HKEY hKey;
+-    WCHAR tmp[2];
++    WCHAR tmp[2], appearance_revision[65] = {0};
++    BOOL appearance_changed = FALSE;
+     HRESULT hr;
+ 
+     if(tf) {
+@@ -448,7 +469,8 @@
+                 WARN("Failed to get LoadedBefore: %ld\n", GetLastError());
+             RegCloseKey(hKey);
+         }
+-        if (loaded_before && same_theme)
++        appearance_changed = managed_appearance_changed( tf, appearance_revision );
++        if (loaded_before && same_theme && !appearance_changed)
+             return MSSTYLES_SetActiveTheme(tf, FALSE);
+ 
+         if (!loaded_before && ret)
+@@ -474,6 +496,9 @@
+             RegSetValueExW(hKey, L"DllName", 0, REG_SZ, (const BYTE*)szCurrentTheme,
+ 		(lstrlenW(szCurrentTheme)+1)*sizeof(WCHAR));
+             RegSetValueExW(hKey, L"LoadedBefore", 0, REG_SZ, (const BYTE *)tmp, sizeof(WCHAR) * 2);
++            if (appearance_revision[0])
++                RegSetValueExW( hKey, L"ProtonAppearanceRevision", 0, REG_SZ,
++                                (const BYTE *)appearance_revision, sizeof(appearance_revision) );
+         }
+         else {
+             RegDeleteValueW(hKey, L"ColorName");

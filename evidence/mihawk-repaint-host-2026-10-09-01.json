@@ -1,0 +1,24 @@
+{
+ "candidate": "Mihawk GDI composition, idempotent Appearance paint, phase-driven desktop captures and control-socket observations",
+ "host_suites": 47,
+ "host_log": "klog/mihawk-repaint-host-2026-10-09-01.log",
+ "image_tests": 8,
+ "desktop_capture_tests": 4,
+ "battery_tests": 5,
+ "composition_runner_tests": 1,
+ "host_passed": true,
+ "console_gate": {
+  "run": "mihawk-repaint-gate-2026-10-09-02",
+  "passed": true,
+  "cases": 50,
+  "seconds": 1554.2
+ },
+ "build_attempt_01": {
+  "passed": false,
+  "deployed": false,
+  "reason": "desktop-session strncmp import absent from probe link recipe"
+ },
+ "build_attempt_02": "passed",
+ "scope": "Pro only; runtime socket handling unchanged; intermittent initial helper startup unqualified",
+ "build_fingerprint": "932c68c32a631a32e2a46c154e0ed7051afbd22bc7a7dcc64576873393f6a27a"
+}

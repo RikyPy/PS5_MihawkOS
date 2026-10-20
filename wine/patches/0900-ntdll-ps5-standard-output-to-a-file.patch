@@ -1,0 +1,87 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Sat, 3 Oct 2026 16:00:00 -0400
+Subject: [PATCH] ntdll: a Windows program's standard output is written to a file
+ on the PS5
+
+A PS5 title has no file descriptors 1 and 2 that lead anywhere: a Windows program
+gets standard handles for them and what it writes is lost. Wine's conformance tests
+print every result with printf. With WINE_PS5_STDOUT set to a unix path, the first
+process's standard output and error are that file (rewritten for each process); a
+test run sets it to /data/ps5proton/logs/wine-stdout.txt and reads it back over FTP.
+No pipe and no thread are involved.
+---
+  dlls/ntdll/unix/env.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
+  1 file changed, 44 insertions(+)
+
+diff --git a/dlls/ntdll/unix/env.c b/dlls/ntdll/unix/env.c
+index 364960a..7837acf 100644
+--- a/dlls/ntdll/unix/env.c
++++ b/dlls/ntdll/unix/env.c
+@@ -1348,6 +1348,41 @@ static void add_registry_environment( WCHAR **env, SIZE_T *pos, SIZE_T *size )
+     }
+ }
+ 
++#ifdef __PROSPERO__
++/* A PS5 title has no file descriptors 1 and 2 that lead anywhere: a Windows program
++ * gets standard handles for them, and what it writes is lost. Wine's conformance
++ * tests print every result with printf. With WINE_PS5_STDOUT set to a unix path, the
++ * first process's standard output and error are that file instead (rewritten for each
++ * process), which a test run reads back over FTP. */
++static HANDLE open_standard_output_file(void)
++{
++    static HANDLE handle;
++    static const WCHAR prefixW[] = { '\\', '?', '?', '\\', 'u', 'n', 'i', 'x' };
++    const char *path = getenv( "WINE_PS5_STDOUT" );
++    WCHAR *nt_path;
++    UNICODE_STRING name;
++    OBJECT_ATTRIBUTES attr;
++    IO_STATUS_BLOCK io;
++    SIZE_T length, i;
++
++    if (handle) return handle;
++    if (!path || path[0] != '/') return NULL;
++    length = strlen( path );
++    if (!(nt_path = malloc( (ARRAY_SIZE(prefixW) + length + 1) * sizeof(WCHAR) ))) return NULL;
++    memcpy( nt_path, prefixW, sizeof(prefixW) );
++    for (i = 0; i < length; i++) nt_path[ARRAY_SIZE(prefixW) + i] = path[i] == '/' ? '\\' : (unsigned char)path[i];
++    nt_path[ARRAY_SIZE(prefixW) + length] = 0;
++    init_unicode_string( &name, nt_path );
++    InitializeObjectAttributes( &attr, &name, OBJ_INHERIT, 0, NULL );
++    if (NtCreateFile( &handle, GENERIC_WRITE | SYNCHRONIZE, &attr, &io, NULL, FILE_ATTRIBUTE_NORMAL,
++                      FILE_SHARE_READ | FILE_SHARE_WRITE, FILE_OVERWRITE_IF,
++                      FILE_SYNCHRONOUS_IO_NONALERT | FILE_NON_DIRECTORY_FILE, NULL, 0 ))
++        handle = NULL;
++    free( nt_path );
++    return handle;
++}
++#endif
++
+ static void get_std_handle( int fd, unsigned int access, unsigned int attributes, HANDLE *handle )
+ {
+     IO_STATUS_BLOCK io;
+@@ -1355,6 +1390,9 @@ static void get_std_handle( int fd, unsigned int access, unsigned int attributes
+     FILE_NAME_INFORMATION name_info;
+     NTSTATUS status;
+ 
++#ifdef __PROSPERO__
++    if ((fd == 1 || fd == 2) && (*handle = open_standard_output_file())) return;
++#endif
+     wine_server_fd_to_handle( fd, access, attributes, handle );
+     if (!*handle) return;
+ 
+@@ -2131,6 +2169,12 @@ void init_startup_info(void)
+     params->hStdInput       = wine_server_ptr_handle( info->hstdin );
+     params->hStdOutput      = wine_server_ptr_handle( info->hstdout );
+     params->hStdError       = wine_server_ptr_handle( info->hstderr );
++#ifdef __PROSPERO__
++    {
++        HANDLE file = open_standard_output_file();
++        if (file) params->hStdOutput = params->hStdError = file;
++    }
++#endif
+     params->dwX             = info->x;
+     params->dwY             = info->y;
+     params->dwXSize         = info->xsize;
+-- 
+2.43.0

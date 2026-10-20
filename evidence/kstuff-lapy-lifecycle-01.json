@@ -1,0 +1,25 @@
+{
+  "daemon_revision": "5b8397b9f2b5f12a7bc2f9c8745a00d1c2dd01ad",
+  "daemon_elf_sha256": "b8a3892efe5467debd33ae9999b4d59b5c78bc904dfcc11d80414c5b57f554b0",
+  "daemon_build_id": "0529ff16d59175979502c773f95a294068d3c9932905f2654a8a14dbef90ea52",
+  "mode": "one-shot",
+  "stdout_mirror_patch": "platform/lapy/stdout-mirror.patch",
+  "title_launched": false,
+  "complete_balanced_lifecycle": false,
+  "kernel_fault_records": 1,
+  "capture_errors": [],
+  "lifecycle_records": [
+    "1\t913631463891\tMARK\tdaemon_start build=0529ff16d59175979502c773f95a294068d3c9932905f2654a8a14dbef90ea52 firmware=10010000 title=PPSA99170 service=0 require_client_result=1 max_requests=0",
+    "7\t913632471421\tMARK\troot_sample build=0529ff16d59175979502c773f95a294068d3c9932905f2654a8a14dbef90ea52 phase=layout_before hold=55 use=54",
+    "8\t913683070346\tMARK\troot_sample build=0529ff16d59175979502c773f95a294068d3c9932905f2654a8a14dbef90ea52 phase=layout_donor hold=57 use=56",
+    "9\t914134078377\tMARK\troot_sample build=0529ff16d59175979502c773f95a294068d3c9932905f2654a8a14dbef90ea52 phase=layout_released hold=55 use=54",
+    "11\t914134102352\tMARK\troot_layout build=0529ff16d59175979502c773f95a294068d3c9932905f2654a8a14dbef90ea52 valid=1 error=0 attempts=1",
+    "12\t914134126087\tMARK\troot_sample build=0529ff16d59175979502c773f95a294068d3c9932905f2654a8a14dbef90ea52 phase=baseline hold=55 use=54",
+    "13\t974135643997\tERR\tdaemon_result build=0529ff16d59175979502c773f95a294068d3c9932905f2654a8a14dbef90ea52 stage=find_request error=60 pid=-1 acknowledged=0 root_balanced=0"
+  ],
+  "title_passed": false,
+  "capture": "klog/kstuff-lapy-lifecycle-01",
+  "passed": false,
+  "kernel_fault_signatures": 2,
+  "counting_note": "One crash emitted both a fatal-signal header and a signal-delivery signature."
+}

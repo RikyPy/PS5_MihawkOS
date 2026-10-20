@@ -1,0 +1,88 @@
+From: PS5_Proton
+Subject: [PATCH] ntdll: count what a process writes to regular files, by call size
+
+A launcher's download of a Unity game ran at 2.5 MB/s on a 1 Gbps line (2026-10-11).
+Native speeds on the console (tools/console-iobench.py): TCP receive 18-19 MB/s
+on this LAN, the same inside Wine (tests/net-throughput-probe.c); disk writes
+cost about 0.7 ms for 4 KiB, 2.8 ms for 64 KiB, and reach 134 MB/s only from
+1 MiB (bfs on the internal SSD under a nullfs, not mounted synchronous). What
+the downloader writes is not known, so NtWriteFile counts regular-file writes:
+calls, bytes, time in the write, five size buckets and the slowest call, read
+through __wine_file_write_stats and logged by each helper with its census.
+---
+diff --git a/dlls/ntdll/unix/file.c b/dlls/ntdll/unix/file.c
+--- a/dlls/ntdll/unix/file.c
++++ b/dlls/ntdll/unix/file.c
+@@ -6855,6 +6855,42 @@
+ }
+ 
+ 
++#ifdef __PROSPERO__
++/* What a process writes to regular files, by call size: the console's disk costs about 0.7 ms for a 4 KiB write and
++ * 2.8 ms for 64 KiB, 134 MB/s only from 1 MiB (tools/console-iobench.c), and a launcher's download of a Unity game ran at
++ * 2.5 MB/s on a 1 Gbps line (2026-10-11). Counters: calls, bytes, nanoseconds in the write, and the calls of up to
++ * 4 KiB, 16 KiB, 64 KiB, 256 KiB and more, and the slowest call. */
++enum { FILE_WRITE_CALLS, FILE_WRITE_BYTES, FILE_WRITE_NS, FILE_WRITE_4K, FILE_WRITE_16K, FILE_WRITE_64K, FILE_WRITE_256K,
++       FILE_WRITE_BIG, FILE_WRITE_SLOWEST_NS, FILE_WRITE_COUNT };
++static ULONG64 file_write_stats[FILE_WRITE_COUNT];
++
++static void file_write_account( ULONG bytes, const struct timespec *begin )
++{
++    struct timespec end;
++    ULONG64 ns;
++
++    clock_gettime( CLOCK_MONOTONIC, &end );
++    ns = (ULONG64)(end.tv_sec - begin->tv_sec) * 1000000000ull + end.tv_nsec - begin->tv_nsec;
++    __atomic_add_fetch( &file_write_stats[FILE_WRITE_CALLS], 1, __ATOMIC_RELAXED );
++    __atomic_add_fetch( &file_write_stats[FILE_WRITE_BYTES], bytes, __ATOMIC_RELAXED );
++    __atomic_add_fetch( &file_write_stats[FILE_WRITE_NS], ns, __ATOMIC_RELAXED );
++    __atomic_add_fetch( &file_write_stats[bytes <= 4096 ? FILE_WRITE_4K : bytes <= 16384 ? FILE_WRITE_16K :
++                                          bytes <= 65536 ? FILE_WRITE_64K : bytes <= 262144 ? FILE_WRITE_256K :
++                                          FILE_WRITE_BIG], 1, __ATOMIC_RELAXED );
++    if (ns > file_write_stats[FILE_WRITE_SLOWEST_NS]) file_write_stats[FILE_WRITE_SLOWEST_NS] = ns;
++}
++
++/* Copy up to count counters; returns how many exist. */
++DECLSPEC_EXPORT unsigned int __wine_file_write_stats( ULONG64 *out, unsigned int count )
++{
++    unsigned int i;
++
++    for (i = 0; i < count && i < FILE_WRITE_COUNT; i++) out[i] = __atomic_load_n( &file_write_stats[i], __ATOMIC_RELAXED );
++    return FILE_WRITE_COUNT;
++}
++#endif
++
++
+ /******************************************************************************
+  *              NtWriteFile   (NTDLL.@)
+  */
+@@ -6872,6 +6908,9 @@
+     ULONG_PTR cvalue = apc ? 0 : (ULONG_PTR)apc_user;
+     BOOL send_completion = FALSE, async_write, append_write = FALSE, timeout_init_done = FALSE;
+     LARGE_INTEGER offset_eof;
++#ifdef __PROSPERO__
++    struct timespec write_begin;
++#endif
+ 
+     TRACE( "(%p,%p,%p,%p,%p,%p,0x%08x,%p,%p)\n",
+            handle, event, apc, apc_user, io, buffer, length, offset, key );
+@@ -6898,6 +6937,9 @@
+     if (status == STATUS_BAD_DEVICE_TYPE)
+         return server_write_file( handle, event, apc, apc_user, io, buffer, length, offset, key );
+ 
++#ifdef __PROSPERO__
++    clock_gettime( CLOCK_MONOTONIC, &write_begin );
++#endif
+     if (type == FD_TYPE_FILE)
+     {
+         if (async_write &&
+@@ -7054,6 +7096,9 @@
+ 
+ done:
+     send_completion = cvalue != 0;
++#ifdef __PROSPERO__
++    if (type == FD_TYPE_FILE && status == STATUS_SUCCESS) file_write_account( total, &write_begin );
++#endif
+ 
+ err:
+     if (needs_close) close( unix_handle );

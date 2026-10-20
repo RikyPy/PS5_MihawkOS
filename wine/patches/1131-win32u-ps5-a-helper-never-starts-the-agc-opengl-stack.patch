@@ -1,0 +1,43 @@
+From: PS5_Proton <local>
+Subject: [PATCH] win32u: PS5: a helper never starts the AGC OpenGL stack
+
+win32u.prx is the same module in the title and in helpers, and links the PS5 OpenGL (EGL/AGC) stack. Its only gate was
+WINE_PS5_OPENGL, which a helper inherits (pw_wine_process.c) and a .NET game's game.json sets. Every GUI helper of such a
+game then started the stack without any GL call: get_desktop_window makes the desktop, ps5drv's SetDesktopWindow
+updates the display cache, lock_display_devices asks get_opengl_gpus, and egl_init's eglInitialize allocates direct
+memory and maps it wired for the GPU (0x33) at an address the kernel picks: outside ntdll's memory backend, maybe inside
+one of Wine's reservations, the kind of mapping whose teardown hung the console ("unwire timeout at 0xc80000000").
+
+A helper has no AGC (libSceAgcDriver does not load in a payload), and its OpenGL is Mesa/Zink through the GPU broker
+(opengl32=n,b), so both gates now also refuse when WINE_PS5_CHILD is set. The title keeps the stack.
+
+Host: tests/test_helper_opengl.py checks both gates in the applied tree. Console: not run.
+---
+diff --git a/dlls/win32u/opengl.c b/dlls/win32u/opengl.c
+index af44e8e..7f49412 100644
+--- a/dlls/win32u/opengl.c
++++ b/dlls/win32u/opengl.c
+@@ -4015,8 +4015,10 @@ const struct opengl_funcs *__wine_get_opengl_driver( UINT version )
+     static pthread_once_t init_once = PTHREAD_ONCE_INIT;
+ 
+ #ifdef WINE_PS5_OPENGL
+-    /* DXVK and GDI profiles must not initialize the PS5 EGL/AGC stack. */
+-    if (!getenv( "WINE_PS5_OPENGL" )) return NULL;
++    /* DXVK and GDI profiles must not initialize the PS5 EGL/AGC stack. Nor may a helper (WINE_PS5_CHILD): it has no
++     * AGC, its OpenGL is Mesa/Zink through the GPU broker, and eglInitialize would map wired GPU memory at an address
++     * the kernel picks, outside ntdll's memory backend, maybe inside one of its reservations ("unwire timeout"). */
++    if (!getenv( "WINE_PS5_OPENGL" ) || getenv( "WINE_PS5_CHILD" )) return NULL;
+ #endif
+ 
+     if (version != WINE_OPENGL_DRIVER_VERSION)
+@@ -4035,8 +4037,8 @@ BOOL get_opengl_gpus( struct list *gpus )
+     struct egl_platform *egl;
+ 
+ #ifdef WINE_PS5_OPENGL
+-    /* DXVK and GDI profiles must not initialize the PS5 EGL/AGC stack. */
+-    if (!getenv( "WINE_PS5_OPENGL" )) return TRUE;
++    /* DXVK and GDI profiles, and helpers, must not initialize the PS5 EGL/AGC stack (__wine_get_opengl_driver). */
++    if (!getenv( "WINE_PS5_OPENGL" ) || getenv( "WINE_PS5_CHILD" )) return TRUE;
+ #endif
+ 
+     if (!__wine_get_opengl_driver( WINE_OPENGL_DRIVER_VERSION )) return FALSE;

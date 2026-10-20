@@ -1,0 +1,724 @@
+/* File Explorer (Windows 11 23H2), owner: explorer (js/apps/explorer.js).
+   Layers of the window: the tab strip sits on the window's Mica Alt; the selected tab and the
+   header (address bar + command bar) share one opaque layer; the body (navigation pane,
+   items, details pane, status bar) is the solid content layer. Every colour is a WinUI token. */
+
+.ex, .ex-tabs {
+  --ex-header: var(--LayerOnMicaBaseAltFillColorTertiary);
+  --ex-body: var(--SolidBackgroundFillColorQuarternary);
+  --ex-hover: var(--SubtleFillColorSecondary);
+  --ex-pressed: var(--SubtleFillColorTertiary);
+  --ex-sel: color-mix(in srgb, var(--SystemAccentColor) 16%, transparent);
+  --ex-sel-hover: color-mix(in srgb, var(--SystemAccentColor) 23%, transparent);
+  --ex-nav-sel: var(--ControlAltFillColorTertiary);
+  --ex-bar-track: var(--ControlStrongStrokeColorDisabled);
+}
+[data-theme="dark"] :is(.ex, .ex-tabs) {
+  --ex-body: var(--SolidBackgroundFillColorSecondary);
+  --ex-sel: color-mix(in srgb, var(--SystemAccentColor) 30%, transparent);
+  --ex-sel-hover: color-mix(in srgb, var(--SystemAccentColor) 38%, transparent);
+  --ex-nav-sel: var(--ControlFillColorSecondary);
+}
+
+/* ---------- tabs in the title bar ---------- */
+.ex-tabs {
+  display: flex;
+  align-items: stretch;
+  height: 100%;
+  min-width: 0;
+  padding: 8px 40px 0 0; /* an empty drag region always stays right of the + button */
+}
+.ex-tablist {
+  display: flex;
+  align-items: stretch;
+  min-width: 0;
+  padding: 0 8px; /* room for the selected tab's outward corners */
+  overflow: hidden;
+}
+.ex-tab {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 0 1 240px;
+  width: 240px; /* the title bar slot sizes to intrinsic width; tabs are equal width (TabWidthMode Equal) */
+  min-width: 88px;
+  max-width: 240px;
+  padding: 0 4px 0 8px;
+  border: 1px solid transparent;
+  border-bottom: 0;
+  border-radius: 8px 8px 0 0;
+  color: var(--TextFillColorSecondary);
+  font: var(--type-caption);
+  outline-offset: -3px;
+  transition: background-color var(--dur-faster) linear, color var(--dur-faster) linear;
+}
+.ex-tab:hover { background: var(--LayerOnMicaBaseAltFillColorSecondary); color: var(--TextFillColorPrimary); }
+.ex-tab:active:not(:has(.ex-tab-close:active)) { background: var(--LayerOnMicaBaseAltFillColorDefault); }
+.ex-tab.selected {
+  z-index: 1;
+  background: var(--ex-header);
+  border-color: var(--CardStrokeColorDefault);
+  color: var(--TextFillColorPrimary);
+}
+/* The selected tab flows into the header with concave corners, as WinUI's TabView draws it. */
+.ex-tab.selected::before, .ex-tab.selected::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  width: 8px;
+  height: 8px;
+  pointer-events: none;
+}
+.ex-tab.selected::before {
+  left: -9px;
+  background: radial-gradient(circle at 0 0, transparent 7.5px, var(--CardStrokeColorDefault) 7.5px, var(--CardStrokeColorDefault) 8.5px, var(--ex-header) 8.5px);
+}
+.ex-tab.selected::after {
+  right: -9px;
+  background: radial-gradient(circle at 100% 0, transparent 7.5px, var(--CardStrokeColorDefault) 7.5px, var(--CardStrokeColorDefault) 8.5px, var(--ex-header) 8.5px);
+}
+/* Separators between unselected tabs (TabViewItemSeparatorMargin 0,8,0,8). */
+.ex-tab:not(.selected)::after {
+  content: "";
+  position: absolute;
+  right: -1px;
+  top: 8px;
+  bottom: 8px;
+  width: 1px;
+  background: var(--DividerStrokeColorDefault);
+  transition: opacity var(--dur-faster) linear;
+}
+.ex-tab:not(.selected):is(:hover, :last-child, :has(+ .ex-tab.selected), :has(+ .ex-tab:hover))::after { opacity: 0; }
+.ex-tab-icon { margin-right: 10px; }
+.ex-tab-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.ex-tab-close {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 24px;
+  margin-left: 4px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--TextFillColorSecondary);
+  opacity: 0;
+  transition: background-color var(--dur-faster) linear, opacity var(--dur-faster) linear;
+}
+.ex-tab:is(.selected, :hover) .ex-tab-close, .ex-tab-close:focus-visible { opacity: 1; }
+.ex-tab-close:hover { background: var(--SubtleFillColorSecondary); color: var(--TextFillColorPrimary); }
+.ex-tab-close:active { background: var(--SubtleFillColorTertiary); color: var(--TextFillColorSecondary); }
+.ex-tab-add {
+  flex: none;
+  align-self: center;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 28px;
+  margin: 0 0 0 -4px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--TextFillColorPrimary);
+  transition: background-color var(--dur-faster) linear;
+}
+.ex-tab-add:hover { background: var(--SubtleFillColorSecondary); }
+.ex-tab-add:active { background: var(--SubtleFillColorTertiary); color: var(--TextFillColorSecondary); }
+:is(.window, .window-snapshot):not(.active) :is(.ex-tab:not(.selected), .ex-tab-add) { color: var(--TextFillColorTertiary); }
+
+/* ---------- window body ---------- */
+.ex {
+  --ex-row: 32px;
+  --ex-nav-w: var(--explorer-sidebar-width);
+  container: ex / inline-size;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  font: var(--type-caption);
+  color: var(--TextFillColorPrimary);
+}
+.ex.ex-compact { --ex-row: 24px; }
+.ex :is(button) { font: inherit; }
+
+/* ---------- header: address bar row ---------- */
+.ex-header { flex: none; background: var(--ex-header); }
+.ex-addrrow {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 48px;
+  padding: 0 12px 0 8px;
+  min-width: 0;
+}
+.ex-iconbtn, .ex-cmd, .ex-status-btn, .ex-crumb, .ex-crumb-chev, .ex-crumb-more, .ex-search-clear, .ex-section-head {
+  border: 0;
+  background: transparent;
+  color: var(--TextFillColorPrimary);
+  transition: background-color var(--dur-faster) linear, color var(--dur-faster) linear;
+}
+.ex-iconbtn {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: var(--radius-control);
+}
+:is(.ex-iconbtn, .ex-cmd, .ex-status-btn, .ex-crumb, .ex-crumb-chev, .ex-crumb-more, .ex-section-head):hover:not(:disabled) { background: var(--ex-hover); }
+:is(.ex-iconbtn, .ex-cmd, .ex-status-btn, .ex-crumb, .ex-crumb-chev, .ex-crumb-more, .ex-section-head):active:not(:disabled) { background: var(--ex-pressed); color: var(--TextFillColorSecondary); }
+:is(.ex-iconbtn, .ex-cmd, .ex-status-btn):disabled { color: var(--TextFillColorDisabled); }
+.ex-iconbtn:active:not(:disabled) .icon { transform: scale(0.9); }
+.ex-iconbtn .icon, .ex-cmd .ex-cmd-icon { transition: transform var(--dur-faster) linear; }
+
+/* Address box and search box: WinUI TextBox fill, stroke and accent underline on focus. */
+.ex-address, .ex-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 32px;
+  min-width: 0;
+  border: 1px solid var(--ControlStrokeColorDefault);
+  border-bottom-color: var(--ControlStrokeColorSecondary);
+  border-radius: var(--radius-control);
+  background: var(--ControlFillColorDefault);
+  background-clip: padding-box;
+  transition: background-color var(--dur-faster) linear;
+}
+.ex-address { flex: 1 1 auto; margin-left: 4px; min-width: 72px; }
+.ex-search { flex: 0 1 280px; min-width: 96px; margin-left: 4px; }
+.ex-address:hover, .ex-search:hover { background-color: var(--ControlFillColorSecondary); }
+.ex-address.editing, .ex-search:focus-within {
+  background-color: var(--ControlFillColorInputActive);
+  border-bottom-color: var(--AccentFillColorDefault);
+  box-shadow: inset 0 -1px 0 var(--AccentFillColorDefault);
+}
+.ex-crumbs {
+  display: flex;
+  align-items: center;
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 100%;
+  padding: 0 4px 0 2px;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.ex-crumb-icon { flex: none; display: grid; place-items: center; width: 28px; height: 24px; }
+.ex-crumb {
+  flex: none;
+  height: 24px;
+  padding: 0 6px;
+  border-radius: var(--radius-control);
+  font: var(--type-caption);
+  white-space: nowrap;
+}
+.ex-crumb-chev, .ex-crumb-more {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 24px;
+  padding: 0;
+  border-radius: var(--radius-control);
+  color: var(--TextFillColorSecondary);
+}
+.ex-crumb-chev .icon { transition: transform var(--dur-fast) var(--ease-in); }
+.ex-crumb-chev.open .icon { transform: rotate(90deg); }
+.ex-crumb-chev.open, .ex-crumb-more.open { background: var(--ex-pressed); }
+.ex-crumb-text { flex: none; padding: 0 6px; color: var(--TextFillColorPrimary); }
+.ex-crumb.drop-target { background: var(--ex-sel-hover); }
+.ex-path, .ex-search-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 100%;
+  padding: 0 10px;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: var(--TextFillColorPrimary);
+  font: var(--type-caption);
+}
+.ex-path:focus-visible, .ex-search-input:focus-visible { outline: none; box-shadow: none; }
+.ex-search-input::placeholder { color: var(--TextFillColorSecondary); opacity: 1; }
+.ex-search-clear {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border-radius: var(--radius-control);
+  color: var(--TextFillColorSecondary);
+}
+.ex-search-clear:hover { background: var(--ex-hover); }
+.ex-search-glyph { flex: none; display: grid; place-items: center; width: 32px; color: var(--TextFillColorSecondary); }
+
+/* ---------- header: command bar ---------- */
+.ex-cmdbar {
+  display: flex;
+  align-items: center;
+  height: 48px;
+  padding: 0 12px 0 8px;
+  border-bottom: 1px solid var(--DividerStrokeColorDefault);
+  min-width: 0;
+}
+.ex-cmd {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 32px;
+  min-width: 40px;
+  padding: 0 10px;
+  border-radius: var(--radius-control);
+  font: var(--type-caption);
+  white-space: nowrap;
+}
+.ex-cmd:has(.ex-cmd-chev) { padding-right: 8px; }
+.ex-cmd-chev { margin-left: -2px; color: var(--TextFillColorSecondary); }
+.ex-cmd:disabled .ex-cmd-chev { color: var(--TextFillColorDisabled); }
+.ex-cmd:active:not(:disabled) .ex-cmd-icon { transform: scale(0.9); }
+.ex-cmd-new:not(:disabled) .ex-cmd-icon { color: var(--AccentTextFillColorTertiary); }
+.ex-cmd.open, .ex-cmd.checked, .ex-status-btn.checked { background: var(--ex-hover); }
+.ex-cmd.checked:hover { background: var(--ex-pressed); }
+.ex-cmd-filter.checked .ex-cmd-icon { color: var(--AccentTextFillColorTertiary); }
+.ex-cmd-sep { flex: none; width: 1px; height: 24px; margin: 0 4px; background: var(--DividerStrokeColorDefault); }
+.ex-cmd-spacer { flex: 1 1 0; min-width: 4px; }
+.ex:not(.ex-in-recycle) .ex-recycle-only { display: none; }
+
+/* Narrower windows: labels collapse, then commands fold into "See more" (moreMenuItems reads
+   which ones are hidden). */
+@container ex (max-width: 1000px) {
+  :is(.ex-cmd-sort, .ex-cmd-view, .ex-cmd-filter, .ex-cmd-empty, .ex-cmd-restore) .ex-cmd-label { display: none; }
+  :is(.ex-cmd-sort, .ex-cmd-view, .ex-cmd-filter, .ex-cmd-empty, .ex-cmd-restore) { gap: 4px; padding-left: 8px; }
+}
+@container ex (max-width: 820px) {
+  :is(.ex-cmd-share, .ex-cmd-rename, .ex-cmd-filter, .ex-cmd-restore) { display: none; }
+  .ex-cmd-details .ex-cmd-label { display: none; }
+}
+@container ex (max-width: 640px) {
+  .ex-nav, .ex-splitter { display: none; }
+  :is(.ex-cmd-cut, .ex-cmd-copy, .ex-cmd-paste, .ex-cmd-empty) { display: none; }
+  .ex-cmd-new .ex-cmd-label { display: none; }
+  .ex-cmd-new { gap: 4px; padding-left: 8px; }
+  .ex-cmd-sep:first-of-type { display: none; }
+  .ex-dpane { display: none; }
+  .ex-search { flex-basis: 200px; }
+}
+@container ex (max-width: 500px) {
+  :is(.ex-cmd-delete, .ex-cmd-sort, .ex-cmd-details) { display: none; }
+  .ex-cmd-sep:not(.ex-sep-more) { display: none; }
+  .ex-addrrow { gap: 2px; padding: 0 8px 0 4px; }
+  .ex-search { flex-basis: 120px; }
+}
+
+/* ---------- body ---------- */
+.ex-body { flex: 1 1 auto; display: flex; min-height: 0; min-width: 0; background: var(--ex-body); }
+.ex.ex-no-nav :is(.ex-nav, .ex-splitter) { display: none; }
+
+/* Navigation pane. Expand chevrons fade in only while the pointer is over the pane. */
+.ex-nav {
+  flex: none;
+  width: var(--ex-nav-w);
+  padding: 4px 4px 8px;
+  overflow: hidden auto;
+  scrollbar-gutter: stable;
+}
+.ex-nav-item {
+  display: flex;
+  align-items: center;
+  height: var(--ex-row);
+  padding: 0 8px 0 calc(var(--depth, 0) * 16px);
+  border-radius: var(--radius-control);
+  color: var(--TextFillColorPrimary);
+  white-space: nowrap;
+  outline-offset: -2px;
+  transition: background-color var(--dur-faster) linear;
+}
+.ex-nav-item:hover { background: var(--ex-hover); }
+.ex-nav-item.selected { background: var(--ex-nav-sel); }
+.ex-nav-item.selected:hover { background: linear-gradient(var(--ex-hover), var(--ex-hover)), var(--ex-nav-sel); }
+.ex-nav-item:active { background: var(--ex-pressed); }
+.ex-nav-item.drop-target { background: var(--ex-sel-hover); }
+.ex-nav-chev {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-control);
+  color: var(--TextFillColorSecondary);
+  opacity: 0;
+  transition: opacity var(--dur-fast) linear;
+}
+.ex-nav-chev .icon { transition: transform var(--dur-fast) var(--ease-in); }
+.ex-nav-chev.open .icon { transform: rotate(90deg); }
+.ex-nav:is(:hover, :focus-within) .ex-nav-chev { opacity: 1; }
+.ex-nav-chev:hover { color: var(--TextFillColorPrimary); }
+.ex-nav-icon { margin: 0 8px 0 2px; }
+.ex-nav-label { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.ex-nav-pin { margin-left: 4px; color: var(--TextFillColorTertiary); }
+.ex-nav-sep { height: 1px; margin: 8px 8px; background: var(--DividerStrokeColorDefault); }
+
+.ex-splitter {
+  flex: none;
+  width: 6px;
+  margin: 0 -3px;
+  z-index: 2;
+  cursor: var(--cursor-ew); /* the navigation pane splitter sizes like a window border */
+}
+
+/* ---------- items area ---------- */
+.ex-content {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 0 8px 12px 12px;
+  overflow: auto;
+  outline: none;
+}
+.ex-content:focus-visible { outline: none; box-shadow: none; }
+.ex-dragging .ex-content, .ex-marqueeing .ex-content { scroll-behavior: auto; }
+
+.ex-item {
+  position: relative;
+  border-radius: var(--radius-control);
+  transition: background-color var(--dur-faster) linear;
+}
+.ex-item:hover { background: var(--ex-hover); }
+.ex-item.selected { background: var(--ex-sel); }
+.ex-item.selected:hover, .ex-item.drop-target { background: var(--ex-sel-hover); }
+.ex-kb .ex-item.focused { outline: 1px solid var(--FocusStrokeColorOuter); outline-offset: -1px; }
+.ex-item.cut .ex-ico { opacity: 0.5; }
+.ex-ico { position: relative; flex: none; display: flex; align-items: center; justify-content: center; }
+.ex-ico > .icon { width: 100%; height: 100%; }
+.ex-badge { position: absolute; left: 0; bottom: 0; }
+.ex-thumb {
+  display: block;
+  width: 100%;
+  height: 75%;
+  border-radius: 2px;
+  background-size: cover !important;
+  box-shadow: 0 0 0 1px var(--CardStrokeColorDefault), var(--shadow-2);
+}
+.ex-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ex-meta { color: var(--TextFillColorSecondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ex-note { padding: 16px 8px; color: var(--TextFillColorSecondary); text-align: center; }
+/* Network with discovery off: an informational InfoBar across the top of the items. */
+.ex-infobar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 40px;
+  margin: 4px 0;
+  padding: 8px 16px;
+  border: 1px solid var(--CardStrokeColorDefault);
+  border-radius: var(--radius-control);
+  background: var(--SystemFillColorAttentionBackground);
+  color: var(--TextFillColorPrimary);
+  font: var(--type-body);
+}
+.ex-infobar-icon { flex: none; color: var(--AccentTextFillColorPrimary); }
+
+/* Details view: sticky column headers (sort glyph at the top centre, as Explorer draws it),
+   full-row hover and selection plates across the columns. */
+.ex-dv { width: max-content; min-width: 100%; padding-bottom: 4px; }
+.ex-dv-head, .ex-row { width: max-content; }
+.ex-dv-head {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: var(--cols);
+  height: 32px;
+  margin-bottom: 2px;
+  background: var(--ex-body);
+}
+.ex-dv-hcell {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  padding: 0 8px 0 10px;
+  color: var(--TextFillColorSecondary);
+  transition: background-color var(--dur-faster) linear;
+}
+.ex-dv-hcell::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 4px;
+  bottom: 4px;
+  width: 1px;
+  background: var(--DividerStrokeColorDefault);
+}
+.ex-dv-hcell:not(.static):hover { background: var(--ex-hover); }
+.ex-dv-hcell.pressed { background: var(--ex-pressed); }
+.ex-dv-hcell.right { justify-content: flex-end; }
+.ex-dv-htext { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ex-dv-sort { position: absolute; left: 50%; top: -1px; transform: translateX(-50%); color: var(--TextFillColorSecondary); }
+.ex-dv-grip { position: absolute; top: 0; bottom: 0; right: -4px; width: 8px; z-index: 1; cursor: var(--cursor-split); }
+.ex-row {
+  display: grid;
+  grid-template-columns: var(--cols);
+  align-items: center;
+  height: var(--ex-row);
+}
+.ex-cell {
+  min-width: 0;
+  padding: 0 8px 0 10px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--TextFillColorSecondary);
+}
+.ex-cell.right { text-align: right; }
+.ex-cell-name { display: flex; align-items: center; gap: 8px; color: var(--TextFillColorPrimary); }
+
+/* Icon views. */
+.ex-grid { display: grid; gap: 2px; align-content: start; padding: 8px 0; }
+.ex-grid-large { grid-template-columns: repeat(auto-fill, 116px); }
+.ex-grid-medium { grid-template-columns: repeat(auto-fill, 88px); }
+.ex-grid-small { grid-template-columns: repeat(auto-fill, minmax(200px, 240px)); gap: 0 4px; }
+.ex-grid-tiles { grid-template-columns: repeat(auto-fill, minmax(240px, 260px)); gap: 4px; }
+.ex-grid-list { display: block; column-width: 220px; column-gap: 4px; column-fill: auto; height: calc(100% - 4px); padding: 4px 0; }
+.ex-tile { display: flex; align-items: center; min-width: 0; }
+.ex-tile-large, .ex-tile-medium {
+  flex-direction: column;
+  padding: 6px 4px 6px;
+  text-align: center;
+}
+.ex-tile-large .ex-ico, .ex-tile-medium .ex-ico { margin-bottom: 4px; }
+.ex-tile-large .ex-name, .ex-tile-medium .ex-name {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 16px;
+}
+.ex-tile-large.selected .ex-name, .ex-tile-medium.selected .ex-name { -webkit-line-clamp: 4; }
+.ex-tile-small, .ex-tile-list { gap: 8px; height: var(--ex-row); padding: 0 8px; }
+.ex-tile-list { break-inside: avoid; }
+.ex-tile-tiles { gap: 12px; height: 72px; padding: 8px 12px; }
+.ex-tile-text { display: flex; flex-direction: column; min-width: 0; }
+
+/* Home, This PC and Gallery pages. */
+.ex-page { padding: 4px 4px 8px 0; }
+.ex-section { margin-bottom: 4px; }
+.ex-section-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  margin-top: 4px;
+  padding: 0 10px 0 8px;
+  border-radius: var(--radius-control);
+  font: 600 14px/20px var(--font-ui);
+  outline-offset: -2px;
+}
+.ex-section-chev { color: var(--TextFillColorSecondary); transition: transform var(--dur-fast) var(--ease-in); }
+.ex-section.collapsed .ex-section-chev { transform: rotate(-90deg); }
+.ex-section.collapsed .ex-section-body { display: none; }
+.ex-section-body { padding: 4px 0 8px 4px; }
+.ex-section-body > .ex-note { text-align: left; padding: 8px 4px 12px; }
+.ex-qa-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(196px, 1fr)); gap: 4px; }
+.ex-qa {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  align-items: center;
+  gap: 0 12px;
+  height: 72px;
+  padding: 8px 12px;
+}
+.ex-qa-text, .ex-drive-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.ex-qa-sub { display: flex; align-items: center; gap: 6px; color: var(--TextFillColorSecondary); }
+.ex-qa-pin { color: var(--TextFillColorTertiary); }
+.ex-drive-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 280px)); gap: 4px; }
+.ex-drive {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  align-items: center;
+  gap: 0 12px;
+  height: 76px;
+  padding: 8px 12px;
+}
+.ex-drive-text { gap: 4px; }
+.ex-bar { height: 6px; border-radius: 3px; background: var(--ex-bar-track); overflow: hidden; }
+.ex-bar-fill { height: 100%; border-radius: 3px; background: var(--AccentFillColorDefault); }
+.ex-bar.full .ex-bar-fill { background: var(--SystemFillColorCritical); }
+.ex-gallery-head { padding: 12px 8px 8px; font: 600 14px/20px var(--font-ui); }
+.ex-photos { display: grid; grid-template-columns: repeat(auto-fill, minmax(176px, 1fr)); gap: 6px; padding: 0 4px; }
+.ex-photo { aspect-ratio: 3 / 2; padding: 0; overflow: hidden; }
+.ex-photo-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-size: cover !important;
+  transition: transform var(--dur-normal) var(--ease-in);
+}
+.ex-photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px var(--CardStrokeColorDefault);
+  transition: background-color var(--dur-faster) linear, box-shadow var(--dur-faster) linear;
+}
+.ex-photo:hover::after { background: var(--SubtleFillColorSecondary); }
+.ex-photo.selected::after { box-shadow: inset 0 0 0 2px var(--AccentFillColorDefault), inset 0 0 0 3px var(--ex-body); background: var(--ex-sel); }
+
+/* Rubber band: accent stroke over an accent tint. */
+.ex-marquee {
+  position: absolute;
+  z-index: 3;
+  border: 1px solid var(--SystemAccentColor);
+  background: color-mix(in srgb, var(--SystemAccentColor) 25%, transparent);
+  pointer-events: none;
+}
+
+/* Inline rename box. */
+.ex-rename {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 22px;
+  margin: 0 -2px;
+  padding: 0 4px;
+  border: 1px solid var(--ControlStrokeColorDefault);
+  border-bottom: 2px solid var(--AccentFillColorDefault);
+  border-radius: var(--radius-control);
+  outline: none;
+  background: var(--ControlFillColorInputActive);
+  color: var(--TextFillColorPrimary);
+  font: var(--type-caption);
+}
+.ex-rename:focus-visible { outline: none; box-shadow: none; }
+:is(.ex-tile-large, .ex-tile-medium) .ex-rename { width: 100%; text-align: center; flex: none; }
+.ex-item.renaming, .ex-item.renaming:hover { background: var(--ex-sel); }
+
+/* ---------- details pane ---------- */
+.ex-dpane {
+  flex: none;
+  width: 280px;
+  padding: 20px 16px;
+  border-left: 1px solid var(--DividerStrokeColorDefault);
+  overflow: hidden auto;
+}
+.ex-dp-head { display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; padding-bottom: 16px; }
+.ex-dp-head > .ex-ico, .ex-dp-loc { margin-bottom: 6px; }
+.ex-dp-thumb { width: 200px; height: 134px; border-radius: var(--radius-control); background-size: cover !important; box-shadow: var(--shadow-8); margin-bottom: 6px; }
+.ex-dp-name { font: 600 14px/20px var(--font-ui); overflow-wrap: anywhere; }
+.ex-dp-type, .ex-dp-hint { color: var(--TextFillColorSecondary); }
+.ex-dp-hint { margin-top: 12px; }
+.ex-dp-title { padding: 12px 0 8px; border-top: 1px solid var(--DividerStrokeColorDefault); font: 600 14px/20px var(--font-ui); }
+.ex-dp-props { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 8px 12px; margin: 0; }
+.ex-dp-props dt { color: var(--TextFillColorSecondary); }
+.ex-dp-props dd { margin: 0; overflow-wrap: anywhere; }
+
+/* ---------- status bar ---------- */
+.ex-status {
+  flex: none;
+  display: flex;
+  align-items: center;
+  height: 26px;
+  padding: 0 4px 0 12px;
+  background: var(--ex-body);
+  white-space: nowrap;
+}
+.ex-status-text { display: flex; align-items: center; min-width: 0; overflow: hidden; }
+.ex-status-size { margin-left: 8px; }
+.ex-status-sep { width: 1px; height: 14px; margin: 0 10px; background: var(--DividerStrokeColorDefault); }
+.ex-status-fill { flex: 1 1 auto; }
+.ex-status-btn { display: grid; place-items: center; width: 28px; height: 22px; padding: 0; border-radius: var(--radius-control); }
+.ex-status-btn:disabled { opacity: 0.5; }
+
+/* ---------- drag visual: the dragged items on an accent plate, the count badge and the
+   "Move to ..." tip that follows the pointer ---------- */
+.ex-ghost { position: fixed; left: 0; top: 0; z-index: 10; pointer-events: none; will-change: transform; }
+.ex-ghost-plate {
+  position: absolute;
+  left: -36px;
+  top: -40px;
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  border-radius: var(--radius-control);
+  background: var(--ex-sel, color-mix(in srgb, var(--SystemAccentColor) 16%, transparent));
+  opacity: 0.85;
+}
+.ex-ghost-count {
+  position: absolute;
+  right: -8px;
+  top: -8px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 10px;
+  background: var(--AccentFillColorDefault);
+  color: var(--TextOnAccentFillColorPrimary);
+  font: 600 12px/20px var(--font-ui);
+  text-align: center;
+  box-shadow: var(--shadow-2);
+}
+.ex-ghost-tip {
+  position: absolute;
+  left: 14px;
+  top: 30px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 8px 6px;
+  border: 1px solid var(--SurfaceStrokeColorFlyout);
+  border-radius: var(--radius-control);
+  background: var(--SolidBackgroundFillColorQuarternary);
+  background-clip: padding-box;
+  box-shadow: var(--shadow-tooltip);
+  color: var(--TextFillColorPrimary);
+  font: var(--type-caption);
+  white-space: nowrap;
+}
+.ex-ghost-tip[hidden] { display: none; }
+.ex-ghost-verb { color: var(--AccentTextFillColorTertiary); }
+.ex-ghost.no-drop .ex-ghost-plate { opacity: 0.6; }
+
+/* ---------- permanent delete confirmation (shell32 "Delete File"): question, then the item's
+   64 px picture beside its name, type, size and date; Yes / No on the grey strip. The palette,
+   push buttons and frame are the classic ones of css/dialogs.css (.dlg, .dlg-foot, .dlg-btn). */
+.ex-purge { display: flex; flex-direction: column; background: var(--dlg-page); }
+.ex-purge-main { display: flex; flex-direction: column; gap: 16px; padding: 18px 24px 22px; overflow-wrap: anywhere; }
+.ex-purge-item { display: flex; align-items: center; gap: 14px; min-width: 0; padding-left: 8px; }
+.ex-purge-facts { min-width: 0; }
+.ex-purge-facts > div { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ex-purge-foot { gap: 10px; }
+.ex-purge-foot .dlg-btn { min-width: 75px; }
+/* The disabled owner while it is up: presses land here and flash the dialog. */
+.ex-blocker { position: absolute; inset: -8px; z-index: 3; }
+
+/* ---------- fallback frame, only while js/wm.js is absent ---------- */
+.ex-fallback {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--SurfaceStrokeColorDefault);
+  border-radius: var(--radius-window);
+  box-shadow: var(--shadow-window);
+}
+.ex-fallback-bar { flex: none; display: flex; height: var(--titlebar-tall-height); padding-right: 138px; }
+.ex-fallback > .ex { flex: 1 1 auto; height: auto; }

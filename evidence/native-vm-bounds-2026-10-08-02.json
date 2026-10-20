@@ -1,0 +1,14 @@
+{
+ "run": "native-vm-bounds-2026-10-08-02",
+ "read_only": true,
+ "payload": true,
+ "elf_sha256": "e42c5bea710e6eed671281d0460f4e055e2583a0bfe9d71031824a780ebdfb2a",
+ "source_sha256": "76eddef93524f7e80d9a30f9169fc1e8677d47c795edb627b5658482232fca68",
+ "passed": true,
+ "lines": [
+  "PS5_PROTON_VM_BOUNDS min=0x800000000000 max=0x4000 firmware=0x10010000 proc_vmspace_offset=0x200",
+  "vm field offset=0x28 user_value=0x800000000000",
+  "vm field offset=0x1c0 user_value=0x10600000106",
+  "pmap offset=0x2e8"
+ ]
+}

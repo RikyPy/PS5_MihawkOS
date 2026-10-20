@@ -1,0 +1,48 @@
+{
+  "launch_readiness": {
+    "ready": true,
+    "seconds": 0.362,
+    "settle_seconds": 0.0,
+    "census_seconds": 0.346,
+    "previous_cleanup_verified": true
+  },
+  "session_marker_left": false,
+  "title": "PPSA99170",
+  "identity": "3f11368e268546f2bceddf71b485a1e5",
+  "frames_requested": 120,
+  "eboot_sha256": "d35032c45f1e91a7a364294bbeaf00d1a17db57b6907138d7323b75c250c8b08",
+  "fresh_identity_seen": true,
+  "shell_idle_after_run": true,
+  "title_finished_successfully": true,
+  "picture_and_log_check_passed": true,
+  "post_launch_fault_records": 0,
+  "post_launch_driver_errors": 0,
+  "elevation": [
+    "ok (filesystem access)"
+  ],
+  "sample": [
+    "starts",
+    "ok, 120 frames in 2.36 s, 59.9 fps after the first half"
+  ],
+  "library": [
+    "5 game(s); searched: /data/ps5proton/games (4 entries); /data/homebrew/PPSA99170/games (not there)",
+    "library shows 1 of 5 (Mihawk OS and entries with a prefix of their own; /data/ps5proton/library-show-all shows them all)",
+    "The last session (Gate marker) did not end normally: it crashed, froze or lost power. Its log: /data/ps5proton/logs/title-last.log"
+  ],
+  "notices": [],
+  "startup_seconds": {
+    "exec": 0.0,
+    "starts": 0.61,
+    "elevation": 0.61,
+    "library": 0.7,
+    "ui": 0.73
+  },
+  "probe": null,
+  "probe_passed": null,
+  "probe_records": [],
+  "controls_preview": null,
+  "passed": true,
+  "capture": "klog/loud-failures-2026-10-18-02-launcher-ended-marker",
+  "forced_close": false,
+  "storage_errors": 0
+}

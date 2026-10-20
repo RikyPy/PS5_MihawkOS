@@ -1,0 +1,134 @@
+{
+ "launch_readiness": {
+  "ready": true,
+  "seconds": 8.025,
+  "settle_seconds": 7.843,
+  "census_seconds": 0.153,
+  "previous_cleanup_verified": false
+ },
+ "run": "mihawk-capture-diagnostic-2026-10-09-13-appearance64",
+ "what": "appearance64-probe.exe",
+ "env": [
+  "PS5_PROTON_PROBE_CAPTURE=Z:\\data\\ps5proton\\logs\\game-frame.ppm"
+ ],
+ "result": "finished",
+ "seconds": 11.5,
+ "probe_verdict": "FAIL",
+ "clean_owner_restart": false,
+ "launcher_end_status": 0,
+ "initial_status": 1,
+ "closed_on_request": false,
+ "child_logs": [
+  "klog/mihawk-capture-diagnostic-2026-10-09-13-appearance64-wine-child-2472.log",
+  "klog/mihawk-capture-diagnostic-2026-10-09-13-appearance64-wine-child-2473.log",
+  "klog/mihawk-capture-diagnostic-2026-10-09-13-appearance64-wine-child-2474.log",
+  "klog/mihawk-capture-diagnostic-2026-10-09-13-appearance64-wine-child-2475.log",
+  "klog/mihawk-capture-diagnostic-2026-10-09-13-appearance64-wine-child-2476.log",
+  "klog/mihawk-capture-diagnostic-2026-10-09-13-appearance64-wine-child-2477.log",
+  "klog/mihawk-capture-diagnostic-2026-10-09-13-appearance64-wine-child-2478.log",
+  "klog/mihawk-capture-diagnostic-2026-10-09-13-appearance64-wine-child-2479.log",
+  "klog/mihawk-capture-diagnostic-2026-10-09-13-appearance64-wine-child-2480.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": false,
+ "bench": {},
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   }
+  ],
+  "top": []
+ },
+ "shown": {
+  "frames": 0,
+  "per_10s": [],
+  "longest_gap_ms": 0
+ },
+ "broker": {
+  "local_offer": 8589934592,
+  "host_limit": 1073741824,
+  "refused": [],
+  "refused_count": 0,
+  "clients": [
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": 2473,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   }
+  ],
+  "wedged": false,
+  "failure_reasons": [],
+  "host_peak": 2113536,
+  "local_peak": 0
+ },
+ "pad_script": [
+  "# Appearance requests each capture after painting and holds the variant until saved."
+ ],
+ "captures": [],
+ "cleanup_verified": false,
+ "hooks_removed": true,
+ "api_passed": false,
+ "appearance_pixels": [
+  {
+   "variant": "light",
+   "passed": false,
+   "error": "missing capture or measured client origin"
+  },
+  {
+   "variant": "dark",
+   "passed": false,
+   "error": "missing capture or measured client origin"
+  }
+ ]
+}

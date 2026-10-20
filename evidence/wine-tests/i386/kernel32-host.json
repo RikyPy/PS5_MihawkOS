@@ -1,0 +1,296 @@
+{
+ "loader": {
+  "context": {
+   "arch": "i386",
+   "batch_header_sha256": "29b29d960f4c6cb1517812814c85353c99197bbeb068470d44d62fefefbf3dd1",
+   "host_wine_sha256": "ddaea569e3f97724ccae7bbc063aed6dbec0549eb67f5a70559d6babf4f8a5d1",
+   "test_sha256": "ef926e46248346351ba19abdeb556d37b26383e8830809232daa9a051bee7814",
+   "wine_revision": "7e893751d256bfe062fd1d159375f024dedfa696"
+  },
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "log": "klog/wt-host-i386-kernel32-loader-1791424202588084217.log",
+  "seconds": 10.9,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 17881,
+   "todo": 23
+  },
+  "todo_lines": 26
+ },
+ "pipe": {
+  "context": {
+   "arch": "i386",
+   "batch_header_sha256": "29b29d960f4c6cb1517812814c85353c99197bbeb068470d44d62fefefbf3dd1",
+   "host_wine_sha256": "ddaea569e3f97724ccae7bbc063aed6dbec0549eb67f5a70559d6babf4f8a5d1",
+   "test_sha256": "ef926e46248346351ba19abdeb556d37b26383e8830809232daa9a051bee7814",
+   "wine_revision": "7e893751d256bfe062fd1d159375f024dedfa696"
+  },
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "log": "klog/wt-host-i386-kernel32-pipe-1791424191690720467.log",
+  "seconds": 8.6,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 38462,
+   "todo": 27
+  },
+  "todo_lines": 27
+ },
+ "process": {
+  "context": {
+   "arch": "i386",
+   "batch_header_sha256": "29b29d960f4c6cb1517812814c85353c99197bbeb068470d44d62fefefbf3dd1",
+   "host_wine_sha256": "ddaea569e3f97724ccae7bbc063aed6dbec0549eb67f5a70559d6babf4f8a5d1",
+   "test_sha256": "ef926e46248346351ba19abdeb556d37b26383e8830809232daa9a051bee7814",
+   "wine_revision": "7e893751d256bfe062fd1d159375f024dedfa696"
+  },
+  "exit_code": 48,
+  "failure_count": 43,
+  "failures": [
+   {
+    "file": "process.c",
+    "line": 1615,
+    "text": "Getting sb info"
+   },
+   {
+    "file": "process.c",
+    "line": 1616,
+    "text": "Getting console in mode"
+   },
+   {
+    "file": "process.c",
+    "line": 1617,
+    "text": "Getting console out mode"
+   },
+   {
+    "file": "process.c",
+    "line": 1628,
+    "text": "Getting sb info"
+   },
+   {
+    "file": "process.c",
+    "line": 1629,
+    "text": "Getting console in mode"
+   },
+   {
+    "file": "process.c",
+    "line": 1630,
+    "text": "Getting console out mode"
+   },
+   {
+    "file": "process.c",
+    "line": 1645,
+    "text": "GetLastError: expecting 87 got 6"
+   },
+   {
+    "file": "process.c",
+    "line": 1655,
+    "text": "GetLastError: expecting 87 got 6"
+   },
+   {
+    "file": "process.c",
+    "line": 1684,
+    "text": "Console:SizeX expected 132, but got 0"
+   },
+   {
+    "file": "process.c",
+    "line": 1685,
+    "text": "Console:SizeY expected 0, but got 1"
+   },
+   {
+    "file": "process.c",
+    "line": 1686,
+    "text": "Console:CursorX expected 136, but got 0"
+   },
+   {
+    "file": "process.c",
+    "line": 1687,
+    "text": "Console:CursorY expected 0, but got 1"
+   },
+   {
+    "file": "process.c",
+    "line": 1688,
+    "text": "Console:Attributes expected 408, but got 0"
+   },
+   {
+    "file": "process.c",
+    "line": 1689,
+    "text": "Console:winLeft expected 0, but got 1"
+   },
+   {
+    "file": "process.c",
+    "line": 1690,
+    "text": "Console:winTop expected 412, but got 0"
+   },
+   {
+    "file": "process.c",
+    "line": 1691,
+    "text": "Console:winRight expected 0, but got 1"
+   },
+   {
+    "file": "process.c",
+    "line": 1692,
+    "text": "Console:winBottom expected 0, but got 1"
+   },
+   {
+    "file": "process.c",
+    "line": 1693,
+    "text": "Console:maxWinWidth expected 0, but got 1"
+   },
+   {
+    "file": "process.c",
+    "line": 1694,
+    "text": "Console:maxWinHeight expected 0, but got 1"
+   },
+   {
+    "file": "process.c",
+    "line": 1697,
+    "text": "Console:InputMode expected 0, but got 1"
+   },
+   {
+    "file": "process.c",
+    "line": 1698,
+    "text": "Console:OutputMode expected 0, but got 1"
+   },
+   {
+    "file": "process.c",
+    "line": 1702,
+    "text": "Wrong console CP (expected 1252 got 0/0)"
+   },
+   {
+    "file": "process.c",
+    "line": 1703,
+    "text": "Wrong console-SB CP (expected 1252 got 0/0)"
+   },
+   {
+    "file": "process.c",
+    "line": 1708,
+    "text": "Wrong console mode"
+   },
+   {
+    "file": "process.c",
+    "line": 1709,
+    "text": "Wrong console-SB mode"
+   },
+   {
+    "file": "process.c",
+    "line": 3682,
+    "text": "nothing_gui[6] : StartupInfoA:hStdInputEncode expected 0x8, but got 0x2e"
+   },
+   {
+    "file": "process.c",
+    "line": 3683,
+    "text": "nothing_gui[6] : StartupInfoA:hStdOutputEncode expected 0x8, but got 0x2e"
+   },
+   {
+    "file": "process.c",
+    "line": 3687,
+    "text": "nothing_gui[6] : StartupInfoW:hStdInputEncode expected 0x8, but got 0x2e"
+   },
+   {
+    "file": "process.c",
+    "line": 3688,
+    "text": "nothing_gui[6] : StartupInfoW:hStdOutputEncode expected 0x8, but got 0x2e"
+   },
+   {
+    "file": "process.c",
+    "line": 3690,
+    "text": "nothing_gui[6] : TEB:hStdInputEncode expected 0x8, but got 0x2e"
+   },
+   {
+    "file": "process.c",
+    "line": 3691,
+    "text": "nothing_gui[6] : TEB:hStdOutputEncode expected 0x8, but got 0x2e"
+   },
+   {
+    "file": "process.c",
+    "line": 3690,
+    "text": "nothing_gui[7] : TEB:hStdInputEncode expected 0x8, but got 0x2e"
+   },
+   {
+    "file": "process.c",
+    "line": 3691,
+    "text": "nothing_gui[7] : TEB:hStdOutputEncode expected 0x8, but got 0x2e"
+   },
+   {
+    "file": "process.c",
+    "line": 3682,
+    "text": "detached_gui[1] : StartupInfoA:hStdInputEncode expected 0x8, but got 0x2e"
+   },
+   {
+    "file": "process.c",
+    "line": 3683,
+    "text": "detached_gui[1] : StartupInfoA:hStdOutputEncode expected 0x8, but got 0x2e"
+   },
+   {
+    "file": "process.c",
+    "line": 3687,
+    "text": "detached_gui[1] : StartupInfoW:hStdInputEncode expected 0x8, but got 0x2e"
+   },
+   {
+    "file": "process.c",
+    "line": 3688,
+    "text": "detached_gui[1] : StartupInfoW:hStdOutputEncode expected 0x8, but got 0x2e"
+   },
+   {
+    "file": "process.c",
+    "line": 3690,
+    "text": "detached_gui[1] : TEB:hStdInputEncode expected 0x8, but got 0x2e"
+   },
+   {
+    "file": "process.c",
+    "line": 3691,
+    "text": "detached_gui[1] : TEB:hStdOutputEncode expected 0x8, but got 0x2e"
+   },
+   {
+    "file": "process.c",
+    "line": 3690,
+    "text": "pseudoconsole_cui[17] : TEB:hStdInputEncode expected 0x2e, but got 0xe"
+   },
+   {
+    "file": "process.c",
+    "line": 3691,
+    "text": "pseudoconsole_cui[17] : TEB:hStdOutputEncode expected 0x2e, but got 0xe"
+   },
+   {
+    "file": "process.c",
+    "line": 3690,
+    "text": "pseudoconsole_cui[19] : TEB:hStdInputEncode expected 0x2e, but got 0x4e"
+   },
+   {
+    "file": "process.c",
+    "line": 3691,
+    "text": "pseudoconsole_cui[19] : TEB:hStdOutputEncode expected 0x2e, but got 0x4e"
+   }
+  ],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "log": "klog/wt-host-i386-kernel32-process-1791424183095214522.log",
+  "seconds": 22.2,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 48,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 3624,
+   "todo": 172
+  },
+  "todo_lines": 172
+ }
+}

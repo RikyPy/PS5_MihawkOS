@@ -1,0 +1,55 @@
+{
+ "run": "carrier-xo32-2026-10-19-01",
+ "elf_sha256": "cebca59c01a82a914d6c8262ba6bb02980c17250e802e24b06141fe5a9359749",
+ "source_sha256": "c38d586ceeb0c4593c2be398f9b1cd906d223c1d5a7de06d51f908aace49405c",
+ "process": "payload through websrv/elfldr in the NPXS40112 carrier, no title running",
+ "passed": true,
+ "stopped_by": null,
+ "modes": {
+  "xo32": {
+   "passed": true,
+   "ended": true,
+   "stopped": false,
+   "last_step": "CARRIER end mode=xo32",
+   "returned": [
+    "CARRIER xo32 control returned cs=0x33 ss=0x3b value=42 want=42",
+    "CARRIER xo32 low returned cs=0x33 ss=0x3b value=42 want=42"
+   ],
+   "lines": [
+    "CARRIER start mode=xo32 pid=114 text=200008880",
+    "CARRIER map before low start=0x400000 end=0x454000 prot=0x4 type=0 flags=0x1 name=executable",
+    "CARRIER map before low start=0x454000 end=0x470000 prot=0x1 type=0 flags=0x1 name=executable",
+    "CARRIER map before low start=0x470000 end=0x474000 prot=0x1 type=0 flags=0x1 name=executable",
+    "CARRIER map before low start=0x474000 end=0x478000 prot=0x3 type=0 flags=0x1 name=executable",
+    "CARRIER map before low start=0x478000 end=0x584000 prot=0x3 type=0 flags=0x1 name=executable",
+    "CARRIER map before above start=0x200000000 end=0x20000c000 prot=0x3 type=0 flags=0x1 name=(NoName)SceSpZeroConfMain",
+    "CARRIER modules before status=0 count=1",
+    "CARRIER module before handle=0 name=eboot.bin seg=0x400000+0x54000/0x4 seg=0x454000+0x1c000/0x1 seg=0x470000+0x4000/0x1 seg=0x474000+0x110000/0x3",
+    "CARRIER carrier before module=0",
+    "CARRIER unmap seg=0x400000-0x454000",
+    "CARRIER unmapped seg=0x400000 status=0 errno=0",
+    "CARRIER unmap seg=0x454000-0x470000",
+    "CARRIER unmapped seg=0x454000 status=0 errno=0",
+    "CARRIER unmap seg=0x470000-0x474000",
+    "CARRIER unmapped seg=0x470000 status=0 errno=0",
+    "CARRIER unmap seg=0x474000-0x584000",
+    "CARRIER unmapped seg=0x474000 status=0 errno=0",
+    "CARRIER map released above start=0x200000000 end=0x20000c000 prot=0x3 type=0 flags=0x1 name=(NoName)SceSpZeroConfMain",
+    "CARRIER xo32 released=1",
+    "CARRIER xo32 data=0x10000000",
+    "CARRIER xo xo32 map want=0x590000 got=590000 errno=0",
+    "CARRIER xo32 control jit readonly=0 create=0 scratch=1 map=0 protect=0 query=0 prot=0x5",
+    "CARRIER xo32 control enter code=0x590000 farptr=0x10000020 stack=0x10003000",
+    "CARRIER xo32 control returned cs=0x33 ss=0x3b value=42 want=42",
+    "CARRIER xo xo32 map want=0x400000 got=400000 errno=0",
+    "CARRIER xo32 low jit readonly=0 create=0 scratch=1 map=0 protect=0 query=0 prot=0x5",
+    "CARRIER xo32 low enter code=0x400000 farptr=0x10000020 stack=0x10003000",
+    "CARRIER xo32 low returned cs=0x33 ss=0x3b value=42 want=42",
+    "CARRIER xo32 result control=0 low=0",
+    "CARRIER end mode=xo32"
+   ],
+   "klog_fatal": [],
+   "klog_error": null
+  }
+ }
+}

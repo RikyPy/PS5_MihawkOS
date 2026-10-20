@@ -1,0 +1,60 @@
+{
+  "run": "syscall-trace-pro-gate-2026-10-10-01",
+  "mode": "redirect",
+  "build": {
+    "sdk_revision": "611893fc25ef3e138f5bc2c90d829d8b58174cd2",
+    "source_sha256": "b37630428796cb0a311cc19d845992e50820497a1d9016fc449e3b88f22a5911",
+    "elf_sha256": "234651f8fb2e6d7e08ceac90186c647c716e5c8a768ff5a0fcadb58495685ca2",
+    "host_sha256": "529598794ff75e22e105dac9d87adcedae768c5067e093bdb28e2c0caa4cb138"
+  },
+  "runner_sha256": "4d6b844f8cb6df515ca9120d48bc909b259afd48e747f412fd501e9f2e243196",
+  "question": "Can an owned payload stop native syscall entry, prevent the original pipe write and resume an owned dispatcher on the stopped thread?",
+  "production_changed": false,
+  "wine_integrated": false,
+  "title_launched": false,
+  "host_only": false,
+  "passed": true,
+  "host": {
+    "passed": true,
+    "tracee": [
+      "TRACE_READY pid=677465",
+      "TRACE_RESULT mode=redirect result=1349735538 dispatched=1 pipe_bytes=-1 empty=1 native_ok=1",
+      "TRACE_TRACEE PASS"
+    ],
+    "tracer": [
+      "TRACE_CAPABILITY attached=1 registers=1 register_bytes=216",
+      "TRACE_ENTRY owned=1 code=1 tid=677465",
+      "TRACE_STOP flags=0 kind=2 tid=677465 at_owned=0 result_matches=1",
+      "TRACE_EXIT replacement=getpid result_matches=1 method=owned-return-gate",
+      "TRACE_TRACER PASS mode=redirect stops=6 entries=3 exits=3 replaced=1 ms=8"
+    ],
+    "error": null
+  },
+  "readiness": {
+    "ready": true,
+    "seconds": 0.139,
+    "settle_seconds": 0.0,
+    "census_seconds": 0.126,
+    "previous_cleanup_verified": true
+  },
+  "tracee_pid": 2058,
+  "native": {
+    "tracee": [
+      "TRACE_READY pid=2058",
+      "TRACE_RESULT mode=redirect result=1349735538 dispatched=1 pipe_bytes=-1 empty=1 native_ok=1",
+      "TRACE_TRACEE PASS"
+    ],
+    "tracer": [
+      "TRACE_CAPABILITY attached=1 registers=1 register_bytes=176",
+      "TRACE_ENTRY owned=1 code=4 tid=101538",
+      "TRACE_STOP flags=40 kind=2 tid=101538 at_owned=0 result_matches=1",
+      "TRACE_EXIT replacement=getpid result_matches=1 method=owned-return-gate",
+      "TRACE_TRACER PASS mode=redirect stops=5 entries=4 exits=1 replaced=1 ms=2"
+    ],
+    "passed": true
+  },
+  "post_control": "ok procs app=4294967295 title= count=0 pids=",
+  "leftover_helpers": [],
+  "clean": true,
+  "seconds": 0.431
+}

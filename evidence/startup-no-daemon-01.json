@@ -1,0 +1,35 @@
+{
+  "title": "PPSA99170",
+  "identity": "a9388fdc85994791b875138ba2e561e3",
+  "frames_requested": 300,
+  "eboot_sha256": "502c5fdcfbc2ac04bf461627b84ad83a9f755d33003b8cff453a26aa099178f7",
+  "fresh_identity_seen": true,
+  "shell_idle_after_run": true,
+  "title_finished_successfully": true,
+  "picture_and_log_check_passed": true,
+  "post_launch_fault_records": 0,
+  "post_launch_driver_errors": 0,
+  "elevation": [
+    "timeout (sandbox only)"
+  ],
+  "sample": [
+    "starts",
+    "ok, 300 frames in 5.53 s, 59.9 fps after the first half"
+  ],
+  "library": [
+    "0 game(s); No games installed. searched: /app0/games (not there); /mnt/sandbox/PPSA99170_000/app0/games (not there)"
+  ],
+  "startup_seconds": {
+    "exec": 0.0,
+    "starts": 3.04,
+    "elevation": 3.04,
+    "library": 3.08,
+    "ui": 3.22
+  },
+  "probe": null,
+  "probe_passed": null,
+  "probe_records": [],
+  "passed": true,
+  "capture": "klog/startup-no-daemon-01",
+  "forced_close": false
+}

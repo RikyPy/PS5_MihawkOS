@@ -1,0 +1,166 @@
+From 7ba0fc37b4103e8f69602148724a06bdada70731 Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Sat, 3 Oct 2026 00:39:04 -0400
+Subject: [PATCH] server: keep the registry on disk across a closed or
+ powered-off PS5
+
+A save wrote each branch to a temporary file and renamed it over the old
+one, without a sync: when the console went down right after a save, the
+rename had reached the disk and the data had not, and the probe prefix was
+left with three empty .reg files (2026-10-03, 00:15). And the title replaces
+the process with LoadExec half a second after Wine ends, or at once when it
+stops a running game, racing the save the server starts when the last
+process goes, or skipping it.
+
+On the PS5 a save now syncs each file before the rename, so an interrupted
+save leaves the old branch or the new one. And the title can ask for a save
+and wait for it before LoadExec: pw_wineserver_flush sends a byte with no
+descriptor on the in-process client channel, the server thread saves the
+registry (only it may touch the registry) and reports back; ntdll forwards
+it to the title as pw_wine_server_flush.
+---
+ dlls/ntdll/unix/server.c | 14 ++++++++++
+ server/registry.c        |  9 +++++++
+ server/request.c         | 56 ++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 79 insertions(+)
+
+diff --git a/dlls/ntdll/unix/server.c b/dlls/ntdll/unix/server.c
+index d32f022..0fd8fc2 100644
+--- a/dlls/ntdll/unix/server.c
++++ b/dlls/ntdll/unix/server.c
+@@ -1489,6 +1489,19 @@ static void server_connect_error( const char *serverdir )
+ #ifdef WINE_INPROCESS_SERVER
+ /* the in-process server signals threads through this table on PS5 */
+ static int (*register_server_thread)( long tid, pthread_t thread );
++/* and saves the registry on request (the title asks before replacing the process) */
++static int (*flush_server)( unsigned int timeout_ms );
++
++/***********************************************************************
++ *           pw_wine_server_flush
++ *
++ * For the title: the in-process server's registry on disk, waiting at most
++ * timeout_ms. 0 when saved, -1 with no server or when it did not finish.
++ */
++DECLSPEC_EXPORT int pw_wine_server_flush( unsigned int timeout_ms )
++{
++    return flush_server ? flush_server( timeout_ms ) : -1;
++}
+ 
+ /***********************************************************************
+  *           connect_inprocess_server
+@@ -1530,6 +1543,7 @@ static int connect_inprocess_server(void)
+     if (!(connect_server = dlsym( module, "pw_wineserver_connect" )))
+         fatal_error( "%s has no pw_wineserver_connect\n", module_path );
+     register_server_thread = dlsym( module, "pw_wine_thread_register" );
++    flush_server = dlsym( module, "pw_wineserver_flush" );
+     if ((fd = connect_server( nls_dir )) == -1)
+         fatal_error( "the in-process server %s did not start\n", module_path );
+     TRACE( "connected to the in-process server %s\n", module_path );
+diff --git a/server/registry.c b/server/registry.c
+index 0dc40d5..f989cff 100644
+--- a/server/registry.c
++++ b/server/registry.c
+@@ -2238,7 +2238,16 @@ static int save_branch( struct key *key, const char *filename )
+     }
+ 
+     save_all_subkeys( key, f );
++#ifdef __PROSPERO__
++    /* The console can lose power or be closed right after a save. Without a
++     * sync the rename can reach the disk before the data does, and the branch
++     * is left empty: put the data on disk first, so a save interrupted at any
++     * point leaves either the old file or the new one. */
++    ret = !fflush( f ) && !fsync( fileno( f ));
++    ret = !fclose(f) && ret;
++#else
+     ret = !fclose(f);
++#endif
+ 
+     if (tmp[0])
+     {
+diff --git a/server/request.c b/server/request.c
+index c6249b3..100864a 100644
+--- a/server/request.c
++++ b/server/request.c
+@@ -28,6 +28,10 @@
+ #endif
+ #include <signal.h>
+ #include <stdio.h>
++#ifdef __PROSPERO__
++#include <pthread.h>
++#include <time.h>
++#endif
+ #include <stdlib.h>
+ #include <stdarg.h>
+ #include <string.h>
+@@ -546,6 +550,9 @@ static void master_socket_destroy( struct object *obj )
+ 
+ #ifdef WINE_INPROCESS_SERVER
+ /* receive one client socket sent by connect_inprocess_client */
++#ifdef __PROSPERO__
++static void inprocess_flush_requested(void);
++#endif
+ static int receive_inprocess_client( int channel )
+ {
+     char dummy;
+@@ -567,9 +574,58 @@ static int receive_inprocess_client( int channel )
+         memcpy( &fd, CMSG_DATA( cmsg ), sizeof(fd) );
+         return fd;
+     }
++#ifdef __PROSPERO__
++    if (dummy == 'F') inprocess_flush_requested();
++#endif
+     return -1;
+ }
+ 
++#ifdef __PROSPERO__
++/* The title asks for the registry on disk before it replaces the process
++ * (a game ended, or the title stops it): pw_wineserver_flush sends 'F' on the
++ * client channel, and the server thread, the only one that may touch the
++ * registry, saves it and reports back. */
++static pthread_mutex_t flush_mutex = PTHREAD_MUTEX_INITIALIZER;
++static pthread_cond_t flush_done = PTHREAD_COND_INITIALIZER;
++static unsigned int flush_generation;
++
++static void inprocess_flush_requested(void)
++{
++    flush_registry();
++    pthread_mutex_lock( &flush_mutex );
++    flush_generation++;
++    pthread_cond_broadcast( &flush_done );
++    pthread_mutex_unlock( &flush_mutex );
++}
++
++/* Save the registry and wait for it, at most timeout_ms: 0 when saved. */
++DECLSPEC_EXPORT int pw_wineserver_flush( unsigned int timeout_ms )
++{
++    char request = 'F';
++    unsigned int seen;
++    struct timespec deadline;
++    int status = 0;
++
++    if (client_channel == -1) return -1;
++    pthread_mutex_lock( &flush_mutex );
++    seen = flush_generation;
++    if (send( client_channel, &request, 1, 0 ) != 1)
++    {
++        pthread_mutex_unlock( &flush_mutex );
++        return -1;
++    }
++    clock_gettime( CLOCK_REALTIME, &deadline );
++    deadline.tv_sec += timeout_ms / 1000;
++    deadline.tv_nsec += (long)(timeout_ms % 1000) * 1000000;
++    if (deadline.tv_nsec >= 1000000000) { deadline.tv_sec++; deadline.tv_nsec -= 1000000000; }
++    while (flush_generation == seen && !status)
++        status = pthread_cond_timedwait( &flush_done, &flush_mutex, &deadline );
++    status = flush_generation == seen ? -1 : 0;
++    pthread_mutex_unlock( &flush_mutex );
++    return status;
++}
++#endif
++
+ /* create a connection to the in-process server and return the client end;
+  * the server end is handed to the server thread, which accepts it as a new
+  * process exactly as it would a connection on the master socket */
+-- 
+2.56.0
+

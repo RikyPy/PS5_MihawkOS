@@ -1,0 +1,55 @@
+{
+  "scope": "Eight unchanged PE64 targets in the broker build; does not measure a clean build or full production build",
+  "targets": [
+    "dlls/kernel32/x86_64-windows/kernel32.dll",
+    "dlls/ntdll/x86_64-windows/ntdll.dll",
+    "dlls/user32/x86_64-windows/user32.dll",
+    "dlls/gdi32/x86_64-windows/gdi32.dll",
+    "dlls/combase/x86_64-windows/combase.dll",
+    "dlls/shell32/x86_64-windows/shell32.dll",
+    "dlls/uxtheme/x86_64-windows/uxtheme.dll",
+    "dlls/msvcrt/x86_64-windows/msvcrt.dll"
+  ],
+  "repeats": [
+    {
+      "repeat": 1,
+      "batched": false,
+      "seconds": 3.453,
+      "make_processes": 8
+    },
+    {
+      "repeat": 1,
+      "batched": true,
+      "seconds": 0.507,
+      "make_processes": 1
+    },
+    {
+      "repeat": 2,
+      "batched": false,
+      "seconds": 3.786,
+      "make_processes": 8
+    },
+    {
+      "repeat": 2,
+      "batched": true,
+      "seconds": 0.484,
+      "make_processes": 1
+    },
+    {
+      "repeat": 3,
+      "batched": false,
+      "seconds": 3.825,
+      "make_processes": 8
+    },
+    {
+      "repeat": 3,
+      "batched": true,
+      "seconds": 0.487,
+      "make_processes": 1
+    }
+  ],
+  "individual_median_seconds": 3.786,
+  "batched_median_seconds": 0.487,
+  "binary_hashes_unchanged": true,
+  "passed": true
+}

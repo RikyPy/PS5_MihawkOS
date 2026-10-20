@@ -1,0 +1,48 @@
+--- a/tooling/native/sce_module_writer.hpp
++++ b/tooling/native/sce_module_writer.hpp
+@@ -25,6 +25,7 @@
+     std::string file_name = "eboot.elf";
+     std::uint32_t module_sdk = 0x02000009;
+     std::uint32_t companion_sdk = 0x08050001;
++    std::uint64_t preload_prx_flags = 0;
+     std::vector<std::string> version_components;
+ };
+ 
+--- a/tooling/native/native_app_builder.cpp
++++ b/tooling/native/native_app_builder.cpp
+@@ -264,6 +264,8 @@
+         link_options.module_sdk = static_cast<std::uint32_t>(parse_integer(*value));
+     if (const auto value = option(args, "--companion-sdk"))
+         link_options.companion_sdk = static_cast<std::uint32_t>(parse_integer(*value));
++    if (const auto value = option(args, "--preload-prx-flags"))
++        link_options.preload_prx_flags = parse_integer(*value);
+     for (std::string_view value : options(args, "--component"))
+         link_options.version_components.emplace_back(value);
+ 
+--- a/tooling/native/sce_module_writer.cpp
++++ b/tooling/native/sce_module_writer.cpp
+@@ -677,7 +677,13 @@
+ 
+     const Bytes process_parameters =
+         build_process_parameters(options.module_sdk, options.companion_sdk);
+-    const ParameterBlocks blocks = build_parameter_blocks();
++    ParameterBlocks blocks = build_parameter_blocks();
++    const std::size_t preload_offset = blocks.data.size();
++    if (options.preload_prx_flags != 0)
++    {
++        blocks.data.resize(preload_offset + 8);
++        write_u64(blocks.data, preload_offset, options.preload_prx_flags);
++    }
+     const std::uint64_t process_address =
+         align_up(std::max(relro_content_end, ro_end > relro_start ? ro_end : 0), 8);
+     const std::uint64_t blocks_address = align_up(process_address + process_parameters.size(), 8);
+@@ -782,6 +788,9 @@
+     std::vector<DynamicRelocation> relocations;
+     for (const auto &[offset, addend] : parameter_pointers)
+         relocations.push_back({offset, kRelRelative, addend});
++    if (options.preload_prx_flags != 0)
++        relocations.push_back({process_address + 0x50, kRelRelative,
++                               blocks_address + preload_offset});
+     relocations.insert(relocations.end(), relative.begin(), relative.end());
+     const std::size_t relative_count = relocations.size();
+     relocations.insert(relocations.end(), symbolic.begin(), symbolic.end());

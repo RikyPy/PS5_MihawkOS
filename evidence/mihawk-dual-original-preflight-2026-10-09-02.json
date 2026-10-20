@@ -1,0 +1,36 @@
+{
+  "battery": "mihawk-dual-original-preflight-2026-10-09-02",
+  "expected_cases": [
+    "pe64",
+    "pe32"
+  ],
+  "console": "original",
+  "firmware": "13.40",
+  "revision": "6beb560f49475dcf76ae1cb368103477dda15efa",
+  "dirty": true,
+  "cases": [
+    {
+      "case": "pe64",
+      "run": "mihawk-dual-original-preflight-2026-10-09-02-pe64",
+      "console": "original",
+      "firmware": "13.40",
+      "runner_status": 1,
+      "seconds": 153.9,
+      "result": "runner_error",
+      "probe_verdict": null,
+      "returned_to_launcher": null,
+      "exit_stall": null,
+      "passed": false,
+      "run_seconds": null,
+      "launch_readiness": null,
+      "layout": null,
+      "fault_records": 0,
+      "helpers": 0,
+      "protocol_errors": 0
+    }
+  ],
+  "stopped_after": "pe64",
+  "complete": false,
+  "seconds": 153.9,
+  "passed": false
+}

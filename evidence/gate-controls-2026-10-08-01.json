@@ -1,0 +1,31 @@
+{
+  "battery": "gate-controls-2026-10-08-01",
+  "revision": "d3e024466e097cac01dd7a48607af159081f7056",
+  "dirty": true,
+  "cases": [
+    {
+      "case": "controls-menu",
+      "run": "gate-controls-2026-10-08-01-controls-menu",
+      "runner_status": 0,
+      "seconds": 11.6,
+      "result": null,
+      "probe_verdict": null,
+      "returned_to_launcher": null,
+      "exit_stall": null,
+      "passed": true
+    },
+    {
+      "case": "mouse-controls",
+      "run": "gate-controls-2026-10-08-01-mouse-controls",
+      "runner_status": 1,
+      "seconds": 120.6,
+      "result": "runner_error",
+      "probe_verdict": null,
+      "returned_to_launcher": null,
+      "exit_stall": null,
+      "passed": false
+    }
+  ],
+  "stopped_after": "mouse-controls",
+  "passed": false
+}

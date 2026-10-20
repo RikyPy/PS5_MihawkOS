@@ -1,0 +1,153 @@
+{
+  "about": "Windows 11 design numbers that Microsoft publishes, each with its source and the date it was read (2026-10-12). Tier A = official or MIT-licensed source. Only numbers are kept here, not Microsoft's text or images.",
+  "geometry": {
+    "source": "https://learn.microsoft.com/en-us/windows/apps/design/signature-experiences/geometry",
+    "top_level_corner_radius_px": 8,
+    "in_page_corner_radius_px": 4,
+    "tooltip_corner_radius_px": 4,
+    "bar_corner_radius_px": 4,
+    "overlay_elements_radius_px": 8,
+    "square_when": [
+      "window snapped",
+      "window maximized",
+      "straight edge meets a straight edge",
+      "adjacent parts of one control (split button)"
+    ],
+    "resources": {
+      "ControlCornerRadius": 4,
+      "OverlayCornerRadius": 8
+    }
+  },
+  "title_bar": {
+    "source": "https://learn.microsoft.com/en-us/windows/apps/design/basics/titlebar-design",
+    "standard_height_px": 32,
+    "tall_height_px": 48,
+    "tall_when": "a search box or a person picture is in the title bar",
+    "icon_size_px": 16,
+    "icon_left_margin_px": 16,
+    "icon_vertical_margin_px_at_32": 8,
+    "title_gap_after_icon_px": 16,
+    "title_style": "Caption (12/16), Segoe UI Variable",
+    "default_material": "Mica",
+    "inactive": "all title bar elements semi-transparent",
+    "caption_button_glyphs_segoe_fluent": {
+      "minimize": "E921",
+      "maximize": "E922",
+      "restore": "E923",
+      "close": "E8BB",
+      "back": "E830"
+    },
+    "caption_buttons": "full-bleed backplates; states rest, hover, pressed, active, inactive; maximize and restore glyphs have rounded corners",
+    "caption_button_width_px": 46,
+    "caption_button_width_note": "46 is the width Windows Terminal's source (MIT) gives its caption buttons, which it builds to match the system's; Microsoft's design pages do not state it",
+    "behaviour": {
+      "drag": "all empty title bar space",
+      "double_click": "toggle maximize",
+      "right_click": "system menu",
+      "icon_click": "system menu",
+      "icon_double_click": "close"
+    },
+    "caption_buttons_from_windows_terminal": {
+      "source": "https://github.com/microsoft/terminal/blob/7d06b26f73ef4bcb78b56647c395251eeee4c2bc/src/cascadia/TerminalApp/MinMaxCloseControl.xaml",
+      "licence": "MIT",
+      "width_px": 46,
+      "min_width_px": 46,
+      "height_px_maximized": 32,
+      "height_px_windowed_in_terminal": 40,
+      "glyph_box_px": [
+        10,
+        10
+      ],
+      "close_hover_background": "#C42B1C",
+      "close_pressed_background_opacity": 0.9,
+      "close_pressed_foreground_opacity": 0.7,
+      "hover_background": "SubtleFillColorSecondary",
+      "pressed_background": "SubtleFillColorTertiary",
+      "transition_ms": {
+        "hover_to_normal_background": 150,
+        "hover_to_normal_foreground": 100
+      },
+      "glyphs": {
+        "minimize": "E921",
+        "maximize": "E922",
+        "restore": "E923",
+        "close": "E8BB",
+        "high_contrast": {
+          "minimize": "EF2D",
+          "maximize": "EF2E",
+          "restore": "EF2F",
+          "close": "EF2C"
+        }
+      }
+    }
+  },
+  "elevation": {
+    "source": "https://learn.microsoft.com/en-us/windows/apps/design/signature-experiences/layering",
+    "values": {
+      "window": 128,
+      "dialog": 128,
+      "flyout": 32,
+      "tooltip": 16,
+      "card": 8,
+      "control": 2,
+      "layer": 1
+    },
+    "stroke_width_px": 1,
+    "control_states": {
+      "rest": 2,
+      "hover": 2,
+      "pressed": 1
+    },
+    "note": "the shadow blur and offset behind each elevation value are not published in this page; they are measured in a later step (Tier B or C)"
+  },
+  "motion": {
+    "source": "https://learn.microsoft.com/en-us/windows/apps/design/motion/timing-and-easing",
+    "durations_ms": {
+      "ControlNormalAnimationDuration": 250,
+      "ControlFastAnimationDuration": 167,
+      "ControlFasterAnimationDuration": 83
+    },
+    "easing": {
+      "fast_out_slow_in": {
+        "cubic_bezier": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "use": "objects entering the scene"
+      },
+      "slow_out_fast_in": {
+        "cubic_bezier": [
+          1,
+          0,
+          1,
+          1
+        ],
+        "use": "objects exiting the scene"
+      }
+    },
+    "note": "control-level values; shell animations (Start, task view, window open/close) are not published and are measured separately"
+  },
+  "typography": {
+    "source": "https://learn.microsoft.com/en-us/windows/apps/design/signature-experiences/typography",
+    "font": "Segoe UI Variable (weight and optical-size axes); Selawik is the open font metrically compatible with Segoe UI",
+    "weights": {
+      "regular": 400,
+      "semibold": 600
+    },
+    "minimum": "14 px Semibold, 12 px Regular",
+    "casing": "sentence case",
+    "type_ramp_epx_size_over_line_height": {
+      "Caption": "12/16",
+      "Body": "14/20",
+      "BodyStrong (semibold)": "14/20",
+      "BodyLarge": "18/24",
+      "BodyLargeStrong (semibold)": "18/24",
+      "Subtitle (display semibold)": "20/28",
+      "Title (display semibold)": "28/36",
+      "TitleLarge (display semibold)": "40/52",
+      "Display (display semibold)": "68/92"
+    }
+  }
+}

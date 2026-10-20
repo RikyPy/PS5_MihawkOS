@@ -1,0 +1,50 @@
+{
+  "battery": "loud-failures-2026-10-18-02",
+  "expected_cases": [
+    "launcher-ended",
+    "games-autodetect",
+    "notice-fixed-base32"
+  ],
+  "revision": "f11e3ad27c9b3c72a331ddacb14dd3795f0df79d",
+  "dirty": false,
+  "cases": [
+    {
+      "case": "launcher-ended",
+      "run": "loud-failures-2026-10-18-02-launcher-ended",
+      "runner_status": 0,
+      "seconds": 25.9,
+      "result": "finished",
+      "probe_verdict": null,
+      "returned_to_launcher": true,
+      "exit_stall": null,
+      "passed": true,
+      "run_seconds": null,
+      "launch_readiness": null,
+      "stages": null
+    },
+    {
+      "case": "games-autodetect",
+      "run": "loud-failures-2026-10-18-02-games-autodetect",
+      "runner_status": 1,
+      "seconds": 101.2,
+      "passed": false
+    },
+    {
+      "case": "notice-fixed-base32",
+      "run": "loud-failures-2026-10-18-02-notice-fixed-base32",
+      "runner_status": 0,
+      "seconds": 23.7,
+      "result": "finished",
+      "probe_verdict": null,
+      "returned_to_launcher": true,
+      "exit_stall": null,
+      "passed": true,
+      "run_seconds": null,
+      "launch_readiness": null,
+      "stages": null
+    }
+  ],
+  "complete": true,
+  "seconds": 150.8,
+  "passed": false
+}

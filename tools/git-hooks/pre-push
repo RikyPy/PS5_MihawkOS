@@ -1,0 +1,5 @@
+#!/bin/sh
+# SPDX-License-Identifier: GPL-3.0-or-later
+# The privacy guard (tools/privacy_check.py) on everything a push would publish: the new commits and each pushed tip's
+# whole tree. Remote name and URL arrive in "$@", refs on stdin; installed with pre-commit (core.hooksPath).
+exec python3 "$(dirname "$0")/../privacy_check.py" push "$@"

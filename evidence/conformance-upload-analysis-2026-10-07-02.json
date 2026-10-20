@@ -1,0 +1,114 @@
+{
+  "workload": "tests/gl-upload-probe.c; six concurrent 4096x4096 RGBA8 textures; two release/recreate rounds",
+  "build_fingerprint": "da8343761da748b2991f67bb972b397be7e63f65388617d22a878c5a907a12f3",
+  "results": [
+    {
+      "bits": 32,
+      "pixel_checks": 120,
+      "swap_calls": 120,
+      "rounds": 2,
+      "upload_max_ms": 48,
+      "swap_max_ms": 27,
+      "frame_max_ms": 35803,
+      "run": "conformance-upload-2026-10-07-02-gl-upload32",
+      "passed": false,
+      "run_seconds": 221.3,
+      "watchdog_stop_requested": true,
+      "returned_to_launcher": true,
+      "shown": {
+        "frames": 102,
+        "per_10s": [
+          21,
+          8,
+          4,
+          3,
+          2,
+          1,
+          1,
+          1,
+          1,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          0,
+          0,
+          1,
+          55
+        ],
+        "longest_gap_ms": 35806
+      },
+      "broker": {
+        "local_offer": 8589934592,
+        "host_limit": 1073741824,
+        "refused": [],
+        "refused_count": 0,
+        "clients": [
+          {
+            "pid": -1,
+            "frames": 0,
+            "submissions": 0
+          },
+          {
+            "pid": 3107,
+            "frames": 120,
+            "submissions": 374
+          }
+        ],
+        "host_peak": 415989760,
+        "local_peak": 499515392
+      },
+      "unknown_message_type_0_lines": 182077
+    },
+    {
+      "bits": 64,
+      "pixel_checks": 120,
+      "swap_calls": 120,
+      "rounds": 2,
+      "upload_max_ms": 32,
+      "swap_max_ms": 27,
+      "frame_max_ms": 27,
+      "run": "conformance-upload-2026-10-07-02-gl-upload64",
+      "passed": true,
+      "run_seconds": 9.9,
+      "watchdog_stop_requested": false,
+      "returned_to_launcher": true,
+      "shown": {
+        "frames": 0,
+        "per_10s": [],
+        "longest_gap_ms": 0
+      },
+      "broker": {
+        "local_offer": 8589934592,
+        "host_limit": 1073741824,
+        "refused": [],
+        "refused_count": 0,
+        "clients": [
+          {
+            "pid": -1,
+            "frames": 0,
+            "submissions": 0
+          },
+          {
+            "pid": 3118,
+            "frames": 120,
+            "submissions": 374
+          }
+        ],
+        "host_peak": 415989760,
+        "local_peak": 499515392
+      },
+      "unknown_message_type_0_lines": 0
+    }
+  ],
+  "conclusion": "PE64 completed autonomously in 9.9 seconds. PE32 verified pixels but stalled while processing messages, completed after watchdog stop, and correctly failed the run verdict. The 32-bit whole-frame maximum was 35.803 seconds while SwapBuffers maximum was 27 milliseconds. No broker allocation refusals were recorded.",
+  "limits": [
+    "Exact cause of the PE32 message/input stall remains unqualified.",
+    "120 verified readbacks and swap calls do not qualify real games or full graphics conformance.",
+    "PE64 ended before the first 10-second display counter sample; zero recorded frames is not evidence of no display."
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "run": "compatibility-probes-host-01",
+  "scope": "host-only; no PS5 validation",
+  "wine_revision": "a518d643873ff733bafb31595dfd01ab8bbdf790",
+  "vm_protect": {
+    "passed": true,
+    "executions": 32,
+    "adjacent_writes_and_queries": 480,
+    "probe_sha256": "de72188325c6ebce99eac72aedef4e20df81340549848bf3697bb44debd6e564"
+  },
+  "gl_present": {
+    "passed": false,
+    "reason": "Host Wine could not create a window without an available display; no rendering verdict.",
+    "probe_sha256": "9ea3515f3af45e3f0aee434385f238affba88b0e4e455364d938a03359d11c83"
+  },
+  "host_tests": {
+    "passed": true,
+    "count": 3,
+    "tests": [
+      "wine_dmem_regions",
+      "wine_process_io",
+      "wine_threads"
+    ],
+    "sanitizers": [
+      "address",
+      "undefined"
+    ]
+  }
+}

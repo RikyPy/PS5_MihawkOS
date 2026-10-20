@@ -1,0 +1,232 @@
+From: PS5_Proton
+Subject: [PATCH] server: publish a bounded coherent retained-window snapshot
+
+Keep authoritative window geometry, visibility, stacking, ownership and lifetime
+in Wine. Add generation/native ownership to its private window-info response.
+Publish a copied snapshot after window mutations and asynchronous destruction;
+readers never walk Wine objects or acquire Wine's mutable-state lock. Preserve
+request error state and use the same input desktop as hardware injection.
+The first transport model marks shaped/layered rows unsupported explicitly.
+
+--- a/server/protocol.def
++++ b/server/protocol.def
+@@ -2705,6 +2705,8 @@
+     user_handle_t  last_active; /* last active popup */
+     int            is_unicode;  /* ANSI or unicode */
+     lparam_t       info;        /* current window info value */
++    object_id_t    generation;  /* lifetime identity for retained surfaces */
++    int            native_pid;  /* process allowed to publish this surface */
+ @END
+ 
+ 
+--- a/server/window.c
++++ b/server/window.c
+@@ -37,6 +37,11 @@
+ #include "process.h"
+ #include "user.h"
+ #include "unicode.h"
++#ifdef __PROSPERO__
++#include <pthread.h>
++#include <errno.h>
++#include "pw_window_snapshot.h"
++#endif
+ 
+ /* a window property */
+ struct property
+@@ -57,6 +62,9 @@
+ struct window
+ {
+     struct object    obj;             /* object header */
++#ifdef __PROSPERO__
++    uint64_t         ps5_generation;
++#endif
+     struct window   *parent;          /* parent window */
+     user_handle_t    owner;           /* owner of this window */
+     struct list      children;        /* list of children in Z-order */
+@@ -149,6 +157,88 @@
+     int            total;
+ };
+ 
++#ifdef __PROSPERO__
++/* Only Wine's server thread/lock touches window objects. Broker readers copy
++ * this independent bounded record; they never traverse mutable Wine lists. */
++static uint64_t ps5_window_generation;
++static int ps5_windows_dirty = 1;
++static pthread_mutex_t ps5_snapshot_mutex = PTHREAD_MUTEX_INITIALIZER;
++static PwWindowSnapshot ps5_snapshot;
++struct desktop *ps5_hardware_desktop(void);
++
++DECLSPEC_EXPORT int pw_wineserver_windows(void *output, unsigned int bytes)
++{
++    if (!output || bytes != sizeof(ps5_snapshot)) { errno = EINVAL;return -1; }
++    pthread_mutex_lock(&ps5_snapshot_mutex);
++    memcpy(output, &ps5_snapshot, sizeof(ps5_snapshot));
++    pthread_mutex_unlock(&ps5_snapshot_mutex);
++    return 0;
++}
++
++void ps5_windows_note_request(unsigned int request)
++{
++    switch (request)
++    {
++    case REQ_create_window: case REQ_destroy_window: case REQ_get_desktop_window:
++    case REQ_init_window_info: case REQ_set_window_info: case REQ_set_window_pos:
++    case REQ_set_parent: case REQ_set_window_owner: case REQ_set_window_region:
++    case REQ_update_window_zorder: case REQ_set_window_layered_info:
++    case REQ_create_desktop: case REQ_set_input_desktop: case REQ_set_thread_desktop:
++        ps5_windows_dirty = 1;break;
++    }
++}
++
++static void ps5_snapshot_add(PwWindowSnapshot *snapshot, const struct window *win, int desktop)
++{
++    PwWindowRow *row;
++    if (snapshot->count == PW_WINDOW_LIMIT) { snapshot->overflow = 1;return; }
++    row = &snapshot->windows[snapshot->count++];
++    row->hwnd = win->handle;
++    row->generation = win->ps5_generation;
++    row->pid = win->thread ? win->thread->process->unix_pid : 0;
++    row->windows_pid = win->thread ? win->thread->process->id : 0;
++    row->owner = win->owner;
++    row->left = win->visible_rect.left;
++    row->top = win->visible_rect.top;
++    row->right = win->visible_rect.right;
++    row->bottom = win->visible_rect.bottom;
++    if ((win->style & WS_VISIBLE) && !(win->style & WS_MINIMIZE))row->flags |= PW_WINDOW_VISIBLE;
++    if (desktop)row->flags |= PW_WINDOW_DESKTOP;
++    if (win->win_region || (win->ex_style & WS_EX_LAYERED))row->flags |= PW_WINDOW_UNSUPPORTED;
++}
++
++void ps5_windows_publish(void)
++{
++    PwWindowSnapshot snapshot = {0};
++    struct desktop *desktop;
++    struct window *win;
++    unsigned int saved_error, saved_global_error;
++    if (!ps5_windows_dirty)return;
++    saved_error = get_error();
++    saved_global_error = global_error;
++    snapshot.version = PW_WINDOW_SNAPSHOT_VERSION;
++    snapshot.size = sizeof(snapshot);
++    desktop = ps5_hardware_desktop();
++    if (desktop)
++    {
++        if (desktop->top_window)
++        {
++            LIST_FOR_EACH_ENTRY(win, &desktop->top_window->children, struct window, entry)
++                ps5_snapshot_add(&snapshot,win,0);
++            ps5_snapshot_add(&snapshot,desktop->top_window,1);
++        }
++        release_object(desktop);
++    }
++    set_error(saved_error);
++    global_error = saved_global_error;
++    pthread_mutex_lock(&ps5_snapshot_mutex);
++    snapshot.sequence = ps5_snapshot.sequence + 1;
++    ps5_snapshot = snapshot;
++    pthread_mutex_unlock(&ps5_snapshot_mutex);
++    ps5_windows_dirty = 0;
++}
++#endif
++
+ static const struct rectangle empty_rect;
+ 
+ /* magic HWND_TOP etc. pointers */
+@@ -167,6 +257,9 @@
+ static void window_destroy( struct object *obj )
+ {
+     struct window *win = (struct window *)obj;
++#ifdef __PROSPERO__
++    ps5_windows_dirty = 1;
++#endif
+ 
+     assert( !win->handle );
+ 
+@@ -590,6 +683,9 @@
+ static void detach_window_thread( struct window *win )
+ {
+     struct thread *thread = win->thread;
++#ifdef __PROSPERO__
++    ps5_windows_dirty = 1;
++#endif
+ 
+     if (!thread) return;
+     if (thread->queue)
+@@ -671,6 +767,10 @@
+     }
+ 
+     if (!(win = alloc_object( &window_ops ))) goto failed;
++#ifdef __PROSPERO__
++    win->ps5_generation = ++ps5_window_generation;
++    ps5_windows_dirty = 1;
++#endif
+     win->parent         = parent ? (struct window *)grab_object( parent ) : NULL;
+     win->owner          = owner ? owner->handle : 0;
+     win->thread         = current;
+@@ -2414,6 +2514,10 @@
+ 
+     reply->last_active = win->handle;
+     reply->is_unicode  = win->is_unicode;
++#ifdef __PROSPERO__
++    reply->generation = win->ps5_generation;
++    reply->native_pid = win->thread ? win->thread->process->unix_pid : 0;
++#endif
+     if (get_user_object( win->last_active, NTUSER_OBJ_WINDOW )) reply->last_active = win->last_active;
+ 
+     switch (req->offset)
+--- a/server/queue.c
++++ b/server/queue.c
+@@ -3464,6 +3464,8 @@
+  * 2 middle), 4 close: WM_CLOSE to the foreground window, as a user closing it would. The cursor it leaves is kept
+  * for pw_wineserver_cursor. */
+ static int ps5_cursor_x, ps5_cursor_y;
++/* The same authoritative input desktop used by hardware injection. */
++struct desktop *ps5_hardware_desktop(void) { return get_hardware_input_desktop(0); }
+ 
+ void ps5_inject_input( unsigned int type, unsigned int code, int x, int y, unsigned int down )
+ {
+--- a/server/request.c
++++ b/server/request.c
+@@ -321,6 +321,14 @@
+     else
+         set_error( STATUS_NOT_IMPLEMENTED );
+ 
++#ifdef __PROSPERO__
++    {
++        extern void ps5_windows_note_request(unsigned int);
++        extern void ps5_windows_publish(void);
++        ps5_windows_note_request(req);
++        ps5_windows_publish();
++    }
++#endif
+     if (current)
+     {
+         if (current->reply_fd)
+--- a/server/fd.c
++++ b/server/fd.c
+@@ -598,6 +598,12 @@
+ static inline void fd_poll_event( struct fd *fd, int event )
+ {
+     fd->fd_ops->poll_event( fd, event );
++#ifdef __PROSPERO__
++    {
++        extern void ps5_windows_publish(void);
++        ps5_windows_publish();
++    }
++#endif
+ }
+ 
+ #ifdef USE_EPOLL
+@@ -1123,6 +1129,12 @@
+     while (active_users)
+     {
+         timeout = get_next_timeout( NULL );
++#ifdef __PROSPERO__
++        {
++            extern void ps5_windows_publish(void);
++            ps5_windows_publish();
++        }
++#endif
+ 
+         if (!active_users) break;  /* last user removed by a timeout */
+ 

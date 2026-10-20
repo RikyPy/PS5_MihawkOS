@@ -1,0 +1,33 @@
+From: PS5_Proton
+Subject: [PATCH] ntdll: ps5: tell the section cache how many pages a fault may map
+
+A first touch of a large buffer in a demand-mapped section faulted every 16 KiB
+(a HashLink game in the earlier emulator experiment (removed): 1,400 faults a second). The fault now passes how many
+host pages from the faulting one share its Windows protection exactly, and the
+cache maps up to WINE_PS5_SECTION_CLUSTER of them (default 1) in one call, never
+past the view or over a cached page.
+---
+diff --git a/dlls/ntdll/unix/virtual.c b/dlls/ntdll/unix/virtual.c
+--- a/dlls/ntdll/unix/virtual.c
++++ b/dlls/ntdll/unix/virtual.c
+@@ -5708,8 +5708,17 @@ NTSTATUS virtual_handle_fault( EXCEPTION_RECORD *rec, void *stack )
+         PwWineSectionRetry *retry = (PwWineSectionRetry *)&ntdll_get_thread_data()->ps5_section_retry;
+         unsigned int access = err == EXCEPTION_EXECUTE_FAULT ? PROT_EXEC :
+                               err == EXCEPTION_WRITE_FAULT ? PROT_WRITE : PROT_READ;
++        /* How many host pages from this one share its protection: the cache may map that many in one call (a first touch of
++         * a large buffer would otherwise fault every 16 KiB). */
++        unsigned int run = 1, wanted = __wine_ps5_section_cluster();
++        if (wanted > 1)
++        {
++            BYTE first = get_host_page_vprot( page );
++            while (run < wanted && (char *)page + (run + 1) * (size_t)host_page_size <= (char *)address_space_limit &&
++                   get_host_page_vprot( page + run * (size_t)host_page_size ) == first) run++;
++        }
+         int resolved = __wine_ps5_section_fault( (uintptr_t)addr,
+-                           get_unix_prot( get_host_page_vprot( page ) ), access, retry );
++                           get_unix_prot( get_host_page_vprot( page ) ), access, retry, run );
+         if (resolved > 0) ret = STATUS_SUCCESS;
+         else if (resolved < 0)
+         {
+-- 
+2.56.0

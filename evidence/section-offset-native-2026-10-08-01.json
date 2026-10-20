@@ -1,0 +1,32 @@
+{
+ "run": "section-offset-native-2026-10-08-01",
+ "read_only": false,
+ "temporary_direct_backing_bytes": 0,
+ "kernel_reads": false,
+ "kernel_writes": false,
+ "no_overwrite": true,
+ "payload": true,
+ "elf_sha256": "a09ce96f8085b532e4879688ad50286a5bf315233c7636564be8f8fd37b61bb4",
+ "source_sha256": "ef8fa8d7b8bb8c35656f6a88a641c438bfb865844b7af1810eba93d09e56bbf3",
+ "completed": true,
+ "passed": false,
+ "purpose": "sparse-file mapping length controls; no page writes; not physical capacity",
+ "lines": [
+  "section-arena reserve=0 exact=1",
+  "section-arena open=1 errno=0",
+  "section-arena truncate=0 errno=0",
+  "section-offset bytes=16384 offset=0 exact=1 errno=0",
+  "section-offset unmap=0",
+  "section-offset bytes=16384 offset=8589934592 exact=1 errno=0",
+  "section-offset unmap=0",
+  "section-offset bytes=16384 offset=14495498240 exact=1 errno=0",
+  "section-offset unmap=0",
+  "section-alias-budget first_exact=1 second_exact=0 second_errno=12 same_offset=1 touched_bytes=0",
+  "section-alias-budget first_unmap=0",
+  "section-offset completed=3 expected=3 touched_bytes=0",
+  "section-arena close=0",
+  "section-arena unlink=0",
+  "section-arena arena_unmap=0",
+  "section-arena result=PASS"
+ ]
+}

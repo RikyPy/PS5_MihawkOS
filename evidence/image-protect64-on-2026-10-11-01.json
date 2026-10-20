@@ -1,0 +1,113 @@
+{
+ "telemetry_hold": null,
+ "launch_readiness": {
+  "ready": true,
+  "seconds": 8.065,
+  "settle_seconds": 7.899,
+  "census_seconds": 0.152,
+  "previous_cleanup_verified": false
+ },
+ "native_close_failures": [],
+ "run": "image-protect64-on-2026-10-11-01",
+ "what": "image-protect64-probe.exe",
+ "env": [],
+ "result": "finished",
+ "seconds": 10.4,
+ "probe_verdict": "FAIL",
+ "clean_owner_restart": false,
+ "launcher_end_status": 0,
+ "initial_status": 1,
+ "closed_on_request": false,
+ "child_logs": [
+  "klog/image-protect64-on-2026-10-11-01-wine-child-412.log",
+  "klog/image-protect64-on-2026-10-11-01-wine-child-413.log",
+  "klog/image-protect64-on-2026-10-11-01-wine-child-414.log",
+  "klog/image-protect64-on-2026-10-11-01-wine-child-415.log",
+  "klog/image-protect64-on-2026-10-11-01-wine-child-416.log",
+  "klog/image-protect64-on-2026-10-11-01-wine-child-417.log",
+  "klog/image-protect64-on-2026-10-11-01-wine-child-418.log",
+  "klog/image-protect64-on-2026-10-11-01-wine-child-419.log",
+  "klog/image-protect64-on-2026-10-11-01-wine-child-420.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": false,
+ "bench": {},
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [],
+  "top": []
+ },
+ "shown": {
+  "frames": 0,
+  "per_10s": [],
+  "longest_gap_ms": 0
+ },
+ "broker": {
+  "local_offer": 8589934592,
+  "host_limit": 1073741824,
+  "windows": {
+   "presents": 0,
+   "effect_bytes": 0,
+   "mica_builds": 0,
+   "thumbnail_builds": 0,
+   "compositions": 0,
+   "compose_avg_us": 0,
+   "compose_max_us": 0
+  },
+  "refused": [],
+  "refused_count": 0,
+  "clients": [
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   }
+  ],
+  "wedged": false,
+  "failure_reasons": [],
+  "host_peak": 0,
+  "local_peak": 0
+ },
+ "pacing": null,
+ "captures": [],
+ "cleanup_verified": false,
+ "hooks_removed": true
+}

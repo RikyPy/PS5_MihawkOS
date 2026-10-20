@@ -1,0 +1,251 @@
+From cb180a7b0991b9223957d6d1b52db42615d6ec02 Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Sat, 3 Oct 2026 00:20:11 -0400
+Subject: [PATCH] ntdll: end a thread killed inside the Unix side at the
+ user-mode boundary on PS5
+
+The server kills a thread with SIGQUIT, and Wine's quit_handler ends it at
+once, wherever it is. On the PS5 every Wine thread shares one process with
+the title, the in-process server and the Unix-side heap, so a thread ended
+inside the Unix side takes its locks with it: the heap's single mutex, the
+virtual memory lock, the title's output sink. ExitProcess kills the other
+threads first, and the HID/PnP thread, still starting and tracing, was
+killed holding the output sink's lock: the exiting thread then blocked on
+its next trace, every time a short process exited during HID start.
+
+Windows ends a thread that is in kernel mode only on its way back to user
+mode. quit_handler now does the same for a thread inside a syscall or Unix
+call: it marks the thread, and the syscall and Unix call dispatchers end it
+on return (ps5_dispatcher_terminate), with every Unix-side frame returned. A
+killed thread's closed server connection no longer aborts in place either:
+send_request, the reply read and the wait pipe report
+STATUS_THREAD_IS_TERMINATING, so the caller unwinds and releases what it
+holds before the dispatcher ends the thread. A thread killed in user mode
+still ends at once. abort_process uses exit, so the title's handler returns
+to the launcher, as exit_process already did.
+---
+ dlls/ntdll/unix/server.c        | 44 +++++++++++++++++++++++++++++----
+ dlls/ntdll/unix/signal_x86_64.c | 35 ++++++++++++++++++++++++++
+ dlls/ntdll/unix/thread.c        |  6 +++++
+ dlls/ntdll/unix/unix_private.h  |  6 +++++
+ 4 files changed, 86 insertions(+), 5 deletions(-)
+
+diff --git a/dlls/ntdll/unix/server.c b/dlls/ntdll/unix/server.c
+index 4b74029..d32f022 100644
+--- a/dlls/ntdll/unix/server.c
++++ b/dlls/ntdll/unix/server.c
+@@ -197,6 +197,23 @@ extern void pw_wine_perf_select( int blocked, unsigned long long ticks, unsigned
+ #endif
+ 
+ 
++#ifdef __PROSPERO__
++/***********************************************************************
++ *           ps5_terminating
++ *
++ * The server closed this thread's connection: it was killed. In place of
++ * abort_thread, which would end it wherever it is, possibly holding a lock
++ * every other thread needs, the call fails and the thread ends once it is
++ * back at the user-mode boundary (quit_handler, ps5_dispatcher_terminate).
++ */
++static unsigned int ps5_terminating(void)
++{
++    __atomic_store_n( &ntdll_get_thread_data()->ps5_terminating, 1, __ATOMIC_RELAXED );
++    return STATUS_THREAD_IS_TERMINATING;
++}
++#endif
++
++
+ /***********************************************************************
+  *           send_request
+  *
+@@ -257,7 +274,11 @@ static unsigned int send_request( const struct __server_request_info *req )
+         }
+     }
+ 
++#ifdef __PROSPERO__
++    if (errno == EPIPE) return ps5_terminating();
++#else
+     if (errno == EPIPE) abort_thread(0);
++#endif
+     if (errno == EFAULT) return STATUS_ACCESS_VIOLATION;
+     server_protocol_perror( "write" );
+ }
+@@ -268,7 +289,7 @@ static unsigned int send_request( const struct __server_request_info *req )
+  *
+  * Read data from the reply buffer; helper for wait_reply.
+  */
+-static void read_reply_data( void *buffer, size_t size )
++static BOOL read_reply_data( void *buffer, size_t size )
+ {
+     int ret;
+ 
+@@ -276,7 +297,7 @@ static void read_reply_data( void *buffer, size_t size )
+     {
+         if ((ret = read( ntdll_get_thread_data()->reply_fd, buffer, size )) > 0)
+         {
+-            if (!(size -= ret)) return;
++            if (!(size -= ret)) return TRUE;
+             buffer = (char *)buffer + ret;
+             continue;
+         }
+@@ -286,7 +307,12 @@ static void read_reply_data( void *buffer, size_t size )
+         server_protocol_perror("read");
+     }
+     /* the server closed the connection; time to die... */
++#ifdef __PROSPERO__
++    ps5_terminating();
++    return FALSE;
++#else
+     abort_thread(0);
++#endif
+ }
+ 
+ 
+@@ -297,9 +323,10 @@ static void read_reply_data( void *buffer, size_t size )
+  */
+ static inline unsigned int wait_reply( struct __server_request_info *req )
+ {
+-    read_reply_data( &req->u.reply, sizeof(req->u.reply) );
+-    if (req->u.reply.reply_header.reply_size)
+-        read_reply_data( req->reply_data, req->u.reply.reply_header.reply_size );
++    if (!read_reply_data( &req->u.reply, sizeof(req->u.reply) )) return STATUS_THREAD_IS_TERMINATING;
++    if (req->u.reply.reply_header.reply_size &&
++        !read_reply_data( req->reply_data, req->u.reply.reply_header.reply_size ))
++        return STATUS_THREAD_IS_TERMINATING;
+     return req->u.reply.reply_header.error;
+ }
+ 
+@@ -392,7 +419,11 @@ static int wait_select_reply( void *cookie )
+         ret = read( ntdll_get_thread_data()->wait_fd[0], &reply, sizeof(reply) );
+         if (ret == sizeof(reply))
+         {
++#ifdef __PROSPERO__
++            if (!reply.cookie) return ps5_terminating();  /* thread got killed */
++#else
+             if (!reply.cookie) abort_thread( reply.signaled );  /* thread got killed */
++#endif
+             if (wine_server_get_ptr(reply.cookie) == cookie) return reply.signaled;
+             /* we stole another reply, wait for the real one */
+             signaled = wait_select_reply( cookie );
+@@ -407,6 +438,9 @@ static int wait_select_reply( void *cookie )
+             }
+             return signaled;
+         }
++#ifdef __PROSPERO__
++        if (!ret) return ps5_terminating();  /* the server closed the wait pipe */
++#endif
+         if (ret >= 0) server_protocol_error( "partial wakeup read %d\n", ret );
+         if (errno == EINTR) continue;
+         server_protocol_perror("wakeup read");
+diff --git a/dlls/ntdll/unix/signal_x86_64.c b/dlls/ntdll/unix/signal_x86_64.c
+index 72381fb..55319e8 100644
+--- a/dlls/ntdll/unix/signal_x86_64.c
++++ b/dlls/ntdll/unix/signal_x86_64.c
+@@ -2986,6 +2986,17 @@ static void quit_handler( int signal, siginfo_t *siginfo, void *sigcontext )
+     ucontext_t *ucontext = init_handler( sigcontext );
+ 
+     if (!is_inside_syscall( RSP_sig(ucontext) )) user_mode_abort_thread( 0, get_syscall_frame() );
++#ifdef __PROSPERO__
++    /* Inside the Unix side the thread may hold any of its locks: the heap,
++     * the virtual memory lock, the title's output sink. Every thread of a PS5
++     * title lives in this one process, so a lock it takes with it hangs the
++     * thread that ends the process. Windows ends a thread in kernel mode only
++     * on its way back to user mode; do the same: mark it, and the syscall or
++     * Unix call dispatcher ends it there (ps5_dispatcher_terminate), once
++     * every Unix-side frame has returned and released what it held. */
++    __atomic_store_n( &ntdll_get_thread_data()->ps5_terminating, 1, __ATOMIC_RELAXED );
++    return;
++#endif
+     abort_thread( 0 );
+ }
+ 
+@@ -3599,6 +3610,10 @@ __ASM_GLOBAL_FUNC( __wine_syscall_dispatcher,
+                    "callq *%r12\n\t"
+                    "leaq -0x98(%rbp),%rcx\n\t"
+                    __ASM_LOCAL_LABEL("__wine_syscall_dispatcher_return") ":\n\t"
++#ifdef __PROSPERO__
++                   "cmpl $0,0x3e0(%r13)\n\t"     /* thread_data->ps5_terminating */
++                   "jnz " __ASM_NAME("ps5_dispatcher_terminate") "\n\t"
++#endif
+                    /* push rbp-based kernel stack cfi */
+                    __ASM_CFI(".cfi_remember_state\n\t")
+                    __ASM_CFI_CFA_IS_AT2(rcx, 0xa8, 0x01) /* frame->syscall_cfa */
+@@ -3777,6 +3792,22 @@ __ASM_GLOBAL_FUNC( __wine_syscall_dispatcher_instrumentation,
+                    "jmp " __ASM_LOCAL_LABEL("__wine_syscall_dispatcher_prolog_end") )
+ 
+ 
++#ifdef __PROSPERO__
++/***********************************************************************
++ *           ps5_dispatcher_terminate
++ *
++ * A thread killed while inside the Unix side (quit_handler) ends here, as it
++ * returns to user mode: on the kernel stack at its syscall frame (%rcx), with
++ * nothing of the Unix side held any more.
++ */
++extern void ps5_dispatcher_terminate(void);
++__ASM_GLOBAL_FUNC( ps5_dispatcher_terminate,
++                   "movq %rcx,%rsp\n\t"
++                   "andq $~15,%rsp\n\t"
++                   "xorl %edi,%edi\n\t"
++                   "call " __ASM_NAME("abort_thread") )
++#endif
++
+ /***********************************************************************
+  *           __wine_unix_call_dispatcher
+  */
+@@ -3868,6 +3899,10 @@ __ASM_GLOBAL_FUNC( __wine_unix_call_dispatcher,
+                    "movdqa 0x230(%rcx),%xmm13\n\t"
+                    "movdqa 0x240(%rcx),%xmm14\n\t"
+                    "movdqa 0x250(%rcx),%xmm15\n\t"
++#ifdef __PROSPERO__
++                   "cmpl $0,0x3e0(%r13)\n\t"     /* thread_data->ps5_terminating */
++                   "jnz " __ASM_NAME("ps5_dispatcher_terminate") "\n\t"
++#endif
+                    "testl $0xffff,0xb4(%rcx)\n\t"  /* frame->restore_flags */
+                    "jnz " __ASM_LOCAL_LABEL("__wine_syscall_dispatcher_return") "\n\t"
+                    /* switch to user stack */
+diff --git a/dlls/ntdll/unix/thread.c b/dlls/ntdll/unix/thread.c
+index 823bee1..347b949 100644
+--- a/dlls/ntdll/unix/thread.c
++++ b/dlls/ntdll/unix/thread.c
+@@ -1498,7 +1498,13 @@ void abort_thread( int status )
+  */
+ void abort_process( int status )
+ {
++#ifdef __PROSPERO__
++    /* A title never _exits: exit runs the title's atexit handler, which
++     * returns to the launcher, as process_exit_wrapper does. */
++    exit( get_unix_exit_code( status ));
++#else
+     _exit( get_unix_exit_code( status ));
++#endif
+ }
+ 
+ 
+diff --git a/dlls/ntdll/unix/unix_private.h b/dlls/ntdll/unix/unix_private.h
+index 9b3c48a..41eba23 100644
+--- a/dlls/ntdll/unix/unix_private.h
++++ b/dlls/ntdll/unix/unix_private.h
+@@ -117,6 +117,9 @@ struct ntdll_thread_data
+     void                     *param;         /* thread entry point parameter */
+     void                     *jmp_buf;       /* setjmp buffer for exception handling */
+     int                      *fsync_apc_futex;
++#ifdef __PROSPERO__
++    int                       ps5_terminating; /* 03e0 killed inside the Unix side: end at the boundary */
++#endif
+ };
+ 
+ C_ASSERT( sizeof(struct ntdll_thread_data) <= sizeof(((TEB *)0)->GdiTebBatch) );
+@@ -124,6 +127,9 @@ C_ASSERT( sizeof(struct ntdll_thread_data) <= sizeof(((TEB *)0)->GdiTebBatch) );
+ C_ASSERT( offsetof( TEB, GdiTebBatch ) + offsetof( struct ntdll_thread_data, syscall_table ) == 0x370 );
+ C_ASSERT( offsetof( TEB, GdiTebBatch ) + offsetof( struct ntdll_thread_data, syscall_frame ) == 0x378 );
+ C_ASSERT( offsetof( TEB, GdiTebBatch ) + offsetof( struct ntdll_thread_data, syscall_trace ) == 0x380 );
++#ifdef __PROSPERO__
++C_ASSERT( offsetof( TEB, GdiTebBatch ) + offsetof( struct ntdll_thread_data, ps5_terminating ) == 0x3e0 );
++#endif
+ #else
+ C_ASSERT( offsetof( TEB, GdiTebBatch ) + offsetof( struct ntdll_thread_data, syscall_table ) == 0x214 );
+ C_ASSERT( offsetof( TEB, GdiTebBatch ) + offsetof( struct ntdll_thread_data, syscall_frame ) == 0x218 );
+-- 
+2.56.0
+

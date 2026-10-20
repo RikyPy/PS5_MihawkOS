@@ -1,0 +1,94 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: PS5 Proton <ps5proton@invalid>
+Date: Sun, 4 Oct 2026 12:00:00 -0400
+Subject: [PATCH] ntdll: Route an opted-in graphics child into the server-owning title.
+
+A headless initial client runs in a Sony-managed helper. Its designated
+Windows graphics child gets the original native title's unused Wine client
+and GPU context, preserving the startup socket and Windows parent/handles.
+Bind the existing in-process server callbacks before attaching that socket.
+Only one graphics client can use the title; this is explicitly opt-in.
+---
+diff --git a/dlls/ntdll/unix/process.c b/dlls/ntdll/unix/process.c
+--- a/dlls/ntdll/unix/process.c
++++ b/dlls/ntdll/unix/process.c
+@@ -405,7 +405,7 @@
+                                int unixdir, char *winedebug, const struct pe_image_info *pe_info )
+ {
+ #ifdef __PROSPERO__
+-    extern int pw_ps5_spawn(int, const char *, const char *, const char *, const char *);
++    extern int pw_ps5_spawn(int, const char *, const char *, const char *, const char *, unsigned int);
+     UNICODE_STRING nt_cwd = {0}, true_cwd = {0};
+     OBJECT_ATTRIBUTES cwd_attr;
+     char *cwd = NULL;
+@@ -415,8 +415,17 @@
+     nt_cwd.Length = wcslen(nt_cwd.Buffer) * sizeof(WCHAR);
+     InitializeObjectAttributes(&cwd_attr, &nt_cwd, OBJ_CASE_INSENSITIVE, 0, NULL);
+     status = get_nt_and_unix_names(&cwd_attr, &true_cwd, &cwd, FILE_OPEN, FALSE);
++    unsigned int flags = 0;
++    const WCHAR *env = params->Environment;
++    const char *key = "WINE_PS5_GRAPHICS_CHILD=1";
++    for (; env && *env; env += wcslen(env) + 1)
++    {
++        unsigned int i = 0;
++        while (key[i] && env[i] == key[i]) ++i;
++        if (!key[i] && !env[i]) { flags = 2; break; }
++    }
+     if (!status && pw_ps5_spawn(socketfd, getenv("WINE_PS5_NTDLL_DIR"), config_dir, cwd,
+-                               winedebug ? strchr(winedebug, '=') + 1 : NULL)) status = errno_to_status(errno);
++                               winedebug ? strchr(winedebug, '=') + 1 : NULL, flags)) status = errno_to_status(errno);
+     free(cwd); free(nt_cwd.Buffer); free(true_cwd.Buffer);
+     return status;
+ #else
+@@ -816,7 +826,8 @@
+ #ifdef __PROSPERO__
+     /* Experimental Sony service loader: only PE64, explicitly enabled. */
+     if (!getenv("WINE_PS5_CHILDREN") || strcmp(getenv("WINE_PS5_CHILDREN"), "1") ||
+-        (getenv("WINE_PS5_CHILD") && !ps5_descendants_enabled()) || debug ||
++        (getenv("WINE_PS5_CHILD") && !getenv("WINE_PS5_INITIAL_CLIENT") &&
++         !ps5_descendants_enabled()) || debug ||
+         pe_info.machine != IMAGE_FILE_MACHINE_AMD64 || (machine && machine != IMAGE_FILE_MACHINE_AMD64))
+     {
+         status = STATUS_NOT_SUPPORTED;
+diff --git a/dlls/ntdll/unix/server.c b/dlls/ntdll/unix/server.c
+--- a/dlls/ntdll/unix/server.c
++++ b/dlls/ntdll/unix/server.c
+@@ -1947,6 +1947,16 @@
+     server_pid = -1;
+     if (env_socket)
+     {
++#ifdef __PROSPERO__
++        /* A Windows graphics child may be the first client in the native
++         * title which already hosts the server. Bind its local callbacks,
++         * then attach the parent's existing startup connection. */
++        if (getenv("WINE_PS5_GRAPHICS_OWNER"))
++        {
++            int unused = server_connect();
++            close(unused);
++        }
++#endif
+         fd_socket = atoi( env_socket );
+         if (fcntl( fd_socket, F_SETFD, FD_CLOEXEC ) == -1)
+             fatal_perror( "Bad server socket %d", fd_socket );
+diff --git a/dlls/ntdll/unix/env.c b/dlls/ntdll/unix/env.c
+--- a/dlls/ntdll/unix/env.c
++++ b/dlls/ntdll/unix/env.c
+@@ -2141,6 +2141,18 @@
+     env = malloc( env_size * sizeof(WCHAR) );
+     memcpy( env, (char *)info + info_size, env_size * sizeof(WCHAR) );
+     env_pos = env_size - 1;
++#ifdef __PROSPERO__
++    if (getenv("WINE_PS5_GRAPHICS_OWNER"))
++    {
++        /* Consume the private routing request. The game's ordinary
++         * descendants must use separate helpers, not claim the GPU title. */
++        const char *name = "WINE_PS5_GRAPHICS_CHILD";
++        WCHAR nameW[32];
++        unsigned int i;
++        for (i = 0; name[i]; ++i) nameW[i] = name[i];
++        set_env_var( &env, &env_pos, &env_size, nameW, i, NULL );
++    }
++#endif
+     add_dynamic_environment( &env, &env_pos, &env_size );
+     is_prefix_bootstrap = !!find_env_var( env, env_pos, bootstrapW, ARRAY_SIZE(bootstrapW) );
+     env[env_pos++] = 0;

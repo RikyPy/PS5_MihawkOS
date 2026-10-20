@@ -1,0 +1,62 @@
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Tue, 13 Oct 2026 17:00:00 -0400
+Subject: [PATCH] ntoskrnl, ps5: a device interface takes over its link, whatever
+ is left behind
+
+On the PS5 every program runs its own HID stack on the title's one
+wineserver (patch 0870) and the DualSense's interface link has one name for
+all of them. A link outlives the process that made it. Patch 0941 meant a
+program's bus to replace such a link when IoCreateSymbolicLink answered
+STATUS_OBJECT_NAME_EXISTS, but the server's create_symlink clears that
+status when it opens an existing link, so the old link stayed and the code
+that replaced it never ran (0941 itself listed it as not exercised).
+
+The first session of a new prefix showed it. Wine runs the Mono
+installer's tools while it builds the prefix; one of them started a bus,
+made the link and ended. The game's bus then found its interface listed and
+enabled in 32 ms, and every open of it failed with "path not found": the
+link led to \Device\HID#ac#..., a device of the process that was gone
+(probe run hid-enum-fresh-2026-10-13-02: CreateFile error 3; the link's
+target opened with status c0000034, on every one of 30 rounds). SDL never
+found the DualSense and a .NET game ignored the pad, while XInput read 103
+presses in the user's own run. The same happens whenever a program that
+made a bus ends before the next one starts, in any session.
+
+IoCreateSymbolicLink's answer is not used any more: the interface deletes
+the link of its name first, then makes its own, so the name always leads to
+the newest program's device ("a program's DualSense is its own", 0941).
+---
+diff --git a/dlls/ntoskrnl.exe/pnp.c b/dlls/ntoskrnl.exe/pnp.c
+--- a/dlls/ntoskrnl.exe/pnp.c
++++ b/dlls/ntoskrnl.exe/pnp.c
+@@ -883,17 +883,18 @@
+     }
+ 
+     RtlInitUnicodeString( &device_nameU, device_name );
+-    ret = IoCreateSymbolicLink( symlink_name, &device_nameU );
+-    if (ret == STATUS_OBJECT_NAME_EXISTS)
+-    {
+-        /* A link of this name is already there, made by a driver stack that ended without removing it: a link is
+-         * permanent, so it outlives the process that made it. On the PS5 every program runs its own HID stack on
+-         * the title's one server (patch 0870); wineboot's DualSense left its link, the game's DualSense found the
+-         * name taken, its interface stayed disabled, and no program in the game could find the controller
+-         * (2026-10-06). The name belongs to this device now. */
++    /* A link of this name may be there already, made by a driver stack that ended without removing it: a link is
++     * permanent, so it outlives the process that made it. On the PS5 every program runs its own HID stack on the
++     * title's one server (patch 0870), and the name belongs to the program that enabled the interface last, so
++     * this device takes it over. Patch 0941 meant to do that when IoCreateSymbolicLink answered
++     * STATUS_OBJECT_NAME_EXISTS, but the server clears that status (create_symlink opens the existing link and
++     * reports success), so the old link stayed, still leading to a device that was gone. In the first session of a
++     * new prefix the Mono installer's tools had made one before the game started: the game's interface was listed
++     * and enabled, every open of it failed with "path not found", and SDL never found the DualSense (probe run
++     * hid-enum-fresh-2026-10-13-02: link target \Device\HID#ac#..., opening it status c0000034). */
++    if (!IoDeleteSymbolicLink( symlink_name ))
+         MESSAGE( "[PS5 Proton] %s: replacing a link left behind\n", debugstr_us( symlink_name ) );
+-        if (!(ret = IoDeleteSymbolicLink( symlink_name ))) ret = IoCreateSymbolicLink( symlink_name, &device_nameU );
+-    }
++    ret = IoCreateSymbolicLink( symlink_name, &device_nameU );
+     free( device_name );
+     return ret;
+ }
+-- 
+2.56.0

@@ -1,0 +1,37 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Sun, 4 Oct 2026 23:30:00 -0400
+Subject: [PATCH] win32u: on PS5, report the refresh rate the title asked of the display
+
+The PS5 driver's one display mode said 60 Hz whatever the output did. A game that opts in to 119.88 Hz
+output (PS5_Proton's PROTON_120HZ, which points RADV at the title's high-frame-rate declaration) ran
+at 119.88 Hz on the console (2026-10-04, record removed from the tree; in git history: the shell reports 2560x1440 at 119.8801 Hz, frames paced
+at 8.5 ms) while a Java game's debug screen still said "@60Hz", read from this mode. The title now
+passes the rate it asked for in WINE_PS5_REFRESH; without it the mode stays at 60 Hz.
+---
+  dlls/win32u/ps5drv.c | 5 ++++-
+  1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/dlls/win32u/ps5drv.c b/dlls/win32u/ps5drv.c
+index 6c8da1b..9c4870d 100644
+--- a/dlls/win32u/ps5drv.c
++++ b/dlls/win32u/ps5drv.c
+@@ -203,6 +203,9 @@ static UINT ps5_UpdateDisplayDevices( const struct gdi_device_manager *manager,
+     struct pci_id pci_id = {0};
+     struct gdi_monitor monitor = {0};
+     DEVMODEW mode = {.dmSize = sizeof(mode)};
++    /* WINE_PS5_REFRESH: the rate the title asked of the display (120 for a game that opts in
++     * to 119.88 Hz output); a game reads it to pace itself and to show it */
++    const char *refresh = getenv( "WINE_PS5_REFRESH" );
+ 
+     mode.dmFields = DM_DISPLAYORIENTATION | DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT |
+                     DM_DISPLAYFLAGS | DM_DISPLAYFREQUENCY | DM_POSITION;
+@@ -210,7 +213,7 @@ static UINT ps5_UpdateDisplayDevices( const struct gdi_device_manager *manager,
+     mode.dmBitsPerPel = 32;
+     mode.dmPelsWidth = screen_width;
+     mode.dmPelsHeight = screen_height;
+-    mode.dmDisplayFrequency = 60;
++    mode.dmDisplayFrequency = refresh && atoi( refresh ) > 0 ? atoi( refresh ) : 60;
+ 
+     SetRect( &monitor.rc_monitor, 0, 0, screen_width, screen_height );
+     monitor.rc_work = monitor.rc_monitor;

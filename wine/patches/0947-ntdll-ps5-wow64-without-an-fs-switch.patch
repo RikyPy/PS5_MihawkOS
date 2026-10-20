@@ -1,0 +1,364 @@
+From 7c6268b8586ddc9e5234d974f75deb364408938d Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Wed, 7 Oct 2026 18:03:53 -0400
+Subject: [PATCH] ntdll: PS5: WoW64 without an FS switch.
+
+In 32-bit code the CPU ignores the upper half of the FS base. A WoW64
+thread's 32-bit TEB placed at the low 32 bits of its own libkernel
+thread pointer (the host FS base) is therefore what 32-bit code finds
+through %fs while the host base stays in place, and a crossing needs
+no sysarch at all. Measured on the console (PS5_Proton's M0 fsalias
+mode): fs:[0x18] read the alias, and a 64->32->64 round trip took
+55 ns. The FS switch of patch 0945 made a 32-bit system call cost
+5.2 us against 1.2 us from 64-bit code (cross probe).
+
+- libkernel's thread pointers lie 16 KiB apart from 0x8ff800080
+  (measured for 17 threads), so their low halves fall in a window
+  at 0xff800000 the process reserves at start; the TEB blocks of
+  WoW64 threads go just below it, where WowTebOffset reaches;
+- each thread moves its 32-bit TEB there itself, before any 32-bit
+  code runs, fixing the fields that point into the TEB; the creating
+  thread waits for it, since kernelbase writes to the new TEB;
+- the dispatcher skips both FS switches for such a thread; on entry
+  it checks libkernel's thread pointer at %fs:0x10, which is absent
+  when 32-bit code (wow64cpu's full-context return) loaded %fs again,
+  and then restores the host base with one sysarch; the signal entry
+  does the same;
+- SS is loaded from its selector again on the way out of a WoW64
+  thread's system call: without the sysarch, the kernel returns
+  through SYSRET, which on AMD keeps the stack segment's cached
+  descriptor from kernel mode, and in compatibility mode the next
+  32-bit ret read [sp] with 16 bits (address 0xfb50 for esp
+  0x0022fb50, the first run of this patch);
+- wow64's ThreadBasicInformation and RtlWow64GetThreadSelectorEntry
+  read the 32-bit TEB's place from the thread's own TEB for threads
+  of this process (another process's keep the usual offset);
+- a thread whose alias falls outside the window, or too far from its
+  64-bit TEB, keeps switching FS as before.
+---
+ dlls/ntdll/process.c            |   3 +
+ dlls/ntdll/unix/signal_x86_64.c | 114 ++++++++++++++++++++++++++++++--
+ dlls/ntdll/unix/thread.c        |   6 ++
+ dlls/ntdll/unix/unix_private.h  |   6 ++
+ dlls/ntdll/unix/virtual.c       |  51 ++++++++++++++
+ dlls/wow64/process.c            |   4 ++
+ 6 files changed, 179 insertions(+), 5 deletions(-)
+
+diff --git a/dlls/ntdll/process.c b/dlls/ntdll/process.c
+index 38ead60..cf0eb92 100644
+--- a/dlls/ntdll/process.c
++++ b/dlls/ntdll/process.c
+@@ -296,6 +296,9 @@ NTSTATUS WINAPI RtlWow64GetThreadSelectorEntry( HANDLE handle, THREAD_DESCRIPTOR
+         if (!NtQueryInformationThread( handle, ThreadBasicInformation, &tbi, sizeof(tbi), NULL ))
+         {
+             ULONG addr = (ULONG_PTR)tbi.TebBaseAddress + 0x2000;  /* 32-bit teb offset */
++            /* PS5: a thread of this process may have its 32-bit TEB elsewhere (signal_wow_alias_teb) */
++            if (tbi.ClientId.UniqueProcess == NtCurrentTeb()->ClientId.UniqueProcess)
++                addr = (ULONG_PTR)tbi.TebBaseAddress + ((TEB *)tbi.TebBaseAddress)->WowTebOffset;
+             entry.BaseLow = addr;
+             entry.HighWord.Bytes.BaseMid = addr >> 16;
+             entry.HighWord.Bytes.BaseHi  = addr >> 24;
+diff --git a/dlls/ntdll/unix/signal_x86_64.c b/dlls/ntdll/unix/signal_x86_64.c
+index 1649a7b..9da9708 100644
+--- a/dlls/ntdll/unix/signal_x86_64.c
++++ b/dlls/ntdll/unix/signal_x86_64.c
+@@ -235,11 +235,24 @@ __ASM_GLOBAL_FUNC( modify_ldt,
+  * title may not issue the system call itself (PPRBUG-22859), and user-mode
+  * wrfsbase is disabled. %rsi is clobbered; %rbx keeps the stack pointer.
+  * A WoW64 thread (amd64_thread_data()->fs set) enters with the 32-bit TEB as
+- * its FS base, so it always gets the host base back here (docs/IA32_DESIGN.md,
+- * M3: the console has no user LDT, so the FS base is the only way). */
++ * its FS base, so it gets the host base back here (docs/IA32_DESIGN.md, M3:
++ * the console has no user LDT, so the FS base is the only way); one whose
++ * 32-bit TEB is at the low half of the host base (signal_wow_alias_teb) only
++ * when 32-bit code loaded %fs again, which libkernel's thread pointer at
++ * %fs:0x10 shows. */
+ # define PW_RESTORE_FS \
+     "cmpw $0,0x338(%r13)\n\t"      /* amd64_thread_data()->fs: a WoW64 thread */ \
+-    "jnz 6f\n\t" \
++    "jz 5f\n\t" \
++    "cmpl $1,0x348(%r13)\n\t"      /* amd64_thread_data()->wow_alias: the host base serves both sides */ \
++    "jne 6f\n\t" \
++    "movw %fs,%si\n\t" \
++    "testw %si,%si\n\t" \
++    "jz 6f\n\t" \
++    "movq %fs:0x10,%rsi\n\t"       /* libkernel's thread pointer: absent when 32-bit code reloaded %fs */ \
++    "cmpq 0x340(%r13),%rsi\n\t"    /* amd64_thread_data()->tcb_thread */ \
++    "je 7f\n\t" \
++    "jmp 6f\n" \
++    "5:\n\t" \
+     "movw %fs,%si\n\t" \
+     "testw %si,%si\n\t" \
+     "jnz 7f\n" \
+@@ -287,6 +300,10 @@ __ASM_GLOBAL_FUNC( modify_ldt,
+ # define PW_GUEST_FS(top) \
+     "cmpw $0,0x338(%r13)\n\t"      /* amd64_thread_data()->fs: a WoW64 thread */ \
+     "jz 8f\n\t" \
++    "movw ds64_sel(%rip),%ss\n\t"  /* SS's descriptor from the GDT again: AMD's SYSRET leaves the kernel's, \
++                                       which compatibility mode uses (a 32-bit ret read [sp], 16 bits) */ \
++    "cmpl $1,0x348(%r13)\n\t"      /* amd64_thread_data()->wow_alias: 32-bit code finds its TEB already */ \
++    "je 8f\n\t" \
+     "movq %rsp,-8(" top ")\n\t"    /* the stack pointer to come back to */ \
+     "leaq -8(" top "),%rsp\n\t" \
+     "pushq %rax\n\t" \
+@@ -644,6 +661,10 @@ struct amd64_thread_data
+     void                **instrumentation_callback; /* 0330 */
+     DWORD                 fs;            /* 0338 WOW TEB selector */
+     DWORD                 mxcsr;         /* 033c Unix-side mxcsr register */
++#ifdef __PROSPERO__
++    void                 *tcb_thread;    /* 0340 libkernel's %fs:0x10 in this thread (signal_wow_alias_teb) */
++    DWORD                 wow_alias;     /* 0348 the 32-bit TEB: 0 not placed yet, 1 at the FS base's low half, 2 switched */
++#endif
+ };
+ 
+ C_ASSERT( sizeof(struct amd64_thread_data) <= sizeof(((struct ntdll_thread_data *)0)->cpu_data) );
+@@ -652,6 +673,10 @@ C_ASSERT( offsetof( TEB, GdiTebBatch ) + offsetof( struct amd64_thread_data, fra
+ C_ASSERT( offsetof( TEB, GdiTebBatch ) + offsetof( struct amd64_thread_data, instrumentation_callback ) == 0x330 );
+ C_ASSERT( offsetof( TEB, GdiTebBatch ) + offsetof( struct amd64_thread_data, fs ) == 0x338 );
+ C_ASSERT( offsetof( TEB, GdiTebBatch ) + offsetof( struct amd64_thread_data, mxcsr ) == 0x33c );
++#ifdef __PROSPERO__
++C_ASSERT( offsetof( TEB, GdiTebBatch ) + offsetof( struct amd64_thread_data, tcb_thread ) == 0x340 );
++C_ASSERT( offsetof( TEB, GdiTebBatch ) + offsetof( struct amd64_thread_data, wow_alias ) == 0x348 );
++#endif
+ 
+ static inline struct amd64_thread_data *amd64_thread_data(void)
+ {
+@@ -1066,7 +1091,17 @@ static inline ucontext_t *init_handler( void *sigcontext )
+ 
+         __asm__ volatile( "movq %%gs:0x30,%0" : "=r" (teb) );   /* NT_TIB.Self */
+         thread_data = (struct amd64_thread_data *)((struct ntdll_thread_data *)&teb->GdiTebBatch)->cpu_data;
+-        if (thread_data->fs) sysarch( AMD64_SET_FSBASE, &thread_data->pthread_teb );
++        if (thread_data->fs && thread_data->wow_alias == 1)
++        {
++            /* the host base, unless 32-bit code loaded %fs again (PW_RESTORE_FS) */
++            void *thread = NULL;
++            WORD sel;
++
++            __asm__ volatile( "movw %%fs,%0" : "=r" (sel) );
++            if (sel) __asm__ volatile( "movq %%fs:0x10,%0" : "=r" (thread) );
++            if (thread != thread_data->tcb_thread) sysarch( AMD64_SET_FSBASE, &thread_data->pthread_teb );
++        }
++        else if (thread_data->fs) sysarch( AMD64_SET_FSBASE, &thread_data->pthread_teb );
+     }
+ #elif defined __APPLE__
+     {
+@@ -1099,7 +1134,7 @@ static inline void leave_handler( ucontext_t *sigcontext )
+         __asm__ volatile( "movw %0,%%fs" :: "r" (fs32_sel) );
+ #elif defined(__PROSPERO__)
+     /* Back to user code (32-bit, or 64-bit PE that never reads %fs): the 32-bit TEB as the FS base. */
+-    if (amd64_thread_data()->fs &&
++    if (amd64_thread_data()->fs && amd64_thread_data()->wow_alias != 1 &&
+         !is_inside_signal_stack( (void *)RSP_sig(sigcontext )) &&
+         !is_inside_syscall( RSP_sig(sigcontext )))
+     {
+@@ -3356,6 +3391,68 @@ static void *mac_thread_gsbase(void)
+ 
+ 
+ #ifdef __PROSPERO__
++/***********************************************************************
++ *           signal_wow_alias_teb
++ *
++ * WoW64 without an FS switch (docs/IA32_DESIGN.md, M4). In 32-bit code the
++ * CPU ignores the upper half of the FS base, so a thread's 32-bit TEB placed
++ * at the low 32 bits of its own thread pointer (the host FS base) is what
++ * 32-bit code finds through %fs while the host base stays in place: measured
++ * on the console, fs:[0x18] then read the alias, and a 64->32->64 round trip
++ * took 55 ns where two sysarch calls took about 4 us. The TEB, set up at its
++ * usual place, moves there here, in the thread itself before any 32-bit code
++ * runs (the creating thread waits: signal_wow_alias_wait). A thread whose
++ * alias is outside the window virtual_wow_alias_commit owns, or too far from
++ * its 64-bit TEB for WowTebOffset, keeps switching FS through sysarch.
++ */
++void signal_wow_alias_teb( TEB *teb )
++{
++    struct amd64_thread_data *data = (struct amd64_thread_data *)((struct ntdll_thread_data *)&teb->GdiTebBatch)->cpu_data;
++    WOW_TEB *old = get_wow_teb( teb ), *new = NULL;
++    void *host = NULL, *thread;
++    LONG_PTR offset = 0;
++
++    if (!old || !cs32_sel || data->wow_alias) return;
++    amd64_get_fsbase( &host );
++    __asm__ volatile( "movq %%fs:0x10,%0" : "=r" (thread) );
++    if ((new = virtual_wow_alias_commit( PtrToUlong( host ), sizeof(*new) )))
++    {
++        offset = (char *)new - (char *)teb;
++        if (offset != (LONG)offset) new = NULL;
++    }
++    if (new)
++    {
++        const ULONG from = PtrToUlong( old ), to = PtrToUlong( new );
++
++        memcpy( new, old, sizeof(*new) );
++        /* the fields that point into the TEB itself (init_teb) */
++#define PW_MOVE(field) if (new->field - from < sizeof(*new)) new->field += to - from
++        PW_MOVE( Tib.Self );
++        PW_MOVE( ActivationContextStackPointer );
++        PW_MOVE( ActivationContextStack.FrameListCache.Flink );
++        PW_MOVE( ActivationContextStack.FrameListCache.Blink );
++        PW_MOVE( StaticUnicodeString.Buffer );
++#undef PW_MOVE
++        new->WowTebOffset = -(LONG)offset;
++        teb->WowTebOffset = offset;
++        if (teb->Tib.ExceptionList == (void *)old) teb->Tib.ExceptionList = (void *)new;
++        data->tcb_thread = thread;
++        data->pthread_teb = host;
++    }
++    TRACE_(seh)( "teb %p: 32-bit TEB %p -> %p\n", teb, old, new );
++    __atomic_store_n( &data->wow_alias, new ? 1 : 2, __ATOMIC_RELEASE );
++}
++
++/* The creating thread returns only once the new thread's 32-bit TEB is in place: kernelbase writes to it. */
++void signal_wow_alias_wait( TEB *teb )
++{
++    struct amd64_thread_data *data = (struct amd64_thread_data *)((struct ntdll_thread_data *)&teb->GdiTebBatch)->cpu_data;
++    unsigned int i;
++
++    if (!get_wow_teb( teb ) || !cs32_sel) return;
++    for (i = 0; i < 100000 && !__atomic_load_n( &data->wow_alias, __ATOMIC_ACQUIRE ); i++) sched_yield();
++}
++
+ /* The kernel's own sigaction, from the payload loader (a raw system call, which a PRX module may not make). Through
+  * libkernel's sigaction a handler is entered by a wrapper that reads %fs first, which in a WoW64 thread can hold the
+  * 32-bit TEB: the process dies before the handler (docs/IA32_DESIGN.md, M0). Registered with the kernel, Wine's
+@@ -3430,6 +3527,13 @@ void signal_init_process(void)
+     }
+ 
+     signal_alloc_thread( NtCurrentTeb() );
++#ifdef __PROSPERO__
++    if (wow_teb)
++    {
++        virtual_wow_alias_init();
++        signal_wow_alias_teb( NtCurrentTeb() );
++    }
++#endif
+ 
+     sig_act.sa_mask = server_block_set;
+     sig_act.sa_flags = SA_SIGINFO | SA_RESTART | SA_ONSTACK;
+diff --git a/dlls/ntdll/unix/thread.c b/dlls/ntdll/unix/thread.c
+index 7fbf0f2..d9b0a30 100644
+--- a/dlls/ntdll/unix/thread.c
++++ b/dlls/ntdll/unix/thread.c
+@@ -1162,6 +1162,9 @@ static void start_thread( TEB *teb )
+     thread_data->syscall_trace = TRACE_ON(syscall);
+     thread_data->pthread_id = pthread_self();
+     pthread_setspecific( teb_key, teb );
++#ifdef __PROSPERO__
++    signal_wow_alias_teb( teb );
++#endif
+     server_init_thread( thread_data->start, &suspend );
+     signal_start_thread( thread_data->start, thread_data->param, suspend, teb );
+ }
+@@ -1488,6 +1491,9 @@ NTSTATUS WINAPI NtCreateThreadEx( HANDLE *handle, ACCESS_MASK access, OBJECT_ATT
+         virtual_free_teb( teb );
+         status = STATUS_NO_MEMORY;
+     }
++#ifdef __PROSPERO__
++    else signal_wow_alias_wait( teb );
++#endif
+     pthread_attr_destroy( &pthread_attr );
+ 
+ done:
+diff --git a/dlls/ntdll/unix/unix_private.h b/dlls/ntdll/unix/unix_private.h
+index c7060f5..4f42bfc 100644
+--- a/dlls/ntdll/unix/unix_private.h
++++ b/dlls/ntdll/unix/unix_private.h
+@@ -349,6 +349,12 @@ extern BOOL get_thread_times( int unix_pid, int unix_tid, LARGE_INTEGER *kernel_
+                               LARGE_INTEGER *user_time );
+ extern void signal_init_threading(void);
+ extern NTSTATUS signal_alloc_thread( TEB *teb );
++#ifdef __PROSPERO__
++extern void signal_wow_alias_teb( TEB *teb );
++extern void signal_wow_alias_wait( TEB *teb );
++extern void virtual_wow_alias_init(void);
++extern void *virtual_wow_alias_commit( ULONG addr, SIZE_T size );
++#endif
+ extern void set_thread_teb( TEB *teb );
+ extern void signal_free_thread( TEB *teb );
+ extern void signal_init_process(void);
+diff --git a/dlls/ntdll/unix/virtual.c b/dlls/ntdll/unix/virtual.c
+index b768b45..97cdf62 100644
+--- a/dlls/ntdll/unix/virtual.c
++++ b/dlls/ntdll/unix/virtual.c
+@@ -4784,6 +4784,51 @@ TEB *virtual_alloc_first_teb(void)
+ }
+ 
+ 
++#ifdef __PROSPERO__
++/* The 32-bit TEBs of WoW64 threads at the low halves of their thread pointers
++ * (signal_wow_alias_teb): libkernel's thread pointers lie 16 KiB apart from
++ * 0x8ff800080 (measured), so the low halves fall in this window, which the
++ * process owns from the start so that nothing else is placed there. The TEB
++ * blocks of WoW64 threads go just below it, where WowTebOffset (a LONG)
++ * reaches the window. */
++#define PW_ALIAS_BASE ((char *)0xff800000)
++#define PW_ALIAS_END  ((char *)0xffff0000)
++#define PW_TEBS_BASE  ((char *)0xfe800000)
++static BOOL pw_alias_window;
++static NTSTATUS allocate_virtual_memory( void **ret, SIZE_T *size_ptr, ULONG type, ULONG protect,
++                                         ULONG_PTR limit_low, ULONG_PTR limit_high,
++                                         ULONG_PTR align, ULONG attributes );
++
++void virtual_wow_alias_init(void)
++{
++    void *base = PW_ALIAS_BASE;
++    SIZE_T size = PW_ALIAS_END - PW_ALIAS_BASE;
++    sigset_t sigset;
++
++    server_enter_uninterrupted_section( &virtual_mutex, &sigset );
++    reserve_area( PW_TEBS_BASE, PW_ALIAS_END );
++    pw_alias_window = !allocate_virtual_memory( &base, &size, MEM_RESERVE, PAGE_READWRITE, 0, 0, 0, 0 );
++    server_leave_uninterrupted_section( &virtual_mutex, &sigset );
++    if (!pw_alias_window) ERR( "no window for 32-bit TEBs at %p: WoW64 threads switch FS\n", PW_ALIAS_BASE );
++}
++
++/* Commits the memory of a 32-bit TEB at addr in the window, zeroed; NULL outside it. It stays committed: a later
++ * thread with the same thread pointer uses it again. */
++void *virtual_wow_alias_commit( ULONG addr, SIZE_T size )
++{
++    char *start = ULongToPtr( addr );
++    void *base;
++    SIZE_T commit;
++
++    if (!pw_alias_window || start < PW_ALIAS_BASE || start + size > PW_ALIAS_END) return NULL;
++    base = ROUND_ADDR( start, page_mask );
++    commit = start + size - (char *)base;
++    if (NtAllocateVirtualMemory( NtCurrentProcess(), &base, 0, &commit, MEM_COMMIT, PAGE_READWRITE )) return NULL;
++    memset( start, 0, size );
++    return start;
++}
++#endif
++
+ /***********************************************************************
+  *           virtual_alloc_teb
+  */
+@@ -4808,6 +4853,12 @@ NTSTATUS virtual_alloc_teb( TEB **ret_teb )
+         {
+             SIZE_T total = 32 * block_size;
+ 
++#ifdef __PROSPERO__
++            /* beside the window of 32-bit TEBs (virtual_wow_alias_init) */
++            if (!pw_alias_window || allocate_virtual_memory( &ptr, &total, MEM_RESERVE | MEM_TOP_DOWN, PAGE_READWRITE,
++                                                             (ULONG_PTR)PW_TEBS_BASE, (ULONG_PTR)PW_ALIAS_BASE - 1,
++                                                             0, 0 ))
++#endif
+             if ((status = NtAllocateVirtualMemory( NtCurrentProcess(), &ptr, user_space_wow_limit,
+                                                    &total, MEM_RESERVE, PAGE_READWRITE )))
+             {
+diff --git a/dlls/wow64/process.c b/dlls/wow64/process.c
+index 90faeb1..26cc930 100644
+--- a/dlls/wow64/process.c
++++ b/dlls/wow64/process.c
+@@ -737,6 +737,10 @@ NTSTATUS WINAPI wow64_NtQueryInformationThread( UINT *args )
+             info32.ExitStatus = info.ExitStatus;
+             info32.TebBaseAddress = is_process_id_wow64( &info.ClientId ) && info.TebBaseAddress ?
+                                     PtrToUlong(info.TebBaseAddress) + 0x2000 : 0;
++            /* PS5: a thread of this process may have its 32-bit TEB elsewhere (ntdll's signal_wow_alias_teb) */
++            if (info32.TebBaseAddress && info.ClientId.UniqueProcess == ULongToHandle( GetCurrentProcessId() ))
++                info32.TebBaseAddress = PtrToUlong( (char *)info.TebBaseAddress +
++                                                    ((TEB *)info.TebBaseAddress)->WowTebOffset );
+             info32.ClientId.UniqueProcess = HandleToULong( info.ClientId.UniqueProcess );
+             info32.ClientId.UniqueThread = HandleToULong( info.ClientId.UniqueThread );
+             info32.AffinityMask = info.AffinityMask;
+-- 
+2.56.0
+

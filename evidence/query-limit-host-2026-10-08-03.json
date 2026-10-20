@@ -1,0 +1,29 @@
+{
+ "run": "query-limit-host-2026-10-08-03",
+ "host_only": true,
+ "wine_revision": "7e893751d256bfe062fd1d159375f024dedfa696",
+ "source_sha256": "fbb29b58131ece35eea1dd40bde04e4c928f78f6a25b7cbfbcdd1fbe539f3fc9",
+ "cases": [
+  {
+   "bits": 32,
+   "exit_code": 0,
+   "seconds": 10.15,
+   "lines": [
+    "0024:warn:debugstr:OutputDebugStringA \"PS5_PROTON_VIRTUAL_QUERY PASS: reserved=102 failures=0 first_free_conflict=00000000 error=0 upper_queries=0 upper_free=0 upper_unavailable=0\\n\""
+   ],
+   "exe_sha256": "fa9dcb246998a19d2d871b16dfacceafe20af2b2eccd13c07d552eface348311",
+   "passed": true
+  },
+  {
+   "bits": 64,
+   "exit_code": 0,
+   "seconds": 0.12,
+   "lines": [
+    "0138:warn:debugstr:OutputDebugStringA \"PS5_PROTON_VIRTUAL_QUERY PASS: reserved=108 failures=0 first_free_conflict=0000000000000000 error=0 upper_queries=11 upper_free=11 upper_unavailable=0\\n\""
+   ],
+   "exe_sha256": "77dd0ac85b2ac822fa3f3d64fe2fdbcff697664266bfbbfaa77e01df63a4357a",
+   "passed": true
+  }
+ ],
+ "passed": true
+}

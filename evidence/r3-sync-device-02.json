@@ -1,0 +1,33 @@
+{
+ "run": "r3-sync-device-02",
+ "what": "sync-probe.exe",
+ "env": [
+  "WINE_PS5_NTSYNC=1"
+ ],
+ "result": "finished",
+ "seconds": 4.8,
+ "probe_verdict": "PASS",
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": false,
+ "passed": true,
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [],
+  "top": []
+ },
+ "bench": {
+  "wait50_ms": 50.0,
+  "event_round_trip_us": 9.44,
+  "set_reset_pair_us": 0.199,
+  "wait_signalled_us": 0.963,
+  "wait_any4_us": 0.991,
+  "wait_all4_us": 1.001,
+  "sem_release_wait_us": 1.079,
+  "mutex_take_release_us": 1.077,
+  "critsec_contended_us": 0.072,
+  "sleep0_us": 4.574,
+  "sleep1_us": 1110.37
+ }
+}

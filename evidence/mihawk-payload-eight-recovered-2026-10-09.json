@@ -1,0 +1,91 @@
+{
+  "question": "Did the crashed test actually start eight simultaneous Windows children?",
+  "source_run": "mihawk-alpha-gate-2026-10-09-09-payload-eight",
+  "collection": "Existing per-PID logs retrieved after user-confirmed full reboot; no new console launch.",
+  "recovered_helper_logs": 17,
+  "owner_log_bytes": 0,
+  "windows_simultaneous_children": {
+    "ready": 8,
+    "alive": 8,
+    "source_native_pid": 1439,
+    "marker_present": true
+  },
+  "children": [
+    {
+      "native_pid": 1447,
+      "exit_request_seconds": 3507.601,
+      "requested_exit_code": 24589,
+      "terminal_begin_ms": 3723138,
+      "terminal_flush_ms": 10,
+      "native_absence_proven": false
+    },
+    {
+      "native_pid": 1448,
+      "exit_request_seconds": 3507.601,
+      "requested_exit_code": 24589,
+      "terminal_begin_ms": 3723138,
+      "terminal_flush_ms": 39,
+      "native_absence_proven": false
+    },
+    {
+      "native_pid": 1449,
+      "exit_request_seconds": 3507.601,
+      "requested_exit_code": 24589,
+      "terminal_begin_ms": 3723138,
+      "terminal_flush_ms": 11,
+      "native_absence_proven": false
+    },
+    {
+      "native_pid": 1450,
+      "exit_request_seconds": 3507.601,
+      "requested_exit_code": 24589,
+      "terminal_begin_ms": 3723135,
+      "terminal_flush_ms": 7,
+      "native_absence_proven": false
+    },
+    {
+      "native_pid": 1451,
+      "exit_request_seconds": 3507.601,
+      "requested_exit_code": 24589,
+      "terminal_begin_ms": 3723135,
+      "terminal_flush_ms": 48,
+      "native_absence_proven": false
+    },
+    {
+      "native_pid": 1452,
+      "exit_request_seconds": 3507.601,
+      "requested_exit_code": 24589,
+      "terminal_begin_ms": 3723135,
+      "terminal_flush_ms": 59,
+      "native_absence_proven": false
+    },
+    {
+      "native_pid": 1453,
+      "exit_request_seconds": 3507.601,
+      "requested_exit_code": 24589,
+      "terminal_begin_ms": 3723135,
+      "terminal_flush_ms": 52,
+      "native_absence_proven": false
+    },
+    {
+      "native_pid": 1454,
+      "exit_request_seconds": 3507.601,
+      "requested_exit_code": 24589,
+      "terminal_begin_ms": 3723135,
+      "terminal_flush_ms": 4,
+      "native_absence_proven": false
+    }
+  ],
+  "cleanup_passed": false,
+  "interpretation": "Eight-child creation and simultaneous liveness worked. All eight requested the expected exit code, then the session failed to complete cleanup. Suspected lifecycle regression versus the last qualified gate; the code change responsible and cause of the console crash remain unproved.",
+  "limits": [
+    "Recovered terminal records occur roughly 215 seconds after the simultaneous exit requests, after host klog stopped; recovery or later intervention may have affected that interval.",
+    "No complete probe PASS, expected child exit results, native absence or owner cleanup proof is present."
+  ],
+  "recovery": {
+    "fresh_boot_confirmed_by_user": true,
+    "idle_and_no_leftover_helpers": true,
+    "stale_test_hooks_removed": true,
+    "new_launches": 0
+  }
+}

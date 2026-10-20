@@ -1,0 +1,29 @@
+From: PS5_Proton <local>
+Subject: [PATCH] ntdll: PS5: the DOS area stays a bare reservation
+
+virtual_init maps 0x10000-0x110000 read-write inside Wine's reserved area, for apps that touch the DOS area without
+allocating it. On PS5 VirtualQuery's walk between views asks the kernel what lies in Wine's reserved space, and since
+patch 1128 an entry that does not read as a bare reservation is a mapping that is not Wine's: occupied. The read-write
+DOS area is such an entry, so a 32-bit program saw no free block below 16 MiB, where it had found 16
+(virtual-query32: reserved=16 on v3-jit-gatecases-2026-10-14, reserved=0 on v2-backend-gate-2026-10-15; the gap log
+read "0x10000-0x110000 reads occupied: protection 0x3 type 12 flags 0x12"). It now stays a bare reservation, as all of
+Wine's reserved space does; a process also keeps the 1 MiB of flexible memory it took.
+
+Console: v3-gap-2026-10-15 measured the cause; the fix is not yet run.
+---
+diff --git a/dlls/ntdll/unix/virtual.c b/dlls/ntdll/unix/virtual.c
+--- a/dlls/ntdll/unix/virtual.c
++++ b/dlls/ntdll/unix/virtual.c
+@@ -4862,6 +4862,12 @@
+ 
+     /* make the DOS area accessible (except the low 64K) to hide bugs in broken apps like Excel 2003 */
+     size = (char *)address_space_start - (char *)0x10000;
++#ifdef __PROSPERO__
++    /* Not on PS5: it stays a bare reservation, as all of Wine's reserved space. Read-write, it is a mapping VirtualQuery's
++     * guard (__wine_ps5_vm_gap) cannot tell from one that is not Wine's, so the 1 MiB read as occupied
++     * ("gap 0x10000-0x110000 reads occupied: protection 0x3", v3-gap-2026-10-15-virtual-query32). */
++    size = 0;
++#endif
+     if (size && mmap_is_in_reserved_area( (void*)0x10000, size ) == 1)
+         anon_mmap_fixed( (void *)0x10000, size, PROT_READ | PROT_WRITE, 0 );
+ #if defined(__PROSPERO__) && defined(_WIN64)

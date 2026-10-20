@@ -1,0 +1,17 @@
+{
+ "run": "native-abi-bounds-2026-10-08-01",
+ "read_only": true,
+ "payload": true,
+ "elf_sha256": "afd3fa287a6b4255947fd17165b48878a15dfda69520365a124e50d9ca0b4846",
+ "source_sha256": "d188388daff6137c3d7eb3b1ba5f7d6b74fc1d7e3d9b044f4315f39493c4985e",
+ "passed": true,
+ "lines": [
+  "kernel relative text=0xffffffffff340000 data=0",
+  "abi=ps5 read=0 entry_count=734",
+  "abi field offset=0x60 user_value=0x400000000800",
+  "abi field offset=0x70 user_value=0x800000000000",
+  "abi=ps4 read=0 entry_count=677",
+  "abi field offset=0x60 user_value=0x400000000800",
+  "abi field offset=0x70 user_value=0x800000000000"
+ ]
+}

@@ -1,0 +1,52 @@
+{
+  "run": "prefix-02",
+  "layout": "launcher",
+  "entry": "proton-prefix-test",
+  "package_sha256": "ec6af1ea0367d16dde6639a89a080a524cebc4d4bedfe00ed0cac4b865a918d8",
+  "probe_sha256": "144623894fb4b6884aa61adc37ab6e637eb110d897b29807d325e5f21f445310",
+  "passed": false,
+  "deployed": true,
+  "runner_status": 1,
+  "result": "timed out",
+  "probe_verdict": null,
+  "seconds": 691.7,
+  "returned_to_launcher": false,
+  "probe_lines": [
+    "OpenSCManager failed (error 1722)",
+    "msiexec exit code 0",
+    "msiexec installed the package: yes",
+    "services listed 0",
+    "system32 has its modules: yes",
+    "the installed program exit code 4294967295",
+    "the installed program ran: NO",
+    "the package's program is in Program Files: NO",
+    "the registry names a Windows version: yes",
+    "the service control manager lists services: NO",
+    "the user's application data folder exists: NO"
+  ],
+  "probe_passed": false,
+  "helpers": [
+    "C:\\\\windows\\\\system32\\\\control.exe",
+    "C:\\\\windows\\\\system32\\\\msiexec.exe",
+    "C:\\\\windows\\\\system32\\\\ntoskrnl.exe",
+    "C:\\\\windows\\\\system32\\\\rundll32.exe",
+    "C:\\\\windows\\\\system32\\\\wineboot.exe",
+    "C:\\\\windows\\\\system32\\\\winemenubuilder.exe",
+    "Z:\\\\data\\\\ps5proton\\\\games\\\\proton-prefix-test\\\\prefix-probe.exe"
+  ],
+  "prefix": {
+    "files": 897,
+    "bytes": 237989192
+  },
+  "prefix_registry": [],
+  "removed": {
+    "game": {
+      "files": 110,
+      "folders": 5
+    },
+    "prefix": {
+      "files": 897,
+      "folders": 133
+    }
+  }
+}

@@ -1,0 +1,55 @@
+From: PS5_Proton <local@invalid>
+Subject: [PATCH] win32u: paint the managed desktop background beneath retained windows
+
+PS5 does not run Explorer as a desktop painter. Load the local managed BMP once
+through the bounded, host-tested decoder. Keep all window pixels opaque and
+fall back to the prior black background when the asset is missing or invalid.
+This supplies the startup default, not dynamic SPI wallpaper changes.
+
+--- a/dlls/win32u/ps5drv.c
++++ b/dlls/win32u/ps5drv.c
+@@ -101,7 +101,7 @@
+  * frames show that part, content_width x content_height, which the title
+  * then centres on the TV as it does any frame. */
+ static UINT content_width, content_height;
+-static UINT32 *screen;
++static UINT32 *screen, *background;
+ static struct ps5_window windows[PS5_MAX_WINDOWS];
+ static UINT window_count;
+ static POINT cursor;
+@@ -282,7 +282,8 @@
+          hwnd = NtUserGetWindowRelative( hwnd, GW_HWNDNEXT ))
+         if ((window = find_window( hwnd )) && window->shown && window->pixels && count < PS5_MAX_WINDOWS)
+             ordered[count++] = window;
+-    memset( screen, 0, (size_t)screen_width * screen_height * sizeof(*screen) );
++    if (background) memcpy( screen, background, (size_t)screen_width * screen_height * sizeof(*screen) );
++    else memset( screen, 0, (size_t)screen_width * screen_height * sizeof(*screen) );
+     while (count)
+     {
+         RECT target;
+@@ -995,6 +996,25 @@
+         ERR( "no memory for a %ux%u desktop\n", screen_width, screen_height );
+         return;
+     }
++    /* The PS5 owner has no Explorer desktop painter. The managed local BMP
++     * supplies the background under retained windows; opaque window pixels stay
++     * opaque. Decode once, not on every frame. A missing asset keeps plain black. */
++    {
++        extern int pw_wine_wallpaper_load( const char *, UINT32 *, unsigned, unsigned );
++        const char *prefix = getenv( "WINEPREFIX" );
++        char path[4096];
++        if (prefix && snprintf( path, sizeof(path), "%s/drive_c/windows/web/wallpaper/proton.bmp", prefix ) < sizeof(path) &&
++            (background = malloc( (size_t)screen_width * screen_height * sizeof(*background) )))
++        {
++            if (pw_wine_wallpaper_load( path, background, screen_width, screen_height ))
++            {
++                free( background );
++                background = NULL;
++            }
++            fprintf( stderr, "wine-ps5: managed wallpaper %s desktop=%ux%u\n",
++                     background ? "loaded" : "absent", screen_width, screen_height );
++        }
++    }
+     present_frame = dlsym( RTLD_DEFAULT, "pw_wine_present" );
+     present_origin = dlsym( RTLD_DEFAULT, "pw_wine_present_origin" );
+     helper_process = getenv( "WINE_PS5_CHILD" ) != NULL;

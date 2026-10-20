@@ -1,0 +1,123 @@
+From: PS5_Proton
+Subject: [PATCH] win32u: publish retained GDI pixels by authoritative window lifetime
+
+Opt-in global HWND composition path. Include the actual local desktop surface,
+keep Wine's surface offsets, and authenticate its publishing native process.
+The native owner determines stacking and visibility from the server snapshot.
+The legacy route stays active until mixed GDI/GPU composition is qualified.
+
+--- a/dlls/win32u/ps5drv.c
++++ b/dlls/win32u/ps5drv.c
+@@ -74,11 +74,12 @@
+     UINT down;
+ };
+ 
+-enum { PS5_MAX_WINDOWS = 64, PS5_INPUT_BATCH = 64 };
++enum { PS5_MAX_WINDOWS = 128, PS5_INPUT_BATCH = 64 };
+ 
+ struct ps5_window
+ {
+     HWND hwnd;
++    UINT64 generation;      /* Wine server lifetime, never inferred from HWND */
+     RECT visible;           /* screen coordinates */
+     BOOL shown;
+     UINT32 *pixels;         /* retained GDI pixels, independent of paint order */
+@@ -91,6 +92,10 @@
+  * draws no cursor of its own, which would stay where this process last saw it. */
+ static void (*present_origin)( INT x, INT y );
+ static BOOL helper_process;
++static BOOL window_surfaces;
++static int (*present_window)( UINT hwnd, UINT64 generation, const void *pixels,
++                              UINT width, UINT height, UINT stride, INT offset_x, INT offset_y );
++static void (*drop_window)( UINT hwnd );
+ static int (*next_input)( struct ps5_input *input );
+ static int (*input_fd)(void);
+ 
+@@ -278,6 +283,8 @@
+     UINT count = 0;
+     RECT clip = {0, 0, screen_width, screen_height};
+ 
++    if (window_surfaces) return; /* The owner composes each HWND, not process frames. */
++
+     for (hwnd = NtUserGetWindowRelative( get_desktop_window(), GW_CHILD ); hwnd;
+          hwnd = NtUserGetWindowRelative( hwnd, GW_HWNDNEXT ))
+         if ((window = find_window( hwnd )) && window->shown && window->pixels && count < PS5_MAX_WINDOWS)
+@@ -314,6 +321,14 @@
+     pthread_mutex_lock( &screen_lock );
+     if ((window = find_window( surface->hwnd )) && window->shown)
+     {
++        if (window_surfaces)
++        {
++            /* Wine retains the full surface under its own lock. Publish those
++             * pixels with their actual surface offset; no second local copy. */
++            okay = !present_window( (UINT)(UINT_PTR)window->hwnd, window->generation,
++                                    color_bits, width, height, width * 4, rect->left, rect->top );
++            goto done;
++        }
+         if (window->width != width || window->height != height)
+         {
+             UINT32 *pixels = calloc( (size_t)width * height, sizeof(*pixels) );
+@@ -417,21 +432,41 @@
+                                   const struct window_rects *new_rects, struct window_surface *surface )
+ {
+     struct ps5_window *window;
+-    BOOL shown = (NtUserGetWindowLongW( hwnd, GWL_STYLE ) & WS_VISIBLE) &&
+-                 NtUserGetAncestor( hwnd, GA_PARENT ) == get_desktop_window();
++    UINT style = NtUserGetWindowLongW( hwnd, GWL_STYLE );
++    BOOL shown = (style & WS_VISIBLE) && !(style & WS_MINIMIZE) &&
++                 (NtUserGetAncestor( hwnd, GA_PARENT ) == get_desktop_window() ||
++                  (window_surfaces && hwnd == get_desktop_window()));
+     BOOL repaint = FALSE;
++    UINT64 generation = 0;
++
++    if (window_surfaces)
++    {
++        SERVER_START_REQ( get_window_info )
++        {
++            req->handle = wine_server_user_handle( hwnd );
++            if (!wine_server_call( req ) && reply->native_pid == getpid())generation = reply->generation;
++        }
++        SERVER_END_REQ;
++        if (!generation) shown = FALSE;
++    }
+ 
+     pthread_mutex_lock( &screen_lock );
+     if (!(window = find_window( hwnd )) && shown && window_count < PS5_MAX_WINDOWS)
+     {
+         window = &windows[window_count++];
+         window->hwnd = hwnd;
++        window->generation = generation;
+         window->shown = FALSE;
+     }
+     if (window)
+     {
+         BOOL changed = window->shown != shown || !EqualRect( &window->visible, &new_rects->visible ) ||
+                        !(swp_flags & SWP_NOZORDER);
++        if (window_surfaces && generation && window->generation != generation)
++        {
++            drop_window( (UINT)(UINT_PTR)hwnd );
++            window->generation = generation;
++        }
+         /* a window just shown may have painted before it had this surface */
+         repaint = shown && !window->shown;
+         window->visible = new_rects->visible;
+@@ -449,6 +484,7 @@
+     pthread_mutex_lock( &screen_lock );
+     if ((window = find_window( hwnd )))
+     {
++        if (window_surfaces) drop_window( (UINT)(UINT_PTR)hwnd );
+         free( window->pixels );
+         *window = windows[--window_count];
+         memset( &windows[window_count], 0, sizeof(windows[window_count]) );
+@@ -1018,6 +1054,11 @@
+     present_frame = dlsym( RTLD_DEFAULT, "pw_wine_present" );
+     present_origin = dlsym( RTLD_DEFAULT, "pw_wine_present_origin" );
+     helper_process = getenv( "WINE_PS5_CHILD" ) != NULL;
++    present_window = dlsym( RTLD_DEFAULT, "pw_wine_window_present" );
++    drop_window = dlsym( RTLD_DEFAULT, "pw_wine_window_drop" );
++    window_surfaces = helper_process && present_window && drop_window &&
++                      getenv( "WINE_PS5_WINDOW_SURFACES" ) &&
++                      !strcmp( getenv( "WINE_PS5_WINDOW_SURFACES" ), "1" );
+     next_input = dlsym( RTLD_DEFAULT, "pw_wine_next_input" );
+     input_fd = dlsym( RTLD_DEFAULT, "pw_wine_input_fd" );
+ #ifdef SONAME_LIBVULKAN

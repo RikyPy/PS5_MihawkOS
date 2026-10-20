@@ -1,0 +1,52 @@
+{
+ "run": "zink-payload-wgl-01",
+ "what": "gl-vertex-probe.exe",
+ "env": [
+  "WINEDLLOVERRIDES=opengl32=n;d3d11,dxgi,d3d10core=n,b;bcrypt=b",
+  "GALLIUM_DRIVER=zink",
+  "WINE_PS5_HID=0",
+  "PROTON_LOADING_SCREEN=0",
+  "PROTON_GPU_CAPTURE=1",
+  "WINEDEBUG=-all,+seh,+debugstr,+loaddll"
+ ],
+ "result": "finished",
+ "seconds": 6.2,
+ "probe_verdict": null,
+ "clean_owner_restart": false,
+ "child_logs": [
+  "klog/zink-payload-wgl-01-wine-child-4872.log",
+  "klog/zink-payload-wgl-01-wine-child-4873.log",
+  "klog/zink-payload-wgl-01-wine-child-4874.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": false,
+ "bench": {},
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [],
+  "top": []
+ },
+ "native_payloads_absent": [
+  {
+   "pid": 4872,
+   "status": -1,
+   "errno": 3,
+   "absent": 1
+  },
+  {
+   "pid": 4873,
+   "status": -1,
+   "errno": 3,
+   "absent": 1
+  },
+  {
+   "pid": 4874,
+   "status": -1,
+   "errno": 3,
+   "absent": 1
+  }
+ ]
+}

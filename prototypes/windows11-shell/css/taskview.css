@@ -1,0 +1,293 @@
+/* Task View (Win+Tab), the virtual desktops strip and the Alt+Tab switcher.
+   Owned by the taskview module (js/taskview.js). Colours are WinUI tokens; sizes follow
+   Windows 11 at 1920x1080, 100% scale. */
+
+/* ---------- Task View ---------- */
+.tv-root {
+  --tv-tint: color-mix(in srgb, var(--SolidBackgroundFillColorBase) 62%, transparent);
+  --tv-hover: var(--ControlFillColorDefault);
+  --tv-pressed: var(--ControlFillColorTertiary);
+  --tv-current: var(--ControlFillColorSecondary); /* one step under hover, so the current tile still answers it */
+  --tv-close-fill: #c42b1c; /* tier-a title_bar close_hover_background, the same in both themes */
+  --tv-close-glyph: #ffffff;
+  --tv-desk-h: clamp(56px, 10vh, 104px);
+  position: fixed;
+  inset: 0 0 var(--taskbar-height) 0;
+  overflow: hidden;
+  outline: none;
+  color: var(--TextFillColorPrimary);
+}
+[data-theme="dark"] .tv-root {
+  --tv-tint: color-mix(in srgb, var(--SolidBackgroundFillColorBase) 66%, transparent);
+  --tv-hover: var(--ControlFillColorSecondary);
+  --tv-current: var(--ControlFillColorDefault);
+}
+.tv-root:focus-visible { outline: none; box-shadow: none; }
+.tv-closing { pointer-events: none; }
+
+/* Acrylic smoke over the desktop: the blurred wallpaper (Mica's sample), the theme tint, noise. */
+.tv-backdrop {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(var(--tv-tint), var(--tv-tint)),
+    var(--mica-image, var(--wallpaper-fallback)) center / cover fixed;
+}
+.tv-backdrop::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--noise);
+  opacity: var(--acrylic-noise-opacity);
+  mix-blend-mode: overlay;
+}
+[data-transparency="off"] .tv-backdrop { background: var(--SolidBackgroundFillColorBase); }
+
+.tv-grid { position: absolute; inset: 0; }
+
+/* A window card: title row above the thumbnail; the hover plate wraps both. */
+.tv-card {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  padding: 0 var(--tv-pad) var(--tv-pad);
+  border-radius: var(--radius-overlay);
+  transition: background-color var(--dur-faster) linear;
+  touch-action: none;
+}
+.tv-card:hover { background-color: var(--tv-hover); }
+.tv-card:active { background-color: var(--tv-pressed); }
+.tv-closing .tv-card { background-color: transparent; box-shadow: none; }
+
+.tv-head, .at-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: var(--tv-head);
+  min-width: 0;
+  padding-left: 4px;
+}
+.tv-title {
+  flex: 1;
+  min-width: 0;
+  font: var(--type-caption);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Close: hidden until the card is hovered or selected; red plate on its own hover. */
+.tv-x {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  margin-right: -4px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--TextFillColorPrimary);
+  opacity: 0;
+  transition: background-color var(--dur-faster) linear, color var(--dur-faster) linear, opacity var(--dur-faster) linear;
+}
+.tv-card:hover .tv-x, .tv-card:focus-visible .tv-x,
+.tv-desk:hover .tv-x, .tv-desk:focus-visible .tv-x,
+.at-item:hover .tv-x, .at-item.selected .tv-x { opacity: 1; }
+.tv-x:hover { background: var(--tv-close-fill); color: var(--tv-close-glyph); }
+.tv-x:active {
+  background: color-mix(in srgb, var(--tv-close-fill) 90%, transparent);
+  color: color-mix(in srgb, var(--tv-close-glyph) 70%, transparent);
+}
+.tv-x:focus-visible { opacity: 1; }
+
+.tv-thumb, .at-thumb {
+  position: relative;
+  flex: none;
+  display: grid;
+  justify-content: center; /* an oversized (cropped) snapshot stays centred and top-aligned */
+  align-content: start;
+  overflow: hidden;
+  background: var(--SolidBackgroundFillColorBase);
+  pointer-events: none;
+}
+.tv-thumb {
+  border-radius: var(--radius-overlay);
+  box-shadow: var(--shadow-16);
+  transform-origin: 0 0;
+  contain: strict; /* a copy of a whole window: its style and layout stay local to the thumbnail */
+}
+.tv-placeholder { place-content: center; color: var(--TextFillColorSecondary); }
+
+/* Keyboard selection: the WinUI focus visual drawn inside the plate's rounded edge. */
+.tv-card:focus-visible, .tv-desk:focus-visible, .at-item.selected {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--FocusStrokeColorOuter), inset 0 0 0 3px var(--FocusStrokeColorInner);
+}
+
+/* Dragging a card toward a desktop: it shrinks under the pointer, more over the strip. */
+.tv-card.tv-dragging {
+  z-index: 50;
+  pointer-events: none;
+  background-color: transparent;
+  scale: 0.72;
+  transition: scale var(--dur-fast) var(--ease-in);
+}
+.tv-card.tv-dragging.tv-over-desk { scale: 0.34; }
+.tv-card.tv-dragging .tv-head { opacity: 0; transition: opacity var(--dur-faster) linear; }
+.tv-card.tv-dragging .tv-thumb { box-shadow: var(--shadow-28); }
+
+/* ---------- desktops strip ---------- */
+.tv-strip {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 12px 12px;
+  background: var(--LayerFillColorDefault);
+  border-top: 1px solid var(--CardStrokeColorDefault);
+}
+.tv-desks {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  gap: 8px;
+  justify-content: safe center;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 2px;
+}
+.tv-desks::-webkit-scrollbar { display: none; }
+
+.tv-desk {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  padding: 0 8px 8px;
+  border-radius: var(--radius-overlay);
+  transition: background-color var(--dur-faster) linear;
+}
+.tv-desk:hover { background-color: var(--tv-hover); }
+.tv-desk:active { background-color: var(--tv-pressed); }
+.tv-desk.current { background-color: var(--tv-current); }
+.tv-desk.current:hover { background-color: var(--tv-hover); }
+.tv-desk.current:active { background-color: var(--tv-pressed); }
+.tv-desk.tv-drop { background-color: var(--tv-hover); }
+
+.tv-desk-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  min-width: 0;
+  padding-left: 4px;
+}
+.tv-desk-name {
+  flex: 1;
+  min-width: 0;
+  font: var(--type-caption);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tv-desk.current .tv-desk-name { font-weight: 600; }
+.tv-desk-input {
+  flex: 1;
+  min-width: 0;
+  height: 24px;
+  margin-right: -4px;
+  padding: 0 6px;
+  font: var(--type-caption);
+  color: var(--TextFillColorPrimary);
+  background: var(--ControlFillColorInputActive);
+  border: 1px solid var(--ControlStrokeColorDefault);
+  border-bottom: 2px solid var(--AccentFillColorDefault);
+  border-radius: var(--radius-control);
+  outline: none;
+}
+.tv-desk-input:focus-visible { outline: none; box-shadow: none; }
+
+.tv-desk-thumb {
+  width: calc(var(--tv-desk-h) * var(--tv-screen, 1.78));
+  height: var(--tv-desk-h);
+  border-radius: var(--radius-control);
+  background: var(--wallpaper, var(--wallpaper-fallback));
+  box-shadow: var(--shadow-8), inset 0 0 0 1px var(--CardStrokeColorDefault);
+  transition: box-shadow var(--dur-faster) linear;
+}
+.tv-desk.tv-drop .tv-desk-thumb { box-shadow: var(--shadow-8), inset 0 0 0 2px var(--AccentFillColorDefault); }
+
+.tv-desk-new .tv-desk-thumb {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: var(--ControlFillColorSecondary);
+  box-shadow: inset 0 0 0 1px var(--ControlStrokeColorDefault);
+  color: var(--TextFillColorPrimary);
+}
+.tv-desk-new:hover .tv-desk-thumb { background: var(--ControlFillColorDefault); }
+.tv-new-label { font: var(--type-caption); white-space: nowrap; }
+
+.tv-scroll {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--ControlFillColorDefault);
+  box-shadow: inset 0 0 0 1px var(--ControlStrokeColorDefault);
+  color: var(--TextFillColorPrimary);
+  transition: background-color var(--dur-faster) linear;
+}
+.tv-scroll:hover { background: var(--ControlFillColorSecondary); }
+.tv-scroll:active { background: var(--ControlFillColorTertiary); color: var(--TextFillColorSecondary); }
+.tv-scroll.off { visibility: hidden; }
+
+/* ---------- Alt+Tab ---------- */
+.at-plate.acrylic {
+  --tv-head: 32px;
+  --tv-close-fill: #c42b1c;
+  --tv-close-glyph: #ffffff;
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 50%;
+  translate: 0 -50%;
+  width: fit-content;
+  max-width: calc(100vw - 32px);
+  max-height: calc(100vh - 32px);
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-content: flex-start;
+  gap: 4px;
+  padding: 12px;
+  overflow-y: auto;
+  color: var(--TextFillColorPrimary);
+  box-shadow: var(--shadow-64);
+}
+.at-item {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  padding: 0 8px 8px;
+  border-radius: var(--radius-overlay);
+  transition: background-color var(--dur-faster) linear;
+}
+.at-item:hover { background-color: var(--SubtleFillColorSecondary); }
+.at-item:active { background-color: var(--SubtleFillColorTertiary); }
+.at-thumb {
+  align-self: center;
+  border-radius: var(--radius-control);
+  box-shadow: var(--shadow-8);
+}

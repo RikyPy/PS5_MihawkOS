@@ -1,0 +1,46 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: PS5 Proton <ps5proton@invalid>
+Date: Sun, 4 Oct 2026 12:00:00 -0400
+Subject: [PATCH] ntdll: Opt in to descendant spawning through the owning title.
+
+Keep the shared Wine server and normal Windows parent/handle registration.
+Headless children transfer the new server connection to their native owner;
+only that title uses Sony's launch client. Enable with the Windows environment
+variable WINE_PS5_DESCENDANTS=1, after bootstrap for isolated probe runs.
+---
+diff --git a/dlls/ntdll/unix/process.c b/dlls/ntdll/unix/process.c
+--- a/dlls/ntdll/unix/process.c
++++ b/dlls/ntdll/unix/process.c
+@@ -703,6 +703,23 @@
+ /**********************************************************************
+  *           NtCreateUserProcess  (NTDLL.@)
+  */
++#ifdef __PROSPERO__
++/* This Windows-environment opt-in is set by the probe after wineboot, so
++ * unrelated bootstrap processes keep the established restriction. */
++static BOOL ps5_descendants_enabled(void)
++{
++    const char *key = "WINE_PS5_DESCENDANTS=1";
++    const WCHAR *env = NtCurrentTeb()->Peb->ProcessParameters->Environment;
++    for (; env && *env; env += wcslen(env) + 1)
++    {
++        unsigned int i = 0;
++        while (key[i] && env[i] == key[i]) ++i;
++        if (!key[i] && !env[i]) return TRUE;
++    }
++    return FALSE;
++}
++#endif
++
+ NTSTATUS WINAPI NtCreateUserProcess( HANDLE *process_handle_ptr, HANDLE *thread_handle_ptr,
+                                      ACCESS_MASK process_access, ACCESS_MASK thread_access,
+                                      OBJECT_ATTRIBUTES *process_attr, OBJECT_ATTRIBUTES *thread_attr,
+@@ -799,7 +816,7 @@
+ #ifdef __PROSPERO__
+     /* Experimental Sony service loader: only PE64, explicitly enabled. */
+     if (!getenv("WINE_PS5_CHILDREN") || strcmp(getenv("WINE_PS5_CHILDREN"), "1") ||
+-        getenv("WINE_PS5_CHILD") || debug ||
++        (getenv("WINE_PS5_CHILD") && !ps5_descendants_enabled()) || debug ||
+         pe_info.machine != IMAGE_FILE_MACHINE_AMD64 || (machine && machine != IMAGE_FILE_MACHINE_AMD64))
+     {
+         status = STATUS_NOT_SUPPORTED;

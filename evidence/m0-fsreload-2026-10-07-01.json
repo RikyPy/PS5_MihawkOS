@@ -1,0 +1,21 @@
+{
+ "run": "m0-fsreload-2026-10-07-01",
+ "elf_sha256": "3194226e8abe02dc0abf24c9af35f77473a202b9dca0f045a6e9f4dc4dd2a0bd",
+ "process": "payload through websrv/elfldr, no title running",
+ "modes": {
+  "fsreload": {
+   "lines": [
+    "M0 start mode=fsreload",
+    "M0 low_page at=10000000",
+    "M0 fsreload host=0x8ff800080 stale=0xff800080 page=ff800000 mapped=ff800000",
+    "M0 fsreload amd64 set=0 read=0x57a1e000 (stale_host) fsbase_after=0x10009000 restored=0",
+    "M0 fsreload amd64_spin set=0 read=0x6e57f500 (guest) fsbase_after=0x10009000 restored=0",
+    "M0 fsreload i386 set=0 read=0x6e57f500 (guest) fsbase_after=0x10009000 restored=0",
+    "M0 fsreload i386_spin set=0 read=0x6e57f500 (guest) fsbase_after=0x10009000 restored=0",
+    "M0 fsreload amd64_after_i386 set=0 read=0x6e57f500 (guest) fsbase_after=0x10009000 restored=0",
+    "M0 end"
+   ],
+   "ended": true
+  }
+ }
+}

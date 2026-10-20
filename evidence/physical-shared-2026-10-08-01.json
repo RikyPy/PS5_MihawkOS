@@ -1,0 +1,21 @@
+{
+ "name": "physical-shared-2026-10-08-01",
+ "question": "Does physical shared backing preserve cross-process and alias coherence without charging touched pages to FMEM?",
+ "bytes": 8388608,
+ "source_sha256": "e7a803e250019886cd4112e5c9387bd51aa5b549a9ce8b783aca07613100c12c",
+ "roles": [
+  {
+   "role": "producer",
+   "output": "physical-shared phase=baseline native=236 resident_status=0 resident_pages=214 direct_status=0x8002000c total=0 largest_available=0\nphysical-shared create=12 errno=0\nphysical-shared phase=producer-held native=236 resident_status=0 resident_pages=214 direct_status=0x8002000c total=0 largest_available=0\nphysical-shared phase=released native=236 resident_status=0 resident_pages=214 direct_status=0x8002000c total=0 largest_available=0\nPS5_PHYSICAL_SHARED FAIL role=producer errno=12\n",
+   "passed": false
+  },
+  {
+   "role": "reader",
+   "output": "physical-shared phase=baseline native=237 resident_status=0 resident_pages=214 direct_status=0x8002000c total=0 largest_available=0\nphysical-shared create=12 errno=0\nphysical-shared phase=producer-held native=237 resident_status=0 resident_pages=214 direct_status=0x8002000c total=0 largest_available=0\nphysical-shared phase=released native=237 resident_status=0 resident_pages=214 direct_status=0x8002000c total=0 largest_available=0\nPS5_PHYSICAL_SHARED FAIL role=producer errno=12\n",
+   "passed": false
+  }
+ ],
+ "passed": false,
+ "post_control": "ok procs app=4294967295 title= count=0 pids=",
+ "qualification": "Invalid role parsing: websrv places the first argument in argv[0], which the scratch probe skipped. Both payloads ran the producer role; cross-process semantics are untested by this attempt."
+}

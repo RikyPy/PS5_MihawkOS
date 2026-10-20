@@ -1,0 +1,81 @@
+{
+  "run": "syscall-trace-pro-thread-gate-2026-10-10-01",
+  "mode": "redirect",
+  "build": {
+    "sdk_revision": "611893fc25ef3e138f5bc2c90d829d8b58174cd2",
+    "source_sha256": "eae94d4b7c380295de0162853d7586fb856cddd405d6c9d1682926f181f03752",
+    "ptrace_adapter_sha256": "32e980c4d690dd0fc358153ec2c8c96ec0a46adbae662625a458d8ae7034f245",
+    "signal_trampoline_sha256": "f57299922d1158fdc3823f44363b6aad9508ed6e733255eaee8c0a6fb2cc15be",
+    "elf_sha256": "a106e0a1d481121f1a86d8e25de15b37df23517aae3317119b74a88a03b5daf0",
+    "host_sha256": "3bb0a2ecf7152ec66b0c0e88753bb91f94999703003abee1b75ad281b6414884"
+  },
+  "runner_sha256": "411cb99ba1d764f3b1f901acca47f9c50c7c92af0943b17b156667002982e865",
+  "question": "Can an owned payload stop native syscall entry, prevent the original pipe write and resume an owned dispatcher on the stopped thread?",
+  "production_changed": false,
+  "wine_integrated": false,
+  "title_launched": false,
+  "host_only": false,
+  "passed": true,
+  "host": {
+    "passed": true,
+    "tracee": [
+      "TRACE_READY pid=794297",
+      "TRACE_RESULT mode=redirect result=1349735538 dispatched=1 pipe_bytes=-1 empty=1 native_ok=1",
+      "TRACE_TRACEE PASS"
+    ],
+    "tracer": [
+      "TRACE_CAPABILITY attached=1 registers=1 register_bytes=216",
+      "TRACE_EVENT status=857f flags=1 tid=794297 signal=0 kind=1",
+      "TRACE_EVENT status=857f flags=2 tid=794297 signal=0 kind=2",
+      "TRACE_EVENT status=857f flags=1 tid=794297 signal=0 kind=1",
+      "TRACE_EVENT status=857f flags=2 tid=794297 signal=0 kind=2",
+      "TRACE_EVENT status=857f flags=1 tid=794297 signal=0 kind=1",
+      "TRACE_ENTRY owned=1 code=1 tid=794297",
+      "TRACE_EVENT status=57f flags=0 tid=794297 signal=5 kind=0",
+      "TRACE_STOP flags=0 kind=2 tid=794297 at_owned=0 result_matches=1",
+      "TRACE_EXIT replacement=getpid result_matches=1 method=owned-return-gate",
+      "TRACE_TRACER PASS mode=redirect stops=6 entries=3 exits=3 replaced=1 ms=8"
+    ],
+    "error": null
+  },
+  "readiness": {
+    "ready": true,
+    "seconds": 0.148,
+    "settle_seconds": 0.0,
+    "census_seconds": 0.137,
+    "previous_cleanup_verified": true
+  },
+  "tracee_pid": 116,
+  "native": {
+    "tracee": [
+      "TRACE_SIGTRAMP result=0 errno=2 start=7eeffc000 end=7ef000000",
+      "TRACE_READY pid=116",
+      "TRACE_RESULT mode=redirect result=1349735538 dispatched=1 pipe_bytes=-1 empty=1 native_ok=1",
+      "TRACE_TRACEE PASS"
+    ],
+    "tracer": [
+      "TRACE_CAPABILITY attached=1 registers=1 register_bytes=176",
+      "syscall-trace: request=33 target=116 errno=14",
+      "TRACE_NATIVE_ERRNO invalid_register_buffer=14 PASS",
+      "TRACE_SIGINFO event=1 flags=24 signo=17 code=2",
+      "TRACE_EVENT status=57f flags=36 tid=101621 signal=0 kind=1",
+      "TRACE_SIGINFO event=1 flags=24 signo=17 code=2",
+      "TRACE_EVENT status=57f flags=36 tid=101621 signal=0 kind=1",
+      "TRACE_SIGINFO event=1 flags=24 signo=17 code=2",
+      "TRACE_EVENT status=57f flags=36 tid=101621 signal=0 kind=1",
+      "TRACE_SIGINFO event=1 flags=24 signo=17 code=2",
+      "TRACE_EVENT status=57f flags=36 tid=101621 signal=0 kind=1",
+      "TRACE_ENTRY owned=1 code=4 tid=101621",
+      "TRACE_SIGINFO event=1 flags=28 signo=5 code=1",
+      "TRACE_EVENT status=57f flags=40 tid=101621 signal=0 kind=2",
+      "TRACE_STOP flags=40 kind=2 tid=101621 at_owned=0 result_matches=1",
+      "TRACE_EXIT replacement=getpid result_matches=1 method=owned-return-gate",
+      "TRACE_TRACER PASS mode=redirect stops=5 entries=4 exits=1 replaced=1 ms=2"
+    ],
+    "passed": true
+  },
+  "post_control": "ok procs app=4294967295 title= count=0 pids=",
+  "leftover_helpers": [],
+  "clean": true,
+  "seconds": 0.443
+}

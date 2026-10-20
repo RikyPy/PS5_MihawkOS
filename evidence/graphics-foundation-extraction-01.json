@@ -1,0 +1,155 @@
+{
+  "schema": 1,
+  "date": "2026-10-06",
+  "scope": "shared-graphics-foundation-extraction",
+  "ps5_vulkan_revision": "ae2c38c68e5f65f912b8ee475ed80a165a66f51d",
+  "ps5_mesa_overlay_and_zink_revision": "f7ce91ac4c3697990bf89d79fdc61ae7cb98570b",
+  "radv_base_revision": "7b59ef27c1b09b9671bc4153c41940c3155c3af2",
+  "radv_archive_sha256": "0ffa39311881236b4872ec77a56bca417ce56c71cefca5954224b9ea8f3a1bf5",
+  "foundation_transport": {
+    "asan_ubsan": true,
+    "packet_bounds": true,
+    "descriptor_transfer": true,
+    "rendezvous": true,
+    "truncation_cleanup": true
+  },
+  "proton_host_tests": [
+    "test_pw_gpu_broker",
+    "test_pw_wine_process_io",
+    "test_pw_wine_prx",
+    "test_pw_wine_start"
+  ],
+  "standalone_owner_display_compile": {
+    "passed": true,
+    "warnings_as_errors": true
+  },
+  "production_build": {
+    "passed": true,
+    "staged_files": 2138,
+    "title_sha256": "146db5037623217adb6cbc13d5f31fd879063cef6e03011678ae556f70990f7d",
+    "payload_loader_sha256": "e25547b132fa71d01bfe8945de74a735bb420de750e65aa86adf7482c2545234"
+  },
+  "native_graphics_probe_build": {
+    "passed": true,
+    "kind": "service-native",
+    "two_native_renderers": true,
+    "draw": true,
+    "present": true,
+    "title_sha256": "c7eb5da07f48a4d3f60e6a65512c03981e9143787aee1a578be80c1c0fa97871",
+    "helper_sha256": "13af0f89d9478c0b18a8614a3dc8a06fa5cb42da5bcf244592d3a573016f2b9b",
+    "client_sha256": "a581f00e7e34d010495893278b840a527ed86066d4876597bd737c7992f94e5f"
+  },
+  "console_run_performed": false,
+  "console_qualification": "pending actual restart and service restoration",
+  "visible_wgl_presentation": "unproved",
+  "native_egl_opengl_frontend": "not implemented",
+  "previous_console_evidence": {
+    "run": "payload-graphics-10",
+    "dxvk_renderers": 4,
+    "submissions": 96,
+    "display_flips": 27,
+    "native_pids_absent": 6,
+    "applies_to_extracted_binaries": false
+  },
+  "wgl_build": {
+    "mesa_version": "26.2.0",
+    "mesa_revision": "f7ce91ac4c3697990bf89d79fdc61ae7cb98570b",
+    "llvm_mingw": "20260922-ucrt",
+    "build_script": "57f2a775d4bec048d2c17dee3e07d0bca2526d2aa1d3da333f8e2546a5f61d0b",
+    "architecture": "x86_64",
+    "driver": "zink",
+    "files": {
+      "libgallium_wgl.dll": "22b133fc0b6cde9d2b253340429aa911d7dd4e659359c8edbc31a15ef318092e",
+      "opengl32.dll": "2304968d508d5b25a719bd2de23ecf3f6353664d746f8edcf7d275f453cd74cb"
+    },
+    "console_validated": false,
+    "zink_source_sha256": "ced82bd27d9f568f4e861c677822fca3545833d369e495b9931902c8cf3f28e4",
+    "foundation_revision": "ae2c38c68e5f65f912b8ee475ed80a165a66f51d"
+  },
+  "broker_client_module": {
+    "wsi": true,
+    "sha256": "96e0ae5091b7cfac86928d2c1691db88e5a0354d84b539341c7d0b22389ba451",
+    "elf_sha256": "1ae59fbce99b4372e182aa191c327a3d8c3ad6eb9700d1990e23fb9c97669f08",
+    "needed": [
+      "libSceLibcInternal.sprx",
+      "libkernel.sprx"
+    ],
+    "sdk_revision": "611893fc25ef3e138f5bc2c90d829d8b58174cd2",
+    "mesa_revision": "7b59ef27c1b09b9671bc4153c41940c3155c3af2",
+    "archive_sha256": "0ffa39311881236b4872ec77a56bca417ce56c71cefca5954224b9ea8f3a1bf5",
+    "recipe_sha256": "efef0a82c7ba4ffd97c225f6969a31bc550938689b03e9fafe2cf69734e8d7c9",
+    "tool_sha256": "678c1a4bce88bfdb42d24b042917a824f68ef01394793f64198bfd3beebb55ec",
+    "source_sha256": {
+      "native/proton_gpu_client.c": "e3fd80ac1f5dad79b75931034f3d4117569223b3df97a7e02ffea6090bbcf727",
+      "native/proton_gpu_vulkan_probe.c": "ae1ea0f6930501350a9fd649234e7576e19b3537dd1f996503799901c99605a7",
+      "native/proton_gpu_vulkan_exports.c": "24fab3b4f140437b751f1c0bd1548b9be2c899a956e2ff91677654b5ccb125cb",
+      "src/pw_gpu_broker.h": "7bdc93fd8aff74182b522e949e9002340fa473195b8de3658ee37c368a21e013",
+      "tools/setup-graphics-foundation.sh": "c15deda1b01722959fde8c5f7fb5a227be3bc54784cc1289fd2d288caf063451",
+      "tools/link_gpu_client.sh": "e1c43d11e36d161a72f4bc88e9fb0b114227097501964e021e2b1165bcee5529",
+      "native/proton_gpu_probe_spv.h": "99b42cc15257777a91efd4f8b7212a6f254ce0b5d680362400146551b254e4fd",
+      "tools/gen_prx_descriptor.py": "3be71c5df76a6695a0e4f7ec0fe28257c6c98596c93bac30d32e771ea8f34cd5",
+      "wine/ps5/prx_eh_frame.ld": "ebf4f2bc7c4f49e85a895053c8f2162c5bcef323cdb99563bb45439c10f34264"
+    },
+    "graphics_foundation_revision": "ae2c38c68e5f65f912b8ee475ed80a165a66f51d",
+    "graphics_foundation": {
+      "wsi": true,
+      "sha256": "9116e7e3b3facba6d6d664cfd0a1e86d518d416c104bd24a8a4e093690675e47",
+      "mesa_base_revision": "7b59ef27c1b09b9671bc4153c41940c3155c3af2",
+      "mesa_overlay_revision": "f7ce91ac4c3697990bf89d79fdc61ae7cb98570b",
+      "sdk_revision": "611893fc25ef3e138f5bc2c90d829d8b58174cd2",
+      "recipe_sha256": "efef0a82c7ba4ffd97c225f6969a31bc550938689b03e9fafe2cf69734e8d7c9",
+      "build_script_sha256": "96850274046431fc9385db889e5725d30e333d9b032c578f50baeb6c30619014",
+      "source_sha256": {
+        "tooling/gpu-broker/.clang-format": "54a8a61c2aab50ee252a944e7acc92c9ee3ce7e19b8866aa0e5b9524089eecef",
+        "tooling/gpu-broker/README.md": "8f90555c062a8d7df7f4f84acd02e7f1a065b63fa160d19a5e7a5eb21b32ab6e",
+        "tooling/gpu-broker/client.c": "d4c03da631c769f4b2cf1b229aacaba1b33b3cb6e8b2d616709e568c8bb65fd5",
+        "tooling/gpu-broker/client.h": "4359a26dc3db60f96f30f32266e068fe2902b56b0ffedc801510d1b035370e73",
+        "tooling/gpu-broker/completion.h": "1bfa0e9aef0d6e5cb242fb894644baf1a8b0738d6eb3abdbfca8330aec9c28ed",
+        "tooling/gpu-broker/display.cpp": "f073929513433a32606f01465514c1a8b0a4672f5657e02e07d7e8466e02bb1d",
+        "tooling/gpu-broker/display.h": "b6ff64dfb8c5f85dd089072f88b2e5e7a5d9ad83f2cef933fdffd2d8fe7de804",
+        "tooling/gpu-broker/frame_page.h": "d79305b8629ae679fb025c9e198f46d52c758fa480610742ffbbbb035764769c",
+        "tooling/gpu-broker/headless_wsi.c": "e44325bdd7585960b9572633ca85bf91f6941e419f5806a27e5773416db7c6f1",
+        "tooling/gpu-broker/packet_io.c": "678b940e9fcc85619626f8135da17eca58d3a83fad3cf7ba0c67d5aa9bad0fe0",
+        "tooling/gpu-broker/packet_io.h": "82049daab4739b87584ed66bec51927d4fa5baa011d49208dfb07cd728699723",
+        "tooling/gpu-broker/protocol.h": "41887216549faa14e07ceb441e3b7bc39ab56906282ce270fda3bf867cab193d",
+        "tooling/gpu-broker/server.cpp": "4b1dc7a6bebe1fcf6d932bacc2eed423db979dabca4e92f1c8d0612cd1bd4890",
+        "tooling/gpu-broker/server.h": "6bc8d30630e4276be7a1439075f80de30e6339e3703851a4ea014c401618158c",
+        "tooling/gpu-broker/test_transport.c": "450a74e94bb4b4aa9b3d8c69d097ef86e4c4fea466448215c7e979159a917935",
+        "tooling/gpu-broker/radv_ps5_platform.h": "24e770da15304fe95a4e0191271bc33f545dc8f964e186408c7996f5bce2aa97"
+      },
+      "patch_sha256": {
+        "radv-gpu-broker-features.patch": "3672d8035f45c808ddfb8c588daf387d19fcbccb254103ef0645af3075b5f1a6",
+        "radv-gpu-broker-local-memory.patch": "cb8b56b5276b2e3773555287d0d998823b70204a2ed9dad1e3324df03c375ddd",
+        "radv-gpu-broker-client-wait.patch": "64759d65fc31c50ff8fa89a4d0d06d8aebee9809cf4a1f5002c745f1530c594e",
+        "radv-gpu-broker-wsi.patch": "ffe9f48358d12ce39e9cd529c6312d37ebf1fc1b3ef02a0d709940d05c55e128"
+      },
+      "console_validated": false
+    }
+  },
+  "runtime_audits": {
+    "wine-ps5": {
+      "module_count": 15,
+      "unresolved": 0,
+      "errors": 0,
+      "raw_syscalls": 0,
+      "title_unbound": 0
+    },
+    "wine-gpu-broker": {
+      "module_count": 15,
+      "unresolved": 0,
+      "errors": 0,
+      "raw_syscalls": 0,
+      "title_unbound": 0
+    }
+  },
+  "pinned_platform_header_sha256": "24e770da15304fe95a4e0191271bc33f545dc8f964e186408c7996f5bce2aa97",
+  "adapter_sources_sha256": {
+    "tools/setup-graphics-foundation.sh": "c15deda1b01722959fde8c5f7fb5a227be3bc54784cc1289fd2d288caf063451",
+    "tools/link_gpu_client.sh": "e1c43d11e36d161a72f4bc88e9fb0b114227097501964e021e2b1165bcee5529",
+    "tools/build-mesa-windows-zink.sh": "603c6b8b92fd2713cc4235a4ebd4beb94789921d9060316de84cc868d1b789f9",
+    "native/proton_gpu_server_probe.cpp": "0620129116d7e670c5b8e1d918683a7784338f68cd8cf38417593f23729ae9b5",
+    "native/proton_gpu_client.c": "e3fd80ac1f5dad79b75931034f3d4117569223b3df97a7e02ffea6090bbcf727",
+    "wine/ps5/pw_wine_process_io.c": "3d7f260826d507bf276943415a3531bfeb18c3e040ea64b401cb95ab7030aeb7",
+    "ps5/CMakeLists.txt": "6b871bda9ce4b3f3f62f80eb86bd287a3b0bec275162382410d139a60fb87462"
+  }
+}

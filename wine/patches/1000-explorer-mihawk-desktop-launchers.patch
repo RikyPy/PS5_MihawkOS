@@ -1,0 +1,300 @@
+From: PS5_Proton
+Subject: [PATCH] explorer: the Mihawk desktop's launchers behave as Windows' do
+
+Wine's desktop draws its launchers with no feedback, opens one only on a
+double click, and has no menu. On the Mihawk OS desktop (the user,
+2026-10-10) a launcher showed no hover or selection, a double click
+started nothing that any log showed, and a right click did nothing. In
+the session, Progman now:
+
+- highlights the launcher under the pointer, and selects one on a click
+  (a stronger highlight with a border); Enter opens the selection;
+- opens a launcher on a double click with the shell's default verb, as
+  Windows' desktop does (a shortcut runs its target through the link's
+  own handler), and logs each open with ShellExecute's result on the
+  explorer channel, so one that does not open shows why;
+- answers WM_CONTEXTMENU: over a launcher, Open (the default, first; a
+  shortcut has no verbs in the registry, so shell32 alone shows none)
+  then shell32's item menu (Cut, Copy, Create shortcut, Delete,
+  Properties; Rename needs a folder view and is left out); elsewhere the
+  desktop's menu: Refresh, Paste and New folder (shell32's background
+  commands, by verb) and Personalize, the session's appearance app
+  (patch 0968). shell32's own background menu acts on a folder view
+  (View, Arrange, Refresh), which this desktop has not.
+
+The desktop folders are already watched, so a deleted or new item updates
+the launchers by itself.
+---
+diff --git a/programs/explorer/desktop.c b/programs/explorer/desktop.c
+--- a/programs/explorer/desktop.c
++++ b/programs/explorer/desktop.c
+@@ -249,6 +249,48 @@
+     return launchers[index];
+ }
+ 
++/* The Mihawk desktop's launchers as Windows' desktop shows them (patch 1000): a light highlight under the pointer,
++ * a stronger one with a border on the selected launcher. -1: none. */
++static int hot_launcher = -1, selected_launcher = -1;
++
++static int launcher_index( const struct launcher *launcher )
++{
++    unsigned int i;
++    for (i = 0; i < nb_launchers; i++) if (launchers[i] == launcher) return i;
++    return -1;
++}
++
++static RECT get_launcher_rect( unsigned int index )
++{
++    RECT icon = get_icon_rect( index ), title = get_title_rect( index ), rect;
++    UnionRect( &rect, &icon, &title );
++    InflateRect( &rect, 4, 3 );
++    return rect;
++}
++
++static void draw_highlight( HDC hdc, RECT rect, BYTE alpha, BOOL border )
++{
++    HDC memory = CreateCompatibleDC( hdc );
++    HBITMAP pixel = CreateCompatibleBitmap( hdc, 1, 1 ), previous;
++    BLENDFUNCTION blend = { AC_SRC_OVER, 0, alpha, 0 };
++
++    if (memory && pixel)
++    {
++        previous = SelectObject( memory, pixel );
++        SetPixel( memory, 0, 0, RGB(204, 232, 255) );
++        GdiAlphaBlend( hdc, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top, memory, 0, 0, 1, 1, blend );
++        SelectObject( memory, previous );
++    }
++    if (border)
++    {
++        HBRUSH brush = CreateSolidBrush( RGB(153, 209, 255) );
++        FrameRect( hdc, &rect, brush );
++        DeleteObject( brush );
++    }
++    if (pixel) DeleteObject( pixel );
++    if (memory) DeleteDC( memory );
++}
++
+ static void draw_launchers( HDC hdc, RECT update_rect )
+ {
+     COLORREF color = SetTextColor( hdc, RGB(255,255,255) ); /* FIXME: depends on background color */
+@@ -262,8 +304,10 @@
+ 
+     for (i = 0; i < nb_launchers; i++)
+     {
+-        RECT dummy, icon = get_icon_rect( i ), title = get_title_rect( i );
++        RECT dummy, icon = get_icon_rect( i ), title = get_title_rect( i ), cell = get_launcher_rect( i );
+ 
++        if ((i == selected_launcher || i == hot_launcher) && IntersectRect( &dummy, &cell, &update_rect ))
++            draw_highlight( hdc, cell, i == selected_launcher ? 0x66 : 0x33, i == selected_launcher );
+         if (IntersectRect( &dummy, &icon, &update_rect ))
+             DrawIconEx( hdc, icon.left, icon.top, launchers[i]->icon, icon_cx, icon_cy,
+                         0, 0, DI_DEFAULTSIZE|DI_NORMAL );
+@@ -415,6 +459,7 @@
+         if (!wcsicmp( launchers[i]->path, path ))
+         {
+             free_launcher( launchers[i] );
++            hot_launcher = selected_launcher = -1;  /* the indices after it move */
+             if (--nb_launchers)
+                 memmove( &launchers[i], &launchers[i + 1], sizeof(launchers[i]) * (nb_launchers - i) );
+             ret = TRUE;
+@@ -853,6 +898,159 @@
+     return desktop_orig_wndproc( hwnd, message, wp, lp );
+ }
+ 
++/* The shell's menu for an item, as Windows' desktop shows it: shell32's own (its verbs, Cut, Copy, Create shortcut,
++ * Delete, Properties). Without CMF_CANRENAME it leaves Rename out, which needs a folder view this desktop has not. */
++static IContextMenu *item_menu( HWND hwnd, const WCHAR *path )
++{
++    IContextMenu *menu = NULL;
++    IShellFolder *folder;
++    const ITEMIDLIST *child;
++    ITEMIDLIST *pidl;
++
++    if (FAILED(SHParseDisplayName( path, NULL, &pidl, 0, NULL ))) return NULL;
++    if (SUCCEEDED(SHBindToParent( pidl, &IID_IShellFolder, (void **)&folder, &child )))
++    {
++        IShellFolder_GetUIObjectOf( folder, hwnd, 1, &child, &IID_IContextMenu, NULL, (void **)&menu );
++        IShellFolder_Release( folder );
++    }
++    CoTaskMemFree( pidl );
++    return menu;
++}
++
++/* Run one of shell32's desktop background commands by its verb ("NewFolder", "paste"). */
++static void background_verb( HWND hwnd, const char *verb )
++{
++    CMINVOKECOMMANDINFO info = { sizeof(info) };
++    IContextMenu *menu = NULL;
++    IShellFolder *desktop;
++
++    if (FAILED(SHGetDesktopFolder( &desktop ))) return;
++    if (SUCCEEDED(IShellFolder_CreateViewObject( desktop, hwnd, &IID_IContextMenu, (void **)&menu )))
++    {
++        info.hwnd = hwnd;
++        info.lpVerb = verb;
++        info.nShow = SW_SHOWNORMAL;
++        IContextMenu_InvokeCommand( menu, &info );
++        IContextMenu_Release( menu );
++    }
++    IShellFolder_Release( desktop );
++}
++
++enum { MENU_REFRESH = 1, MENU_NEW_FOLDER, MENU_PASTE, MENU_PERSONALIZE, MENU_OPEN = 0x7000 };
++
++/* Opens a launcher with the shell's default verb, as a double click on Windows' desktop does (a shortcut runs its
++ * target through the link's own handler). Logged on the explorer channel (warn+explorer in the title's WINEDEBUG): a
++ * launcher that does not open shows why. */
++static void open_launcher( HWND hwnd, const struct launcher *launcher, const char *how )
++{
++    HINSTANCE result = ShellExecuteW( hwnd, NULL, launcher->path, NULL, NULL, SW_SHOWNORMAL );
++    WARN( "Mihawk desktop: %s opens %s: %Iu%s\n", how, debugstr_w(launcher->path), (ULONG_PTR)result,
++          (ULONG_PTR)result > 32 ? "" : " (failed)" );
++}
++
++static void invalidate_launcher( HWND hwnd, int index )
++{
++    RECT rect;
++    if (index < 0 || index >= (int)nb_launchers) return;
++    rect = get_launcher_rect( index );
++    InvalidateRect( hwnd, &rect, TRUE );
++}
++
++static void set_launcher_state( HWND hwnd, int *state, int index )
++{
++    if (*state == index) return;
++    invalidate_launcher( hwnd, *state );
++    *state = index;
++    invalidate_launcher( hwnd, index );
++}
++
++/* A right click on the Mihawk desktop (WM_CONTEXTMENU, at screen x, y; -1, -1 from the keyboard): the item's shell
++ * menu over a launcher, else the desktop's. shell32's background menu (View, Arrange, Refresh) acts on a folder view,
++ * which this desktop has not, so the desktop's own menu holds what works here: Refresh, New folder and Paste
++ * through shell32, and Personalize, the session's appearance app (patch 0968). */
++static void show_desktop_menu( HWND hwnd, int x, int y )
++{
++    const struct launcher *launcher;
++    IContextMenu *menu = NULL;
++    WCHAR appearance[MAX_PATH];
++    POINT point = { x, y }, client;
++    HMENU popup;
++    UINT command;
++
++    if (x == -1 && y == -1) GetCursorPos( &point );
++    client = point;
++    ScreenToClient( hwnd, &client );
++    if (!(popup = CreatePopupMenu())) return;
++    launcher = launcher_from_point( client.x, client.y );
++    if (launcher) set_launcher_state( hwnd, &selected_launcher, launcher_index( launcher ) );
++    /* shell32 takes its verbs from the registry, and a shortcut has none there (Windows' link handler adds "Open"):
++     * the desktop puts Open first, as the default, and shell32's items after it */
++    if (launcher && (menu = item_menu( hwnd, launcher->path )) &&
++        FAILED(IContextMenu_QueryContextMenu( menu, popup, 0, 1, MENU_OPEN - 1, CMF_NORMAL )))
++    {
++        IContextMenu_Release( menu );
++        menu = NULL;
++    }
++    if (menu)
++    {
++        InsertMenuW( popup, 0, MF_BYPOSITION | MF_SEPARATOR, 0, NULL );
++        InsertMenuW( popup, 0, MF_BYPOSITION | MF_STRING, MENU_OPEN, L"Open" );
++        SetMenuDefaultItem( popup, MENU_OPEN, FALSE );
++    }
++    if (!launcher)
++    {
++        AppendMenuW( popup, MF_STRING, MENU_REFRESH, L"Refresh" );
++        AppendMenuW( popup, MF_STRING, MENU_PASTE, L"Paste" );
++        AppendMenuW( popup, MF_SEPARATOR, 0, NULL );
++        AppendMenuW( popup, MF_STRING, MENU_NEW_FOLDER, L"New folder" );
++        if (GetSystemDirectoryW( appearance, MAX_PATH - 32 ))
++        {
++            lstrcatW( appearance, L"\\mihawk-appearance.exe" );
++            if (GetFileAttributesW( appearance ) != INVALID_FILE_ATTRIBUTES)
++            {
++                AppendMenuW( popup, MF_SEPARATOR, 0, NULL );
++                AppendMenuW( popup, MF_STRING, MENU_PERSONALIZE, L"Personalize" );
++            }
++            else appearance[0] = 0;
++        }
++        else appearance[0] = 0;
++    }
++    if (launcher && !menu)
++    {
++        DestroyMenu( popup );
++        return;
++    }
++    SetForegroundWindow( hwnd );
++    command = TrackPopupMenu( popup, TPM_RETURNCMD | TPM_RIGHTBUTTON, point.x, point.y, 0, hwnd, NULL );
++    DestroyMenu( popup );
++    if (menu && command == MENU_OPEN)
++    {
++        open_launcher( hwnd, launcher, "Open" );
++        IContextMenu_Release( menu );
++        return;
++    }
++    if (menu)
++    {
++        if (command)
++        {
++            CMINVOKECOMMANDINFO info = { sizeof(info) };
++            info.hwnd = hwnd;
++            info.lpVerb = MAKEINTRESOURCEA( command - 1 );
++            info.nShow = SW_SHOWNORMAL;
++            IContextMenu_InvokeCommand( menu, &info );
++        }
++        IContextMenu_Release( menu );
++        return;
++    }
++    switch (command)
++    {
++    case MENU_REFRESH:     InvalidateRect( hwnd, NULL, TRUE ); break;
++    case MENU_PASTE:       background_verb( hwnd, "paste" ); break;
++    case MENU_NEW_FOLDER:  background_verb( hwnd, CMDSTR_NEWFOLDERA ); break;
++    case MENU_PERSONALIZE: ShellExecuteW( hwnd, NULL, appearance, NULL, NULL, SW_SHOWNORMAL ); break;
++    }
++}
++
+ /* The Mihawk session's desktop, as on Windows: the system owns the desktop window (the PS5 server makes it, with no
+  * thread) and the shell's desktop is Progman, a bottom-most top-level window that paints the wallpaper and the
+  * launchers. When this Explorer ends (game mode unloads it, or it fails) Progman goes with it and the desktop window
+@@ -866,6 +1064,40 @@
+         /* Windows keeps the shell's desktop at the bottom of the z-order. */
+         if (!(((WINDOWPOS *)lp)->flags & SWP_NOZORDER)) ((WINDOWPOS *)lp)->hwndInsertAfter = HWND_BOTTOM;
+         break;
++    case WM_CONTEXTMENU:
++        show_desktop_menu( hwnd, (short)LOWORD(lp), (short)HIWORD(lp) );
++        return 0;
++    case WM_MOUSEMOVE:
++    {
++        static TRACKMOUSEEVENT track = { sizeof(track), TME_LEAVE };
++        const struct launcher *launcher = launcher_from_point( (short)LOWORD(lp), (short)HIWORD(lp) );
++        track.hwndTrack = hwnd;
++        TrackMouseEvent( &track );
++        set_launcher_state( hwnd, &hot_launcher, launcher ? launcher_index( launcher ) : -1 );
++        break;
++    }
++    case WM_MOUSELEAVE:
++        set_launcher_state( hwnd, &hot_launcher, -1 );
++        return 0;
++    case WM_LBUTTONDOWN:
++    {
++        const struct launcher *launcher = launcher_from_point( (short)LOWORD(lp), (short)HIWORD(lp) );
++        set_launcher_state( hwnd, &selected_launcher, launcher ? launcher_index( launcher ) : -1 );
++        SetFocus( hwnd );
++        break;
++    }
++    case WM_LBUTTONDBLCLK:
++    {
++        const struct launcher *launcher = launcher_from_point( (short)LOWORD(lp), (short)HIWORD(lp) );
++        WARN( "Mihawk desktop: double click at %d,%d on %s\n", (short)LOWORD(lp), (short)HIWORD(lp),
++              launcher ? debugstr_w(launcher->path) : "no launcher" );
++        if (launcher) open_launcher( hwnd, launcher, "double click" );
++        return 0;
++    }
++    case WM_KEYDOWN:
++        if (wp == VK_RETURN && selected_launcher >= 0 && selected_launcher < (int)nb_launchers)
++            open_launcher( hwnd, launchers[selected_launcher], "Enter" );
++        break;
+     case WM_SETTINGCHANGE:
+     case WM_SYSCOLORCHANGE:
+         /* The system repaints its own desktop window for a new wallpaper or colour; this one repaints itself. */

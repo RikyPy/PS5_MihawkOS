@@ -1,0 +1,72 @@
+{
+  "review": "battery-readiness-console-2026-10-09-01",
+  "battery_evidence": "evidence/readiness-benchmark-2026-10-08-01.json",
+  "timing_evidence": "evidence/readiness-benchmark-2026-10-08-01-timing.json",
+  "production_fingerprint": "20294822ed0713a979689d2808699772ec32e2c468fb5d44f2e278b7966cac5a",
+  "complete": true,
+  "cases": 37,
+  "passed_cases": 33,
+  "failed_cases": [
+    "socket-options32",
+    "socket-options64",
+    "launcher-tls",
+    "launcher-desktop"
+  ],
+  "battery_wall_seconds": 1308.6,
+  "deployment_seconds": 5.7,
+  "readiness_seconds_total": 38.308,
+  "readiness_seconds_median": 0.179,
+  "longest_cases": [
+    {
+      "case": "prefix-fresh32",
+      "seconds": 208.2
+    },
+    {
+      "case": "prefix-fresh64",
+      "seconds": 207.6
+    },
+    {
+      "case": "memory-classes",
+      "seconds": 170.2
+    },
+    {
+      "case": "launcher-desktop",
+      "seconds": 139.7
+    },
+    {
+      "case": "launcher-tls",
+      "seconds": 71.5
+    }
+  ],
+  "user_network_context": "Router-level internet restriction; user requests ignoring network failures for current review.",
+  "network_failures": {
+    "socket-options32": "IPv6 loopback bind returns 10049; router WAN filtering is not established as its cause.",
+    "socket-options64": "IPv6 loopback bind returns 10049.",
+    "launcher-tls": "HTTPS requests time out with 12002 while console internet is restricted."
+  },
+  "desktop_failure": {
+    "observed": "39 pointer moves, zero button-down/up events; script pressed touchpad while the saved left-click mapping is L3.",
+    "confirmation_evidence": "evidence/desktop-mapping-confirm-2026-10-09-01.json",
+    "confirmation_passed": true,
+    "confirmation_seconds": 14.2,
+    "confirmation_events": {
+      "moves": 2,
+      "downs": 1,
+      "ups": 1
+    },
+    "confirmation_cleanup_verified": true,
+    "changed_runtime_or_preferences": false,
+    "next_tooling_fix": "Derive desktop probe click buttons from the saved global mapping; do not assume the default touchpad binding."
+  },
+  "after_battery": {
+    "shell_idle": true,
+    "leftover_websrv_helpers": 0,
+    "drop_guard_triggered": false,
+    "tested_source_fingerprint_unchanged": true
+  },
+  "gate_qualified": false,
+  "code_committed": false,
+  "published": false,
+  "branch_created_after_battery": "mihawk-os",
+  "scope_limit": "One completed measured batch, including network timeouts and the desktop script mismatch. Healthy-run duration and repeated-run median are unmeasured."
+}

@@ -1,0 +1,15 @@
+DXVK source is exported from checksum-pinned archives without Git metadata.
+Name the actual upstream revision and local overlay instead of describing
+the containing PS5_Proton checkout.
+
+--- a/meson.build
++++ b/meson.build
+@@ -207,7 +207,7 @@
+ )
+ 
+ dxvk_version = vcs_tag(
+-  command: ['git', 'describe', '--dirty=+'],
++  command: ['printf', 'v3.1-19-g601930949-ps5-1'],
+   input:  'version.h.in',
+   output: 'version.h',
+ )

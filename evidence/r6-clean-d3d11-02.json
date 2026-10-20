@@ -1,0 +1,83 @@
+{
+ "run": "r6-clean-d3d11-02",
+ "what": "d3d11-probe.exe",
+ "env": [
+  "PS5_PROTON_PROBE_EXIT_LIVE=1"
+ ],
+ "result": "finished",
+ "seconds": 7.8,
+ "probe_verdict": "PASS",
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": true,
+ "bench": {
+  "frames": 180.0,
+  "draws": 1.0,
+  "vsync": 1.0,
+  "total_ms": 3055.0,
+  "frame_us": 16972.0
+ },
+ "steady": {
+  "vulkan_first_frame_ms": 1309.0
+ },
+ "intervals": {
+  "frames": [
+   {
+    "api": "vulkan",
+    "first_frame_ms": 1309.0
+   },
+   {
+    "api": "vulkan",
+    "frames": 180.0,
+    "fps": 35.6,
+    "p50_ms": 16.75,
+    "p95_ms": 16.75,
+    "p99_ms": 17.0,
+    "max_ms": 64.25,
+    "present_avg_ms": 0.006,
+    "present_max_all_ms": 0.076
+   }
+  ],
+  "server": [
+   {
+    "calls": 8356.0,
+    "per_s": 1651.0,
+    "avg_us": 32.0,
+    "selects": 1396.0,
+    "blocked": 457.0,
+    "block_avg_us": 16304.0,
+    "waits": 1370.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 908.0,
+    "delays": 0.0,
+    "yields": 0.0
+   }
+  ],
+  "top": [
+   {
+    "create_mapping": {
+     "count": 76,
+     "avg_us": 1097.9
+    },
+    "create_file": {
+     "count": 83,
+     "avg_us": 436.9
+    },
+    "event_op": {
+     "count": 455,
+     "avg_us": 63.4
+    },
+    "close_handle": {
+     "count": 1994,
+     "avg_us": 13.9
+    },
+    "select": {
+     "count": 1396,
+     "avg_us": 15.1
+    }
+   }
+  ]
+ }
+}

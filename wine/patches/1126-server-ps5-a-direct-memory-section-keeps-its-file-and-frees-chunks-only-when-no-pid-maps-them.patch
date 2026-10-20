@@ -1,0 +1,75 @@
+From: PS5_Proton <local>
+Subject: [PATCH] server: PS5: a direct-memory section keeps its file and frees chunks only when no pid maps them
+
+Patch 1121 registered a large anonymous section with the title under its backing file's identity and released it
+when the mapping object went, and the title gave the chunks back then, one memory-helper call per chunk on the server
+thread, while a helper could still map them; the server never came back after a terminate (2026-10-14; record removed from the tree; in git history). The
+backing descriptor now goes to the title with the registration (pw_wineserver_set_dsection_fd; the old
+pw_wineserver_set_dsection is gone, so a title and a runtime from different builds find no hook and keep file
+backing). The title holds a copy until the section's memory goes back, so (dev, ino) names no other section meanwhile;
+the release only marks the section, and a title thread frees the chunks once every process admitted to it has ended
+(wine/ps5/pw_wine_dsection.h, host-tested in tests/test_pw_wine_dsection.c). The server keeps its own descriptor.
+
+A memory helper that stopped answering (the title reports ENOTCONN) no longer has the server grow the file in the
+title: those pages would be the title's (src/pw_shared_page.h). Known gap: set_session_mapping and
+create_user_data_mapping ignore ps5_touch's result; both run inside connect_server after the title's first request to
+the helper, so the title's startup check covers them unless the helper dies in between. Not yet run on the console.
+---
+diff --git a/server/mapping.c b/server/mapping.c
+index 4801b51..52f1bdc 100644
+--- a/server/mapping.c
++++ b/server/mapping.c
+@@ -449,22 +449,36 @@ DECLSPEC_EXPORT void pw_wineserver_set_shared_memory( int (*alloc)( size_t ), in
+ }
+ /* Large anonymous sections in direct memory (wine/ps5/pw_wine_dsection.h), kept by the title: registered under their
+  * backing file's identity when made (the file stays only as that identity; clients ask the title for the memory behind
+- * a page over their own channel), released when the section goes. Set before the server starts; without them a
+- * section keeps its file backing. */
+-static int (*ps5_dsection_register)( unsigned __int64 dev, unsigned __int64 ino, unsigned __int64 size );
++ * a page over their own channel), released when the section goes. The backing descriptor goes to the title, which
++ * holds a copy until the section's direct memory goes back, so (dev, ino) names no other section while any process
++ * may map the chunks. The release only marks the section and never waits on the memory helper; the title frees the
++ * chunks once every process admitted to the section has ended. Set before the server starts; without them (a title
++ * and a runtime from different builds find no hook) a section keeps its file backing. */
++static int (*ps5_dsection_register)( int fd, unsigned __int64 dev, unsigned __int64 ino, unsigned __int64 size );
+ static void (*ps5_dsection_release)( unsigned __int64 dev, unsigned __int64 ino );
+-DECLSPEC_EXPORT void pw_wineserver_set_dsection( int (*reg)( unsigned __int64, unsigned __int64, unsigned __int64 ),
+-                                                 void (*release)( unsigned __int64, unsigned __int64 ) )
++DECLSPEC_EXPORT void pw_wineserver_set_dsection_fd( int (*reg)( int, unsigned __int64, unsigned __int64,
++                                                                 unsigned __int64 ),
++                                                    void (*release)( unsigned __int64, unsigned __int64 ) )
+ {
+     ps5_dsection_register = reg;
+     ps5_dsection_release = release;
+ }
+-/* The pages of [from, to) the helper's, before the server writes them. 0 or -1; without a helper, grow only. */
++/* The pages of [from, to) the helper's, before the server writes them. 0 or -1; without a helper, grow only. A helper
++ * that stopped answering (the title reports ENOTCONN) gets no file grown here: those pages would be the title's
++ * (src/pw_shared_page.h). */
+ static int ps5_touch( int unix_fd, file_pos_t from, file_pos_t to )
+ {
+-    static int logged;
++    static int logged, stopped;
++    int error;
+     if (ps5_shared_touch && !ps5_shared_touch( unix_fd, from, to )) return 0;
+-    if (ps5_shared_touch && !logged++) fprintf( stderr, "wine-ps5: the memory helper did not write through a server page: errno %d\n", errno );
++    error = errno;
++    if (ps5_shared_touch && (error == ENOTCONN || error == ETIMEDOUT))
++    {
++        if (!stopped++) fprintf( stderr, "wine-ps5: the memory helper stopped answering: server pages are not grown in the title\n" );
++        errno = error;
++        return -1;
++    }
++    if (ps5_shared_touch && !logged++) fprintf( stderr, "wine-ps5: the memory helper did not write through a server page: errno %d\n", error );
+     return grow_file( unix_fd, to ) ? 0 : -1;
+ }
+ #endif
+@@ -1243,7 +1257,7 @@ static struct mapping *create_mapping( struct object *root, const struct unicode
+         {
+             struct stat st;
+             if (ps5_dsection_register && !fstat( unix_fd, &st ) &&
+-                !ps5_dsection_register( st.st_dev, st.st_ino, mapping->size ))
++                !ps5_dsection_register( unix_fd, st.st_dev, st.st_ino, mapping->size ))
+             {
+                 mapping->ps5_dmem = 1;
+                 mapping->ps5_dev = st.st_dev;

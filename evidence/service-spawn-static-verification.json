@@ -1,0 +1,35 @@
+{
+  "kind": "static_metadata_verification",
+  "modules": [
+    {
+      "path": "common/lib/libkernel.sprx",
+      "sha256": "8074564a92f227069774ff4fb3ddce6a4a9b68ef51e5027566e7ab279baa70b8"
+    },
+    {
+      "path": "common/lib/libkernel_sys.sprx",
+      "sha256": "a30e1973f86492c911e37fcbba725a271e886a27f66481c9c7f743899b32b6d0"
+    },
+    {
+      "path": "common/lib/libSceSystemService.sprx",
+      "sha256": "88b19224a5dc2717b20f748e65eab3fbcf1e793ddee73218ef3f4ff593ec5966"
+    },
+    {
+      "path": "common/lib/libSceSysCore.sprx",
+      "sha256": "3d599673c17d913ca21b2fe198a7e484d5ae656c6a454a72c273acd1689d3998"
+    },
+    {
+      "path": "sys/SceSysCore.elf",
+      "sha256": "b80d3d2be13145aae5eaaf803e0dfc3781e10d901e681d7400466eb2d3cbe70f"
+    },
+    {
+      "path": "vsh/SceShellCore.elf",
+      "sha256": "d8f7d7360fed8e348d7f65e583b5f3e1a0b14689ca828d04d9d031b65d21dd49"
+    },
+    {
+      "path": "common/lib/libSceSysmodule.sprx",
+      "sha256": "727a2d26b7a5bc9d5902d9ef45e2ea9c31276ecd7f600124ed51821dbbeab5ba"
+    }
+  ],
+  "checks_passed": 55,
+  "runtime_child_proven": false
+}

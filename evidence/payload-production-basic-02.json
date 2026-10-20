@@ -1,0 +1,48 @@
+{
+ "run": "payload-production-basic-02",
+ "what": "process-probe.exe",
+ "env": [
+  "WINE_PS5_HID=0",
+  "PROTON_LOADING_SCREEN=0"
+ ],
+ "result": "finished",
+ "seconds": 5.9,
+ "probe_verdict": "PASS",
+ "clean_owner_restart": true,
+ "child_logs": [
+  "klog/payload-production-basic-02-wine-child-4812.log",
+  "klog/payload-production-basic-02-wine-child-4813.log",
+  "klog/payload-production-basic-02-wine-child-4814.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": true,
+ "bench": {},
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [],
+  "top": []
+ },
+ "native_payloads_absent": [
+  {
+   "pid": 4812,
+   "status": -1,
+   "errno": 3,
+   "absent": 1
+  },
+  {
+   "pid": 4813,
+   "status": -1,
+   "errno": 3,
+   "absent": 1
+  },
+  {
+   "pid": 4814,
+   "status": -1,
+   "errno": 3,
+   "absent": 1
+  }
+ ]
+}

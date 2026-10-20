@@ -1,0 +1,159 @@
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Subject: [PATCH] win32u: PS5: compose retained GDI windows in server Z order
+
+Keep each top-level window's pixels and compose in Windows Z order instead of
+paint order. Background repaints must not overwrite dialogs, and closing a
+foreground window must reveal the retained background. Wine delegates top-level
+occlusion to the native windowing system; its surface clip does not provide it.
+---
+--- a/dlls/win32u/ps5drv.c
++++ b/dlls/win32u/ps5drv.c
+@@ -81,6 +81,8 @@
+     HWND hwnd;
+     RECT visible;           /* screen coordinates */
+     BOOL shown;
++    UINT32 *pixels;         /* retained GDI pixels, independent of paint order */
++    UINT width, height;
+ };
+ 
+ static int (*present_frame)( const void *bgra, UINT width, UINT height, UINT stride );
+@@ -126,17 +128,6 @@
+     return NULL;
+ }
+ 
+-/* screen_lock held */
+-static void clear_screen_rect( const RECT *rect )
+-{
+-    RECT clip = {0, 0, screen_width, screen_height};
+-    INT y;
+-
+-    if (!intersect_rect( &clip, &clip, rect )) return;
+-    for (y = clip.top; y < clip.bottom; y++)
+-        memset( screen + y * screen_width + clip.left, 0, (clip.right - clip.left) * 4 );
+-}
+-
+ /* screen_lock held: blend the cursor into out, a width x height copy of
+  * the screen area whose top left is origin.  The pointer reaches every
+  * pixel, so at the right and bottom edges an arrow's hotspot would leave
+@@ -276,34 +267,71 @@
+ {
+ }
+ 
++/* screen_lock held. Native window systems compose retained surfaces in Z
++ * order; PS5 has only our display buffer. Wine's surface clip region excludes
++ * pixel-format children, not top-level siblings, so it cannot do this for us.
++ * Keep each window's pixels and use the server's current order every time. */
++static void compose_screen(void)
++{
++    struct ps5_window *ordered[PS5_MAX_WINDOWS], *window;
++    HWND hwnd;
++    UINT count = 0;
++    RECT clip = {0, 0, screen_width, screen_height};
++
++    for (hwnd = NtUserGetWindowRelative( get_desktop_window(), GW_CHILD ); hwnd;
++         hwnd = NtUserGetWindowRelative( hwnd, GW_HWNDNEXT ))
++        if ((window = find_window( hwnd )) && window->shown && window->pixels && count < PS5_MAX_WINDOWS)
++            ordered[count++] = window;
++    memset( screen, 0, (size_t)screen_width * screen_height * sizeof(*screen) );
++    while (count)
++    {
++        RECT target;
++        INT y;
++        window = ordered[--count];
++        target = window->visible;
++        target.right = min( target.right, target.left + (INT)window->width );
++        target.bottom = min( target.bottom, target.top + (INT)window->height );
++        if (!intersect_rect( &target, &target, &clip )) continue;
++        for (y = target.top; y < target.bottom; y++)
++            memcpy( screen + y * screen_width + target.left,
++                    window->pixels + (y - window->visible.top) * window->width + target.left - window->visible.left,
++                    (target.right - target.left) * sizeof(*screen) );
++    }
++    present_screen();
++}
++
+ static BOOL ps5_surface_flush( struct window_surface *surface, const RECT *rect, const RECT *dirty,
+                                const BITMAPINFO *color_info, const void *color_bits, BOOL shape_changed,
+                                const BITMAPINFO *shape_info, const void *shape_bits )
+ {
+     struct ps5_window *window;
+-    UINT stride = color_info->bmiHeader.biWidth * 4;
+-    RECT target, clip = {0, 0, screen_width, screen_height};
++    UINT width = color_info->bmiHeader.biWidth, height = abs( color_info->bmiHeader.biHeight );
++    RECT target, clip = {0, 0, width, height};
++    BOOL okay = TRUE;
+     INT y;
+ 
+     pthread_mutex_lock( &screen_lock );
+     if ((window = find_window( surface->hwnd )) && window->shown)
+     {
+-        /* dirty is relative to the surface, whose origin is the visible rect's */
+-        target = *dirty;
+-        OffsetRect( &target, window->visible.left, window->visible.top );
+-        if (intersect_rect( &target, &target, &clip ) && intersect_rect( &target, &target, &window->visible ))
++        if (window->width != width || window->height != height)
+         {
++            UINT32 *pixels = calloc( (size_t)width * height, sizeof(*pixels) );
++            if (!pixels) { okay = FALSE; goto done; }
++            free( window->pixels );
++            window->pixels = pixels;
++            window->width = width;
++            window->height = height;
++        }
++        if (intersect_rect( &target, dirty, &clip ))
+             for (y = target.top; y < target.bottom; y++)
+-            {
+-                const BYTE *src = (const BYTE *)color_bits + (y - window->visible.top) * stride +
+-                                  (target.left - window->visible.left) * 4;
+-                memcpy( screen + y * screen_width + target.left, src, (target.right - target.left) * 4 );
+-            }
+-            present_screen();
+-        }
+-    }
++                memcpy( window->pixels + y * width + target.left,
++                        (const UINT32 *)color_bits + y * width + target.left,
++                        (target.right - target.left) * sizeof(*window->pixels) );
++        compose_screen();
++    }
++done:
+     pthread_mutex_unlock( &screen_lock );
+-    return TRUE;
++    return okay;
+ }
+ 
+ static void ps5_surface_destroy( struct window_surface *surface )
+@@ -401,15 +429,13 @@
+     }
+     if (window)
+     {
+-        if (window->shown && (!shown || !EqualRect( &window->visible, &new_rects->visible )))
+-        {
+-            clear_screen_rect( &window->visible );
+-            present_screen();
+-        }
++        BOOL changed = window->shown != shown || !EqualRect( &window->visible, &new_rects->visible ) ||
++                       !(swp_flags & SWP_NOZORDER);
+         /* a window just shown may have painted before it had this surface */
+         repaint = shown && !window->shown;
+         window->visible = new_rects->visible;
+         window->shown = shown;
++        if (changed) compose_screen();
+     }
+     pthread_mutex_unlock( &screen_lock );
+     if (repaint) NtUserRedrawWindow( hwnd, NULL, 0, RDW_INVALIDATE | RDW_ERASE | RDW_FRAME | RDW_ALLCHILDREN );
+@@ -422,12 +448,10 @@
+     pthread_mutex_lock( &screen_lock );
+     if ((window = find_window( hwnd )))
+     {
+-        if (window->shown)
+-        {
+-            clear_screen_rect( &window->visible );
+-            present_screen();
+-        }
++        free( window->pixels );
+         *window = windows[--window_count];
++        memset( &windows[window_count], 0, sizeof(windows[window_count]) );
++        compose_screen();
+     }
+     pthread_mutex_unlock( &screen_lock );
+ }

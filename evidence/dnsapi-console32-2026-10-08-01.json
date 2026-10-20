@@ -1,0 +1,92 @@
+{
+ "run": "dnsapi-console32-2026-10-08-01",
+ "what": "dnsapi32-probe.exe",
+ "env": [
+  "PROTON_LAYOUT=launcher",
+  "WINEDEBUG=warn+debugstr"
+ ],
+ "result": "finished",
+ "seconds": 8.7,
+ "probe_verdict": "PASS",
+ "clean_owner_restart": true,
+ "launcher_end_status": 0,
+ "initial_status": 0,
+ "closed_on_request": false,
+ "child_logs": [
+  "klog/dnsapi-console32-2026-10-08-01-wine-child-1472.log",
+  "klog/dnsapi-console32-2026-10-08-01-wine-child-1473.log",
+  "klog/dnsapi-console32-2026-10-08-01-wine-child-1474.log",
+  "klog/dnsapi-console32-2026-10-08-01-wine-child-1475.log",
+  "klog/dnsapi-console32-2026-10-08-01-wine-child-1476.log",
+  "klog/dnsapi-console32-2026-10-08-01-wine-child-1477.log",
+  "klog/dnsapi-console32-2026-10-08-01-wine-child-1478.log",
+  "klog/dnsapi-console32-2026-10-08-01-wine-child-1479.log",
+  "klog/dnsapi-console32-2026-10-08-01-wine-child-1480.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": true,
+ "bench": {},
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [],
+  "top": []
+ },
+ "shown": {
+  "frames": 0,
+  "per_10s": [],
+  "longest_gap_ms": 0
+ },
+ "broker": {
+  "local_offer": 8589934592,
+  "host_limit": 1073741824,
+  "refused": [],
+  "refused_count": 0,
+  "clients": [
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   }
+  ],
+  "host_peak": 0,
+  "local_peak": 0
+ }
+}

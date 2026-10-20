@@ -1,0 +1,1946 @@
+{
+ "run": "mc-05",
+ "what": "profile 7",
+ "env": [],
+ "result": "timed out",
+ "seconds": 241.5,
+ "probe_verdict": null,
+ "exit_stall": false,
+ "stop_requested": "run budget reached",
+ "returned_to_launcher": false,
+ "passed": false,
+ "bench": {},
+ "steady": {
+  "opengl_first_frame_ms": 5773.0,
+  "opengl": {
+   "frames": 193.0,
+   "fps": 38.1,
+   "p50_ms": 16.75,
+   "p95_ms": 17.5,
+   "p99_ms": 33.25,
+   "max_ms": 64.25,
+   "present_avg_ms": 0.05,
+   "present_max_all_ms": 0.359,
+   "intervals": 17,
+   "worst_p99_ms": 64.25,
+   "worst_max_ms": 64.25
+  },
+  "server": {
+   "calls": 10375.0,
+   "per_s": 2047.5,
+   "avg_us": 16.8,
+   "selects": 2317.5,
+   "blocked": 803.0,
+   "block_avg_us": 45755.45,
+   "waits": 2317.5,
+   "handles_avg": 1.27,
+   "wait_all": 0.0,
+   "polled": 1377.0,
+   "delays": 0.0,
+   "yields": 0.0,
+   "intervals": 46
+  }
+ },
+ "intervals": {
+  "frames": [
+   {
+    "api": "opengl",
+    "first_frame_ms": 5773.0
+   },
+   {
+    "api": "opengl",
+    "frames": 80.0,
+    "fps": 15.8,
+    "p50_ms": 53.5,
+    "p95_ms": 58.25,
+    "p99_ms": 64.25,
+    "max_ms": 64.25,
+    "present_avg_ms": 0.061,
+    "present_max_all_ms": 0.359
+   },
+   {
+    "api": "opengl",
+    "frames": 85.0,
+    "fps": 16.8,
+    "p50_ms": 53.5,
+    "p95_ms": 64.25,
+    "p99_ms": 64.25,
+    "max_ms": 64.25,
+    "present_avg_ms": 0.057,
+    "present_max_all_ms": 0.359
+   },
+   {
+    "api": "opengl",
+    "frames": 84.0,
+    "fps": 16.6,
+    "p50_ms": 53.25,
+    "p95_ms": 64.25,
+    "p99_ms": 64.25,
+    "max_ms": 64.25,
+    "present_avg_ms": 0.056,
+    "present_max_all_ms": 0.359
+   },
+   {
+    "api": "opengl",
+    "frames": 33.0,
+    "fps": 6.5,
+    "p50_ms": 53.25,
+    "p95_ms": 64.25,
+    "p99_ms": 64.25,
+    "max_ms": 64.25,
+    "present_avg_ms": 0.057,
+    "present_max_all_ms": 0.359
+   },
+   {
+    "api": "opengl",
+    "frames": 8.0,
+    "fps": 1.6,
+    "p50_ms": 17.5,
+    "p95_ms": 64.25,
+    "p99_ms": 64.25,
+    "max_ms": 64.25,
+    "present_avg_ms": 0.068,
+    "present_max_all_ms": 0.359
+   },
+   {
+    "api": "opengl",
+    "frames": 153.0,
+    "fps": 30.2,
+    "p50_ms": 16.75,
+    "p95_ms": 19.5,
+    "p99_ms": 33.25,
+    "max_ms": 64.25,
+    "present_avg_ms": 0.051,
+    "present_max_all_ms": 0.359
+   },
+   {
+    "api": "opengl",
+    "frames": 304.0,
+    "fps": 60.0,
+    "p50_ms": 16.75,
+    "p95_ms": 17.5,
+    "p99_ms": 17.75,
+    "max_ms": 17.75,
+    "present_avg_ms": 0.049,
+    "present_max_all_ms": 0.359
+   },
+   {
+    "api": "opengl",
+    "frames": 304.0,
+    "fps": 60.0,
+    "p50_ms": 16.75,
+    "p95_ms": 17.5,
+    "p99_ms": 17.75,
+    "max_ms": 28.75,
+    "present_avg_ms": 0.049,
+    "present_max_all_ms": 0.359
+   },
+   {
+    "api": "opengl",
+    "frames": 303.0,
+    "fps": 59.8,
+    "p50_ms": 16.75,
+    "p95_ms": 17.5,
+    "p99_ms": 17.75,
+    "max_ms": 17.75,
+    "present_avg_ms": 0.049,
+    "present_max_all_ms": 0.359
+   },
+   {
+    "api": "opengl",
+    "frames": 304.0,
+    "fps": 60.0,
+    "p50_ms": 16.75,
+    "p95_ms": 17.5,
+    "p99_ms": 17.75,
+    "max_ms": 17.75,
+    "present_avg_ms": 0.05,
+    "present_max_all_ms": 0.359
+   },
+   {
+    "api": "opengl",
+    "frames": 295.0,
+    "fps": 58.2,
+    "p50_ms": 16.75,
+    "p95_ms": 17.5,
+    "p99_ms": 18.5,
+    "max_ms": 64.25,
+    "present_avg_ms": 0.05,
+    "present_max_all_ms": 0.359
+   },
+   {
+    "api": "opengl",
+    "frames": 304.0,
+    "fps": 60.0,
+    "p50_ms": 16.75,
+    "p95_ms": 17.5,
+    "p99_ms": 18.0,
+    "max_ms": 32.0,
+    "present_avg_ms": 0.05,
+    "present_max_all_ms": 0.359
+   },
+   {
+    "api": "opengl",
+    "frames": 303.0,
+    "fps": 59.8,
+    "p50_ms": 16.75,
+    "p95_ms": 17.5,
+    "p99_ms": 17.5,
+    "max_ms": 18.5,
+    "present_avg_ms": 0.049,
+    "present_max_all_ms": 0.359
+   },
+   {
+    "api": "opengl",
+    "frames": 304.0,
+    "fps": 60.0,
+    "p50_ms": 16.75,
+    "p95_ms": 17.5,
+    "p99_ms": 17.75,
+    "max_ms": 17.75,
+    "present_avg_ms": 0.05,
+    "present_max_all_ms": 0.359
+   },
+   {
+    "api": "opengl",
+    "frames": 157.0,
+    "fps": 31.0,
+    "p50_ms": 16.75,
+    "p95_ms": 17.5,
+    "p99_ms": 34.0,
+    "max_ms": 64.25,
+    "present_avg_ms": 0.05,
+    "present_max_all_ms": 0.359
+   },
+   {
+    "api": "opengl",
+    "frames": 97.0,
+    "fps": 19.1,
+    "p50_ms": 17.75,
+    "p95_ms": 64.25,
+    "p99_ms": 64.25,
+    "max_ms": 64.25,
+    "present_avg_ms": 0.06,
+    "present_max_all_ms": 0.359
+   },
+   {
+    "api": "opengl",
+    "frames": 193.0,
+    "fps": 38.1,
+    "p50_ms": 17.25,
+    "p95_ms": 46.0,
+    "p99_ms": 64.25,
+    "max_ms": 64.25,
+    "present_avg_ms": 0.061,
+    "present_max_all_ms": 0.359
+   },
+   {
+    "api": "opengl",
+    "frames": 58.0,
+    "fps": 11.4,
+    "p50_ms": 16.75,
+    "p95_ms": 64.25,
+    "p99_ms": 64.25,
+    "max_ms": 64.25,
+    "present_avg_ms": 0.059,
+    "present_max_all_ms": 0.359
+   }
+  ],
+  "server": [
+   {
+    "calls": 18511.0,
+    "per_s": 3652.0,
+    "avg_us": 61.8,
+    "selects": 2105.0,
+    "blocked": 643.0,
+    "block_avg_us": 12537.2,
+    "waits": 2078.0,
+    "handles_avg": 1.26,
+    "wait_all": 0.0,
+    "polled": 1100.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 14877.0,
+    "per_s": 2935.0,
+    "avg_us": 43.5,
+    "selects": 4478.0,
+    "blocked": 2549.0,
+    "block_avg_us": 17644.8,
+    "waits": 4467.0,
+    "handles_avg": 1.14,
+    "wait_all": 0.0,
+    "polled": 1597.0,
+    "delays": 10.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 8244.0,
+    "per_s": 1626.0,
+    "avg_us": 25.8,
+    "selects": 2437.0,
+    "blocked": 883.0,
+    "block_avg_us": 27239.9,
+    "waits": 2433.0,
+    "handles_avg": 1.25,
+    "wait_all": 0.0,
+    "polled": 1418.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 8396.0,
+    "per_s": 1656.0,
+    "avg_us": 21.3,
+    "selects": 2657.0,
+    "blocked": 966.0,
+    "block_avg_us": 137513.7,
+    "waits": 2636.0,
+    "handles_avg": 1.24,
+    "wait_all": 0.0,
+    "polled": 1497.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 22988.0,
+    "per_s": 4533.0,
+    "avg_us": 76.9,
+    "selects": 8959.0,
+    "blocked": 6682.0,
+    "block_avg_us": 14812.3,
+    "waits": 8876.0,
+    "handles_avg": 1.07,
+    "wait_all": 0.0,
+    "polled": 1779.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 22809.0,
+    "per_s": 4498.0,
+    "avg_us": 120.0,
+    "selects": 9314.0,
+    "blocked": 5989.0,
+    "block_avg_us": 5041.9,
+    "waits": 9318.0,
+    "handles_avg": 1.06,
+    "wait_all": 0.0,
+    "polled": 1447.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 9125.0,
+    "per_s": 1800.0,
+    "avg_us": 20.4,
+    "selects": 3163.0,
+    "blocked": 1509.0,
+    "block_avg_us": 19431.6,
+    "waits": 3163.0,
+    "handles_avg": 1.2,
+    "wait_all": 0.0,
+    "polled": 1630.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 9355.0,
+    "per_s": 1847.0,
+    "avg_us": 17.3,
+    "selects": 3294.0,
+    "blocked": 1589.0,
+    "block_avg_us": 16230.1,
+    "waits": 3294.0,
+    "handles_avg": 1.19,
+    "wait_all": 0.0,
+    "polled": 1705.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 9987.0,
+    "per_s": 1972.0,
+    "avg_us": 16.5,
+    "selects": 3721.0,
+    "blocked": 1803.0,
+    "block_avg_us": 18620.1,
+    "waits": 3722.0,
+    "handles_avg": 1.17,
+    "wait_all": 0.0,
+    "polled": 1918.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 10546.0,
+    "per_s": 2082.0,
+    "avg_us": 16.6,
+    "selects": 3791.0,
+    "blocked": 1838.0,
+    "block_avg_us": 11789.9,
+    "waits": 3790.0,
+    "handles_avg": 1.16,
+    "wait_all": 0.0,
+    "polled": 1953.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 12723.0,
+    "per_s": 2511.0,
+    "avg_us": 16.6,
+    "selects": 3805.0,
+    "blocked": 1845.0,
+    "block_avg_us": 27798.0,
+    "waits": 3804.0,
+    "handles_avg": 1.16,
+    "wait_all": 0.0,
+    "polled": 1959.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 12460.0,
+    "per_s": 2459.0,
+    "avg_us": 17.2,
+    "selects": 3734.0,
+    "blocked": 1802.0,
+    "block_avg_us": 58169.6,
+    "waits": 3736.0,
+    "handles_avg": 1.17,
+    "wait_all": 0.0,
+    "polled": 1912.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 11871.0,
+    "per_s": 2341.0,
+    "avg_us": 16.9,
+    "selects": 3839.0,
+    "blocked": 1861.0,
+    "block_avg_us": 26162.9,
+    "waits": 3838.0,
+    "handles_avg": 1.16,
+    "wait_all": 0.0,
+    "polled": 1977.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 11262.0,
+    "per_s": 2223.0,
+    "avg_us": 16.5,
+    "selects": 3848.0,
+    "blocked": 1866.0,
+    "block_avg_us": 12530.9,
+    "waits": 3847.0,
+    "handles_avg": 1.16,
+    "wait_all": 0.0,
+    "polled": 1981.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 12861.0,
+    "per_s": 2537.0,
+    "avg_us": 16.5,
+    "selects": 3800.0,
+    "blocked": 1842.0,
+    "block_avg_us": 19206.0,
+    "waits": 3800.0,
+    "handles_avg": 1.16,
+    "wait_all": 0.0,
+    "polled": 1958.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 44658.0,
+    "per_s": 8811.0,
+    "avg_us": 43.8,
+    "selects": 21006.0,
+    "blocked": 16599.0,
+    "block_avg_us": 46327.4,
+    "waits": 21006.0,
+    "handles_avg": 1.03,
+    "wait_all": 0.0,
+    "polled": 3718.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 75144.0,
+    "per_s": 14824.0,
+    "avg_us": 192.1,
+    "selects": 34666.0,
+    "blocked": 10580.0,
+    "block_avg_us": 98874.8,
+    "waits": 34625.0,
+    "handles_avg": 1.01,
+    "wait_all": 0.0,
+    "polled": 18846.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 58041.0,
+    "per_s": 11446.0,
+    "avg_us": 251.3,
+    "selects": 22663.0,
+    "blocked": 6221.0,
+    "block_avg_us": 111050.9,
+    "waits": 22644.0,
+    "handles_avg": 1.02,
+    "wait_all": 0.0,
+    "polled": 13456.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 50131.0,
+    "per_s": 9878.0,
+    "avg_us": 100.6,
+    "selects": 16207.0,
+    "blocked": 5492.0,
+    "block_avg_us": 33714.4,
+    "waits": 16162.0,
+    "handles_avg": 1.03,
+    "wait_all": 0.0,
+    "polled": 9154.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 13148.0,
+    "per_s": 2593.0,
+    "avg_us": 360.5,
+    "selects": 4118.0,
+    "blocked": 1199.0,
+    "block_avg_us": 32331.5,
+    "waits": 4134.0,
+    "handles_avg": 1.12,
+    "wait_all": 0.0,
+    "polled": 2368.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 10379.0,
+    "per_s": 2048.0,
+    "avg_us": 17.6,
+    "selects": 2168.0,
+    "blocked": 784.0,
+    "block_avg_us": 172811.7,
+    "waits": 2166.0,
+    "handles_avg": 1.29,
+    "wait_all": 0.0,
+    "polled": 1381.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 10358.0,
+    "per_s": 2045.0,
+    "avg_us": 17.0,
+    "selects": 2205.0,
+    "blocked": 784.0,
+    "block_avg_us": 57820.8,
+    "waits": 2205.0,
+    "handles_avg": 1.28,
+    "wait_all": 0.0,
+    "polled": 1371.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 10371.0,
+    "per_s": 2047.0,
+    "avg_us": 17.0,
+    "selects": 2156.0,
+    "blocked": 783.0,
+    "block_avg_us": 44637.6,
+    "waits": 2156.0,
+    "handles_avg": 1.29,
+    "wait_all": 0.0,
+    "polled": 1373.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 10333.0,
+    "per_s": 2040.0,
+    "avg_us": 17.2,
+    "selects": 2154.0,
+    "blocked": 777.0,
+    "block_avg_us": 45689.0,
+    "waits": 2154.0,
+    "handles_avg": 1.29,
+    "wait_all": 0.0,
+    "polled": 1377.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 10748.0,
+    "per_s": 2121.0,
+    "avg_us": 16.9,
+    "selects": 2401.0,
+    "blocked": 793.0,
+    "block_avg_us": 62772.3,
+    "waits": 2401.0,
+    "handles_avg": 1.26,
+    "wait_all": 0.0,
+    "polled": 1371.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 10337.0,
+    "per_s": 2040.0,
+    "avg_us": 16.8,
+    "selects": 2157.0,
+    "blocked": 784.0,
+    "block_avg_us": 44579.1,
+    "waits": 2157.0,
+    "handles_avg": 1.29,
+    "wait_all": 0.0,
+    "polled": 1373.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 9101.0,
+    "per_s": 1796.0,
+    "avg_us": 17.0,
+    "selects": 1741.0,
+    "blocked": 651.0,
+    "block_avg_us": 250739.2,
+    "waits": 1739.0,
+    "handles_avg": 1.28,
+    "wait_all": 0.0,
+    "polled": 1087.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 10666.0,
+    "per_s": 2105.0,
+    "avg_us": 16.9,
+    "selects": 2318.0,
+    "blocked": 815.0,
+    "block_avg_us": 61399.5,
+    "waits": 2318.0,
+    "handles_avg": 1.27,
+    "wait_all": 0.0,
+    "polled": 1373.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 10347.0,
+    "per_s": 2042.0,
+    "avg_us": 16.8,
+    "selects": 2164.0,
+    "blocked": 788.0,
+    "block_avg_us": 44733.3,
+    "waits": 2164.0,
+    "handles_avg": 1.29,
+    "wait_all": 0.0,
+    "polled": 1375.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 10395.0,
+    "per_s": 2052.0,
+    "avg_us": 16.8,
+    "selects": 2177.0,
+    "blocked": 793.0,
+    "block_avg_us": 346611.1,
+    "waits": 2169.0,
+    "handles_avg": 1.29,
+    "wait_all": 0.0,
+    "polled": 1379.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 10789.0,
+    "per_s": 2129.0,
+    "avg_us": 16.6,
+    "selects": 2379.0,
+    "blocked": 822.0,
+    "block_avg_us": 280045.2,
+    "waits": 2375.0,
+    "handles_avg": 1.26,
+    "wait_all": 0.0,
+    "polled": 1377.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 10537.0,
+    "per_s": 2080.0,
+    "avg_us": 16.7,
+    "selects": 2225.0,
+    "blocked": 803.0,
+    "block_avg_us": 1242103.7,
+    "waits": 2193.0,
+    "handles_avg": 1.28,
+    "wait_all": 0.0,
+    "polled": 1406.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 10291.0,
+    "per_s": 2031.0,
+    "avg_us": 16.6,
+    "selects": 2145.0,
+    "blocked": 769.0,
+    "block_avg_us": 49464.6,
+    "waits": 2145.0,
+    "handles_avg": 1.29,
+    "wait_all": 0.0,
+    "polled": 1376.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 10469.0,
+    "per_s": 2064.0,
+    "avg_us": 16.7,
+    "selects": 2265.0,
+    "blocked": 803.0,
+    "block_avg_us": 62294.1,
+    "waits": 2265.0,
+    "handles_avg": 1.28,
+    "wait_all": 0.0,
+    "polled": 1373.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 10346.0,
+    "per_s": 2042.0,
+    "avg_us": 16.6,
+    "selects": 2160.0,
+    "blocked": 787.0,
+    "block_avg_us": 44363.1,
+    "waits": 2160.0,
+    "handles_avg": 1.29,
+    "wait_all": 0.0,
+    "polled": 1373.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 10358.0,
+    "per_s": 2044.0,
+    "avg_us": 16.6,
+    "selects": 2167.0,
+    "blocked": 792.0,
+    "block_avg_us": 44500.6,
+    "waits": 2167.0,
+    "handles_avg": 1.29,
+    "wait_all": 0.0,
+    "polled": 1375.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 10634.0,
+    "per_s": 2099.0,
+    "avg_us": 16.6,
+    "selects": 2317.0,
+    "blocked": 825.0,
+    "block_avg_us": 61198.1,
+    "waits": 2317.0,
+    "handles_avg": 1.27,
+    "wait_all": 0.0,
+    "polled": 1373.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 10368.0,
+    "per_s": 2046.0,
+    "avg_us": 16.8,
+    "selects": 2160.0,
+    "blocked": 786.0,
+    "block_avg_us": 44451.7,
+    "waits": 2159.0,
+    "handles_avg": 1.29,
+    "wait_all": 0.0,
+    "polled": 1374.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 10295.0,
+    "per_s": 2032.0,
+    "avg_us": 16.6,
+    "selects": 2145.0,
+    "blocked": 769.0,
+    "block_avg_us": 45773.4,
+    "waits": 2146.0,
+    "handles_avg": 1.29,
+    "wait_all": 0.0,
+    "polled": 1376.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 10779.0,
+    "per_s": 2127.0,
+    "avg_us": 16.4,
+    "selects": 2363.0,
+    "blocked": 803.0,
+    "block_avg_us": 211886.7,
+    "waits": 2362.0,
+    "handles_avg": 1.26,
+    "wait_all": 0.0,
+    "polled": 1375.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 10308.0,
+    "per_s": 2035.0,
+    "avg_us": 16.7,
+    "selects": 2149.0,
+    "blocked": 776.0,
+    "block_avg_us": 45045.8,
+    "waits": 2149.0,
+    "handles_avg": 1.29,
+    "wait_all": 0.0,
+    "polled": 1373.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 10280.0,
+    "per_s": 2029.0,
+    "avg_us": 16.2,
+    "selects": 2138.0,
+    "blocked": 765.0,
+    "block_avg_us": 45737.5,
+    "waits": 2138.0,
+    "handles_avg": 1.29,
+    "wait_all": 0.0,
+    "polled": 1373.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 9677.0,
+    "per_s": 1911.0,
+    "avg_us": 16.1,
+    "selects": 2259.0,
+    "blocked": 787.0,
+    "block_avg_us": 139518.7,
+    "waits": 2259.0,
+    "handles_avg": 1.28,
+    "wait_all": 0.0,
+    "polled": 1355.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 9050.0,
+    "per_s": 1787.0,
+    "avg_us": 15.7,
+    "selects": 2091.0,
+    "blocked": 742.0,
+    "block_avg_us": 46583.8,
+    "waits": 2091.0,
+    "handles_avg": 1.3,
+    "wait_all": 0.0,
+    "polled": 1349.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 9185.0,
+    "per_s": 1814.0,
+    "avg_us": 15.8,
+    "selects": 2100.0,
+    "blocked": 747.0,
+    "block_avg_us": 47797.1,
+    "waits": 2100.0,
+    "handles_avg": 1.3,
+    "wait_all": 0.0,
+    "polled": 1353.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 9251.0,
+    "per_s": 1827.0,
+    "avg_us": 15.8,
+    "selects": 2103.0,
+    "blocked": 748.0,
+    "block_avg_us": 47360.1,
+    "waits": 2103.0,
+    "handles_avg": 1.3,
+    "wait_all": 0.0,
+    "polled": 1355.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 9321.0,
+    "per_s": 1841.0,
+    "avg_us": 15.9,
+    "selects": 2213.0,
+    "blocked": 765.0,
+    "block_avg_us": 75359.1,
+    "waits": 2213.0,
+    "handles_avg": 1.28,
+    "wait_all": 0.0,
+    "polled": 1348.0,
+    "delays": 0.0,
+    "yields": 0.0
+   }
+  ],
+  "top": [
+   {
+    "create_file": {
+     "count": 1857,
+     "avg_us": 222.7
+    },
+    "event_op": {
+     "count": 618,
+     "avg_us": 442.2
+    },
+    "create_mapping": {
+     "count": 120,
+     "avg_us": 987.4
+    },
+    "close_handle": {
+     "count": 3883,
+     "avg_us": 25.2
+    },
+    "select": {
+     "count": 2129,
+     "avg_us": 23.5
+    }
+   },
+   {
+    "event_op": {
+     "count": 2722,
+     "avg_us": 56.0
+    },
+    "select": {
+     "count": 4495,
+     "avg_us": 33.4
+    },
+    "create_file": {
+     "count": 164,
+     "avg_us": 577.3
+    },
+    "close_handle": {
+     "count": 2460,
+     "avg_us": 32.2
+    },
+    "create_event": {
+     "count": 1885,
+     "avg_us": 26.0
+    }
+   },
+   {
+    "select": {
+     "count": 2439,
+     "avg_us": 20.6
+    },
+    "close_handle": {
+     "count": 1941,
+     "avg_us": 22.0
+    },
+    "event_op": {
+     "count": 812,
+     "avg_us": 48.3
+    },
+    "create_event": {
+     "count": 1867,
+     "avg_us": 18.2
+    },
+    "create_file": {
+     "count": 36,
+     "avg_us": 478.9
+    }
+   },
+   {
+    "select": {
+     "count": 2650,
+     "avg_us": 20.4
+    },
+    "close_handle": {
+     "count": 1930,
+     "avg_us": 17.0
+    },
+    "event_op": {
+     "count": 933,
+     "avg_us": 35.2
+    },
+    "create_event": {
+     "count": 1869,
+     "avg_us": 16.5
+    },
+    "send_hardware_message": {
+     "count": 621,
+     "avg_us": 19.9
+    }
+   },
+   {
+    "event_op": {
+     "count": 7160,
+     "avg_us": 106.6
+    },
+    "select": {
+     "count": 8976,
+     "avg_us": 55.4
+    },
+    "create_file": {
+     "count": 130,
+     "avg_us": 1916.5
+    },
+    "close_handle": {
+     "count": 2191,
+     "avg_us": 39.2
+    },
+    "create_event": {
+     "count": 1855,
+     "avg_us": 35.5
+    }
+   },
+   {
+    "select": {
+     "count": 9325,
+     "avg_us": 114.3
+    },
+    "event_op": {
+     "count": 6480,
+     "avg_us": 143.1
+    },
+    "close_handle": {
+     "count": 2209,
+     "avg_us": 114.5
+    },
+    "release_mutex": {
+     "count": 1662,
+     "avg_us": 134.8
+    },
+    "create_event": {
+     "count": 1749,
+     "avg_us": 61.2
+    }
+   },
+   {
+    "select": {
+     "count": 3163,
+     "avg_us": 17.7
+    },
+    "event_op": {
+     "count": 1583,
+     "avg_us": 29.9
+    },
+    "close_handle": {
+     "count": 1865,
+     "avg_us": 18.7
+    },
+    "create_event": {
+     "count": 1863,
+     "avg_us": 15.9
+    },
+    "send_hardware_message": {
+     "count": 621,
+     "avg_us": 18.9
+    }
+   },
+   {
+    "select": {
+     "count": 3294,
+     "avg_us": 16.7
+    },
+    "event_op": {
+     "count": 1700,
+     "avg_us": 23.1
+    },
+    "create_event": {
+     "count": 1866,
+     "avg_us": 15.2
+    },
+    "close_handle": {
+     "count": 1867,
+     "avg_us": 14.8
+    },
+    "send_hardware_message": {
+     "count": 622,
+     "avg_us": 17.7
+    }
+   },
+   {
+    "select": {
+     "count": 3722,
+     "avg_us": 16.2
+    },
+    "event_op": {
+     "count": 1905,
+     "avg_us": 20.4
+    },
+    "create_event": {
+     "count": 1866,
+     "avg_us": 15.0
+    },
+    "close_handle": {
+     "count": 1866,
+     "avg_us": 14.1
+    },
+    "send_hardware_message": {
+     "count": 622,
+     "avg_us": 17.3
+    }
+   },
+   {
+    "select": {
+     "count": 3790,
+     "avg_us": 16.3
+    },
+    "event_op": {
+     "count": 1939,
+     "avg_us": 20.7
+    },
+    "create_event": {
+     "count": 1866,
+     "avg_us": 15.0
+    },
+    "close_handle": {
+     "count": 1866,
+     "avg_us": 14.3
+    },
+    "send_hardware_message": {
+     "count": 698,
+     "avg_us": 17.5
+    }
+   },
+   {
+    "select": {
+     "count": 3804,
+     "avg_us": 16.4
+    },
+    "event_op": {
+     "count": 1945,
+     "avg_us": 20.6
+    },
+    "create_event": {
+     "count": 1866,
+     "avg_us": 15.2
+    },
+    "close_handle": {
+     "count": 1866,
+     "avg_us": 14.2
+    },
+    "send_hardware_message": {
+     "count": 1079,
+     "avg_us": 18.2
+    }
+   },
+   {
+    "select": {
+     "count": 3736,
+     "avg_us": 17.0
+    },
+    "event_op": {
+     "count": 1931,
+     "avg_us": 21.7
+    },
+    "create_event": {
+     "count": 1866,
+     "avg_us": 15.3
+    },
+    "close_handle": {
+     "count": 1883,
+     "avg_us": 14.8
+    },
+    "send_hardware_message": {
+     "count": 1036,
+     "avg_us": 18.6
+    }
+   },
+   {
+    "select": {
+     "count": 3839,
+     "avg_us": 16.8
+    },
+    "event_op": {
+     "count": 1972,
+     "avg_us": 20.8
+    },
+    "create_event": {
+     "count": 1869,
+     "avg_us": 15.1
+    },
+    "close_handle": {
+     "count": 1895,
+     "avg_us": 14.5
+    },
+    "send_hardware_message": {
+     "count": 911,
+     "avg_us": 18.1
+    }
+   },
+   {
+    "select": {
+     "count": 3847,
+     "avg_us": 16.3
+    },
+    "event_op": {
+     "count": 1973,
+     "avg_us": 20.1
+    },
+    "create_event": {
+     "count": 1866,
+     "avg_us": 15.1
+    },
+    "close_handle": {
+     "count": 1866,
+     "avg_us": 14.3
+    },
+    "send_hardware_message": {
+     "count": 805,
+     "avg_us": 17.6
+    }
+   },
+   {
+    "select": {
+     "count": 3800,
+     "avg_us": 16.3
+    },
+    "event_op": {
+     "count": 1949,
+     "avg_us": 20.4
+    },
+    "create_event": {
+     "count": 1866,
+     "avg_us": 15.0
+    },
+    "close_handle": {
+     "count": 1870,
+     "avg_us": 14.3
+    },
+    "send_hardware_message": {
+     "count": 1102,
+     "avg_us": 18.3
+    }
+   },
+   {
+    "event_op": {
+     "count": 17939,
+     "avg_us": 56.8
+    },
+    "select": {
+     "count": 21006,
+     "avg_us": 27.4
+    },
+    "create_file": {
+     "count": 3,
+     "avg_us": 81731.9
+    },
+    "create_event": {
+     "count": 1779,
+     "avg_us": 20.8
+    },
+    "close_handle": {
+     "count": 1782,
+     "avg_us": 20.7
+    }
+   },
+   {
+    "event_op": {
+     "count": 37902,
+     "avg_us": 173.0
+    },
+    "select": {
+     "count": 34640,
+     "avg_us": 171.3
+    },
+    "close_handle": {
+     "count": 904,
+     "avg_us": 863.4
+    },
+    "send_hardware_message": {
+     "count": 338,
+     "avg_us": 851.3
+    },
+    "get_message": {
+     "count": 60,
+     "avg_us": 4030.3
+    }
+   },
+   {
+    "select": {
+     "count": 22671,
+     "avg_us": 262.0
+    },
+    "event_op": {
+     "count": 32119,
+     "avg_us": 177.3
+    },
+    "close_handle": {
+     "count": 1287,
+     "avg_us": 850.6
+    },
+    "get_message": {
+     "count": 14,
+     "avg_us": 40107.1
+    },
+    "create_file": {
+     "count": 71,
+     "avg_us": 7187.6
+    }
+   },
+   {
+    "event_op": {
+     "count": 29335,
+     "avg_us": 105.9
+    },
+    "select": {
+     "count": 16212,
+     "avg_us": 82.3
+    },
+    "create_file": {
+     "count": 19,
+     "avg_us": 13308.5
+    },
+    "create_event": {
+     "count": 1662,
+     "avg_us": 89.7
+    },
+    "close_handle": {
+     "count": 1758,
+     "avg_us": 40.6
+    }
+   },
+   {
+    "select": {
+     "count": 4134,
+     "avg_us": 488.0
+    },
+    "event_op": {
+     "count": 3201,
+     "avg_us": 584.5
+    },
+    "close_handle": {
+     "count": 2091,
+     "avg_us": 219.8
+    },
+    "create_event": {
+     "count": 1519,
+     "avg_us": 128.0
+    },
+    "send_hardware_message": {
+     "count": 551,
+     "avg_us": 226.7
+    }
+   },
+   {
+    "close_handle": {
+     "count": 2648,
+     "avg_us": 14.9
+    },
+    "select": {
+     "count": 2167,
+     "avg_us": 16.9
+    },
+    "create_event": {
+     "count": 1866,
+     "avg_us": 15.8
+    },
+    "event_op": {
+     "count": 883,
+     "avg_us": 25.5
+    },
+    "open_key": {
+     "count": 1033,
+     "avg_us": 20.8
+    }
+   },
+   {
+    "close_handle": {
+     "count": 2617,
+     "avg_us": 14.5
+    },
+    "select": {
+     "count": 2205,
+     "avg_us": 16.3
+    },
+    "create_event": {
+     "count": 1866,
+     "avg_us": 15.5
+    },
+    "event_op": {
+     "count": 927,
+     "avg_us": 23.5
+    },
+    "open_key": {
+     "count": 1002,
+     "avg_us": 20.1
+    }
+   },
+   {
+    "close_handle": {
+     "count": 2645,
+     "avg_us": 14.4
+    },
+    "select": {
+     "count": 2156,
+     "avg_us": 16.3
+    },
+    "create_event": {
+     "count": 1866,
+     "avg_us": 15.4
+    },
+    "event_op": {
+     "count": 879,
+     "avg_us": 24.4
+    },
+    "open_key": {
+     "count": 1037,
+     "avg_us": 19.9
+    }
+   },
+   {
+    "close_handle": {
+     "count": 2637,
+     "avg_us": 14.6
+    },
+    "select": {
+     "count": 2154,
+     "avg_us": 16.3
+    },
+    "create_event": {
+     "count": 1866,
+     "avg_us": 15.5
+    },
+    "event_op": {
+     "count": 876,
+     "avg_us": 24.4
+    },
+    "open_key": {
+     "count": 1028,
+     "avg_us": 19.8
+    }
+   },
+   {
+    "select": {
+     "count": 2401,
+     "avg_us": 16.5
+    },
+    "close_handle": {
+     "count": 2620,
+     "avg_us": 14.4
+    },
+    "create_event": {
+     "count": 1866,
+     "avg_us": 15.4
+    },
+    "event_op": {
+     "count": 1123,
+     "avg_us": 21.8
+    },
+    "open_key": {
+     "count": 1007,
+     "avg_us": 19.8
+    }
+   },
+   {
+    "close_handle": {
+     "count": 2634,
+     "avg_us": 14.4
+    },
+    "select": {
+     "count": 2157,
+     "avg_us": 16.0
+    },
+    "create_event": {
+     "count": 1866,
+     "avg_us": 15.3
+    },
+    "event_op": {
+     "count": 880,
+     "avg_us": 23.3
+    },
+    "open_key": {
+     "count": 1024,
+     "avg_us": 19.7
+    }
+   },
+   {
+    "close_handle": {
+     "count": 2291,
+     "avg_us": 14.4
+    },
+    "select": {
+     "count": 1741,
+     "avg_us": 16.2
+    },
+    "create_event": {
+     "count": 1437,
+     "avg_us": 15.3
+    },
+    "open_key": {
+     "count": 1067,
+     "avg_us": 19.6
+    },
+    "event_op": {
+     "count": 747,
+     "avg_us": 23.1
+    }
+   },
+   {
+    "close_handle": {
+     "count": 2637,
+     "avg_us": 14.5
+    },
+    "select": {
+     "count": 2318,
+     "avg_us": 16.3
+    },
+    "create_event": {
+     "count": 1869,
+     "avg_us": 15.3
+    },
+    "event_op": {
+     "count": 1040,
+     "avg_us": 22.4
+    },
+    "open_key": {
+     "count": 1024,
+     "avg_us": 19.8
+    }
+   },
+   {
+    "close_handle": {
+     "count": 2634,
+     "avg_us": 14.3
+    },
+    "select": {
+     "count": 2164,
+     "avg_us": 16.1
+    },
+    "create_event": {
+     "count": 1866,
+     "avg_us": 15.3
+    },
+    "event_op": {
+     "count": 885,
+     "avg_us": 23.3
+    },
+    "open_key": {
+     "count": 1024,
+     "avg_us": 19.4
+    }
+   },
+   {
+    "close_handle": {
+     "count": 2654,
+     "avg_us": 14.4
+    },
+    "select": {
+     "count": 2173,
+     "avg_us": 16.1
+    },
+    "create_event": {
+     "count": 1866,
+     "avg_us": 15.2
+    },
+    "event_op": {
+     "count": 890,
+     "avg_us": 23.3
+    },
+    "open_key": {
+     "count": 1024,
+     "avg_us": 19.7
+    }
+   },
+   {
+    "select": {
+     "count": 2377,
+     "avg_us": 16.1
+    },
+    "close_handle": {
+     "count": 2645,
+     "avg_us": 14.2
+    },
+    "create_event": {
+     "count": 1866,
+     "avg_us": 15.0
+    },
+    "event_op": {
+     "count": 1095,
+     "avg_us": 21.6
+    },
+    "open_key": {
+     "count": 1024,
+     "avg_us": 19.3
+    }
+   },
+   {
+    "close_handle": {
+     "count": 2714,
+     "avg_us": 14.4
+    },
+    "select": {
+     "count": 2209,
+     "avg_us": 16.1
+    },
+    "create_event": {
+     "count": 1866,
+     "avg_us": 15.2
+    },
+    "event_op": {
+     "count": 913,
+     "avg_us": 23.1
+    },
+    "open_key": {
+     "count": 1024,
+     "avg_us": 19.0
+    }
+   },
+   {
+    "close_handle": {
+     "count": 2634,
+     "avg_us": 14.3
+    },
+    "select": {
+     "count": 2145,
+     "avg_us": 15.9
+    },
+    "create_event": {
+     "count": 1866,
+     "avg_us": 15.1
+    },
+    "event_op": {
+     "count": 865,
+     "avg_us": 23.2
+    },
+    "open_key": {
+     "count": 1024,
+     "avg_us": 19.2
+    }
+   },
+   {
+    "close_handle": {
+     "count": 2613,
+     "avg_us": 14.4
+    },
+    "select": {
+     "count": 2265,
+     "avg_us": 16.1
+    },
+    "create_event": {
+     "count": 1869,
+     "avg_us": 15.3
+    },
+    "event_op": {
+     "count": 985,
+     "avg_us": 22.5
+    },
+    "open_key": {
+     "count": 992,
+     "avg_us": 19.5
+    }
+   },
+   {
+    "close_handle": {
+     "count": 2634,
+     "avg_us": 14.2
+    },
+    "select": {
+     "count": 2160,
+     "avg_us": 15.9
+    },
+    "create_event": {
+     "count": 1866,
+     "avg_us": 15.1
+    },
+    "event_op": {
+     "count": 883,
+     "avg_us": 22.9
+    },
+    "open_key": {
+     "count": 1024,
+     "avg_us": 19.3
+    }
+   },
+   {
+    "close_handle": {
+     "count": 2634,
+     "avg_us": 14.3
+    },
+    "select": {
+     "count": 2167,
+     "avg_us": 15.9
+    },
+    "create_event": {
+     "count": 1866,
+     "avg_us": 15.1
+    },
+    "event_op": {
+     "count": 888,
+     "avg_us": 23.0
+    },
+    "open_key": {
+     "count": 1024,
+     "avg_us": 19.2
+    }
+   },
+   {
+    "select": {
+     "count": 2317,
+     "avg_us": 16.2
+    },
+    "close_handle": {
+     "count": 2627,
+     "avg_us": 14.2
+    },
+    "create_event": {
+     "count": 1866,
+     "avg_us": 15.1
+    },
+    "event_op": {
+     "count": 1040,
+     "avg_us": 22.0
+    },
+    "open_key": {
+     "count": 1015,
+     "avg_us": 19.0
+    }
+   },
+   {
+    "close_handle": {
+     "count": 2643,
+     "avg_us": 14.4
+    },
+    "select": {
+     "count": 2159,
+     "avg_us": 16.2
+    },
+    "create_event": {
+     "count": 1867,
+     "avg_us": 15.3
+    },
+    "event_op": {
+     "count": 882,
+     "avg_us": 23.9
+    },
+    "open_key": {
+     "count": 1033,
+     "avg_us": 19.5
+    }
+   },
+   {
+    "close_handle": {
+     "count": 2635,
+     "avg_us": 14.3
+    },
+    "select": {
+     "count": 2146,
+     "avg_us": 15.9
+    },
+    "create_event": {
+     "count": 1868,
+     "avg_us": 15.1
+    },
+    "event_op": {
+     "count": 865,
+     "avg_us": 23.2
+    },
+    "open_key": {
+     "count": 1024,
+     "avg_us": 19.2
+    }
+   },
+   {
+    "select": {
+     "count": 2363,
+     "avg_us": 15.9
+    },
+    "close_handle": {
+     "count": 2646,
+     "avg_us": 14.1
+    },
+    "create_event": {
+     "count": 1866,
+     "avg_us": 15.0
+    },
+    "event_op": {
+     "count": 1082,
+     "avg_us": 21.3
+    },
+    "open_key": {
+     "count": 1022,
+     "avg_us": 19.0
+    }
+   },
+   {
+    "close_handle": {
+     "count": 2634,
+     "avg_us": 14.4
+    },
+    "select": {
+     "count": 2149,
+     "avg_us": 16.0
+    },
+    "create_event": {
+     "count": 1866,
+     "avg_us": 15.3
+    },
+    "event_op": {
+     "count": 872,
+     "avg_us": 23.2
+    },
+    "open_key": {
+     "count": 1025,
+     "avg_us": 19.2
+    }
+   },
+   {
+    "close_handle": {
+     "count": 2634,
+     "avg_us": 13.9
+    },
+    "select": {
+     "count": 2138,
+     "avg_us": 15.5
+    },
+    "create_event": {
+     "count": 1866,
+     "avg_us": 14.9
+    },
+    "event_op": {
+     "count": 861,
+     "avg_us": 22.5
+    },
+    "open_key": {
+     "count": 1024,
+     "avg_us": 18.7
+    }
+   },
+   {
+    "select": {
+     "count": 2259,
+     "avg_us": 15.8
+    },
+    "close_handle": {
+     "count": 2415,
+     "avg_us": 13.9
+    },
+    "create_event": {
+     "count": 1866,
+     "avg_us": 14.9
+    },
+    "event_op": {
+     "count": 965,
+     "avg_us": 20.8
+    },
+    "open_key": {
+     "count": 730,
+     "avg_us": 18.9
+    }
+   },
+   {
+    "close_handle": {
+     "count": 2338,
+     "avg_us": 13.7
+    },
+    "select": {
+     "count": 2091,
+     "avg_us": 15.1
+    },
+    "create_event": {
+     "count": 1866,
+     "avg_us": 14.6
+    },
+    "event_op": {
+     "count": 802,
+     "avg_us": 21.1
+    },
+    "open_key": {
+     "count": 631,
+     "avg_us": 18.6
+    }
+   },
+   {
+    "close_handle": {
+     "count": 2370,
+     "avg_us": 13.7
+    },
+    "select": {
+     "count": 2100,
+     "avg_us": 15.2
+    },
+    "create_event": {
+     "count": 1869,
+     "avg_us": 14.6
+    },
+    "event_op": {
+     "count": 810,
+     "avg_us": 21.2
+    },
+    "open_key": {
+     "count": 668,
+     "avg_us": 18.9
+    }
+   },
+   {
+    "close_handle": {
+     "count": 2384,
+     "avg_us": 13.8
+    },
+    "select": {
+     "count": 2103,
+     "avg_us": 15.3
+    },
+    "create_event": {
+     "count": 1866,
+     "avg_us": 14.5
+    },
+    "event_op": {
+     "count": 814,
+     "avg_us": 21.3
+    },
+    "open_key": {
+     "count": 690,
+     "avg_us": 18.6
+    }
+   },
+   {
+    "select": {
+     "count": 2213,
+     "avg_us": 15.4
+    },
+    "close_handle": {
+     "count": 2343,
+     "avg_us": 13.8
+    },
+    "create_event": {
+     "count": 1866,
+     "avg_us": 14.6
+    },
+    "event_op": {
+     "count": 923,
+     "avg_us": 20.5
+    },
+    "open_key": {
+     "count": 635,
+     "avg_us": 19.1
+    }
+   }
+  ]
+ }
+}

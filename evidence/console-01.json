@@ -1,0 +1,57 @@
+{
+ "run": "console-01",
+ "what": "process-probe.exe",
+ "env": [],
+ "result": "finished",
+ "seconds": 10.5,
+ "probe_verdict": "FAIL",
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": false,
+ "bench": {},
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [
+   {
+    "calls": 6871.0,
+    "per_s": 1355.0,
+    "avg_us": 9.6,
+    "selects": 1350.0,
+    "blocked": 454.0,
+    "block_avg_us": 12420.2,
+    "waits": 1345.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 888.0,
+    "delays": 0.0,
+    "yields": 0.0
+   }
+  ],
+  "top": [
+   {
+    "create_mapping": {
+     "count": 43,
+     "avg_us": 239.8
+    },
+    "create_file": {
+     "count": 60,
+     "avg_us": 145.1
+    },
+    "send_hardware_message": {
+     "count": 445,
+     "avg_us": 18.9
+    },
+    "get_key_value": {
+     "count": 372,
+     "avg_us": 16.4
+    },
+    "close_handle": {
+     "count": 1731,
+     "avg_us": 2.9
+    }
+   }
+  ]
+ }
+}

@@ -1,0 +1,63 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Sat, 18 Oct 2026 09:00:00 -0400
+Subject: [PATCH] server: on PS5, the hang snapshot names what keeps a session from ending
+
+A Mihawk OS session ends when its last user process does: the server then asks the system processes, Explorer among
+them, to shut down. In PS5_Proton's gate-2026-10-18-defaults-01, game-mode-dxvk64's session did not end after its
+game's process ended (once in 12 runs with every speed switch on, never in 34 without), and the title's snapshot named
+only threads. It now also prints the counts the shutdown is decided on (user and running processes, the shutdown's
+stage and timeout, the master socket timeout) and every process with its system mark, its running threads, whether it
+has ended and its image's file name, so the next one shows which process the server still counts.
+---
+--- a/server/process.c
++++ b/server/process.c
+@@ -2193,3 +2193,30 @@
+         }
+     }
+ }
++
++/* PS5: what keeps a session from ending, for the title's hang snapshot (wait_snapshot). A Mihawk OS session ends when its
++ * last user process does: the server then asks the system processes, Explorer among them, to shut down. In
++ * gate-2026-10-18-defaults-01 game-mode-dxvk64 one did not end after its game's process ended; this names the counts the
++ * shutdown is decided on, and every process with its system mark, its running threads and its image's name. */
++void ps5_process_snapshot(void)
++{
++    struct process *process;
++
++    fprintf( stderr, "wine-ps5: processes user=%d running=%d shutdown_stage=%d shutdown_timeout=%d master_timeout_ms=%lld\n",
++             user_processes, running_processes, shutdown_stage, shutdown_timeout != NULL,
++             master_socket_timeout == TIMEOUT_INFINITE ? -1ll : (long long)(-master_socket_timeout / 10000) );
++    LIST_FOR_EACH_ENTRY( process, &process_list, struct process, entry )
++    {
++        char name[64];
++        size_t used = 0;
++        const size_t chars = process->image ? process->imagelen / sizeof(WCHAR) : 0;
++        size_t first = chars;
++        while (first && process->image[first - 1] != '\\') first--;
++        for (size_t i = first; i < chars && used < sizeof(name) - 1; i++)
++            name[used++] = process->image[i] < 0x80 ? (char)process->image[i] : '?';
++        name[used] = 0;
++        fprintf( stderr, "wine-ps5: process pid=%04x unix=%d system=%d threads=%d ended=%d name=%s\n", process->id,
++                 process->unix_pid, process->is_system, process->running_threads, process->end_time != 0,
++                 used ? name : "-" );
++    }
++}
+--- a/server/thread.c
++++ b/server/thread.c
+@@ -1219,6 +1219,7 @@
+              thread->ps5_last_req, (long long)((monotonic_time - thread->ps5_last_req_time) / 10000) );
+ }
+ 
++extern void ps5_process_snapshot(void);   /* process.c: what keeps the session from ending */
+ static void wait_snapshot(void)
+ {
+     struct thread *thread;
+@@ -1226,6 +1227,7 @@
+     int i;
+ 
+     fprintf( stderr, "wine-ps5: wait snapshot\n" );
++    ps5_process_snapshot();
+     LIST_FOR_EACH_ENTRY( thread, &thread_list, struct thread, entry )
+     {
+         snapshot_thread_line( thread );

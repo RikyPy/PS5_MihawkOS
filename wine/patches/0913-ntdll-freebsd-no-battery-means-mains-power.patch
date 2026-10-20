@@ -1,0 +1,31 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Sat, 3 Oct 2026 21:30:00 -0400
+Subject: [PATCH] ntdll: a FreeBSD machine without a battery is on mains power
+
+fill_battery_state starts from zeros and sets AcOnLine only when the hw.acpi.battery sysctls exist, so a machine
+without a battery (a desktop, the PS5) reported BatteryPresent FALSE and AcOnLine FALSE: GetSystemPowerStatus
+answered ACLineStatus 0, "offline", which kernel32's power test notices and a game that throttles itself on battery
+power would act on. Windows reports AC online for a machine with no battery, and so does this now.
+---
+  dlls/ntdll/unix/system.c | 5 +++++
+  1 file changed, 5 insertions(+)
+
+diff --git a/dlls/ntdll/unix/system.c b/dlls/ntdll/unix/system.c
+index a944ded..15dfa2b 100644
+--- a/dlls/ntdll/unix/system.c
++++ b/dlls/ntdll/unix/system.c
+@@ -4927,6 +4927,11 @@ static NTSTATUS fill_battery_state( SYSTEM_BATTERY_STATE *bs )
+             bs->MaxCapacity = 100;
+         }
+     }
++    else
++    {
++        /* no battery (a desktop, a console): the machine is on mains power, as Windows reports it */
++        bs->AcOnLine = TRUE;
++    }
+     return STATUS_SUCCESS;
+ }
+ 
+-- 
+2.43.0

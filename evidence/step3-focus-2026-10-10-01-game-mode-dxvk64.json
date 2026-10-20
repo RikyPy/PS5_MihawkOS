@@ -1,0 +1,196 @@
+{
+ "telemetry_hold": null,
+ "launch_readiness": {
+  "ready": true,
+  "seconds": 8.004,
+  "settle_seconds": 7.798,
+  "census_seconds": 0.189,
+  "previous_cleanup_verified": false
+ },
+ "native_close_failures": [],
+ "run": "step3-focus-2026-10-10-01-game-mode-dxvk64",
+ "what": "C:\\windows\\system32\\mihawk.exe",
+ "env": [
+  "PROTON_LAYOUT=launcher",
+  "WINE_PS5_WINDOW_SURFACES=1",
+  "MIHAWK_DESKTOP=1"
+ ],
+ "result": "finished",
+ "seconds": 35.5,
+ "probe_verdict": null,
+ "clean_owner_restart": true,
+ "launcher_end_status": 0,
+ "initial_status": 0,
+ "closed_on_request": false,
+ "child_logs": [
+  "klog/step3-focus-2026-10-10-01-game-mode-dxvk64-wine-child-9788.log",
+  "klog/step3-focus-2026-10-10-01-game-mode-dxvk64-wine-child-9789.log",
+  "klog/step3-focus-2026-10-10-01-game-mode-dxvk64-wine-child-9790.log",
+  "klog/step3-focus-2026-10-10-01-game-mode-dxvk64-wine-child-9791.log",
+  "klog/step3-focus-2026-10-10-01-game-mode-dxvk64-wine-child-9792.log",
+  "klog/step3-focus-2026-10-10-01-game-mode-dxvk64-wine-child-9793.log",
+  "klog/step3-focus-2026-10-10-01-game-mode-dxvk64-wine-child-9794.log",
+  "klog/step3-focus-2026-10-10-01-game-mode-dxvk64-wine-child-9795.log",
+  "klog/step3-focus-2026-10-10-01-game-mode-dxvk64-wine-child-9796.log",
+  "klog/step3-focus-2026-10-10-01-game-mode-dxvk64-wine-child-9797.log",
+  "klog/step3-focus-2026-10-10-01-game-mode-dxvk64-wine-child-9798.log",
+  "klog/step3-focus-2026-10-10-01-game-mode-dxvk64-wine-child-9799.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": false,
+ "bench": {},
+ "steady": {
+  "server": {
+   "calls": 0.0,
+   "per_s": 0.0,
+   "avg_us": 0.0,
+   "selects": 0.0,
+   "blocked": 0.0,
+   "block_avg_us": 0.0,
+   "waits": 0.0,
+   "handles_avg": 0.0,
+   "wait_all": 0.0,
+   "polled": 0.0,
+   "delays": 0.0,
+   "yields": 0.0,
+   "intervals": 1
+  }
+ },
+ "intervals": {
+  "frames": [],
+  "server": [
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   }
+  ],
+  "top": []
+ },
+ "shown": {
+  "frames": 319,
+  "per_10s": [
+   1,
+   318
+  ],
+  "longest_gap_ms": 2239
+ },
+ "broker": {
+  "local_offer": null,
+  "host_limit": null,
+  "windows": {
+   "presents": 50,
+   "effect_bytes": 388800,
+   "mica_builds": 2,
+   "thumbnail_builds": 0,
+   "compositions": 50,
+   "compose_avg_us": 1655,
+   "compose_max_us": 8148
+  },
+  "refused": [],
+  "refused_count": 0,
+  "clients": [],
+  "wedged": false,
+  "failure_reasons": [],
+  "host_peak": null,
+  "local_peak": null
+ },
+ "pacing": {
+  "windows": [
+   {
+    "cookie": 9,
+    "pid": 9797,
+    "route": "independent",
+    "final": true,
+    "refused": "none",
+    "direct": 279.0,
+    "composed": 0.0,
+    "seconds": 23.5,
+    "frames": 279.0,
+    "hidden": 0.0,
+    "fps": 11.9,
+    "mean": 19.45,
+    "p50": 16.75,
+    "p95": 17.25,
+    "p99": 32.75,
+    "max": 679.29,
+    "over20": 4.0,
+    "over34": 2.0,
+    "present_avg": 17.92,
+    "present_max": 678.54
+   }
+  ],
+  "clients": {
+   "9": {
+    "pid": 9797,
+    "route": "independent",
+    "routes": {
+     "independent": 279
+    },
+    "windows": 1,
+    "seconds": 23.5,
+    "frames": 279,
+    "hidden": 0,
+    "direct": 279,
+    "composed": 0,
+    "refused": [],
+    "fps": 11.9,
+    "p50_median_ms": 16.75,
+    "p95_worst_ms": 17.25,
+    "p99_worst_ms": 32.75,
+    "max_ms": 679.29,
+    "over20": 4,
+    "over34": 2,
+    "present_avg_ms": 17.92,
+    "present_max_ms": 678.54
+   }
+  }
+ },
+ "captures": [
+  "klog/step3-focus-2026-10-10-01-game-mode-dxvk64-capture-01.png"
+ ],
+ "cleanup_verified": false,
+ "hooks_removed": true,
+ "api": "dxvk",
+ "game_mode": {
+  "direct_entries": 1,
+  "unloads": [
+   401
+  ],
+  "restores": [
+   {
+    "status": 0,
+    "ms": 225
+   }
+  ],
+  "kept": 0,
+  "could_not_start": 0,
+  "session_root": true
+ },
+ "probe_passed": false
+}

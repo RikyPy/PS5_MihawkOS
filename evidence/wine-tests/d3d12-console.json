@@ -1,0 +1,50 @@
+{
+ "d3d12": {
+  "failure_count": 6,
+  "failures": [
+   {
+    "file": "d3d12-d3d12.c",
+    "line": 1454,
+    "text": "Got unexpected hr 0."
+   },
+   {
+    "file": "d3d12-d3d12.c",
+    "line": 1459,
+    "text": "Got unexpected hr 0."
+   },
+   {
+    "file": "d3d12-d3d12.c",
+    "line": 1463,
+    "text": "ID3D12Device has 1 references left."
+   },
+   {
+    "file": "d3d12-d3d12.c",
+    "line": 1525,
+    "text": "Got unexpected hr 0."
+   },
+   {
+    "file": "d3d12-d3d12.c",
+    "line": 1525,
+    "text": "Got unexpected hr 0."
+   },
+   {
+    "file": "d3d12-d3d12.c",
+    "line": 1545,
+    "text": "Device has 1 references left."
+   }
+  ],
+  "guarded": 10,
+  "last_line": "winetest-batch: done",
+  "seconds": 42.1,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 6,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 673,
+   "todo": 9
+  },
+  "todo_lines": 9
+ }
+}

@@ -1,0 +1,52 @@
+{
+  "battery": "taskbar-2026-10-16-03",
+  "expected_cases": [
+    "desktop-session"
+  ],
+  "revision": "53b020863ace3c7fcd8145609dcaaf5a5ee0a151",
+  "dirty": true,
+  "cases": [
+    {
+      "case": "desktop-session",
+      "run": "taskbar-2026-10-16-03-desktop-session",
+      "runner_status": 0,
+      "seconds": 89.8,
+      "result": "finished",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "run_seconds": 27.1,
+      "launch_readiness": {
+        "ready": true,
+        "seconds": 0.147,
+        "settle_seconds": 0.0,
+        "census_seconds": 0.138,
+        "previous_cleanup_verified": true
+      },
+      "stages": {
+        "launched": 0.94,
+        "title_started": 1.42,
+        "elevated": 1.43,
+        "wine_loaded": 1.6,
+        "wineboot_started": 2.82,
+        "wineboot_ended": 8.73,
+        "program_started": 14.09,
+        "marker": 23.29,
+        "program_ended": 23.3,
+        "wine_ended": 24.9,
+        "launcher_started": 26.3,
+        "launcher_ended": 26.52,
+        "closed": 27.07
+      },
+      "runner_overhead_seconds": 62.7,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 14,
+      "protocol_errors": 0
+    }
+  ],
+  "complete": true,
+  "seconds": 89.8,
+  "passed": true
+}

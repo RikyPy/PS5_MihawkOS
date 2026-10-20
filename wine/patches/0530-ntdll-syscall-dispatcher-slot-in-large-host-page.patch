@@ -1,0 +1,51 @@
+From ab15941d900b72e363d5ec7b91888473470a96d9 Mon Sep 17 00:00:00 2001
+From: prospero-win <prospero-win@invalid>
+Date: Sat, 26 Sep 2026 12:01:11 +0200
+Subject: [PATCH] ntdll: Keep the syscall dispatcher slot inside a large host
+
+ page.
+x86_64 syscall thunks call through the pointer at 0x7ffe1000, which Wine
+maps as a separate 4 KiB page next to KUSER_SHARED_DATA. On hosts with
+larger pages (16 KiB on PS5) both share one host page, which is already a
+read-only view of the USD section, so the separate fixed mapping fails.
+Store the pointer through that view instead. This needs the server to size
+the USD section to at least one host page.
+
+Rebased onto 1c7859662533 for PS5_Proton (see wine/patches/README.md).
+---
+ dlls/ntdll/unix/signal_x86_64.c | 19 +++++++++++++++++--
+ 1 file changed, 17 insertions(+), 2 deletions(-)
+
+diff --git a/dlls/ntdll/unix/signal_x86_64.c b/dlls/ntdll/unix/signal_x86_64.c
+index 3eb8e6b..a706cbf 100644
+--- a/dlls/ntdll/unix/signal_x86_64.c
++++ b/dlls/ntdll/unix/signal_x86_64.c
+@@ -3174,8 +3174,23 @@ void signal_init_process(void)
+ 
+     /* sneak in a syscall dispatcher pointer at a fixed address (7ffe1000) */
+     ptr = (char *)user_shared_data + page_size;
+-    anon_mmap_fixed( ptr, page_size, PROT_READ | PROT_WRITE, 0 );
+-    *(void **)ptr = __wine_syscall_dispatcher;
++    if ((size_t)sysconf( _SC_PAGESIZE ) > page_size)
++    {
++        /* With host pages larger than 4 KiB (16 KiB on PS5) this slot shares
++         * a host page with KUSER_SHARED_DATA, which is already mapped as a
++         * read-only view of the USD section (the server sizes that section
++         * to a host page). Store the pointer through that view. */
++        const size_t host_page = sysconf( _SC_PAGESIZE );
++
++        mprotect( user_shared_data, host_page, PROT_READ | PROT_WRITE );
++        *(void **)ptr = __wine_syscall_dispatcher;
++        mprotect( user_shared_data, host_page, PROT_READ );
++    }
++    else
++    {
++        anon_mmap_fixed( ptr, page_size, PROT_READ | PROT_WRITE, 0 );
++        *(void **)ptr = __wine_syscall_dispatcher;
++    }
+ 
+     xstate_extended_features = user_shared_data->XState.EnabledFeatures & ~(UINT64)3;
+ 
+-- 
+2.55.0
+

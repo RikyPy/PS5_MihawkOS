@@ -1,0 +1,22 @@
+{
+  "probe_sha256": "b061e01d9e4d13e77ec6339fef4b48f7af7821288efb14b8a69e1126fdfffffa",
+  "wine_revision": "a518d643873ff733bafb31595dfd01ab8bbdf790",
+  "cases": [
+    {
+      "case": "graphics",
+      "exit_code": 1,
+      "seconds": 1.72,
+      "verdict": "FAIL",
+      "handles": [
+        {
+          "before": 12,
+          "after": 12
+        }
+      ],
+      "graphics_metadata_passed": true,
+      "graphics_teardown_passed": false,
+      "passed": false
+    }
+  ],
+  "passed": false
+}

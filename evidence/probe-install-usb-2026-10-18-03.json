@@ -1,0 +1,74 @@
+{
+  "title": "PPSA99170",
+  "identity": "e72e7637093c4b169d704d581232c809",
+  "kind": "install-probe",
+  "build": {
+    "graphics_foundation_revision": "f410e67a0241b3e8edcdbcd2a9b285dfc4a412ed",
+    "revision": "515899b092b9bce5be03b96ba2dedb2230325e06",
+    "kind": "install-probe",
+    "elevate_gpu_helper": false,
+    "vulkan_gpu_helper": false,
+    "gpu_draw_helper": false,
+    "gpu_present_helper": false,
+    "wine_gpu_broker": false,
+    "sdk_revision": "611893fc25ef3e138f5bc2c90d829d8b58174cd2",
+    "source_sha256": {
+      "ps5/src/main.cpp": "c8f5dcec7e4781d8a4087f3dd44b35e2f260b4f07c148908dc6784a982581bdc",
+      "ps5/CMakeLists.txt": "01a4ba6085a5da81ab0c51b6b0315d49664a1bdfa00cd45ce478c10168ad8ceb",
+      "native/proton_install_probe.h": "8c5c368262aa5698573716942ce7bf09dfb076c0aab365ae9cde17a0b7a47e4a",
+      "native/proton_install_probe.cpp": "2da4888dc2b380e0110796d1a62068c00d906324c1670a3bcbaaf23cafd4c4e7",
+      "ps5/tools/link-title.sh": "e4d037c3c0a355038ec844499daf0e21ebd79c5030738755e98c3cbbfb41e39f",
+      "tools/setup-graphics-foundation.sh": "aecce2c413007d2a7b397cd3491ff7ebf9e28499ccf4665f41447f7ef1b0ea1c",
+      "src/pw_frame_page.h": "86b25bacd193fc37dd5dc099166f1bef1bca071f944d73c8c58838a252fc0c87"
+    },
+    "radv_recipe_sha256": "efef0a82c7ba4ffd97c225f6969a31bc550938689b03e9fafe2cf69734e8d7c9",
+    "identity": "5588ac8dfac0eda90c398cac9aeec69881a9fc39202ca4ce82d318a5d5cef5f5",
+    "eboot_sha256": "a058bda39fb54819e0e42d92e36295cf5678367874393b6558ca185ceb75a1f8"
+  },
+  "capture": "klog/probe-install-usb-2026-10-18-03",
+  "expected_missing_image": false,
+  "mode": "normal",
+  "passed": false,
+  "status": "complete",
+  "production_sha256": "5e804ea268ebf23b94d80c4b6b73b44764ca984d954f195b89042e522c93b10d",
+  "production_restored": true,
+  "production_backup": "the installed eboot.bin, read back raw",
+  "root_reference_balance_verified": false,
+  "forced_title_close": false,
+  "transfer_stage": "read eboot.bin",
+  "installed_readback_sha256": "edb51113bfb5939accb608f9f88fe2dffcc8cc0ca3bef3cd202e0ff4647e69db",
+  "probe_readback_sha256": "91f38ff2f4de0e0657e7ca8db2b045797563adfac6c3af9c1b0accb7dd0da5d5",
+  "probe_executable_sha256": "400791cac5f45f3bb41728fc8b0099baa15655cf122162c18a5b49db873bda16",
+  "plan": [
+    "usb"
+  ],
+  "host_clock_at_launch": 1792361286,
+  "shell_idle_after_run": true,
+  "post_launch_fault_records": 0,
+  "kernel_fmem": [
+    "0x40000000"
+  ],
+  "kernel_dmem": [
+    "0x2dc000000"
+  ],
+  "parent_shell_exit_seen": false,
+  "observations": [
+    "install-probe identity=e72e7637093c4b169d704d581232c809 phase=1 pid=2212 uid=0 elevated=1",
+    "preroot uid=1 euid=1 stat_data=0 stat_homebrew=0 stat_ps5proton=0 stat_devconf=0 mkdir_data=0 create_homebrew=0",
+    "usb root=/mnt/usb0 stat_errno=0 mode=040777 opendir_errno=0 entries=1",
+    "usb read folder=/mnt/usb0/mihawkos size=314572800 open_errno=0 bytes=314572800 seconds=2.62 mib_s=114.5",
+    "usb root=/mnt/usb1 stat_errno=0 mode=040555 opendir_errno=0 entries=0",
+    "usb root=/mnt/usb2 stat_errno=0 mode=040555 opendir_errno=0 entries=0",
+    "usb root=/mnt/usb3 stat_errno=0 mode=040555 opendir_errno=0 entries=0",
+    "usb root=/mnt/usb4 stat_errno=0 mode=040555 opendir_errno=0 entries=0",
+    "usb root=/mnt/usb5 stat_errno=0 mode=040555 opendir_errno=0 entries=0",
+    "usb root=/mnt/usb6 stat_errno=0 mode=040555 opendir_errno=0 entries=0",
+    "usb root=/mnt/usb7 stat_errno=0 mode=040555 opendir_errno=0 entries=0",
+    "usb root=/mnt/ext0 stat_errno=0 mode=040770 opendir_errno=0 entries=0",
+    "usb done",
+    "result=PASS"
+  ],
+  "fresh_identity_seen": true,
+  "clock_skew_s": [],
+  "restored_readback_sha256": "edb51113bfb5939accb608f9f88fe2dffcc8cc0ca3bef3cd202e0ff4647e69db"
+}

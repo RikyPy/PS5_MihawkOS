@@ -1,0 +1,151 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Sun, 4 Oct 2026 21:00:00 -0400
+Subject: [PATCH] ntdll: on PS5, report signals that reach a thread inside the sync device
+
+The first .NET game freeze traced with patch 0921 (2026-10-04; record removed from the tree; in git history) was a deadlock of two locks: the
+synchronization device's lock was held, not by a thread inside a call, but by one between clearing
+its name and unlocking, and the server lock was held by another thread, neither taken again in 20 s.
+Wine calls the device as it would a kernel driver, which no signal interrupts halfway; the device is
+code in this process, so a signal can land while its thread holds the device's lock, and a handler
+that then needs the server (SIGUSR1's suspend runs a select) waits for a lock whose holder waits for
+the device. To confirm it on the next freeze:
+
+- Wine's SIGINT, SIGQUIT and SIGUSR1 handlers tell the device that a signal arrived
+  (pw_ntsync_signal_arrived, async-signal-safe), which counts the signals that reached a thread in
+  the device, by where it was, for its dump.
+- When the server lock does not move for the snapshot's wait, the snapshot lists every thread from
+  the thread list without the lock (each thread's own fields, no object followed), so the kernel
+  thread holding the lock is named as a Windows thread with its last request.
+---
+  dlls/ntdll/unix/signal_x86_64.c | 21 ++++++++++++++++++
+  server/thread.c                 | 49 +++++++++++++++++++++++++++++------------
+  2 files changed, 56 insertions(+), 14 deletions(-)
+
+diff --git a/dlls/ntdll/unix/signal_x86_64.c b/dlls/ntdll/unix/signal_x86_64.c
+index 0d84eb7..f6dc433 100644
+--- a/dlls/ntdll/unix/signal_x86_64.c
++++ b/dlls/ntdll/unix/signal_x86_64.c
+@@ -2942,6 +2942,15 @@ static void fpe_handler( int signal, siginfo_t *siginfo, void *sigcontext )
+ }
+ 
+ 
++#ifdef __PROSPERO__
++/* The in-process synchronization device (patch 0890) is code in this process,
++ * not a kernel driver: a signal can land while its thread holds the device's
++ * lock, and a handler that then needs the device, or the server lock held by
++ * a thread that waits for the device, never returns. The device counts such
++ * signals for its dump (PS5_Proton src/pw_ntsync.h). */
++extern void pw_ntsync_signal_arrived( int signal );
++#endif
++
+ /**********************************************************************
+  *		int_handler
+  *
+@@ -2952,6 +2961,10 @@ static void int_handler( int signal, siginfo_t *siginfo, void *sigcontext )
+     ucontext_t *ucontext = init_handler( sigcontext );
+     HANDLE handle;
+ 
++#ifdef __PROSPERO__
++    pw_ntsync_signal_arrived( signal );
++#endif
++
+     if (p__wine_ctrl_routine)
+     {
+         if (!NtCreateThreadEx( &handle, THREAD_ALL_ACCESS, NULL, NtCurrentProcess(),
+@@ -2985,6 +2998,10 @@ static void quit_handler( int signal, siginfo_t *siginfo, void *sigcontext )
+ {
+     ucontext_t *ucontext = init_handler( sigcontext );
+ 
++#ifdef __PROSPERO__
++    pw_ntsync_signal_arrived( signal );
++#endif
++
+ #ifdef __PROSPERO__
+     {
+         /* which way a kill goes: a thread inside a syscall or Unix call is marked, one in user mode ends */
+@@ -3027,6 +3044,10 @@ static void usr1_handler( int signal, siginfo_t *siginfo, void *sigcontext )
+ {
+     ucontext_t *ucontext = init_handler( sigcontext );
+ 
++#ifdef __PROSPERO__
++    pw_ntsync_signal_arrived( signal );
++#endif
++
+     if (is_inside_syscall( RSP_sig(ucontext) ))
+     {
+         struct syscall_frame *frame = get_syscall_frame();
+diff --git a/server/thread.c b/server/thread.c
+index a02e818..8d448b3 100644
+--- a/server/thread.c
++++ b/server/thread.c
+@@ -1198,6 +1198,21 @@ static int ps5_peek( int probe[2], unsigned int address, void *out, size_t size
+ extern int ps5_object_device_number( struct object *sync );
+ #endif
+ 
++/* unix: the kernel thread, as the device and the lock holders name it;
++ * sync: the device number a wait on this thread's handle waits for */
++static void snapshot_thread_line( struct thread *thread )
++{
++    fprintf( stderr, "wine-ps5: thread tid=%04x unix=%x sync=#%x suspend=%d/%d state=%d waiting=%d last_req=%d age_ms=%lld\n",
++             thread->id, thread->unix_tid,
++#ifdef __PROSPERO__
++             ps5_object_device_number( thread->sync ),
++#else
++             -1,
++#endif
++             thread->suspend, thread->process->suspend, thread->state, thread->wait != NULL,
++             thread->ps5_last_req, (long long)((monotonic_time - thread->ps5_last_req_time) / 10000) );
++}
++
+ static void wait_snapshot(void)
+ {
+     struct thread *thread;
+@@ -1207,17 +1222,7 @@ static void wait_snapshot(void)
+     fprintf( stderr, "wine-ps5: wait snapshot\n" );
+     LIST_FOR_EACH_ENTRY( thread, &thread_list, struct thread, entry )
+     {
+-        /* unix: the kernel thread, as the device and the lock holders name it;
+-         * sync: the device number a wait on this thread's handle waits for */
+-        fprintf( stderr, "wine-ps5: thread tid=%04x unix=%x sync=#%x suspend=%d/%d state=%d waiting=%d last_req=%d age_ms=%lld\n",
+-                 thread->id, thread->unix_tid,
+-#ifdef __PROSPERO__
+-                 ps5_object_device_number( thread->sync ),
+-#else
+-                 -1,
+-#endif
+-                 thread->suspend, thread->process->suspend, thread->state, thread->wait != NULL,
+-                 thread->ps5_last_req, (long long)((monotonic_time - thread->ps5_last_req_time) / 10000) );
++        snapshot_thread_line( thread );
+         /* Silent outside any wait for over a second: where its i386 code is,
+          * from the WoW64 CPU area (TEB64 TlsSlots[WOW64_TLS_CPURESERVED]).
+          * The server runs in the game's process, so it can read it. A 64-bit
+@@ -1310,9 +1315,25 @@ DECLSPEC_EXPORT int pw_wineserver_snapshot( unsigned int wait_ms )
+     {
+         if (waited >= wait_ms)
+         {
+-            fprintf( stderr, "wine-ps5: snapshot: the server lock is held by unix=%x, taken %u times in %u ms; "
+-                     "not read\n", __atomic_load_n( &inprocess_server_holder, __ATOMIC_RELAXED ),
+-                     __atomic_load_n( &inprocess_server_locks, __ATOMIC_RELAXED ) - locks, wait_ms );
++            const unsigned int taken = __atomic_load_n( &inprocess_server_locks, __ATOMIC_RELAXED ) - locks;
++            struct thread *thread;
++            struct thread_wait *wait;
++
++            fprintf( stderr, "wine-ps5: snapshot: the server lock is held by unix=%x, taken %u times in %u ms\n",
++                     __atomic_load_n( &inprocess_server_holder, __ATOMIC_RELAXED ), taken, wait_ms );
++            if (taken) return -1;
++            /* A lock that has not moved: no thread can change the thread list,
++             * so it is read without the lock, the ages counted to the server's
++             * last time. Only each thread's own fields, no object is followed. */
++            fprintf( stderr, "wine-ps5: snapshot: threads, read without the server lock\n" );
++            LIST_FOR_EACH_ENTRY( thread, &thread_list, struct thread, entry )
++            {
++                snapshot_thread_line( thread );
++                for (wait = thread->wait; wait; wait = wait->next)
++                    fprintf( stderr, "wine-ps5: wait tid=%04x ms=%lld op=%d flags=%#x count=%d\n", thread->id,
++                             (long long)((monotonic_time - wait->start) / 10000), wait->select, wait->flags,
++                             wait->count );
++            }
+             return -1;
+         }
+         usleep( 1000 );

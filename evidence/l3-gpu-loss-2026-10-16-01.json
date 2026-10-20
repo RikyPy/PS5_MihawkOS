@@ -1,0 +1,37 @@
+{
+  "battery": "l3-gpu-loss-2026-10-16-01",
+  "expected_cases": [
+    "gpu-loss"
+  ],
+  "revision": "f3aa632b4a344d3e169a02d63e1895e648bea57e",
+  "dirty": true,
+  "cases": [
+    {
+      "case": "gpu-loss",
+      "run": "l3-gpu-loss-2026-10-16-01-gpu-loss",
+      "runner_status": 0,
+      "seconds": 110.6,
+      "result": "finished",
+      "probe_verdict": null,
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "run_seconds": 110.0,
+      "launch_readiness": {
+        "ready": true,
+        "seconds": 0.14,
+        "settle_seconds": 0.0,
+        "census_seconds": 0.131,
+        "previous_cleanup_verified": true
+      },
+      "runner_overhead_seconds": 0.6,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 8,
+      "protocol_errors": 0
+    }
+  ],
+  "complete": true,
+  "seconds": 110.6,
+  "passed": true
+}

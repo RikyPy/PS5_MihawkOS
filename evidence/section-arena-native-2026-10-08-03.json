@@ -1,0 +1,23 @@
+{
+ "run": "section-arena-native-2026-10-08-03",
+ "read_only": false,
+ "temporary_direct_backing_bytes": 0,
+ "kernel_reads": false,
+ "kernel_writes": false,
+ "no_overwrite": true,
+ "payload": true,
+ "elf_sha256": "f16b0aea50b18bd3b86a097cd214a92373c879811c82eb23478c45e40e7d7013",
+ "source_sha256": "34f3c9308f098862d8736d2f0e9b7b75c5697f422d14660b9510fb2b8d0dd6d5",
+ "passed": false,
+ "purpose": "sparse-file shared-section placement; file stays linked until unmap and close and one-page bidirectional alias coherence; not 13.5 GiB physical capacity",
+ "lines": [
+  "section-arena reserve=0 exact=1",
+  "section-arena open=1 errno=0",
+  "section-arena truncate=0 errno=0",
+  "section-arena view_bytes=14495514624 view_exact=0 view_errno=12 alias_exact=0 alias_errno=12",
+  "section-arena close=0",
+  "section-arena unlink=0",
+  "section-arena arena_unmap=0",
+  "section-arena result=FAIL"
+ ]
+}

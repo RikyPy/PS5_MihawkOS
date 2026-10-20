@@ -1,0 +1,59 @@
+{
+  "title": "PPSA99170",
+  "identity": "1c67eeeaf074489a9d08f7874ec8fdfb",
+  "kind": "service-preflight",
+  "build": {
+    "graphics_foundation_revision": "87a48676dda0977d5ba8ff1ddcf02816d41c443b",
+    "revision": "c573c46e00ba58c1aed605d9c00f6f4905f6273a",
+    "kind": "service-preflight",
+    "elevate_gpu_helper": false,
+    "vulkan_gpu_helper": false,
+    "gpu_draw_helper": false,
+    "gpu_present_helper": false,
+    "wine_gpu_broker": false,
+    "sdk_revision": "611893fc25ef3e138f5bc2c90d829d8b58174cd2",
+    "source_sha256": {
+      "ps5/src/main.cpp": "e06b49675641beacc9feaab3449ad9ba446ecaec3f15b605176534e4c4a94939",
+      "ps5/CMakeLists.txt": "e184254473011b010591d7a48866b870059d84d4c3e351a553c14257d53ca036",
+      "native/proton_service_preflight.h": "3a8a7611112a1b454b8844fc7d8a5aec695d6fc9b706c714f72568787e68773b",
+      "native/proton_service_preflight.cpp": "ba26f1a8d108aa328b974a576bb7a058b9ba825c3758e39a38488516e27e49d9",
+      "ps5/tools/link-title.sh": "e4d037c3c0a355038ec844499daf0e21ebd79c5030738755e98c3cbbfb41e39f",
+      "tools/setup-graphics-foundation.sh": "3efdcc54b7b0c59c732a7ed357ecaf1f53243485e81adc5b6f7abd06bb892d9f",
+      "src/pw_frame_page.h": "c2b2e8a2910646964fe4dbd0de2ee075422fe43215851a019014f4eb46d4ba96"
+    },
+    "radv_recipe_sha256": "efef0a82c7ba4ffd97c225f6969a31bc550938689b03e9fafe2cf69734e8d7c9",
+    "identity": "21c505d43cae4204a25c7a8e983a33b438dc726587a1b5e1f32894c19377df51",
+    "eboot_sha256": "fe2f1da51dd82618f9383ceeadf17861b12adf13de2b657d59d0c5cd7082bc09"
+  },
+  "capture": "klog/dns-info-owner-2026-10-08-01",
+  "expected_missing_image": false,
+  "mode": "normal",
+  "passed": false,
+  "status": "complete",
+  "production_sha256": "24076d519350a1cb71495eed38448580751d23bd4caa42c0f4cbf4fec080a0dd",
+  "production_restored": true,
+  "root_reference_balance_verified": false,
+  "forced_title_close": false,
+  "transfer_stage": "read eboot.bin",
+  "installed_readback_sha256": "eb8b0269e45d5a1dd363b790a9b8adb1624615bf4b68b5ad6d48d1259e858b4e",
+  "production_executable_sha256": "706938a0cbcfa7460f84ef285bf70f9078d20ff72cc0abd790b5d613122a3003",
+  "probe_readback_sha256": "35735dc586cf6290e86238234bea388a75cd50f5fce1b2e67bdf4b00934bc7f1",
+  "probe_executable_sha256": "eacb9e3523114ee849c04ce38686def8ad05e33927bfbd2a6347c499c2f03714",
+  "shell_idle_after_run": true,
+  "post_launch_fault_records": 0,
+  "kernel_fmem": [
+    "0x40000000"
+  ],
+  "kernel_dmem": [
+    "0x2dc000000"
+  ],
+  "parent_shell_exit_seen": true,
+  "observations": [
+    "service-preflight identity=1c67eeeaf074489a9d08f7874ec8fdfb elevated=1 netctl-info-only=1",
+    "dns-info module=0 pool-symbol=0 ipv4-symbol=0 ipv6-symbol=0",
+    "netctl-info completed=0",
+    "result=COMPLETE"
+  ],
+  "fresh_identity_seen": true,
+  "restored_readback_sha256": "eb8b0269e45d5a1dd363b790a9b8adb1624615bf4b68b5ad6d48d1259e858b4e"
+}

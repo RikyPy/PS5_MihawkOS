@@ -1,0 +1,35 @@
+{
+  "title": "PPSA99170",
+  "identity": "b3fa5a09be1946069069b9dac471046c",
+  "frames_requested": 120,
+  "eboot_sha256": "8f63bbc57bd9203520653d9e3eb765798a434b737ac6c1f79b106437542761c3",
+  "fresh_identity_seen": true,
+  "shell_idle_after_run": true,
+  "title_finished_successfully": true,
+  "picture_and_log_check_passed": true,
+  "post_launch_fault_records": 0,
+  "post_launch_driver_errors": 0,
+  "elevation": [
+    "ok (filesystem access)"
+  ],
+  "sample": [
+    "starts",
+    "ok, 120 frames in 2.36 s, 59.9 fps after the first half"
+  ],
+  "library": [
+    "8 game(s); searched: /data/ps5proton/games (8 entries); /data/homebrew/PPSA99170/games (not there)"
+  ],
+  "startup_seconds": {
+    "exec": 0.0,
+    "starts": 0.5,
+    "elevation": 0.5,
+    "library": 0.56,
+    "ui": 0.62
+  },
+  "probe": null,
+  "probe_passed": null,
+  "probe_records": [],
+  "passed": true,
+  "capture": "klog/wine-broker-restored-launcher-01",
+  "forced_close": false
+}

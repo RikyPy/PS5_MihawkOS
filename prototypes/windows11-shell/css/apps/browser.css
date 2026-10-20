@@ -1,0 +1,114 @@
+/* MihawkBrowser (owner: browser, js/apps/browser.js). Colours are WinUI tokens; the only literals
+   are the stand-in web page, which Chromium draws unthemed. Metrics are pw_browser.c's: a 40 px
+   command row, 32 x 32 buttons at 4 px gaps, a 32 px address box, a 360 px Downloads flyout. */
+.br {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background: var(--SolidBackgroundFillColorBase);
+  color: var(--TextFillColorPrimary);
+  font: var(--type-body);
+}
+
+/* ---------- command row ---------- */
+.br-commands {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 40px;
+  padding: 0 4px;
+}
+.br-commands .btn.icon-only { position: relative; flex: none; }
+.br-commands .btn.open { background-color: var(--SubtleFillColorSecondary); }
+.br-address-wrap { position: relative; flex: 1 1 auto; min-width: 32px; }
+.br-address { width: 100%; }
+.br-address.br-has-lock { padding-left: 34px; }
+.br-lock {
+  position: absolute;
+  left: 11px;
+  top: 8px;
+  display: flex;
+  color: var(--TextFillColorSecondary);
+  pointer-events: auto;
+}
+.br-lock[hidden] { display: none; }
+/* Downloads' progress while a download runs: a 16 px ProgressBar under the glyph */
+.br-dl-bar { position: absolute; left: 7px; bottom: 3px; width: 16px; } /* under the glyph: 1 px border + 7 = its 8 px inset */
+.br-dl-bar[hidden] { display: none; }
+
+/* ---------- page area ---------- */
+.br-view { position: relative; flex: 1 1 auto; min-height: 0; overflow: hidden; }
+.br-view > [hidden] { display: none; }
+.br-start, .br-page, .br-error { position: absolute; inset: 0; }
+.br-start-text {
+  position: absolute;
+  top: 40px;
+  left: 0;
+  right: 0;
+  margin: 0;
+  text-align: center;
+  white-space: pre-line;
+}
+.br-launchers {
+  position: absolute;
+  top: 120px;
+  left: 0;
+  right: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 200px);
+  justify-content: center;
+  gap: 8px;
+}
+.br-launcher { width: 200px; height: 40px; }
+
+.br-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 24px;
+  text-align: center;
+}
+.br-error-title { font: var(--type-subtitle); }
+.br-error-detail { color: var(--TextFillColorSecondary); }
+
+/* the stand-in web page: Chromium's, not the shell's, so fixed colours in both themes */
+.br-page { overflow: auto; background: #fff; color: #1b1b1b; }
+.br-page-body { max-width: 640px; margin: 64px auto; padding: 0 24px; font: 16px/1.5 var(--font-ui); }
+.br-page-body h1 { margin: 0 0 12px; font: 600 32px/1.25 var(--font-ui); }
+.br-page-lines { display: grid; gap: 10px; margin-top: 24px; }
+.br-page-lines span { height: 10px; border-radius: 5px; background: #e6e6e6; }
+.br-page-lines span:nth-child(2n) { width: 82%; }
+
+/* ---------- Downloads flyout: under its button, right edges aligned ---------- */
+.br-downloads {
+  position: absolute;
+  top: 40px;
+  right: 4px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  width: 360px;
+  max-width: calc(100% - 8px);
+  max-height: calc(100% - 48px);
+}
+.br-downloads[hidden] { display: none; }
+.br-dl-head { flex: none; padding: 12px 16px 8px; font: 600 14px/20px var(--font-ui); }
+.br-dl-list { overflow: auto; padding-bottom: 4px; }
+.br-dl-empty { padding: 4px 16px 16px; color: var(--TextFillColorSecondary); }
+.br-dl-row {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  gap: 12px;
+  padding: 10px 16px 12px;
+  border-top: 1px solid var(--DividerStrokeColorDefault);
+}
+.br-dl-main { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.br-dl-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.br-dl-progress { margin: 4px 0 2px; }
+.br-dl-status { color: var(--TextFillColorSecondary); font: var(--type-caption); }
+.br-dl-canceled .br-dl-name { color: var(--TextFillColorSecondary); }
+.br-dl-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }

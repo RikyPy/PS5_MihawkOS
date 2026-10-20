@@ -1,0 +1,61 @@
+{
+  "build_fingerprint": "5b3bc04da9eaa3dbebd5d09091c4d3163b8a3c12de976e35e27eb5af89a64932",
+  "console_cases": [
+    {
+      "bits": 32,
+      "seconds": 17.7,
+      "verdicts": [
+        {
+          "verdict": "PASS",
+          "checks": 7,
+          "failures": 0
+        },
+        {
+          "verdict": "PASS",
+          "checks": 19,
+          "failures": 0
+        },
+        {
+          "verdict": "PASS",
+          "checks": 10,
+          "failures": 0
+        },
+        {
+          "verdict": "PASS",
+          "checks": 3,
+          "failures": 0
+        }
+      ],
+      "passed": true
+    },
+    {
+      "bits": 64,
+      "seconds": 13.1,
+      "verdicts": [
+        {
+          "verdict": "PASS",
+          "checks": 19,
+          "failures": 0
+        },
+        {
+          "verdict": "PASS",
+          "checks": 10,
+          "failures": 0
+        },
+        {
+          "verdict": "PASS",
+          "checks": 7,
+          "failures": 0
+        },
+        {
+          "verdict": "PASS",
+          "checks": 3,
+          "failures": 0
+        }
+      ],
+      "passed": true
+    }
+  ],
+  "passed": true,
+  "qualified_scope": "Explicit initial environment, case-insensitive last selection, empty/UTF-8/PATH values, inherited child and descendant, explicit child environment and normal root return. Full code commit gate pending."
+}

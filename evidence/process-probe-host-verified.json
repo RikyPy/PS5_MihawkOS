@@ -1,0 +1,95 @@
+{
+  "probe_sha256": "16fc72852a17469d5c3eac7f6eed5ed16e52312ec56f660f74b077fde333669c",
+  "wine_revision": "a518d643873ff733bafb31595dfd01ab8bbdf790",
+  "cases": [
+    {
+      "case": "basic",
+      "exit_code": 0,
+      "seconds": 1.27,
+      "verdict": "PASS",
+      "child_survived_parent": null,
+      "handles": [
+        {
+          "before": 13,
+          "after": 15
+        },
+        {
+          "before": 15,
+          "after": 15
+        }
+      ]
+    },
+    {
+      "case": "suspended",
+      "exit_code": 0,
+      "seconds": 0.17,
+      "verdict": "PASS",
+      "child_survived_parent": null,
+      "handles": [
+        {
+          "before": 13,
+          "after": 15
+        },
+        {
+          "before": 15,
+          "after": 15
+        }
+      ]
+    },
+    {
+      "case": "terminate",
+      "exit_code": 0,
+      "seconds": 0.06,
+      "verdict": "PASS",
+      "child_survived_parent": null,
+      "handles": [
+        {
+          "before": 13,
+          "after": 15
+        },
+        {
+          "before": 15,
+          "after": 15
+        }
+      ]
+    },
+    {
+      "case": "repeat",
+      "exit_code": 0,
+      "seconds": 0.17,
+      "verdict": "PASS",
+      "child_survived_parent": null,
+      "handles": [
+        {
+          "before": 13,
+          "after": 15
+        },
+        {
+          "before": 15,
+          "after": 15
+        },
+        {
+          "before": 15,
+          "after": 15
+        },
+        {
+          "before": 15,
+          "after": 15
+        },
+        {
+          "before": 15,
+          "after": 15
+        }
+      ]
+    },
+    {
+      "case": "parent-exit",
+      "exit_code": 0,
+      "seconds": 0.07,
+      "verdict": "PASS",
+      "child_survived_parent": true,
+      "handles": []
+    }
+  ],
+  "passed": true
+}

@@ -1,0 +1,43 @@
+From 0d746d970f8b0ec0e44dda00467f955ad35c078f Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Fri, 2 Oct 2026 20:24:27 -0400
+Subject: [PATCH] Back fixed-address reservations outside the PS5 startup
+ regions
+
+The CLR near-code heap reserved 64 KiB then committed 4 KiB, but a bare PS5 virtual reservation remained unbacked after mprotect. Register each successful reservation with the direct-memory allocator so a later commit maps physical pages. Reject registration failures. Console regression pending. SPDX-License-Identifier: LGPL-2.1-or-later
+---
+ dlls/ntdll/unix/virtual.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/dlls/ntdll/unix/virtual.c b/dlls/ntdll/unix/virtual.c
+index e84a95a..34f7fdd 100644
+--- a/dlls/ntdll/unix/virtual.c
++++ b/dlls/ntdll/unix/virtual.c
+@@ -199,7 +199,7 @@ static BOOL host_prot_unchanged( const void *addr, size_t len, int prot )
+ extern void *__wine_ps5_mmap( void *addr, size_t len, int prot, int flags, int fd, off_t off );
+ extern int __wine_ps5_munmap( void *addr, size_t len );
+ extern int __wine_ps5_mprotect( void *addr, size_t len, int prot );
+-extern void __wine_ps5_dmem_region( void *base, size_t size );
++extern int __wine_ps5_dmem_region( void *base, size_t size );
+ #define host_mmap __wine_ps5_mmap
+ #define host_munmap __wine_ps5_munmap
+ #define host_mprotect __wine_ps5_mprotect
+@@ -982,6 +982,15 @@ static void *anon_mmap_tryfixed( void *start, size_t size, int prot, int flags )
+         errno = EEXIST;
+         return MAP_FAILED;
+     }
++    /* Fixed allocations such as CLR's near-code heaps can lie outside the
++     * startup reservations. A bare kernel reservation cannot be committed
++     * by mprotect: register it so later protection changes back its pages. */
++    if (__wine_ps5_dmem_region( start, size ))
++    {
++        munmap( start, size );
++        errno = ENOMEM;
++        return MAP_FAILED;
++    }
+     if (prot != PROT_NONE && anon_mmap_fixed( start, size, prot, flags ) == MAP_FAILED)
+     {
+         munmap( start, size );
+-- 
+2.55.0
+

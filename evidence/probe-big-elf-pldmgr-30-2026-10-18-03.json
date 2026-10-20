@@ -1,0 +1,34 @@
+{
+  "route": "pldmgr",
+  "build": {
+    "mib": 30,
+    "blob_fnv": "135edea031c185f6",
+    "elf_bytes": 31567656,
+    "elf_sha256": "40cc7c417edd8c38c4749549c8b6627134762b65a36a94700902b5029af1fd1a",
+    "sdk_revision": "611893fc25ef3e138f5bc2c90d829d8b58174cd2",
+    "source_sha256": "4e8c1f9c926523dc6be9d781f7300e14414d0fd938badfe38123113d505dca3c"
+  },
+  "started": "2026-10-18T22:04:32Z",
+  "passed": false,
+  "pldmgr_version": "0.5.2",
+  "pldmgr": {
+    "sources_before": [
+      "Official Repository"
+    ],
+    "ours_already_listed": false,
+    "files_before": 20,
+    "sources_after": [
+      "Official Repository"
+    ],
+    "sources_restored": true,
+    "files_after": 20,
+    "files_left_by_run": [],
+    "files_restored": true
+  },
+  "pldmgr_error": "/sources_add: 400 {\"ok\":false,\"message\":\"URL unreachable or download failed\"}",
+  "served": [],
+  "klog_line": null,
+  "seconds_to_line": null,
+  "intact": false,
+  "capture": "klog/probe-big-elf-pldmgr-30-2026-10-18-03.log"
+}

@@ -1,0 +1,78 @@
+{
+  "case": "descendants",
+  "loader": {
+    "sdk_revision": "611893fc25ef3e138f5bc2c90d829d8b58174cd2",
+    "converter_revision": "ab37acd506305ba3e575435e3ae9a351cfaf7cf4",
+    "converter_sha256": "614377a0e37006e1454c67f228fc370a2f785c060205cb9f0264f27af04b5f18",
+    "recipe_sha256": "014b5334a5516d2240ff6e0c7b794635c5a4868b199d0d0201f02eb7ee6870d7",
+    "sources": {
+      "native/proton_wine_child.c": "9e44ad9c812d3fdb39b89c1b9fde2023f40630665e852b6b5322af89a6051b04",
+      "src/pw_wine_start.c": "52bdf039228ca13e9931fc7f7097b196ece76868990b6ea44588990714bf22e2",
+      "wine/ps5/pw_wine_prx.c": "67b8393fca62a72a7aaf53a409c9a34684dd7704037bf194066e5173808c16a2",
+      "wine/ps5/pw_wine_process_io.c": "5060d9d84fb8b0fab0d2b1641137cfdde0344f8c87afcca4a21928bd23fb2c0c",
+      "wine/ps5/pw_wine_process.h": "04a96ff549b9a63452c2a7b51f9ac92770e543146542ed0adef37a1875cbcf2e",
+      "wine/ps5/pw_wine_process_io.h": "a6c2199190bd802205bca32dffc67f1f3e1a440c8b3f9f7f7662fa80d049c1dc",
+      "src/pw_wine_start.h": "f450215176a5bf7b898728ab0a84cbd6b8a3bfd497a4996ee4f590aab95c6ed7",
+      "wine/ps5/pw_wine_prx.h": "82e4cf6b56377bb3ca9e007bd78a3302633fa8675e77d5b507823829959f9bb0"
+    },
+    "preload_mask": "0x8000000000000002",
+    "gpu_preflight": false,
+    "gpu_device_query": false,
+    "ps5-pie.ld": "fbc52518761b58b703a2225c847c5f44a81523cd0e751755adf890ae0f0dd74c",
+    "app-symbols.map": "470ce72a27a7be8e35dd7a25b485faa733d61570bdaf24d3c75bb4e3e3c63cf7",
+    "identity": "92796b1cac6cf70e1afde2bf6223de676ea3b84e8e07a263e0030a6d94e69dea",
+    "sha256": "c76ce137e911fac25ffea1f6f7961b455f928cb4cdcfc3d71cf59766a9e7b577"
+  },
+  "runtime": {
+    "ntdll": "ea3347e0e567ffb1fb1cd559897c05db46dbf535d1494824bdb22c0fcf98c5c6",
+    "wineserver": "9dc0637c4ba021ecacd43fc1f299c9842846f41d661bb6386e7b1dfbb7b3471d"
+  },
+  "passed": false,
+  "production_restored": true,
+  "helper_removed": true,
+  "status": "complete",
+  "owner_title": {
+    "revision": "8dfcc3cd254e2a6ad3b6cbc07258a95fb2f23c9f",
+    "kind": "wine-owner",
+    "sdk_revision": "611893fc25ef3e138f5bc2c90d829d8b58174cd2",
+    "source_sha256": {
+      "ps5/src/main.cpp": "f1eb468f9603425c6543f0b02d8cf91e3e85a6919d7248dec85a24fd2f5aa457",
+      "ps5/CMakeLists.txt": "0e1769164ed4c5b42a0b0ebbcb07e6cce79c77d57c71c69730a2fe3b73a2df04",
+      "native/proton_wine.cpp": "3062582b0f6cf6a589356e2135c37c684bc731bcd45b71ff242ee6633032fe5d",
+      "wine/ps5/pw_wine_process.h": "04a96ff549b9a63452c2a7b51f9ac92770e543146542ed0adef37a1875cbcf2e"
+    },
+    "radv_recipe_sha256": "e2844f49e4af12a9718d5b8b6055ace83e7eaa1d68870de2a79d39d1c92fa674",
+    "identity": "3ca1ae0953a5ece4aaaba222ce3c3f342439438d2a26efdf2739e56befcd283f",
+    "eboot_sha256": "c31b605b352d4e6d2a40a16f847ea8774b2c3e52b3832e68290320f972d6d29d"
+  },
+  "parent_restored": true,
+  "parent_deployed": true,
+  "deployed_modules": [
+    "ntdll",
+    "wineserver"
+  ],
+  "helper_uploaded": true,
+  "probe_uploaded": true,
+  "deployment_verified": true,
+  "probe_sha256": "76f64568686a69ea45e8c382b7df5e527b10a455d7519033612b18f17735cbe1",
+  "descendant_patch_sha256": "57fb947935f4178616a4ce3faeb753acd370fa737d691a86bf73d18c0322713f",
+  "patch_sha256": "2767c06d7ca2d2355275e644fe22f0045b713e90ab5f7946da7c3b22af5712a1",
+  "adapter_sha256": {
+    "pw_wine_process.c": "b8b4bfac8273b7e84fb46867a2f18a2d5149636680e4cd9b37da8736e729581c",
+    "pw_wine_process.h": "04a96ff549b9a63452c2a7b51f9ac92770e543146542ed0adef37a1875cbcf2e",
+    "pw_wine_threads.c": "9fb82ed67f775782a8ec9d9d0dbaf0837adb004cc1241ceebf6f58e60bbe38a0",
+    "pw_wine_threads.h": "a28177375ad16666504b3d05cb285c8f23634b800c2e4bd9b3c20ead21722d30",
+    "pw_wine_process_io.c": "5060d9d84fb8b0fab0d2b1641137cfdde0344f8c87afcca4a21928bd23fb2c0c",
+    "pw_wine_process_io.h": "a6c2199190bd802205bca32dffc67f1f3e1a440c8b3f9f7f7662fa80d049c1dc"
+  },
+  "runner_status": 1,
+  "post_launch_fault_records": 0,
+  "native_descriptor_samples": [],
+  "windows_handle_samples": [],
+  "native_children": [],
+  "native_child_deletions": [],
+  "child_logs": [],
+  "descendant_node_verdicts": 0,
+  "broker_spawns": [],
+  "probe_removed": true
+}

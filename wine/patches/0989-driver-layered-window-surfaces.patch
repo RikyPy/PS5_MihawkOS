@@ -1,0 +1,136 @@
+From: PS5_Proton
+Subject: [PATCH] driver: preserve GDI shape and premultiplied alpha surfaces
+
+Send Wine-owned surface alpha and coverage through the existing retained-page
+transport. Apply UpdateLayeredWindow constant opacity once; retain the opaque
+fast path. Keep unsupported child/GPU layered composition explicit.
+
+--- a/dlls/win32u/ps5drv.c
++++ b/dlls/win32u/ps5drv.c
+@@ -84,6 +84,7 @@
+     BOOL shown;
+     UINT32 *pixels;         /* retained GDI pixels, independent of paint order */
+     UINT width, height;
++    BYTE opacity;          /* UpdateLayeredWindow constant factor, separate from surface alpha */
+ };
+ 
+ static int (*present_frame)( const void *bgra, UINT width, UINT height, UINT stride );
+@@ -101,7 +102,8 @@
+     return window_surfaces;
+ }
+ static int (*present_window)( UINT hwnd, UINT64 generation, const void *pixels,
+-                              UINT width, UINT height, UINT stride, INT offset_x, INT offset_y );
++                              UINT width, UINT height, UINT stride, INT offset_x, INT offset_y,
++                              UINT alpha_mask, UINT opacity, const void *shape, UINT shape_stride, size_t shape_bytes );
+ static void (*drop_window)( UINT hwnd );
+ static int (*next_input)( struct ps5_input *input );
+ static int (*input_fd)(void);
+@@ -332,8 +334,21 @@
+         {
+             /* Wine retains the full surface under its own lock. Publish those
+              * pixels with their actual surface offset; no second local copy. */
++            UINT opacity = surface->alpha_bits == ~0u ? 255 : surface->alpha_bits >> 24;
++            UINT shape_stride = 0;
++            size_t shape_bytes = 0;
++            if (shape_bits)
++            {
++                if (shape_info->bmiHeader.biBitCount != 1 || shape_info->bmiHeader.biWidth != width ||
++                    abs(shape_info->bmiHeader.biHeight) != height || !height)
++                { okay = FALSE; goto done; }
++                shape_bytes = shape_info->bmiHeader.biSizeImage;
++                shape_stride = shape_bytes / height;
++            }
++            opacity = (opacity * window->opacity + 127) / 255;
+             okay = !present_window( (UINT)(UINT_PTR)window->hwnd, window->generation,
+-                                    color_bits, width, height, width * 4, rect->left, rect->top );
++                                    color_bits, width, height, width * 4, rect->left, rect->top,
++                                    surface->alpha_mask, opacity, shape_bits, shape_stride, shape_bytes );
+             goto done;
+         }
+         if (window->width != width || window->height != height)
+@@ -462,6 +477,7 @@
+     {
+         window = &windows[window_count++];
+         window->hwnd = hwnd;
++        window->opacity = 255;
+         window->generation = generation;
+         window->shown = FALSE;
+     }
+@@ -1011,6 +1027,34 @@
+ 
+ #endif  /* WINE_PS5_OPENGL */
+ 
++/* Wine owns the pixel surface and colour key. This driver contributes only
++ * UpdateLayeredWindow's separate constant opacity. Flushing on an opacity-only
++ * update also handles calls with no new source DC. */
++static void ps5_UpdateLayeredWindow(HWND hwnd, BYTE alpha, UINT flags)
++{
++    struct ps5_window *window;
++    struct window_surface *surface;
++    pthread_mutex_lock(&screen_lock);
++    if ((window = find_window(hwnd))) window->opacity = flags & ULW_ALPHA ? alpha : 255;
++    pthread_mutex_unlock(&screen_lock);
++    if (!(surface = window_surface_get(hwnd))) return;
++    if (!(flags & ULW_ALPHA)) window_surface_set_layered(surface, surface->color_key, ~0u, 0);
++    window_surface_lock(surface);
++    surface->bounds = surface->rect;
++    OffsetRect(&surface->bounds, -surface->bounds.left, -surface->bounds.top);
++    window_surface_unlock(surface);
++    window_surface_flush(surface);
++    window_surface_release(surface);
++}
++static void ps5_SetLayeredWindowAttributes(HWND hwnd, COLORREF key, BYTE alpha, DWORD flags)
++{
++    struct ps5_window *window;
++    pthread_mutex_lock(&screen_lock);
++    if ((window = find_window(hwnd))) window->opacity = 255;
++    pthread_mutex_unlock(&screen_lock);
++    /* update_window_state applies key/alpha to Wine's surface immediately after this callback. */
++}
++
+ static const struct user_driver_funcs ps5_user_driver =
+ {
+     .pUpdateDisplayDevices = ps5_UpdateDisplayDevices,
+@@ -1019,6 +1063,8 @@
+     .pCreateWindowSurface = ps5_CreateWindowSurface,
+     .pWindowPosChanged = ps5_WindowPosChanged,
+     .pDestroyWindow = ps5_DestroyWindow,
++    .pUpdateLayeredWindow = ps5_UpdateLayeredWindow,
++    .pSetLayeredWindowAttributes = ps5_SetLayeredWindowAttributes,
+     .pProcessEvents = ps5_ProcessEvents,
+     .pGetCursorPos = ps5_GetCursorPos,
+     .pSetCursor = ps5_SetCursor,
+@@ -1081,7 +1127,7 @@
+     present_frame = dlsym( RTLD_DEFAULT, "pw_wine_present" );
+     present_origin = dlsym( RTLD_DEFAULT, "pw_wine_present_origin" );
+     helper_process = getenv( "WINE_PS5_CHILD" ) != NULL;
+-    present_window = dlsym( RTLD_DEFAULT, "pw_wine_window_present" );
++    present_window = dlsym( RTLD_DEFAULT, "pw_wine_window_present_surface" );
+     drop_window = dlsym( RTLD_DEFAULT, "pw_wine_window_drop" );
+     window_surfaces = helper_process && present_window && drop_window &&
+                       getenv( "WINE_PS5_WINDOW_SURFACES" ) &&
+--- a/server/window.c
++++ b/server/window.c
+@@ -258,8 +258,10 @@
+         }
+         free(rects);
+     }
+-    /* Layered pixels need their own alpha contract; do not silently paint them opaque. */
+-    if (win->ex_style & WS_EX_LAYERED)row->flags |= PW_WINDOW_UNSUPPORTED;
++    /* This surface path covers top-level GDI alpha. GPU/child layered surfaces
++     * still require their own composition contract and must not paint opaque. */
++    if ((win->ex_style & WS_EX_LAYERED) && (row->flags & (PW_WINDOW_CLIENT|PW_WINDOW_CHILD)))
++        row->flags |= PW_WINDOW_UNSUPPORTED;
+ }
+ 
+ /* GDI children draw into their parent's surface. Publish only child HWNDs
+@@ -272,7 +274,8 @@
+     LIST_FOR_EACH_ENTRY(win,&parent->children,struct window,entry)
+     {
+         ps5_snapshot_children(snapshot,win,depth+1);
+-        if(win->paint_flags & PAINT_HAS_PIXEL_FORMAT)ps5_snapshot_add(snapshot,win,0);
++        if((win->paint_flags & PAINT_HAS_PIXEL_FORMAT) || (win->ex_style & WS_EX_LAYERED))
++            ps5_snapshot_add(snapshot,win,0);
+     }
+ }
+ 

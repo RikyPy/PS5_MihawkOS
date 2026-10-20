@@ -1,0 +1,45 @@
+{
+  "battery": "gate-host-query-limit-2026-10-08-02",
+  "revision": "87b8dc5977edf2dfd608923b194896e81c33a400",
+  "dirty": true,
+  "cases": [
+    {
+      "case": "virtual-query32",
+      "run": "gate-host-query-limit-2026-10-08-02-virtual-query32",
+      "runner_status": 1,
+      "seconds": 24.1,
+      "result": "exited",
+      "probe_verdict": null,
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": false,
+      "layout": null,
+      "fault_records": 0,
+      "helpers": 0,
+      "protocol_errors": 0
+    },
+    {
+      "case": "virtual-query64",
+      "run": "gate-host-query-limit-2026-10-08-02-virtual-query64",
+      "runner_status": 0,
+      "seconds": 46.6,
+      "result": "finished",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 2,
+      "protocol_errors": 0
+    }
+  ],
+  "passed": false,
+  "status": "incomplete",
+  "restart_reason": "Shell rejected first launch with 0x80940033 before Wine. Subsequent PE64 query and controls menu pass; restart complete gate. Host orchestrator paused after active run; no forced console closure.",
+  "completed_case_records": [
+    "virtual-query32",
+    "virtual-query64",
+    "controls-menu"
+  ]
+}

@@ -1,0 +1,1370 @@
+{
+ "telemetry_hold": null,
+ "launch_readiness": {
+  "ready": true,
+  "seconds": 0.138,
+  "settle_seconds": 0.0,
+  "census_seconds": 0.129,
+  "previous_cleanup_verified": true
+ },
+ "native_close_failures": [],
+ "run": "explorer-dark-2026-10-16-02",
+ "what": "profile mihawk-os",
+ "env": [
+  "PROTON_STOP_TERMINATE=0"
+ ],
+ "result": "finished",
+ "seconds": 52.4,
+ "probe_verdict": "PASS",
+ "stages": {
+  "launched": 1.12,
+  "title_started": 1.49,
+  "elevated": 1.49,
+  "wine_loaded": 1.65,
+  "wineboot_started": 3.17,
+  "wineboot_ended": 9.31,
+  "program_started": 9.34,
+  "marker": 48.58,
+  "program_ended": 48.61,
+  "wine_ended": 50.17,
+  "launcher_started": 51.64,
+  "launcher_ended": 51.87,
+  "closed": 52.38
+ },
+ "clean_owner_restart": true,
+ "launcher_end_status": 0,
+ "initial_status": 0,
+ "closed_on_request": false,
+ "child_logs": [
+  "klog/explorer-dark-2026-10-16-02-wine-child-4816.log",
+  "klog/explorer-dark-2026-10-16-02-wine-child-4817.log",
+  "klog/explorer-dark-2026-10-16-02-wine-child-4818.log",
+  "klog/explorer-dark-2026-10-16-02-wine-child-4819.log",
+  "klog/explorer-dark-2026-10-16-02-wine-child-4820.log",
+  "klog/explorer-dark-2026-10-16-02-wine-child-4821.log",
+  "klog/explorer-dark-2026-10-16-02-wine-child-4822.log",
+  "klog/explorer-dark-2026-10-16-02-wine-child-4823.log",
+  "klog/explorer-dark-2026-10-16-02-wine-child-4824.log",
+  "klog/explorer-dark-2026-10-16-02-wine-child-4825.log",
+  "klog/explorer-dark-2026-10-16-02-wine-child-4826.log",
+  "klog/explorer-dark-2026-10-16-02-wine-child-4827.log",
+  "klog/explorer-dark-2026-10-16-02-wine-child-4828.log",
+  "klog/explorer-dark-2026-10-16-02-wine-child-4829.log",
+  "klog/explorer-dark-2026-10-16-02-wine-child-4830.log",
+  "klog/explorer-dark-2026-10-16-02-wine-child-4831.log"
+ ],
+ "child_logs_missing": [],
+ "session_logs_status": 0,
+ "storage_errors": 0,
+ "stop_terminate": "0",
+ "injected_fault": null,
+ "exec_protection": {
+  "refused": 0,
+  "conversions": 481,
+  "converted_kib": 64112,
+  "convert_failed": 0,
+  "exec_refused": 0,
+  "grant_retries": 0,
+  "modules": 46,
+  "sdk_refused": 0
+ },
+ "foreign_mappings": {
+  "found": 0,
+  "skipped_unmaps": 0,
+  "refused_maps": 0,
+  "query_failed": 0,
+  "holes": 0,
+  "hole_list": []
+ },
+ "helper_sched": {
+  "helpers": [
+   {
+    "kind": "memory",
+    "mode": "rr",
+    "main_tid": "101665",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xea00",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xea00",
+    "service": "700",
+    "program": "767",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "3/700",
+    "now_kernel": "2/700"
+   },
+   {
+    "kind": "program",
+    "mode": "rr",
+    "main_tid": "101066",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xea00",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xea00",
+    "service": "700",
+    "program": "767",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "3/700",
+    "now_kernel": "2/700"
+   },
+   {
+    "kind": "program",
+    "mode": "rr",
+    "main_tid": "102020",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xea00",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xea00",
+    "service": "700",
+    "program": "767",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "3/700",
+    "now_kernel": "2/700"
+   },
+   {
+    "kind": "program",
+    "mode": "rr",
+    "main_tid": "101643",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xea00",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xea00",
+    "service": "700",
+    "program": "767",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "3/700",
+    "now_kernel": "2/700"
+   },
+   {
+    "kind": "program",
+    "mode": "rr",
+    "main_tid": "101573",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xea00",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xea00",
+    "service": "700",
+    "program": "767",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "3/700",
+    "now_kernel": "2/700"
+   },
+   {
+    "kind": "program",
+    "mode": "rr",
+    "main_tid": "102421",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xea00",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xea00",
+    "service": "700",
+    "program": "767",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "3/700",
+    "now_kernel": "2/700"
+   },
+   {
+    "kind": "program",
+    "mode": "rr",
+    "main_tid": "102478",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xea00",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xea00",
+    "service": "700",
+    "program": "767",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "3/700",
+    "now_kernel": "2/700"
+   },
+   {
+    "kind": "program",
+    "mode": "rr",
+    "main_tid": "101573",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xea00",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xea00",
+    "service": "700",
+    "program": "767",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "3/700",
+    "now_kernel": "2/700"
+   },
+   {
+    "kind": "program",
+    "mode": "rr",
+    "main_tid": "102111",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xea00",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xea00",
+    "service": "700",
+    "program": "767",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "3/700",
+    "now_kernel": "2/700"
+   },
+   {
+    "kind": "program",
+    "mode": "rr",
+    "main_tid": "102092",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xea00",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xea00",
+    "service": "700",
+    "program": "767",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "3/700",
+    "now_kernel": "2/700"
+   },
+   {
+    "kind": "program",
+    "mode": "rr",
+    "main_tid": "101979",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xea00",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xea00",
+    "service": "700",
+    "program": "767",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "3/700",
+    "now_kernel": "2/700"
+   },
+   {
+    "kind": "program",
+    "mode": "rr",
+    "main_tid": "101677",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xea00",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xea00",
+    "service": "700",
+    "program": "767",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "3/700",
+    "now_kernel": "2/700"
+   },
+   {
+    "kind": "program",
+    "mode": "rr",
+    "main_tid": "102142",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xea00",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xea00",
+    "service": "700",
+    "program": "767",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "3/700",
+    "now_kernel": "2/700"
+   },
+   {
+    "kind": "program",
+    "mode": "rr",
+    "main_tid": "102127",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xea00",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xea00",
+    "service": "700",
+    "program": "767",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "3/700",
+    "now_kernel": "2/700"
+   },
+   {
+    "kind": "program",
+    "mode": "rr",
+    "main_tid": "101520",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xea00",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xea00",
+    "service": "700",
+    "program": "767",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "3/700",
+    "now_kernel": "2/700"
+   },
+   {
+    "kind": "program",
+    "mode": "rr",
+    "main_tid": "101497",
+    "entry": "1/700",
+    "entry_kernel": "10/700",
+    "entry_cpus": "0xea00",
+    "plain": "1/700",
+    "plain_kernel": "10/700",
+    "plain_cpus": "0xea00",
+    "service": "700",
+    "program": "767",
+    "program_cpus": "0",
+    "census": "0",
+    "error": "0",
+    "service_status": "0",
+    "now": "3/700",
+    "now_kernel": "2/700"
+   }
+  ],
+  "workers": [
+   {
+    "worker": "3/767",
+    "worker_kernel": "2/767",
+    "worker_cpus": "0xea00",
+    "status": "0",
+    "inherit": "3/767",
+    "inherit_kernel": "2/767",
+    "inherit_cpus": "0xea00"
+   },
+   {
+    "worker": "3/767",
+    "worker_kernel": "2/767",
+    "worker_cpus": "0xea00",
+    "status": "0",
+    "inherit": "3/767",
+    "inherit_kernel": "2/767",
+    "inherit_cpus": "0xea00"
+   },
+   {
+    "worker": "3/767",
+    "worker_kernel": "2/767",
+    "worker_cpus": "0xea00",
+    "status": "0",
+    "inherit": "3/767",
+    "inherit_kernel": "2/767",
+    "inherit_cpus": "0xea00"
+   },
+   {
+    "worker": "3/767",
+    "worker_kernel": "2/767",
+    "worker_cpus": "0xea00",
+    "status": "0",
+    "inherit": "3/767",
+    "inherit_kernel": "2/767",
+    "inherit_cpus": "0xea00"
+   },
+   {
+    "worker": "3/767",
+    "worker_kernel": "2/767",
+    "worker_cpus": "0xea00",
+    "status": "0",
+    "inherit": "3/767",
+    "inherit_kernel": "2/767",
+    "inherit_cpus": "0xea00"
+   },
+   {
+    "worker": "3/767",
+    "worker_kernel": "2/767",
+    "worker_cpus": "0xea00",
+    "status": "0",
+    "inherit": "3/767",
+    "inherit_kernel": "2/767",
+    "inherit_cpus": "0xea00"
+   },
+   {
+    "worker": "3/767",
+    "worker_kernel": "2/767",
+    "worker_cpus": "0xea00",
+    "status": "0",
+    "inherit": "3/767",
+    "inherit_kernel": "2/767",
+    "inherit_cpus": "0xea00"
+   },
+   {
+    "worker": "3/767",
+    "worker_kernel": "2/767",
+    "worker_cpus": "0xea00",
+    "status": "0",
+    "inherit": "3/767",
+    "inherit_kernel": "2/767",
+    "inherit_cpus": "0xea00"
+   },
+   {
+    "worker": "3/767",
+    "worker_kernel": "2/767",
+    "worker_cpus": "0xea00",
+    "status": "0",
+    "inherit": "3/767",
+    "inherit_kernel": "2/767",
+    "inherit_cpus": "0xea00"
+   },
+   {
+    "worker": "3/767",
+    "worker_kernel": "2/767",
+    "worker_cpus": "0xea00",
+    "status": "0",
+    "inherit": "3/767",
+    "inherit_kernel": "2/767",
+    "inherit_cpus": "0xea00"
+   },
+   {
+    "worker": "3/767",
+    "worker_kernel": "2/767",
+    "worker_cpus": "0xea00",
+    "status": "0",
+    "inherit": "3/767",
+    "inherit_kernel": "2/767",
+    "inherit_cpus": "0xea00"
+   },
+   {
+    "worker": "3/767",
+    "worker_kernel": "2/767",
+    "worker_cpus": "0xea00",
+    "status": "0",
+    "inherit": "3/767",
+    "inherit_kernel": "2/767",
+    "inherit_cpus": "0xea00"
+   },
+   {
+    "worker": "3/767",
+    "worker_kernel": "2/767",
+    "worker_cpus": "0xea00",
+    "status": "0",
+    "inherit": "3/767",
+    "inherit_kernel": "2/767",
+    "inherit_cpus": "0xea00"
+   },
+   {
+    "worker": "3/767",
+    "worker_kernel": "2/767",
+    "worker_cpus": "0xea00",
+    "status": "0",
+    "inherit": "3/767",
+    "inherit_kernel": "2/767",
+    "inherit_cpus": "0xea00"
+   },
+   {
+    "worker": "3/767",
+    "worker_kernel": "2/767",
+    "worker_cpus": "0xea00",
+    "status": "0",
+    "inherit": "3/767",
+    "inherit_kernel": "2/767",
+    "inherit_cpus": "0xea00"
+   }
+  ],
+  "program_threads": {
+   "set": 18,
+   "failed": 0
+  },
+  "census": null,
+  "census_processes": 0,
+  "row": null,
+  "scheduled": {
+   "ok": true,
+   "reasons": []
+  }
+ },
+ "helpers_ended": {
+  "why": null,
+  "count": 0,
+  "signals": {},
+  "gone_ms": {},
+  "still_there": [],
+  "after_kill": null,
+  "stalled": null,
+  "wedge_s": null,
+  "recorder_rows": "process rows from kern.proc (the title's own: state=3 pri=10/0 cpu=15 threads=16)"
+ },
+ "helper_doom": [
+  {
+   "seen": [
+    "exit"
+   ],
+   "doomed": null,
+   "stamped_ms_ago": null,
+   "ended": true
+  },
+  {
+   "seen": [
+    "exit"
+   ],
+   "doomed": null,
+   "stamped_ms_ago": null,
+   "ended": true
+  },
+  {
+   "seen": [
+    "exit"
+   ],
+   "doomed": null,
+   "stamped_ms_ago": null,
+   "ended": true
+  },
+  {
+   "seen": [
+    "exit"
+   ],
+   "doomed": null,
+   "stamped_ms_ago": null,
+   "ended": true
+  },
+  {
+   "seen": [
+    "exit"
+   ],
+   "doomed": null,
+   "stamped_ms_ago": null,
+   "ended": true
+  },
+  {
+   "seen": [
+    "exit"
+   ],
+   "doomed": null,
+   "stamped_ms_ago": null,
+   "ended": true
+  },
+  {
+   "seen": [
+    "exit"
+   ],
+   "doomed": null,
+   "stamped_ms_ago": null,
+   "ended": true
+  },
+  {
+   "seen": [
+    "exit"
+   ],
+   "doomed": null,
+   "stamped_ms_ago": null,
+   "ended": true
+  },
+  {
+   "seen": [
+    "exit"
+   ],
+   "doomed": null,
+   "stamped_ms_ago": null,
+   "ended": true
+  },
+  {
+   "seen": [
+    "exit"
+   ],
+   "doomed": null,
+   "stamped_ms_ago": null,
+   "ended": true
+  },
+  {
+   "seen": [
+    "exit"
+   ],
+   "doomed": null,
+   "stamped_ms_ago": null,
+   "ended": true
+  },
+  {
+   "seen": [
+    "exit"
+   ],
+   "doomed": null,
+   "stamped_ms_ago": null,
+   "ended": true
+  },
+  {
+   "seen": [
+    "exit"
+   ],
+   "doomed": null,
+   "stamped_ms_ago": null,
+   "ended": true
+  }
+ ],
+ "broker_phases": null,
+ "memory_helper_slowest": {
+  "census": 53,
+  "alloc": 0,
+  "shared": 0,
+  "touch": 0,
+  "dmem": 0,
+  "grant": 0,
+  "free": 0,
+  "stall": 0
+ },
+ "memory_helper": {
+  "dead": [],
+  "stall_tests": 0,
+  "sections_mib": [],
+  "given_back": 0,
+  "lost": 0,
+  "gave_back_lines": 0
+ },
+ "assertion": false,
+ "chunk_maps": null,
+ "mapped_mib": null,
+ "ask_failures_max": null,
+ "misplaced_max": null,
+ "rep_step_us": null,
+ "exec_rewrites_us": null,
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": true,
+ "bench": {},
+ "steady": {
+  "server": {
+   "calls": 0.0,
+   "per_s": 0.0,
+   "avg_us": 0.0,
+   "selects": 0.0,
+   "blocked": 0.0,
+   "block_avg_us": 0.0,
+   "waits": 0.0,
+   "handles_avg": 0.0,
+   "wait_all": 0.0,
+   "polled": 0.0,
+   "delays": 0.0,
+   "yields": 0.0,
+   "intervals": 8
+  }
+ },
+ "intervals": {
+  "frames": [],
+  "server": [
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   }
+  ],
+  "top": []
+ },
+ "shown": {
+  "frames": 228,
+  "per_10s": [
+   1,
+   42,
+   74,
+   45,
+   66
+  ],
+  "longest_gap_ms": 2960
+ },
+ "broker": {
+  "local_offer": 8589934592,
+  "host_limit": 1073741824,
+  "windows": {
+   "presents": 294,
+   "effect_bytes": 8206816,
+   "mica_builds": 2,
+   "thumbnail_builds": 0,
+   "compositions": 280,
+   "compose_avg_us": 2839,
+   "compose_max_us": 21507
+  },
+  "refused": [],
+  "refused_count": 0,
+  "clients": [
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": 4828,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": 4829,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": 4830,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": 4831,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": 4826,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": 4817,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   }
+  ],
+  "wedged": false,
+  "failure_reasons": [],
+  "host_peak": 6340608,
+  "local_peak": 0
+ },
+ "pacing": null,
+ "captures": [
+  "klog/explorer-dark-2026-10-16-02-capture-01.png",
+  "klog/explorer-dark-2026-10-16-02-capture-02.png",
+  "klog/explorer-dark-2026-10-16-02-capture-03.png",
+  "klog/explorer-dark-2026-10-16-02-capture-04.png",
+  "klog/explorer-dark-2026-10-16-02-capture-05.png",
+  "klog/explorer-dark-2026-10-16-02-capture-06.png",
+  "klog/explorer-dark-2026-10-16-02-capture-07.png",
+  "klog/explorer-dark-2026-10-16-02-capture-08.png",
+  "klog/explorer-dark-2026-10-16-02-capture-09.png",
+  "klog/explorer-dark-2026-10-16-02-capture-10.png",
+  "klog/explorer-dark-2026-10-16-02-capture-11.png"
+ ],
+ "pad_script": [
+  "# The probe requests each displayed capture after the actual child/browser is ready."
+ ],
+ "cleanup_verified": true,
+ "hooks_removed": true,
+ "theme": "dark",
+ "session_passed": true,
+ "display_pixels": [
+  {
+   "capture": "klog/explorer-dark-2026-10-16-02-capture-01.png",
+   "architecture": 64,
+   "actual": [
+    30,
+    110,
+    210
+   ],
+   "expected": [
+    30,
+    110,
+    210
+   ],
+   "passed": true
+  },
+  {
+   "capture": "klog/explorer-dark-2026-10-16-02-capture-02.png",
+   "architecture": 32,
+   "actual": [
+    30,
+    180,
+    70
+   ],
+   "expected": [
+    30,
+    180,
+    70
+   ],
+   "passed": true
+  },
+  {
+   "capture": "klog/explorer-dark-2026-10-16-02-capture-03.png",
+   "window": "File Explorer Home",
+   "body_pixels": 635833,
+   "frame": {
+    "frame": [
+     410,
+     166,
+     1510,
+     866
+    ],
+    "active": 1,
+    "theme": "dark",
+    "compared": 538650,
+    "wrong": 0,
+    "worst": 1,
+    "within_1": 1.0,
+    "first_wrong": null,
+    "passed": true
+   },
+   "passed": true
+  },
+  {
+   "capture": "klog/explorer-dark-2026-10-16-02-capture-04.png",
+   "window": "File Explorer Documents",
+   "body_pixels": 644264,
+   "frame": {
+    "frame": [
+     410,
+     166,
+     1510,
+     866
+    ],
+    "active": 1,
+    "theme": "dark",
+    "compared": 215050,
+    "wrong": 0,
+    "worst": 1,
+    "within_1": 1.0,
+    "first_wrong": null,
+    "passed": true
+   },
+   "passed": true
+  },
+  {
+   "capture": "klog/explorer-dark-2026-10-16-02-capture-05.png",
+   "window": "File Explorer Documents in large view",
+   "body_pixels": 624075,
+   "frame": {
+    "frame": [
+     410,
+     166,
+     1510,
+     866
+    ],
+    "active": 1,
+    "theme": "dark",
+    "compared": 182904,
+    "wrong": 0,
+    "worst": 1,
+    "within_1": 1.0,
+    "first_wrong": null,
+    "passed": true
+   },
+   "passed": true
+  },
+  {
+   "capture": "klog/explorer-dark-2026-10-16-02-capture-06.png",
+   "window": "File Explorer Documents in small view",
+   "body_pixels": 647298,
+   "frame": {
+    "frame": [
+     410,
+     166,
+     1510,
+     866
+    ],
+    "active": 1,
+    "theme": "dark",
+    "compared": 173944,
+    "wrong": 0,
+    "worst": 1,
+    "within_1": 1.0,
+    "first_wrong": null,
+    "passed": true
+   },
+   "passed": true
+  },
+  {
+   "capture": "klog/explorer-dark-2026-10-16-02-capture-07.png",
+   "window": "File Explorer Documents in list view",
+   "body_pixels": 647328,
+   "frame": {
+    "frame": [
+     410,
+     166,
+     1510,
+     866
+    ],
+    "active": 1,
+    "theme": "dark",
+    "compared": 173944,
+    "wrong": 0,
+    "worst": 1,
+    "within_1": 1.0,
+    "first_wrong": null,
+    "passed": true
+   },
+   "passed": true
+  },
+  {
+   "capture": "klog/explorer-dark-2026-10-16-02-capture-08.png",
+   "window": "File Explorer Documents filtered, details pane",
+   "body_pixels": 641130,
+   "frame": {
+    "frame": [
+     410,
+     166,
+     1510,
+     866
+    ],
+    "active": 1,
+    "theme": "dark",
+    "compared": 371962,
+    "wrong": 0,
+    "worst": 1,
+    "within_1": 1.0,
+    "first_wrong": null,
+    "passed": true
+   },
+   "passed": true
+  },
+  {
+   "capture": "klog/explorer-dark-2026-10-16-02-capture-09.png",
+   "window": "File Explorer details pane on a folder",
+   "body_pixels": 617500,
+   "frame": {
+    "frame": [
+     410,
+     166,
+     1510,
+     866
+    ],
+    "active": 1,
+    "theme": "dark",
+    "compared": 227721,
+    "wrong": 0,
+    "worst": 1,
+    "within_1": 1.0,
+    "first_wrong": null,
+    "passed": true
+   },
+   "passed": true
+  },
+  {
+   "capture": "klog/explorer-dark-2026-10-16-02-capture-10.png",
+   "window": "File Explorer with a second tab on Home",
+   "body_pixels": 635833,
+   "frame": {
+    "frame": [
+     410,
+     166,
+     1510,
+     866
+    ],
+    "active": 1,
+    "theme": "dark",
+    "compared": 538761,
+    "wrong": 0,
+    "worst": 1,
+    "within_1": 1.0,
+    "first_wrong": null,
+    "passed": true
+   },
+   "passed": true
+  },
+  {
+   "capture": "klog/explorer-dark-2026-10-16-02-capture-11.png",
+   "window": "File Explorer gone up from Documents",
+   "body_pixels": 642004,
+   "frame": {
+    "frame": [
+     410,
+     166,
+     1510,
+     866
+    ],
+    "active": 1,
+    "theme": "dark",
+    "compared": 215050,
+    "wrong": 0,
+    "worst": 1,
+    "within_1": 1.0,
+    "first_wrong": null,
+    "passed": true
+   },
+   "passed": true
+  },
+  {
+   "views_created": 3,
+   "views_visible_when_created": 0,
+   "passed": true
+  }
+ ],
+ "prototype_regions": {
+  "reference": "prototypes/windows11-shell ?fresh&dark&open=explorer[:documents], brightness 100",
+  "home": {
+   "title bar (Mica Alt, tab, caption)": {
+    "pixels": 52704,
+    "exact": 0.3544,
+    "within_1": 0.9995,
+    "within_3": 0.9997,
+    "worst": 46
+   },
+   "title bar right of the tab (Mica Alt only)": {
+    "pixels": 31680,
+    "exact": 0.1296,
+    "within_1": 1.0,
+    "within_3": 1.0,
+    "worst": 1
+   },
+   "tab": {
+    "pixels": 10320,
+    "exact": 0.9317,
+    "within_1": 0.9999,
+    "within_3": 1.0,
+    "worst": 2
+   },
+   "caption buttons": {
+    "pixels": 6624,
+    "exact": 0.6979,
+    "within_1": 0.9982,
+    "within_3": 0.9988,
+    "worst": 44
+   },
+   "address row": {
+    "pixels": 52704,
+    "exact": 0.9567,
+    "within_1": 0.9999,
+    "within_3": 1.0,
+    "worst": 3
+   },
+   "command bar": {
+    "pixels": 52704,
+    "exact": 0.9894,
+    "within_1": 1.0,
+    "within_3": 1.0,
+    "worst": 1
+   },
+   "navigation pane": {
+    "pixels": 87120,
+    "exact": 0.9291,
+    "within_1": 0.9996,
+    "within_3": 1.0,
+    "worst": 6
+   },
+   "Home above Recent rows": {
+    "pixels": 334014,
+    "exact": 0.9847,
+    "within_1": 1.0,
+    "within_3": 1.0,
+    "worst": 2
+   },
+   "Recent rows": {
+    "pixels": 158610,
+    "exact": 0.932,
+    "within_1": 0.9328,
+    "within_3": 0.9336,
+    "worst": 227
+   },
+   "status bar": {
+    "pixels": 28548,
+    "exact": 0.9848,
+    "within_1": 0.989,
+    "within_3": 0.9894,
+    "worst": 227
+   },
+   "status buttons": {
+    "pixels": 2340,
+    "exact": 0.9504,
+    "within_1": 1.0,
+    "within_3": 1.0,
+    "worst": 1
+   },
+   "whole window": {
+    "pixels": 770000,
+    "exact": 0.92,
+    "within_1": 0.9856,
+    "within_3": 0.9858,
+    "worst": 227
+   }
+  },
+  "documents": {
+   "title bar (Mica Alt, tab, caption)": {
+    "pixels": 52704,
+    "exact": 0.344,
+    "within_1": 0.9939,
+    "within_3": 0.9942,
+    "worst": 211
+   },
+   "title bar right of the tab (Mica Alt only)": {
+    "pixels": 31680,
+    "exact": 0.1282,
+    "within_1": 1.0,
+    "within_3": 1.0,
+    "worst": 1
+   },
+   "tab": {
+    "pixels": 10320,
+    "exact": 0.8975,
+    "within_1": 0.9714,
+    "within_3": 0.972,
+    "worst": 211
+   },
+   "caption buttons": {
+    "pixels": 6624,
+    "exact": 0.6745,
+    "within_1": 0.9982,
+    "within_3": 0.9988,
+    "worst": 44
+   },
+   "address row": {
+    "pixels": 52704,
+    "exact": 0.9308,
+    "within_1": 0.971,
+    "within_3": 0.9713,
+    "worst": 199
+   },
+   "command bar": {
+    "pixels": 52704,
+    "exact": 0.9887,
+    "within_1": 1.0,
+    "within_3": 1.0,
+    "worst": 1
+   },
+   "navigation pane": {
+    "pixels": 87120,
+    "exact": 0.931,
+    "within_1": 0.9992,
+    "within_3": 1.0,
+    "worst": 6
+   },
+   "column header": {
+    "pixels": 31722,
+    "exact": 0.9872,
+    "within_1": 1.0,
+    "within_3": 1.0,
+    "worst": 1
+   },
+   "rows": {
+    "pixels": 460902,
+    "exact": 0.9834,
+    "within_1": 0.9837,
+    "within_3": 0.9838,
+    "worst": 227
+   },
+   "status bar": {
+    "pixels": 28548,
+    "exact": 0.9894,
+    "within_1": 0.9909,
+    "within_3": 0.9912,
+    "worst": 227
+   },
+   "status buttons": {
+    "pixels": 2340,
+    "exact": 0.9829,
+    "within_1": 1.0,
+    "within_3": 1.0,
+    "worst": 1
+   },
+   "whole window": {
+    "pixels": 770000,
+    "exact": 0.928,
+    "within_1": 0.9873,
+    "within_3": 0.9876,
+    "worst": 227
+   }
+  }
+ }
+}

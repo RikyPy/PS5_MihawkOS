@@ -1,0 +1,85 @@
+From: PS5_Proton
+Subject: [PATCH] server: the title's stop logs off the desktop session
+
+The title asks a game to close at a stop request (the run's budget, a pad
+script's stop) with input type 4, WM_CLOSE to the foreground window. In
+the Mihawk OS desktop session that is never the session's end: with no
+program left the foreground window is one of Explorer's own, which takes
+the close and goes on. Explorer's main thread woke at the request and
+slept again in its message wait; 10 s later the title ended the session's
+seven helpers by SIGKILL, with no clean restart
+(two runs of 2026-10-18; record removed from the tree; in git history).
+
+Type 8 logs off as Start's Power and the gate's probes do: WM_CLOSE to the
+shell window, Progman, whose close ends Explorer's message loop and
+Explorer, the session's root; the title then returns to the launcher by
+its normal path. With Explorer unloaded in game mode there is no shell
+window, and the game is asked to close as by type 4; the session ends
+once the game has gone (src/pw_desktop_session.h).
+---
+diff --git a/server/queue.c b/server/queue.c
+--- a/server/queue.c
++++ b/server/queue.c
+@@ -3481,7 +3481,8 @@
+  * owns it. type 1 key (code: virtual key, scan code << 8, extended << 16), 2 relative mouse motion (x, y), 3 mouse
+  * button (code 0 left, 1 right, 2 middle, 3 X1, 4 X2), 4 close: WM_CLOSE to the foreground window, as a user closing
+  * it would, 6 the wheels (x horizontal, y vertical, WHEEL_DELTA units), 7 one process by its native pid (code):
+- * its windows asked to close (down 1) or the process ended. The cursor it leaves is kept
++ * its windows asked to close (down 1) or the process ended, 8 the desktop session's log off: WM_CLOSE to the shell
++ * window, as Start's Power does, or with no shell to the foreground window as 4. The cursor it leaves is kept
+  * for pw_wineserver_cursor. */
+ /* The same authoritative input desktop used by hardware injection. */
+ struct desktop *ps5_hardware_desktop(void) { return get_hardware_input_desktop(0); }
+@@ -3503,6 +3504,7 @@
+     };
+     union hw_input input;
+     struct desktop *desktop;
++    user_handle_t shell;
+ 
+     if (!(desktop = get_hardware_input_desktop( 0 ))) return;
+     if (!set_input_desktop( desktop->winstation, desktop ))
+@@ -3564,6 +3566,16 @@
+             queue_mouse_message( desktop, 0, &input, IMO_HARDWARE, NULL, 0 );
+         }
+         break;
++    case 8:
++        /* The shell's close ends Explorer, the session's root, and the session with it. WM_CLOSE to the foreground
++         * window does not: with no program left that is one of Explorer's own windows (2026-10-18:
++         * its main thread took it and slept again). With Explorer unloaded in game mode the game is asked, as by 4. */
++        if ((shell = ps5_shell_window( desktop )))
++        {
++            post_message( shell, WM_CLOSE, 0, 0 );
++            break;
++        }
++        /* fall through */
+     case 4:
+         if (desktop->foreground_input && desktop->foreground_input->shared->active)
+             post_message( desktop->foreground_input->shared->active, WM_CLOSE, 0, 0 );
+diff --git a/server/user.h b/server/user.h
+--- a/server/user.h
++++ b/server/user.h
+@@ -173,6 +173,7 @@
+ extern struct process *get_top_window_owner( struct desktop *desktop );
+ #ifdef __PROSPERO__
+ extern unsigned int ps5_close_process_windows( struct desktop *desktop, struct process *process );
++extern user_handle_t ps5_shell_window( struct desktop *desktop );
+ #endif
+ extern void get_virtual_screen_rect( struct desktop *desktop, struct rectangle *rect, int is_raw );
+ extern void post_desktop_message( struct desktop *desktop, unsigned int message,
+diff --git a/server/window.c b/server/window.c
+--- a/server/window.c
++++ b/server/window.c
+@@ -1318,6 +1318,13 @@
+     }
+     return count;
+ }
++
++/* The desktop's shell window (Progman in the Mihawk session), or 0, for the title's log off (queue.c,
++ * ps5_inject_input). */
++user_handle_t ps5_shell_window( struct desktop *desktop )
++{
++    return desktop->shell_window ? desktop->shell_window->handle : 0;
++}
+ #endif
+ 
+ /* same as is_visible but takes a window handle */

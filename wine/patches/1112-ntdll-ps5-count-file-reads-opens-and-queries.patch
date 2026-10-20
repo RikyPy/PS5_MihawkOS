@@ -1,0 +1,163 @@
+From: PS5_Proton
+Subject: [PATCH] ntdll: ps5: count what a process spends in file reads, opens and queries
+
+A HashLink game in the earlier emulator experiment (removed) took minutes to reach its menu while every thread of the
+process waited (2026-10-13, record removed from the tree; in git history: 98 % of the sampled thread positions were in
+call stubs, and the process used no CPU beyond the telemetry's own census).
+What the threads wait for was not recorded. NtReadFile, NtCreateFile, NtOpenFile,
+the attribute queries, NtQueryDirectoryFile and NtQueryInformationFile now count
+their calls, time in the call, slowest call and bytes read, read through
+__wine_file_call_stats and logged by each helper with its census.
+---
+diff --git a/dlls/ntdll/unix/file.c b/dlls/ntdll/unix/file.c
+--- a/dlls/ntdll/unix/file.c
++++ b/dlls/ntdll/unix/file.c
+@@ -8888,6 +8888,43 @@ NTSTATUS WINAPI unixcall_compat_wine_nt_to_unix_file_name( void *args )
+ }
+ 
+ #ifdef __PROSPERO__
++/* What a process spends in the file calls that a program waits on: reads, opens (NtCreateFile and NtOpenFile), attribute
++ * and directory queries, per kind the calls, nanoseconds, the slowest call and the bytes a read returned. The console's
++ * disk is slow for small writes (patch 1006), and a HashLink game in an emulator took minutes to reach its menu with every
++ * thread waiting and no record of what for (2026-10-13). Read through __wine_file_call_stats. */
++enum { FILE_CALL_READ, FILE_CALL_CREATE, FILE_CALL_OPEN, FILE_CALL_ATTRIBUTES, FILE_CALL_DIRECTORY, FILE_CALL_INFORMATION,
++       FILE_CALL_KINDS };
++enum { FILE_CALL_COUNT, FILE_CALL_NS, FILE_CALL_SLOWEST_NS, FILE_CALL_BYTES, FILE_CALL_FIELDS };
++static ULONG64 file_call_stats[FILE_CALL_KINDS][FILE_CALL_FIELDS];
++
++static void file_call_begin( struct timespec *begin )
++{
++    clock_gettime( CLOCK_MONOTONIC, begin );
++}
++
++static void file_call_end( int kind, ULONG64 bytes, const struct timespec *begin )
++{
++    struct timespec end;
++    ULONG64 ns, *stats = file_call_stats[kind];
++
++    clock_gettime( CLOCK_MONOTONIC, &end );
++    ns = (ULONG64)(end.tv_sec - begin->tv_sec) * 1000000000ull + end.tv_nsec - begin->tv_nsec;
++    __atomic_add_fetch( &stats[FILE_CALL_COUNT], 1, __ATOMIC_RELAXED );
++    __atomic_add_fetch( &stats[FILE_CALL_NS], ns, __ATOMIC_RELAXED );
++    __atomic_add_fetch( &stats[FILE_CALL_BYTES], bytes, __ATOMIC_RELAXED );
++    if (ns > stats[FILE_CALL_SLOWEST_NS]) stats[FILE_CALL_SLOWEST_NS] = ns;
++}
++
++/* Copy up to count counters (kind-major: calls, ns, slowest ns, bytes); returns how many exist. */
++DECLSPEC_EXPORT unsigned int __wine_file_call_stats( ULONG64 *out, unsigned int count )
++{
++    unsigned int i;
++
++    for (i = 0; i < count && i < FILE_CALL_KINDS * FILE_CALL_FIELDS; i++)
++        out[i] = __atomic_load_n( &file_call_stats[i / FILE_CALL_FIELDS][i % FILE_CALL_FIELDS], __ATOMIC_RELAXED );
++    return FILE_CALL_KINDS * FILE_CALL_FIELDS;
++}
++
+ #undef NtReadFile
+ #undef NtReadFileScatter
+ #undef NtWriteFileGather
+@@ -8906,8 +8943,14 @@ NTSTATUS WINAPI unixcall_compat_wine_nt_to_unix_file_name( void *args )
+ 
+ NTSTATUS WINAPI NtReadFile( HANDLE handle, HANDLE event, PIO_APC_ROUTINE apc, void *apc_user, IO_STATUS_BLOCK *io, void *buffer, ULONG length, LARGE_INTEGER *offset, ULONG *key )
+ {
++    struct timespec begin;
++    NTSTATUS status;
++
+     wb_flush_handle( handle );
+-    return real_NtReadFile( handle, event, apc, apc_user, io, buffer, length, offset, key );
++    file_call_begin( &begin );
++    status = real_NtReadFile( handle, event, apc, apc_user, io, buffer, length, offset, key );
++    file_call_end( FILE_CALL_READ, !status || status == STATUS_PENDING ? io->Information : 0, &begin );
++    return status;
+ }
+ 
+ NTSTATUS WINAPI NtReadFileScatter( HANDLE file, HANDLE event, PIO_APC_ROUTINE apc, void *apc_user, IO_STATUS_BLOCK *io, FILE_SEGMENT_ELEMENT *segments, ULONG length, LARGE_INTEGER *offset, ULONG *key )
+@@ -8936,8 +8979,14 @@ NTSTATUS WINAPI NtFlushBuffersFileEx( HANDLE handle, ULONG flags, void *params,
+ 
+ NTSTATUS WINAPI NtQueryInformationFile( HANDLE handle, IO_STATUS_BLOCK *io, void *ptr, ULONG len, FILE_INFORMATION_CLASS class )
+ {
++    struct timespec begin;
++    NTSTATUS status;
++
+     wb_flush_handle( handle );
+-    return real_NtQueryInformationFile( handle, io, ptr, len, class );
++    file_call_begin( &begin );
++    status = real_NtQueryInformationFile( handle, io, ptr, len, class );
++    file_call_end( FILE_CALL_INFORMATION, 0, &begin );
++    return status;
+ }
+ 
+ NTSTATUS WINAPI NtSetInformationFile( HANDLE handle, IO_STATUS_BLOCK *io, void *ptr, ULONG len, FILE_INFORMATION_CLASS class )
+@@ -8960,20 +9009,38 @@ NTSTATUS WINAPI NtDeviceIoControlFile( HANDLE handle, HANDLE event, PIO_APC_ROUT
+ 
+ NTSTATUS WINAPI NtQueryDirectoryFile( HANDLE handle, HANDLE event, PIO_APC_ROUTINE apc_routine, void *apc_context, IO_STATUS_BLOCK *io, void *buffer, ULONG length, FILE_INFORMATION_CLASS info_class, BOOLEAN single_entry, UNICODE_STRING *mask, BOOLEAN restart_scan )
+ {
++    struct timespec begin;
++    NTSTATUS status;
++
+     wb_flush_all();
+-    return real_NtQueryDirectoryFile( handle, event, apc_routine, apc_context, io, buffer, length, info_class, single_entry, mask, restart_scan );
++    file_call_begin( &begin );
++    status = real_NtQueryDirectoryFile( handle, event, apc_routine, apc_context, io, buffer, length, info_class, single_entry, mask, restart_scan );
++    file_call_end( FILE_CALL_DIRECTORY, 0, &begin );
++    return status;
+ }
+ 
+ NTSTATUS WINAPI NtCreateFile( HANDLE *handle, ACCESS_MASK access, OBJECT_ATTRIBUTES *attr, IO_STATUS_BLOCK *io, LARGE_INTEGER *alloc_size, ULONG attributes, ULONG sharing, ULONG disposition, ULONG options, void *ea_buffer, ULONG ea_length )
+ {
++    struct timespec begin;
++    NTSTATUS status;
++
+     wb_flush_all();
+-    return real_NtCreateFile( handle, access, attr, io, alloc_size, attributes, sharing, disposition, options, ea_buffer, ea_length );
++    file_call_begin( &begin );
++    status = real_NtCreateFile( handle, access, attr, io, alloc_size, attributes, sharing, disposition, options, ea_buffer, ea_length );
++    file_call_end( FILE_CALL_CREATE, 0, &begin );
++    return status;
+ }
+ 
+ NTSTATUS WINAPI NtOpenFile( HANDLE *handle, ACCESS_MASK access, OBJECT_ATTRIBUTES *attr, IO_STATUS_BLOCK *io, ULONG sharing, ULONG options )
+ {
++    struct timespec begin;
++    NTSTATUS status;
++
+     wb_flush_all();
+-    return real_NtOpenFile( handle, access, attr, io, sharing, options );
++    file_call_begin( &begin );
++    status = real_NtOpenFile( handle, access, attr, io, sharing, options );
++    file_call_end( FILE_CALL_OPEN, 0, &begin );
++    return status;
+ }
+ 
+ NTSTATUS WINAPI NtDeleteFile( OBJECT_ATTRIBUTES *attr )
+@@ -8984,14 +9051,26 @@ NTSTATUS WINAPI NtDeleteFile( OBJECT_ATTRIBUTES *attr )
+ 
+ NTSTATUS WINAPI NtQueryAttributesFile( const OBJECT_ATTRIBUTES *attr, FILE_BASIC_INFORMATION *info )
+ {
++    struct timespec begin;
++    NTSTATUS status;
++
+     wb_flush_all();
+-    return real_NtQueryAttributesFile( attr, info );
++    file_call_begin( &begin );
++    status = real_NtQueryAttributesFile( attr, info );
++    file_call_end( FILE_CALL_ATTRIBUTES, 0, &begin );
++    return status;
+ }
+ 
+ NTSTATUS WINAPI NtQueryFullAttributesFile( const OBJECT_ATTRIBUTES *attr, FILE_NETWORK_OPEN_INFORMATION *info )
+ {
++    struct timespec begin;
++    NTSTATUS status;
++
+     wb_flush_all();
+-    return real_NtQueryFullAttributesFile( attr, info );
++    file_call_begin( &begin );
++    status = real_NtQueryFullAttributesFile( attr, info );
++    file_call_end( FILE_CALL_ATTRIBUTES, 0, &begin );
++    return status;
+ }
+ 
+ #endif
+-- 
+2.56.0

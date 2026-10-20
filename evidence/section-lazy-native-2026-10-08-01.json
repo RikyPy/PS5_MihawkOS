@@ -1,0 +1,28 @@
+{
+ "run": "section-lazy-native-2026-10-08-01",
+ "read_only": false,
+ "temporary_direct_backing_bytes": 0,
+ "kernel_reads": false,
+ "kernel_writes": false,
+ "no_overwrite": true,
+ "payload": true,
+ "elf_sha256": "83fc8c2b3f38d2b12926b3c2359d717dec989aa1fe3269a781a4bdab2dc109c0",
+ "source_sha256": "b825b4f079323d0f2a92e1925db0b08a01f2c28a633976aff101f89b2e1aa06f",
+ "completed": true,
+ "full_contiguous_view_supported": false,
+ "single_thread_lazy_alias_contract_passed": true,
+ "passed": true,
+ "purpose": "two full virtual aliases of sparse backing, demand mapped shared pages, coherence and remap persistence; single-thread native proof only",
+ "lines": [
+  "section-lazy reserve=0 exact=1 bytes=68719476736",
+  "section-lazy open=1 truncate=0 errno=0",
+  "section-lazy handlers=0/0 virtual_view_bytes=14495514624 aliases=2",
+  "section-lazy phase=before-touch census_status=0 resident_bytes=3588096 mapped_bytes=17268736",
+  "section-lazy phase=after-touch census_status=0 resident_bytes=3637248 mapped_bytes=68736745472",
+  "section-lazy zero=1 coherent=1 flush=0 remove=0 reserve_page=0 persisted=1 faults=4",
+  "section-lazy full_unmap=0 alias_survived=1",
+  "section-lazy phase=before-cleanup census_status=0 resident_bytes=3604480 mapped_bytes=54241230848",
+  "section-lazy restore_handlers=0/0",
+  "section-lazy arena_unmap=0 close=0 unlink=0 result=PASS"
+ ]
+}

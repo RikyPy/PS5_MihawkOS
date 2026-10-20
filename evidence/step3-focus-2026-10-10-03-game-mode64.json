@@ -1,0 +1,200 @@
+{
+ "telemetry_hold": null,
+ "launch_readiness": {
+  "ready": true,
+  "seconds": 0.408,
+  "settle_seconds": 0.0,
+  "census_seconds": 0.389,
+  "previous_cleanup_verified": true
+ },
+ "native_close_failures": [],
+ "run": "step3-focus-2026-10-10-03-game-mode64",
+ "what": "C:\\windows\\system32\\mihawk.exe",
+ "env": [
+  "PROTON_LAYOUT=launcher",
+  "WINE_PS5_WINDOW_SURFACES=1",
+  "MIHAWK_DESKTOP=1"
+ ],
+ "result": "finished",
+ "seconds": 20.0,
+ "probe_verdict": "PASS",
+ "clean_owner_restart": true,
+ "launcher_end_status": 0,
+ "initial_status": 0,
+ "closed_on_request": false,
+ "child_logs": [
+  "klog/step3-focus-2026-10-10-03-game-mode64-wine-child-10166.log",
+  "klog/step3-focus-2026-10-10-03-game-mode64-wine-child-10167.log",
+  "klog/step3-focus-2026-10-10-03-game-mode64-wine-child-10168.log",
+  "klog/step3-focus-2026-10-10-03-game-mode64-wine-child-10169.log",
+  "klog/step3-focus-2026-10-10-03-game-mode64-wine-child-10170.log",
+  "klog/step3-focus-2026-10-10-03-game-mode64-wine-child-10171.log",
+  "klog/step3-focus-2026-10-10-03-game-mode64-wine-child-10172.log",
+  "klog/step3-focus-2026-10-10-03-game-mode64-wine-child-10173.log",
+  "klog/step3-focus-2026-10-10-03-game-mode64-wine-child-10174.log",
+  "klog/step3-focus-2026-10-10-03-game-mode64-wine-child-10175.log",
+  "klog/step3-focus-2026-10-10-03-game-mode64-wine-child-10176.log",
+  "klog/step3-focus-2026-10-10-03-game-mode64-wine-child-10177.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": true,
+ "bench": {
+  "unload_ms": 2182.0,
+  "restore_ms": 2754.0,
+  "adopt_ms": 23.0
+ },
+ "steady": {
+  "server": {
+   "calls": 0.0,
+   "per_s": 0.0,
+   "avg_us": 0.0,
+   "selects": 0.0,
+   "blocked": 0.0,
+   "block_avg_us": 0.0,
+   "waits": 0.0,
+   "handles_avg": 0.0,
+   "wait_all": 0.0,
+   "polled": 0.0,
+   "delays": 0.0,
+   "yields": 0.0,
+   "intervals": 1
+  }
+ },
+ "intervals": {
+  "frames": [],
+  "server": [
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   }
+  ],
+  "top": []
+ },
+ "shown": {
+  "frames": 328,
+  "per_10s": [
+   1,
+   327
+  ],
+  "longest_gap_ms": 2213
+ },
+ "broker": {
+  "local_offer": null,
+  "host_limit": null,
+  "windows": {
+   "presents": 64,
+   "effect_bytes": 388800,
+   "mica_builds": 4,
+   "thumbnail_builds": 0,
+   "compositions": 64,
+   "compose_avg_us": 1529,
+   "compose_max_us": 8645
+  },
+  "refused": [],
+  "refused_count": 0,
+  "clients": [],
+  "wedged": false,
+  "failure_reasons": [],
+  "host_peak": null,
+  "local_peak": null
+ },
+ "pacing": {
+  "windows": [
+   {
+    "cookie": 9,
+    "pid": 10175,
+    "route": "independent",
+    "final": true,
+    "refused": "none",
+    "direct": 291.0,
+    "composed": 0.0,
+    "seconds": 8.7,
+    "frames": 291.0,
+    "hidden": 0.0,
+    "fps": 33.5,
+    "mean": 19.35,
+    "p50": 16.75,
+    "p95": 25.0,
+    "p99": 32.5,
+    "max": 667.28,
+    "over20": 32.0,
+    "over34": 2.0,
+    "present_avg": 15.6,
+    "present_max": 665.47
+   }
+  ],
+  "clients": {
+   "9": {
+    "pid": 10175,
+    "route": "independent",
+    "routes": {
+     "independent": 291
+    },
+    "windows": 1,
+    "seconds": 8.7,
+    "frames": 291,
+    "hidden": 0,
+    "direct": 291,
+    "composed": 0,
+    "refused": [],
+    "fps": 33.4,
+    "p50_median_ms": 16.75,
+    "p95_worst_ms": 25.0,
+    "p99_worst_ms": 32.5,
+    "max_ms": 667.28,
+    "over20": 32,
+    "over34": 2,
+    "present_avg_ms": 15.6,
+    "present_max_ms": 665.47
+   }
+  }
+ },
+ "captures": [
+  "klog/step3-focus-2026-10-10-03-game-mode64-capture-01.png"
+ ],
+ "cleanup_verified": true,
+ "hooks_removed": true,
+ "api": "opengl",
+ "game_mode": {
+  "direct_entries": 1,
+  "unloads": [
+   287
+  ],
+  "restores": [
+   {
+    "status": 0,
+    "ms": 228
+   }
+  ],
+  "kept": 0,
+  "could_not_start": 0,
+  "session_root": true
+ },
+ "probe_passed": true
+}

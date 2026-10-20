@@ -1,0 +1,312 @@
+From: PS5_Proton <local>
+Subject: [PATCH] comctl32: tooltips as the prototype draws them
+
+The approved Windows 11 prototype (prototypes/windows11-shell, css/ui.css .tooltip, js/ui.js) draws every tooltip on
+the flyout's acrylic with a 1 px SurfaceStrokeColorFlyout stroke, 4 px corners and --shadow-8, its 12 px caption text
+in TextFillColorPrimary 5 px below the stroke and 8 px in from it, on 16 px lines, at most 320 px wide. It shows 20 px
+below the pointer (above it when there is more room there), 8 px inside the work area, 500 ms after the pointer
+reaches its element, or 100 ms when another tip hid in the last 400 ms. Wine drew the classic tip: a black border,
+COLOR_INFOBK, the status font, no wrapping without TTM_SETMAXTIPWIDTH, moved only to stay on the screen.
+
+A plain tip (no balloon, title or margins, the system's font and colours, no access-key prefix) whose characters the
+prototype's glyphs cover now
+- is laid out and sized by src/pw_tooltip.h (TOOLTIPS_CalcTipSize): CSS pre-line white space, Blink's line breaks at
+  302 px; the box is Chromium's to the pixel for the three measured tips (293 x 30, 200 x 62, 320 x 62,
+  tests/test_pw_tooltip.c);
+- asks the compositor for the flyout's acrylic without WS_BORDER (pw_tooltip_surface: DWMWA_SYSTEMBACKDROP_TYPE
+  PS5_DWMSBT_FLYOUT, DWMWCP_ROUNDSMALL, a sheet of glass, dark when COLOR_INFOBK is); the compositor draws the
+  material, the stroke and the shadow (server patch 1213);
+- paints its text through one premultiplied buffer from the prototype's own glyphs (pw_tooltip_glyphs.h,
+  tools/build-tooltip-glyphs.py), within one level of Chromium's text in every pixel, light and dark;
+- is placed as the prototype's ui.position places it when it follows the pointer (pw_tooltip_place);
+- shows after the reshow time (100 ms by default) instead of the initial time (500 ms) when another tip hid less than
+  400 ms before, and after a relayed press stays hidden until the pointer reaches another tool or TTM_POP.
+Without the compositor (DWMWA_SYSTEMBACKDROP_TYPE unanswered) the same tip is drawn opaque, on COLOR_INFOBK in a
+COLOR_3DSHADOW frame. Balloons, titled tips and tips with their own font, colours or margins keep Wine's drawing. The
+prototype's tip sends no custom draw notifications and keeps Windows' autopop (ten times the initial time). dwmapi is
+delay-imported.
+
+Measured on the host: the Recycle Bin's tip through the production compositor (src/pw_window_compose.c) over the
+prototype's hover capture, against its infotip capture, light: the shadow ring within one level in 76.7% of 5103
+pixels (worst 4), the tip within one level in 97.1% of 8438 (worst 13). The dark reference is 4 to 6 levels darker
+than its own hover capture across the whole screen, so dark shows only that the shadow is within 7 levels and the tip
+within 14 (89.2% within one).
+---
+diff --git a/dlls/comctl32/Makefile.in b/dlls/comctl32/Makefile.in
+--- a/dlls/comctl32/Makefile.in
++++ b/dlls/comctl32/Makefile.in
+@@ -2,7 +2,7 @@ EXTRADEFS = -D_COMCTL32_ -D__WINE_COMCTL32_VERSION=5
+ MODULE    = comctl32.dll
+ IMPORTLIB = comctl32
+ IMPORTS   = uuid user32 gdi32 advapi32 imm32 kernelbase oleaut32
+-DELAYIMPORTS = oleacc winmm
++DELAYIMPORTS = dwmapi oleacc winmm
+ 
+ SOURCES = \
+ 	animate.c \
+diff --git a/dlls/comctl32/tooltips.c b/dlls/comctl32/tooltips.c
+--- a/dlls/comctl32/tooltips.c
++++ b/dlls/comctl32/tooltips.c
+@@ -101,7 +101,10 @@
+ #include "winnls.h"
+ #include "commctrl.h"
+ #include "comctl32.h"
++#include "dwmapi.h"
+ #include "wine/debug.h"
++#include "pw_tooltip.h"
++#include "pw_tooltip_glyphs.h"
+ 
+ WINE_DEFAULT_DEBUG_CHANNEL(tooltips);
+ 
+@@ -150,6 +153,15 @@ typedef struct
+     int      iconHeight;
+ 
+     TTTOOL_INFO *tools;
++
++    /* PS5_Proton: a plain tip in the system's font and colours is drawn as the approved prototype's (src/pw_tooltip.h) */
++    BOOL     pw_look;     /* the tip last laid out is drawn so */
++    BOOL     pw_dark;     /* ... in the dark theme (COLOR_INFOBK is dark) */
++    BOOL     pw_glass;    /* ... on the compositor's flyout acrylic */
++    int      pw_surface;  /* what the window asked the compositor for: 0 nothing, 1 light glass, 2 dark glass */
++    BOOL     pw_muted;    /* a press hid the tip: none again until the pointer reaches another tool */
++    DWORD    pw_hidden;   /* when a shown tip last hid (GetTickCount) */
++    PwTooltipLayout pw_layout;
+ } TOOLTIPS_INFO;
+ 
+ #define ID_TIMERSHOW   1    /* show delay timer */
+@@ -207,6 +219,98 @@ TOOLTIPS_InitSystemSettings (TOOLTIPS_INFO *infoPtr)
+     infoPtr->hFont = infoPtr->hStatusFont;
+ }
+ 
++/* PS5_Proton: whether the tip in szTipText is drawn as the prototype's: a plain tip (no balloon, title, margins or
++ * access-key prefix) in the system's font and colours whose characters all have the prototype's glyphs. If so it is
++ * laid out (pw_layout). */
++static BOOL pw_tooltip_lay_out(TOOLTIPS_INFO *infoPtr)
++{
++    DWORD style = GetWindowLongW(infoPtr->hwndSelf, GWL_STYLE);
++    COLORREF bk = comctl32_color.clrInfoBk;
++    const RECT *margin = &infoPtr->rcMargin;
++
++    infoPtr->pw_dark = GetRValue(bk) * 299 + GetGValue(bk) * 587 + GetBValue(bk) * 114 < 128 * 1000;
++    infoPtr->pw_look = !(style & TTS_BALLOON) && !infoPtr->pszTitle && infoPtr->hFont == infoPtr->hStatusFont &&
++                       infoPtr->clrBk == bk && infoPtr->clrText == comctl32_color.clrInfoText &&
++                       !margin->left && !margin->top && !margin->right && !margin->bottom &&
++                       ((style & TTS_NOPREFIX) || !wcschr(infoPtr->szTipText, '&')) &&
++                       pw_tooltip_layout(&pw_tooltip_fonts[infoPtr->pw_dark], (const unsigned short *)infoPtr->szTipText,
++                                         lstrlenW(infoPtr->szTipText), &infoPtr->pw_layout);
++    return infoPtr->pw_look;
++}
++
++/* The tip's window for its look: frameless on the prototype's flyout acrylic with 4 px corners, a sheet of glass, in
++ * its theme (the compositor draws the material, stroke and --shadow-8: server patch 1213); a classic tip gets its
++ * border and opaque window back. Without the compositor (DWMWA_SYSTEMBACKDROP_TYPE unanswered) the look is opaque. */
++static void pw_tooltip_surface(TOOLTIPS_INFO *infoPtr)
++{
++    const int surface = infoPtr->pw_look ? 1 + infoPtr->pw_dark : 0;
++    DWORD style = GetWindowLongW(infoPtr->hwndSelf, GWL_STYLE), framed = style;
++    DWORD corner = surface ? DWMWCP_ROUNDSMALL : DWMWCP_DEFAULT, backdrop = surface ? 7 /* PS5_DWMSBT_FLYOUT */ : 1 /* DWMSBT_NONE */;
++    DWORD dark = surface == 2, answer = 0;
++    MARGINS sheet = {surface ? -1 : 0, surface ? -1 : 0, surface ? -1 : 0, surface ? -1 : 0};
++
++    if (surface == infoPtr->pw_surface) return;
++    if (surface) framed &= ~WS_BORDER;
++    else if (!(style & TTS_BALLOON)) framed |= WS_BORDER;
++    if (framed != style)
++    {
++        SetWindowLongW(infoPtr->hwndSelf, GWL_STYLE, framed);
++        SetWindowPos(infoPtr->hwndSelf, NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED);
++    }
++    DwmSetWindowAttribute(infoPtr->hwndSelf, DWMWA_WINDOW_CORNER_PREFERENCE, &corner, sizeof(corner));
++    DwmSetWindowAttribute(infoPtr->hwndSelf, DWMWA_USE_IMMERSIVE_DARK_MODE, &dark, sizeof(dark));
++    DwmExtendFrameIntoClientArea(infoPtr->hwndSelf, &sheet);
++    DwmSetWindowAttribute(infoPtr->hwndSelf, DWMWA_SYSTEMBACKDROP_TYPE, &backdrop, sizeof(backdrop));
++    infoPtr->pw_glass = surface && SUCCEEDED(DwmGetWindowAttribute(infoPtr->hwndSelf, DWMWA_SYSTEMBACKDROP_TYPE, &answer,
++                                                                   sizeof(answer))) && answer == backdrop;
++    infoPtr->pw_surface = surface;
++}
++
++/* The prototype's tip, through one premultiplied buffer: its text over the compositor's glass, or without it over
++ * COLOR_INFOBK in a 1 px COLOR_3DSHADOW frame. */
++static void pw_tooltip_paint(const TOOLTIPS_INFO *infoPtr, HDC hdc)
++{
++    BITMAPINFO info = {{sizeof(BITMAPINFOHEADER)}};
++    HBITMAP bitmap, prev;
++    unsigned int *bits;
++    RECT rc;
++    HDC dc;
++
++    GetClientRect(infoPtr->hwndSelf, &rc);
++    if (rc.right <= 0 || rc.bottom <= 0) return;
++    info.bmiHeader.biWidth = rc.right;
++    info.bmiHeader.biHeight = -rc.bottom;
++    info.bmiHeader.biPlanes = 1;
++    info.bmiHeader.biBitCount = 32;
++    info.bmiHeader.biCompression = BI_RGB;
++    if (!(dc = CreateCompatibleDC(hdc))) return;
++    if (!(bitmap = CreateDIBSection(dc, &info, DIB_RGB_COLORS, (void **)&bits, NULL, 0)))
++    {
++        DeleteDC(dc);
++        return;
++    }
++    pw_tooltip_draw(&pw_tooltip_fonts[infoPtr->pw_dark], &infoPtr->pw_layout, 0, 0, bits, rc.right, rc.bottom);
++    if (!infoPtr->pw_glass)
++        for (int y = 0; y < rc.bottom; y++)
++            for (int x = 0; x < rc.right; x++)
++            {
++                COLORREF c = !x || !y || x == rc.right - 1 || y == rc.bottom - 1 ? comctl32_color.clr3dShadow : infoPtr->clrBk;
++                unsigned int *pixel = &bits[y * rc.right + x];
++                *pixel = pw_text_over(*pixel, 0xff000000 | GetRValue(c) << 16 | GetGValue(c) << 8 | GetBValue(c));
++            }
++    prev = SelectObject(dc, bitmap);
++    BitBlt(hdc, 0, 0, rc.right, rc.bottom, dc, 0, 0, SRCCOPY);
++    SelectObject(dc, prev);
++    DeleteObject(bitmap);
++    DeleteDC(dc);
++}
++
++/* The prototype's quick reshow: a tip wanted within 400 ms of another hiding shows after the reshow time. */
++static INT pw_tooltip_delay(const TOOLTIPS_INFO *infoPtr)
++{
++    return GetTickCount() - infoPtr->pw_hidden < PW_TOOLTIP_RESHOW_WITHIN ? infoPtr->nReshowTime : infoPtr->nInitialTime;
++}
++
+ /* Custom draw routines */
+ static void
+ TOOLTIPS_customdraw_fill(const TOOLTIPS_INFO *infoPtr, NMTTCUSTOMDRAW *lpnmttcd,
+@@ -255,6 +359,12 @@ TOOLTIPS_Refresh (const TOOLTIPS_INFO *infoPtr, HDC hdc)
+     NMTTCUSTOMDRAW nmttcd;
+     DWORD cdmode;
+ 
++    /* shortcut: the prototype's tip sends no custom draw notifications; send them once a program needs to draw over it */
++    if (infoPtr->pw_look)
++    {
++        pw_tooltip_paint(infoPtr, hdc);
++        return;
++    }
+     if (infoPtr->nMaxTipWidth > -1)
+ 	uFlags |= DT_WORDBREAK;
+     if (GetWindowLongW (infoPtr->hwndSelf, GWL_STYLE) & TTS_NOPREFIX)
+@@ -513,7 +623,7 @@ TOOLTIPS_GetTipText (const TOOLTIPS_INFO *infoPtr, INT nTool, WCHAR *buffer)
+ 
+ 
+ static void
+-TOOLTIPS_CalcTipSize (const TOOLTIPS_INFO *infoPtr, LPSIZE lpSize)
++TOOLTIPS_CalcTipSize (TOOLTIPS_INFO *infoPtr, LPSIZE lpSize)
+ {
+     HDC hdc;
+     HFONT hOldFont;
+@@ -529,6 +639,13 @@ TOOLTIPS_CalcTipSize (const TOOLTIPS_INFO *infoPtr, LPSIZE lpSize)
+     if (style & TTS_NOPREFIX)
+ 	uFlags |= DT_NOPREFIX;
+     TRACE("%s\n", debugstr_w(infoPtr->szTipText));
++    if (pw_tooltip_lay_out(infoPtr))
++    {
++        /* the prototype's box: its stroke, padding and text, 320 px wide at most */
++        lpSize->cx = infoPtr->pw_layout.width;
++        lpSize->cy = infoPtr->pw_layout.height;
++        return;
++    }
+ 
+     hdc = GetDC (infoPtr->hwndSelf);
+     if (infoPtr->pszTitle)
+@@ -618,6 +735,7 @@ TOOLTIPS_Show (TOOLTIPS_INFO *infoPtr, BOOL track_activate)
+ 
+     toolPtr = &infoPtr->tools[nTool];
+     TOOLTIPS_CalcTipSize (infoPtr, &size);
++    pw_tooltip_surface (infoPtr);
+ 
+     TRACE("Show tooltip %d, %s, size %ld x %ld\n", nTool, debugstr_w(infoPtr->szTipText),
+         size.cx, size.cy);
+@@ -715,6 +833,21 @@ TOOLTIPS_Show (TOOLTIPS_INFO *infoPtr, BOOL track_activate)
+                 }
+                 rect.left = max(0, rect.left - BALLOON_STEMINDENT);
+             }
++            else if (infoPtr->pw_look)
++            {
++                /* the prototype's ui.position: 20 px below the pointer, or above it when there is more room there,
++                 * 8 px inside the work area */
++                POINT pt = {rect.left, rect.top};
++                int x, y;
++
++                mon_info.cbSize = sizeof(mon_info);
++                GetMonitorInfoW(MonitorFromPoint(pt, MONITOR_DEFAULTTOPRIMARY), &mon_info);
++                pw_tooltip_place(pt.x, pt.y, size.cx, size.cy, mon_info.rcWork.left, mon_info.rcWork.top,
++                                 mon_info.rcWork.right, mon_info.rcWork.bottom, &x, &y);
++                rect.left = x;
++                rect.top = y;
++                infoPtr->bToolBelow = y > pt.y;
++            }
+             else
+             {
+ 		    rect.top += 20;
+@@ -854,6 +987,7 @@ TOOLTIPS_Hide (TOOLTIPS_INFO *infoPtr)
+     SendMessageW (toolPtr->hwnd, WM_NOTIFY, toolPtr->uId, (LPARAM)&hdr);
+ 
+     infoPtr->nCurrentTool = -1;
++    infoPtr->pw_hidden = GetTickCount();
+ 
+     SetWindowPos (infoPtr->hwndSelf, HWND_TOP, 0, 0, 0, 0,
+ 		    SWP_NOZORDER | SWP_HIDEWINDOW | SWP_NOACTIVATE);
+@@ -1272,7 +1406,7 @@ TOOLTIPS_EnumToolsT (const TOOLTIPS_INFO *infoPtr, UINT uIndex, TTTOOLINFOW *ti,
+ }
+ 
+ static LRESULT
+-TOOLTIPS_GetBubbleSize (const TOOLTIPS_INFO *infoPtr, const TTTOOLINFOW *lpToolInfo)
++TOOLTIPS_GetBubbleSize (TOOLTIPS_INFO *infoPtr, const TTTOOLINFOW *lpToolInfo)
+ {
+     INT nTool;
+     SIZE size;
+@@ -1480,6 +1614,7 @@ static inline LRESULT
+ TOOLTIPS_Pop (TOOLTIPS_INFO *infoPtr)
+ {
+     TOOLTIPS_Hide (infoPtr);
++    infoPtr->pw_muted = FALSE;
+ 
+     return 0;
+ }
+@@ -1504,6 +1639,7 @@ TOOLTIPS_RelayEvent (TOOLTIPS_INFO *infoPtr, LPMSG lpMsg)
+ 	case WM_RBUTTONDOWN:
+ 	case WM_RBUTTONUP:
+ 	    TOOLTIPS_Hide (infoPtr);
++	    infoPtr->pw_muted = TRUE;
+ 	    break;
+ 
+ 	case WM_MOUSEMOVE:
+@@ -1517,12 +1653,13 @@ TOOLTIPS_RelayEvent (TOOLTIPS_INFO *infoPtr, LPMSG lpMsg)
+             TRACE("WM_MOUSEMOVE (%p %s)\n", infoPtr->hwndSelf, wine_dbgstr_point(&pt));
+ 
+ 	    if (infoPtr->nTool != nOldTool) {
++	        infoPtr->pw_muted = FALSE;
+ 	        if(infoPtr->nTool == -1) { /* Moved out of all tools */
+ 		    TOOLTIPS_Hide(infoPtr);
+ 		    KillTimer(infoPtr->hwndSelf, ID_TIMERLEAVE);
+ 		} else if (nOldTool == -1) { /* Moved from outside */
+ 		    if(infoPtr->bActive) {
+-		        SetTimer(infoPtr->hwndSelf, ID_TIMERSHOW, infoPtr->nInitialTime, 0);
++		        SetTimer(infoPtr->hwndSelf, ID_TIMERSHOW, pw_tooltip_delay(infoPtr), 0);
+                         TRACE("timer 1 started\n");
+ 		    }
+ 		} else { /* Moved from one to another */
+@@ -1537,9 +1674,9 @@ TOOLTIPS_RelayEvent (TOOLTIPS_INFO *infoPtr, LPMSG lpMsg)
+ 	        KillTimer(infoPtr->hwndSelf, ID_TIMERPOP);
+ 		SetTimer(infoPtr->hwndSelf, ID_TIMERPOP, infoPtr->nAutoPopTime, 0);
+ 		TRACE("timer 2 restarted\n");
+-	    } else if(infoPtr->nTool != -1 && infoPtr->bActive) {
++	    } else if(infoPtr->nTool != -1 && infoPtr->bActive && !infoPtr->pw_muted) {
+                 /* previous show attempt didn't result in tooltip so try again */
+-		SetTimer(infoPtr->hwndSelf, ID_TIMERSHOW, infoPtr->nInitialTime, 0);
++		SetTimer(infoPtr->hwndSelf, ID_TIMERSHOW, pw_tooltip_delay(infoPtr), 0);
+                 TRACE("timer 1 started\n");
+ 	    }
+ 	    break;
+diff --git a/dlls/comctl32_v6/Makefile.in b/dlls/comctl32_v6/Makefile.in
+--- a/dlls/comctl32_v6/Makefile.in
++++ b/dlls/comctl32_v6/Makefile.in
+@@ -1,6 +1,6 @@
+ MODULE    = comctl32_v6.dll
+ IMPORTS   = uuid user32 gdi32 advapi32 imm32 kernelbase oleaut32
+-DELAYIMPORTS = oleacc winmm uxtheme
++DELAYIMPORTS = dwmapi oleacc winmm uxtheme
+ EXTRADEFS = -D_COMCTL32_ -D__WINE_COMCTL32_VERSION=6
+ PARENTSRC = ../comctl32
+ 

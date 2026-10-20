@@ -1,0 +1,73 @@
+{
+ "telemetry_hold": null,
+ "launch_readiness": {
+  "ready": true,
+  "seconds": 0.185,
+  "settle_seconds": 0.0,
+  "census_seconds": 0.17,
+  "previous_cleanup_verified": true
+ },
+ "native_close_failures": [],
+ "run": "mihawk-effects-gate-2026-10-10-05-payload-vm",
+ "what": "vm-protect-probe.exe",
+ "env": [
+  "PROTON_LAYOUT=launcher"
+ ],
+ "result": "finished",
+ "seconds": 9.9,
+ "probe_verdict": "PASS",
+ "clean_owner_restart": true,
+ "launcher_end_status": 0,
+ "initial_status": 0,
+ "closed_on_request": false,
+ "child_logs": [
+  "klog/mihawk-effects-gate-2026-10-10-05-payload-vm-wine-child-6949.log",
+  "klog/mihawk-effects-gate-2026-10-10-05-payload-vm-wine-child-6950.log",
+  "klog/mihawk-effects-gate-2026-10-10-05-payload-vm-wine-child-6951.log",
+  "klog/mihawk-effects-gate-2026-10-10-05-payload-vm-wine-child-6952.log",
+  "klog/mihawk-effects-gate-2026-10-10-05-payload-vm-wine-child-6953.log",
+  "klog/mihawk-effects-gate-2026-10-10-05-payload-vm-wine-child-6954.log",
+  "klog/mihawk-effects-gate-2026-10-10-05-payload-vm-wine-child-6955.log",
+  "klog/mihawk-effects-gate-2026-10-10-05-payload-vm-wine-child-6956.log",
+  "klog/mihawk-effects-gate-2026-10-10-05-payload-vm-wine-child-6957.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": true,
+ "bench": {},
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [],
+  "top": []
+ },
+ "shown": {
+  "frames": 0,
+  "per_10s": [],
+  "longest_gap_ms": 0
+ },
+ "broker": {
+  "local_offer": null,
+  "host_limit": null,
+  "windows": {
+   "presents": 0,
+   "effect_bytes": 0,
+   "mica_builds": 0,
+   "thumbnail_builds": 0,
+   "compositions": 0,
+   "compose_avg_us": 0,
+   "compose_max_us": 0
+  },
+  "refused": [],
+  "refused_count": 0,
+  "clients": [],
+  "wedged": false,
+  "failure_reasons": [],
+  "host_peak": null,
+  "local_peak": null
+ },
+ "captures": [],
+ "cleanup_verified": true,
+ "hooks_removed": true
+}

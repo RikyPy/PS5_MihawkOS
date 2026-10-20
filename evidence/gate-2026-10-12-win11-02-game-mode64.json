@@ -1,0 +1,256 @@
+{
+ "telemetry_hold": null,
+ "launch_readiness": {
+  "ready": true,
+  "seconds": 0.144,
+  "settle_seconds": 0.0,
+  "census_seconds": 0.134,
+  "previous_cleanup_verified": true
+ },
+ "native_close_failures": [],
+ "run": "gate-2026-10-12-win11-02-game-mode64",
+ "what": "C:\\windows\\system32\\mihawk.exe",
+ "env": [
+  "PROTON_LAYOUT=launcher",
+  "WINE_PS5_WINDOW_SURFACES=1",
+  "MIHAWK_DESKTOP=1"
+ ],
+ "result": "exited",
+ "seconds": 23.8,
+ "probe_verdict": "PASS",
+ "clean_owner_restart": true,
+ "launcher_end_status": 0,
+ "initial_status": 0,
+ "closed_on_request": false,
+ "child_logs": [
+  "klog/gate-2026-10-12-win11-02-game-mode64-wine-child-7962.log",
+  "klog/gate-2026-10-12-win11-02-game-mode64-wine-child-7963.log",
+  "klog/gate-2026-10-12-win11-02-game-mode64-wine-child-7964.log",
+  "klog/gate-2026-10-12-win11-02-game-mode64-wine-child-7965.log",
+  "klog/gate-2026-10-12-win11-02-game-mode64-wine-child-7966.log",
+  "klog/gate-2026-10-12-win11-02-game-mode64-wine-child-7967.log",
+  "klog/gate-2026-10-12-win11-02-game-mode64-wine-child-7968.log",
+  "klog/gate-2026-10-12-win11-02-game-mode64-wine-child-7969.log",
+  "klog/gate-2026-10-12-win11-02-game-mode64-wine-child-7970.log",
+  "klog/gate-2026-10-12-win11-02-game-mode64-wine-child-7971.log",
+  "klog/gate-2026-10-12-win11-02-game-mode64-wine-child-7972.log",
+  "klog/gate-2026-10-12-win11-02-game-mode64-wine-child-7973.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": true,
+ "bench": {
+  "unload_ms": 2742.0,
+  "restore_ms": 3123.0,
+  "adopt_ms": 21.0
+ },
+ "steady": {
+  "server": {
+   "calls": 0.0,
+   "per_s": 0.0,
+   "avg_us": 0.0,
+   "selects": 0.0,
+   "blocked": 0.0,
+   "block_avg_us": 0.0,
+   "waits": 0.0,
+   "handles_avg": 0.0,
+   "wait_all": 0.0,
+   "polled": 0.0,
+   "delays": 0.0,
+   "yields": 0.0,
+   "intervals": 1
+  }
+ },
+ "intervals": {
+  "frames": [],
+  "server": [
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   }
+  ],
+  "top": []
+ },
+ "shown": {
+  "frames": 322,
+  "per_10s": [
+   1,
+   321
+  ],
+  "longest_gap_ms": 2370
+ },
+ "broker": {
+  "local_offer": 8589934592,
+  "host_limit": 1073741824,
+  "windows": {
+   "presents": 73,
+   "effect_bytes": 388800,
+   "mica_builds": 10,
+   "thumbnail_builds": 0,
+   "compositions": 73,
+   "compose_avg_us": 2207,
+   "compose_max_us": 8123
+  },
+  "refused": [],
+  "refused_count": 0,
+  "clients": [
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": 7963,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": 7971,
+    "frames": 285,
+    "submissions": 584
+   },
+   {
+    "pid": 7973,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   }
+  ],
+  "wedged": false,
+  "failure_reasons": [],
+  "host_peak": 26198016,
+  "local_peak": 117981184
+ },
+ "pacing": {
+  "windows": [
+   {
+    "cookie": 9,
+    "pid": 7971,
+    "route": "independent",
+    "final": true,
+    "refused": "none",
+    "direct": 285.0,
+    "composed": 0.0,
+    "seconds": 10.0,
+    "frames": 285.0,
+    "hidden": 0.0,
+    "fps": 28.6,
+    "mean": 22.87,
+    "p50": 16.75,
+    "p95": 25.75,
+    "p99": 680.75,
+    "max": 680.75,
+    "over20": 38.0,
+    "over34": 12.0,
+    "present_avg": 17.18,
+    "present_max": 677.93
+   }
+  ],
+  "clients": {
+   "9": {
+    "pid": 7971,
+    "route": "independent",
+    "routes": {
+     "independent": 285
+    },
+    "windows": 1,
+    "seconds": 10.0,
+    "frames": 285,
+    "hidden": 0,
+    "direct": 285,
+    "composed": 0,
+    "refused": [],
+    "fps": 28.5,
+    "p50_median_ms": 16.75,
+    "p95_worst_ms": 25.75,
+    "p99_worst_ms": 680.75,
+    "max_ms": 680.75,
+    "over20": 38,
+    "over34": 12,
+    "present_avg_ms": 17.18,
+    "present_max_ms": 677.93
+   }
+  }
+ },
+ "captures": [
+  "klog/gate-2026-10-12-win11-02-game-mode64-capture-01.png"
+ ],
+ "cleanup_verified": true,
+ "hooks_removed": true,
+ "api": "opengl",
+ "game_mode": {
+  "direct_entries": 1,
+  "unloads": [
+   418
+  ],
+  "restores": [
+   {
+    "status": 0,
+    "ms": 255
+   }
+  ],
+  "kept": 0,
+  "could_not_start": 0,
+  "session_root": true
+ },
+ "probe_passed": true
+}

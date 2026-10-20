@@ -1,0 +1,43 @@
+From: PS5_Proton <local>
+Subject: [PATCH] server: a private system backdrop for the shell's taskbar
+
+The approved Windows 11 prototype's taskbar is its own acrylic (85% #f3f3f3 over the blurred backdrop pushed to near
+white by contrast(0.15) brightness(1.95); 97% #1c1c1c in dark), not Mica, which tinted the taskbar 80% #eef2f8 over the
+blurred wallpaper and showed it blue. DWMWA_SYSTEMBACKDROP_TYPE accepts one value past Windows' own,
+PS5_DWMSBT_TASKBAR (5), which the snapshot reports as PW_BACKDROP_TASKBAR for PS5_Proton's compositor
+(src/pw_window_effects.h). Windows' values keep their meaning.
+---
+diff --git a/server/window.c b/server/window.c
+index a9931d6..3be2474 100644
+--- a/server/window.c
++++ b/server/window.c
+@@ -211,7 +211,10 @@ void ps5_windows_note_request(unsigned int request)
+  * frames itself, and applications that merely extend the frame keep today's
+  * opaque pixels. */
+ enum { PS5_DWMWCP_DEFAULT, PS5_DWMWCP_DONOTROUND, PS5_DWMWCP_ROUND, PS5_DWMWCP_ROUNDSMALL };
+-enum { PS5_DWMSBT_AUTO, PS5_DWMSBT_NONE, PS5_DWMSBT_MAINWINDOW, PS5_DWMSBT_TRANSIENTWINDOW, PS5_DWMSBT_TABBEDWINDOW };
++/* PS5_DWMSBT_TASKBAR is this project's own, past Windows' values: the shell's taskbar asks for the approved
++ * prototype's taskbar acrylic with it (PW_BACKDROP_TASKBAR, src/pw_window_effects.h). */
++enum { PS5_DWMSBT_AUTO, PS5_DWMSBT_NONE, PS5_DWMSBT_MAINWINDOW, PS5_DWMSBT_TRANSIENTWINDOW, PS5_DWMSBT_TABBEDWINDOW,
++       PS5_DWMSBT_TASKBAR };
+ static int32_t ps5_clamp32(int64_t value)
+ {
+     return value < INT32_MIN ? INT32_MIN : value > INT32_MAX ? INT32_MAX : (int32_t)value;
+@@ -219,7 +222,7 @@ static int32_t ps5_clamp32(int64_t value)
+ static void ps5_snapshot_dwm(PwWindowRow *row, const struct window *win)
+ {
+     static const unsigned char kinds[] = {PW_BACKDROP_NONE, PW_BACKDROP_NONE, PW_BACKDROP_MICA,
+-                                          PW_BACKDROP_ACRYLIC, PW_BACKDROP_MICA_ALT};
++                                          PW_BACKDROP_ACRYLIC, PW_BACKDROP_MICA_ALT, PW_BACKDROP_TASKBAR};
+     const int framed = (win->style & WS_CAPTION) == WS_CAPTION || (win->style & WS_THICKFRAME);
+     const int plain = !(win->style & WS_MAXIMIZE) && !win->win_region && !(win->ex_style & WS_EX_LAYERED);
+     const int dropshadow = win->class && (get_class_style( win->class ) & CS_DROPSHADOW);
+@@ -3810,7 +3813,7 @@ DECL_HANDLER(ps5_set_window_dwm)
+         else break;
+         return;
+     case 3:
+-        if (req->value > PS5_DWMSBT_TABBEDWINDOW) break;
++        if (req->value > PS5_DWMSBT_TASKBAR) break;
+         win->ps5_backdrop = req->value;
+         return;
+     case 4:

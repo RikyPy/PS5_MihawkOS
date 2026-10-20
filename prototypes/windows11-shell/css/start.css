@@ -1,0 +1,459 @@
+/* Start and Search (Windows 11 23H2): the two flyouts that rise above the taskbar.
+   Owned by the start module (js/start.js, js/search.js). Colours are WinUI tokens, materials
+   come from base.css, motion runs through Shell.animate. Hover fills fade in over 83 ms and
+   out over 150 ms, as WinUI's do. */
+
+/* The host spans the screen above the taskbar and clips there, so the flyouts rise out of
+   the taskbar; it lets clicks through to the desktop (light dismiss). */
+.start-host { position: fixed; inset: 0 0 var(--taskbar-height) 0; overflow: clip; }
+#flyouts > .start-host { pointer-events: none; }
+
+.st-panel, .sr-panel {
+  position: absolute;
+  bottom: var(--start-bottom-gap);
+  left: 0;
+  width: var(--start-width);
+  height: var(--start-height);
+  display: flex;
+  flex-direction: column;
+  overflow: clip;
+  pointer-events: auto;
+  color: var(--TextFillColorPrimary);
+  font: var(--type-body);
+}
+.st-panel:focus-visible, .sr-panel:focus-visible { outline: none; box-shadow: var(--shadow-flyout); }
+:where(.st-panel, .sr-panel, .start-host) button {
+  appearance: none; margin: 0; padding: 0; border: 0; background: none;
+  color: inherit; font: inherit; text-align: inherit;
+}
+
+/* Shared item plate (pins, recommended, lists, footer): clear at rest, a light layer with a
+   hairline on hover, dimmer when pressed. */
+.st-plate {
+  border: 1px solid transparent;
+  border-radius: var(--radius-control);
+  background-clip: padding-box;
+  transition: background-color 150ms linear, border-color 150ms linear;
+}
+.st-plate:hover { background-color: var(--ControlFillColorSecondary); border-color: var(--ControlStrokeColorDefault); transition-duration: var(--dur-faster); }
+.st-plate:active { background-color: var(--ControlFillColorTertiary); border-color: var(--ControlStrokeColorDefault); }
+.st-plate:disabled { background-color: transparent; border-color: transparent; color: var(--TextFillColorDisabled); }
+
+/* ---------- search box (Start's is a button that opens Search; Search's holds the input) ---------- */
+.st-search {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 36px;
+  margin: 28px 32px 0;
+  padding: 0 16px;
+  border-radius: 18px;
+  border: 1px solid var(--ControlStrokeColorDefault);
+  border-bottom-color: var(--ControlStrokeColorSecondary);
+  background-color: var(--ControlFillColorDefault);
+  background-clip: padding-box;
+  color: var(--TextFillColorSecondary);
+  cursor: var(--cursor-text);
+  transition: background-color 150ms linear;
+}
+.st-search:hover { background-color: var(--ControlFillColorSecondary); transition-duration: var(--dur-faster); }
+.st-search .icon { color: var(--TextFillColorSecondary); }
+.st-search-text { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.st-search:focus-visible { outline-offset: 2px; }
+
+.sr-box:focus-within {
+  background-color: var(--ControlFillColorInputActive);
+  border-color: var(--ControlStrokeColorDefault);
+  box-shadow: inset 0 -2px 0 var(--AccentFillColorDefault);
+}
+.sr-input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: 0;
+  padding: 0;
+  background: none;
+  color: var(--TextFillColorPrimary);
+  font: var(--type-body);
+}
+.sr-input::placeholder { color: var(--TextFillColorSecondary); opacity: 1; }
+.sr-input:focus-visible { outline: none; box-shadow: none; }
+
+/* ---------- Start: header rows and the small buttons in them ---------- */
+.st-stage { flex: 1; min-height: 0; position: relative; overflow: clip; }
+.st-view { position: absolute; inset: 0; display: flex; flex-direction: column; }
+
+.st-head {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  height: 28px;
+  margin: 18px 48px 4px;
+}
+.st-head-title { margin: 0; font: var(--type-body); font-weight: 600; }
+
+.st-btn {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 24px;
+  padding: 0 8px;
+  font: var(--type-caption);
+  border-radius: var(--radius-control);
+  border: 1px solid var(--ControlStrokeColorDefault);
+  border-bottom-color: var(--ControlStrokeColorSecondary);
+  background-color: var(--ControlFillColorDefault);
+  background-clip: padding-box;
+  transition: background-color 150ms linear;
+}
+.st-btn:hover { background-color: var(--ControlFillColorSecondary); transition-duration: var(--dur-faster); }
+.st-btn:active { background-color: var(--ControlFillColorTertiary); border-bottom-color: var(--ControlStrokeColorDefault); color: var(--TextFillColorSecondary); }
+
+/* ---------- Pinned ---------- */
+.st-pinned { flex: none; position: relative; }
+.st-pages {
+  height: calc(var(--rows, 3) * var(--start-pin-height));
+  margin: 0 var(--grid-pad, 27px);
+  overflow: clip;
+}
+.st-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--cols, 6), minmax(0, 1fr));
+  grid-template-rows: repeat(var(--rows, 3), var(--start-pin-height));
+  height: calc(var(--rows, 3) * var(--start-pin-height));
+}
+.st-pin {
+  margin: 3px;
+  min-width: 0;
+  padding: 0 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  touch-action: none;
+}
+.st-pin-icon { transition: transform var(--dur-faster) var(--ease-in); }
+.st-pin:active .st-pin-icon { transform: scale(0.88); }
+.st-pin-label {
+  max-width: 100%;
+  font: var(--type-caption);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.st-pin.is-placeholder { visibility: hidden; }
+.st-pin.is-ghost {
+  position: absolute;
+  margin: 0;
+  z-index: 1;
+  pointer-events: none;
+  background-color: var(--ControlFillColorSecondary);
+  border-color: var(--ControlStrokeColorDefault);
+  color: var(--TextFillColorPrimary);
+  opacity: 0.92;
+}
+
+/* Page dots: a vertical pager at the right edge, as Start draws it. */
+.st-pips {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+}
+.st-pip { width: 16px; height: 14px; display: grid; place-items: center; border-radius: var(--radius-control); }
+.st-pip::after {
+  content: "";
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--ControlStrongFillColorDefault);
+  transition: width var(--dur-faster) linear, height var(--dur-faster) linear;
+}
+.st-pip:hover::after, .st-pip[aria-current="true"]::after { width: 6px; height: 6px; }
+.st-pip:hover { background-color: var(--SubtleFillColorSecondary); }
+
+/* ---------- Recommended ---------- */
+.st-pinned + .st-head { margin-top: 14px; }
+.st-rec {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(var(--rec-cols, 2), minmax(0, 1fr));
+  grid-auto-rows: 52px;
+  align-content: start;
+  column-gap: 12px;
+  margin: 0 32px;
+}
+.st-rec-item {
+  min-width: 0;
+  margin: 2px 0;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+}
+.st-rec-item.is-wide { width: 100%; height: 48px; flex: none; }
+.st-rec-text { display: flex; flex-direction: column; min-width: 0; }
+.st-rec-name, .st-rec-when { font: var(--type-caption); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.st-rec-when { color: var(--TextFillColorSecondary); }
+
+/* ---------- All apps and the full Recommended list ---------- */
+.st-list {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  overflow-y: auto;
+  margin-top: 4px;
+  padding: 0 36px 12px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.st-letter {
+  flex: none;
+  min-width: 32px;
+  height: 32px;
+  margin: 6px 0 2px;
+  padding: 0 11px;
+  display: inline-grid;
+  place-items: center;
+  font: var(--type-body);
+}
+.st-letter:first-child { margin-top: 0; }
+.st-app {
+  flex: none;
+  width: 100%;
+  height: 40px;
+  margin: 1px 0;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.st-app-name { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.st-letters {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-auto-rows: 48px;
+  gap: 4px;
+  align-content: center;
+  padding: 8px 64px 16px;
+}
+.st-letter-cell { display: grid; place-items: center; font: var(--type-body); font-weight: 600; }
+
+/* ---------- account and power ---------- */
+.st-foot {
+  flex: none;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 36px;
+  border-top: 1px solid var(--DividerStrokeColorDefault);
+  /* Windows sets the account/power row on its own layer, a step darker than the panel in both themes. */
+  background: rgba(0, 0, 0, 0.035);
+}
+[data-theme="dark"] .st-foot { background: rgba(0, 0, 0, 0.2); }
+.st-user {
+  min-width: 0;
+  height: 40px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font: var(--type-caption);
+}
+.st-avatar img { border-radius: 50%; }
+.st-user-name { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.st-power { flex: none; width: 40px; height: 40px; display: grid; place-items: center; }
+
+/* ---------- Search ---------- */
+.sr-tabs {
+  flex: none;
+  position: relative;
+  display: flex;
+  gap: 4px;
+  margin: 12px 24px 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.sr-tabs::-webkit-scrollbar { display: none; }
+.sr-tab {
+  flex: none;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: var(--radius-control);
+  color: var(--TextFillColorSecondary);
+  transition: background-color 150ms linear, color 150ms linear;
+}
+.sr-tab:hover { background-color: var(--SubtleFillColorSecondary); color: var(--TextFillColorPrimary); transition-duration: var(--dur-faster); }
+.sr-tab:active { background-color: var(--SubtleFillColorTertiary); color: var(--TextFillColorSecondary); }
+.sr-tab[aria-selected="true"] { color: var(--TextFillColorPrimary); }
+.sr-tab-pill {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 16px;
+  height: 3px;
+  border-radius: 1.5px;
+  background: var(--AccentFillColorDefault);
+  pointer-events: none;
+  transition: transform var(--dur-fast) var(--ease-in);
+}
+.sr-tab-pill.is-instant { transition: none; }
+
+.sr-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 12px 24px 20px;
+}
+.sr-group {
+  flex: none;
+  margin: 0;
+  padding: 0 8px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  font: var(--type-body);
+  font-weight: 600;
+}
+.sr-group:not(:first-child) { margin-top: 8px; }
+
+/* Home: Top apps, Recent, Quick searches */
+.sr-home { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; }
+.sr-tiles { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; margin-top: 4px; }
+.sr-tile {
+  min-width: 0;
+  height: 84px;
+  padding: 0 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: var(--radius-control);
+  border: 1px solid var(--CardStrokeColorDefault);
+  background-color: var(--CardBackgroundFillColorDefault);
+  background-clip: padding-box;
+  transition: background-color 150ms linear;
+}
+.sr-tile:hover { background-color: var(--ControlFillColorSecondary); transition-duration: var(--dur-faster); }
+.sr-tile:active { background-color: var(--ControlFillColorTertiary); }
+.sr-tile:active .icon { transform: scale(0.9); }
+.sr-tile .icon { transition: transform var(--dur-faster) var(--ease-in); }
+.sr-tile-name { max-width: 100%; font: var(--type-caption); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sr-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 12px; }
+.sr-col { min-width: 0; display: flex; flex-direction: column; }
+.sr-col .sr-group:first-child { margin-top: 0; }
+.sr-quick-icon { color: var(--TextFillColorSecondary); width: 24px !important; }
+
+/* Results: the list on the left, the preview card on the right */
+.sr-results { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+.sr-list { position: relative; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; padding-right: 4px; }
+.sr-row {
+  flex: none;
+  width: 100%;
+  min-width: 0;
+  height: 40px;
+  margin: 1px 0;
+  padding: 0 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+}
+.sr-row.is-best { height: 64px; }
+.sr-row.is-selected { background-color: var(--ControlFillColorSecondary); border-color: var(--ControlStrokeColorDefault); }
+.sr-row-text { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.sr-row-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sr-row-kind { font: var(--type-caption); color: var(--TextFillColorSecondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sr-chev {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  margin-right: -4px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-control);
+  color: var(--TextFillColorSecondary);
+  opacity: 0;
+  transition: opacity var(--dur-faster) linear, background-color var(--dur-faster) linear;
+}
+.sr-row:hover .sr-chev, .sr-row.is-selected .sr-chev { opacity: 1; }
+.sr-chev:hover { background-color: var(--SubtleFillColorSecondary); }
+
+.sr-preview {
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 8px 8px;
+  border-radius: var(--radius-overlay);
+  border: 1px solid var(--CardStrokeColorDefault);
+  background-color: var(--CardBackgroundFillColorDefault);
+  background-clip: padding-box;
+}
+.sr-pv-head {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 0 8px 16px;
+  text-align: center;
+}
+.sr-pv-icon { margin-bottom: 10px; }
+.sr-pv-name { font: var(--type-subtitle); overflow-wrap: anywhere; }
+.sr-pv-kind { color: var(--TextFillColorSecondary); }
+.sr-pv-meta {
+  flex: none;
+  margin: 0 8px 12px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 4px 12px;
+  font: var(--type-caption);
+}
+.sr-pv-meta dt { color: var(--TextFillColorSecondary); }
+.sr-pv-meta dd { margin: 0; overflow-wrap: anywhere; user-select: text; }
+.sr-actions { flex: none; display: flex; flex-direction: column; padding-top: 8px; border-top: 1px solid var(--DividerStrokeColorDefault); }
+.sr-action { flex: none; height: 36px; margin: 1px 0; padding: 0 12px; display: flex; align-items: center; gap: 12px; }
+.sr-action .icon { color: var(--TextFillColorPrimary); }
+
+.sr-empty {
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: var(--TextFillColorSecondary);
+  text-align: center;
+}
+.sr-empty p { margin: 0; overflow-wrap: anywhere; }
+
+/* ---------- narrow screens: one column, no preview ---------- */
+.st-panel.is-narrow .st-head { margin-left: 24px; margin-right: 20px; }
+.st-panel.is-narrow .st-rec, .st-panel.is-narrow .st-list { margin-left: 12px; margin-right: 12px; }
+.st-panel.is-narrow .st-list { padding: 0 8px 12px; }
+.st-panel.is-narrow .st-search, .sr-panel.is-narrow .st-search { margin-left: 16px; margin-right: 16px; }
+.st-panel.is-narrow .st-foot { padding: 0 16px; }
+.st-panel.is-narrow .st-letters { padding: 8px 16px 16px; }
+.sr-panel.is-narrow .sr-tabs { margin: 12px 16px 0; gap: 0; }
+.sr-panel.is-narrow .sr-tab { padding: 0 9px; }
+.sr-panel.is-narrow .sr-body { padding: 12px 12px 16px; }
+.sr-panel.is-narrow .sr-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.sr-panel.is-narrow .sr-cols, .sr-panel.is-narrow .sr-results { grid-template-columns: minmax(0, 1fr); }
+.sr-panel.is-narrow .sr-preview { display: none; }

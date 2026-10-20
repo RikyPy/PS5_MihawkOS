@@ -1,0 +1,98 @@
+{
+ "run": "proton-ui-console-2026-10-08-01-proton-ui64",
+ "what": "proton-ui64-probe.exe",
+ "env": [
+  "PROTON_LAYOUT=launcher"
+ ],
+ "result": "finished",
+ "seconds": 9.6,
+ "probe_verdict": null,
+ "clean_owner_restart": true,
+ "launcher_end_status": 0,
+ "initial_status": 0,
+ "closed_on_request": false,
+ "child_logs": [
+  "klog/proton-ui-console-2026-10-08-01-proton-ui64-wine-child-320.log",
+  "klog/proton-ui-console-2026-10-08-01-proton-ui64-wine-child-321.log",
+  "klog/proton-ui-console-2026-10-08-01-proton-ui64-wine-child-322.log",
+  "klog/proton-ui-console-2026-10-08-01-proton-ui64-wine-child-323.log",
+  "klog/proton-ui-console-2026-10-08-01-proton-ui64-wine-child-324.log",
+  "klog/proton-ui-console-2026-10-08-01-proton-ui64-wine-child-325.log",
+  "klog/proton-ui-console-2026-10-08-01-proton-ui64-wine-child-326.log",
+  "klog/proton-ui-console-2026-10-08-01-proton-ui64-wine-child-327.log",
+  "klog/proton-ui-console-2026-10-08-01-proton-ui64-wine-child-328.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": false,
+ "bench": {},
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [],
+  "top": []
+ },
+ "shown": {
+  "frames": 0,
+  "per_10s": [],
+  "longest_gap_ms": 0
+ },
+ "broker": {
+  "local_offer": 8589934592,
+  "host_limit": 1073741824,
+  "refused": [],
+  "refused_count": 0,
+  "clients": [
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": 321,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   }
+  ],
+  "wedged": false,
+  "failure_reasons": [],
+  "host_peak": 2113536,
+  "local_peak": 0
+ },
+ "probe_summary_without_required_verdict": {
+  "checks": 36,
+  "failures": 0,
+  "reason": "Probe omitted required PASS/FAIL token; original runner failure preserved"
+ }
+}

@@ -1,0 +1,19 @@
+From: PS5 Proton contributors
+Subject: [PATCH] win32u: let the broker present the guest image extent
+
+The broker scales completed linear images in the owner. It has no fixed
+native scanout in the child, so forcing the VideoOut fullscreen blit chooses
+the minimum supported size (1x1) instead of the window's image extent.
+Keep the existing fixed-display path for ordinary titles.
+
+--- a/dlls/win32u/vulkan.c
++++ b/dlls/win32u/vulkan.c
+@@ -3072,6 +3072,8 @@ static BOOL surface_get_fshack_dpi( struct surface *surface )
+ {
+     UINT dpi = NtUserGetDpiForWindow( surface->hwnd ), raw = NtUserGetWinMonitorDpi( surface->hwnd, MDT_RAW_DPI );
+ #ifdef __PROSPERO__
++    const char *broker = getenv( "WINE_PS5_GPU_BROKER" );
++    if (broker && broker[0] == '1' && !broker[1]) return 0;
+     /* VideoOut has one fixed scanout extent, even when Windows DPI matches.
+      * Render at the guest extent and use Proton's existing presentation blit. */
+     return raw ? raw : USER_DEFAULT_SCREEN_DPI;

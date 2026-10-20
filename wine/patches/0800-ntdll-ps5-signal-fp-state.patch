@@ -1,0 +1,34 @@
+From d28d46f3b0ed6b56955ab4b2a2621314e592d418 Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Fri, 2 Oct 2026 20:34:23 -0400
+Subject: [PATCH] Preserve PS5 floating point and AVX signal state
+
+A sentinel payload measured FXSAVE at ucontext+320, 32 bytes after the SDK field; the XSAVE header and AVX upper halves follow at +832 and +896. Reading the old location replaced MXCSR with the fault address during managed null-reference handling. Use the measured layout and expose extended state. PE64 fault-resume regression pending. SPDX-License-Identifier: LGPL-2.1-or-later
+---
+ dlls/ntdll/unix/signal_x86_64.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/dlls/ntdll/unix/signal_x86_64.c b/dlls/ntdll/unix/signal_x86_64.c
+index 127f639..72381fb 100644
+--- a/dlls/ntdll/unix/signal_x86_64.c
++++ b/dlls/ntdll/unix/signal_x86_64.c
+@@ -298,8 +298,16 @@ __ASM_GLOBAL_FUNC( modify_ldt,
+ #define RSP_sig(context)     (UCONTEXT_MC(context).mc_rsp)
+ #define TRAP_sig(context)    (UCONTEXT_MC(context).mc_trapno)
+ #define ERROR_sig(context)   (UCONTEXT_MC(context).mc_err)
++#ifdef __PROSPERO__
++/* PS5's signal frame has 32 additional bytes before its XSAVE area.
++ * Sentinel probe: FXSAVE at ucontext+320, XMM0 at +480, XMM15 at +720,
++ * XSAVE header at +832 and YMM upper halves at +896 (FW 12.02). */
++#define FPU_sig(context)     ((void *)((char *)(context) + 320))
++#define XState_sig(fpu)      ((XSAVE_AREA_HEADER *)((char *)(fpu) + sizeof(XSAVE_FORMAT)))
++#else
+ #define FPU_sig(context)     ((void *)(UCONTEXT_MC(context).mc_fpstate))
+ #define XState_sig(context)  NULL
++#endif
+ 
+ #elif defined(__NetBSD__)
+ 
+-- 
+2.55.0
+

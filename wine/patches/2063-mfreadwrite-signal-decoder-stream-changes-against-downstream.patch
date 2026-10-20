@@ -1,0 +1,87 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Fri, 16 Oct 2026 23:48:38 -0400
+Subject: [PATCH] mfreadwrite: Signal decoder stream changes against the type
+ downstream holds.
+
+GE-Proton's media rework (patches 2001-2062) made two choices that together
+hide a decoder's new frame size from the consumer. Its source reader signals
+MF_SOURCE_READERF_CURRENTMEDIATYPECHANGED only when the transform's new output
+type differs from the old one (2002), and its decoder replaces its current
+output type itself when it raises MF_E_TRANSFORM_STREAM_CHANGE (2018). The
+reader then compares the new type with an already updated one, finds them
+equal, and never tells the consumer.
+
+A 1920x1080 H.264 clip read as NV12 shows it: winedmo's decoder announces the
+coded 1920x1088 frame with a 1920x1080 aperture and writes 3133440-byte
+buffers, while IMFSourceReader_GetCurrentMediaType keeps reporting 1920x1080
+with no aperture, so a consumer that places the chroma plane after 1080 rows
+reads it 8 rows early (tests/mf-video-probe.c on GE-Proton11-7's own Linux
+build: luma bit-exact, chroma differs; chroma after 1088 rows bit-exact).
+
+Compare the new output type with what downstream holds instead: the stream's
+current type for the last transform, the next transform's input type
+otherwise.
+---
+ dlls/mfreadwrite/reader.c | 24 +++++++++++++++++++-----
+ 1 file changed, 19 insertions(+), 5 deletions(-)
+
+diff --git a/dlls/mfreadwrite/reader.c b/dlls/mfreadwrite/reader.c
+index 16f5736..3b55129 100644
+--- a/dlls/mfreadwrite/reader.c
++++ b/dlls/mfreadwrite/reader.c
+@@ -1241,8 +1241,11 @@ static HRESULT set_matching_transform_output_type(IMFTransform *transform, IMFMe
+     return hr;
+ }
+ 
+-/* update the transform output type while keeping subtype which matches the old output type */
+-static HRESULT transform_entry_update_output_type(struct transform_entry *entry, IMFMediaType *old_output_type)
++/* update the transform output type while keeping subtype which matches the old output type; the change is signalled
++ * when the new type differs from what downstream holds (the stream's current type or the next transform's input type),
++ * or from the old output type when downstream is not given */
++static HRESULT transform_entry_update_output_type(struct transform_entry *entry, IMFMediaType *old_output_type,
++        IMFMediaType *downstream_type)
+ {
+     IMFMediaType *new_output_type = NULL;
+     DWORD flags = 0;
+@@ -1258,7 +1261,8 @@ static HRESULT transform_entry_update_output_type(struct transform_entry *entry,
+      * and the effective consumer-visible format did not change. */
+     {
+         HRESULT get_hr = IMFTransform_GetOutputCurrentType(entry->transform, 0, &new_output_type);
+-        HRESULT eq_hr = new_output_type ? IMFMediaType_IsEqual(old_output_type, new_output_type, &flags) : E_FAIL;
++        HRESULT eq_hr = new_output_type ? IMFMediaType_IsEqual(downstream_type ? downstream_type : old_output_type,
++                new_output_type, &flags) : E_FAIL;
+ 
+         if (FAILED(get_hr) || FAILED(eq_hr) || !(flags & MF_MEDIATYPE_EQUAL_FORMAT_DATA))
+             entry->pending_flags |= MF_SOURCE_READERF_CURRENTMEDIATYPECHANGED;
+@@ -1283,7 +1287,7 @@ static HRESULT transform_entry_update_input_type(struct transform_entry *entry,
+ 
+     /* check if transform output type is still valid or if we need to update it as well */
+     if (FAILED(hr = IMFTransform_GetOutputCurrentType(entry->transform, 0, &new_output_type)))
+-        hr = transform_entry_update_output_type(entry, old_output_type);
++        hr = transform_entry_update_output_type(entry, old_output_type, NULL);
+     else
+         IMFMediaType_Release(new_output_type);
+ 
+@@ -1400,7 +1404,17 @@ static HRESULT source_reader_pull_transform_samples(struct source_reader *reader
+ 
+         if (hr == MF_E_TRANSFORM_STREAM_CHANGE && SUCCEEDED(hr = IMFTransform_GetOutputCurrentType(entry->transform, 0, &media_type)))
+         {
+-            hr = transform_entry_update_output_type(entry, media_type);
++            /* A decoder may already report its new type as current (winedmo's does), so compare with what
++             * downstream was given, or a new frame size never reaches the consumer. */
++            IMFMediaType *downstream_type = NULL;
++
++            if (!next)
++                IMFMediaType_AddRef((downstream_type = stream->current));
++            else if (FAILED(IMFTransform_GetInputCurrentType(next->transform, 0, &downstream_type)))
++                downstream_type = NULL;
++            hr = transform_entry_update_output_type(entry, media_type, downstream_type);
++            if (downstream_type)
++                IMFMediaType_Release(downstream_type);
+             IMFMediaType_Release(media_type);
+ 
+             if (SUCCEEDED(hr))
+-- 
+2.56.0
+

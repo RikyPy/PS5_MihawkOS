@@ -1,0 +1,19 @@
+{
+  "run": "syscall-trace-host-observe-2026-10-10-01",
+  "mode": "observe",
+  "build": {
+    "sdk_revision": "611893fc25ef3e138f5bc2c90d829d8b58174cd2",
+    "source_sha256": "9c370f4aff4707d2c4195779291e127b0bcf05d24bec12b4d1282d8d866a103b",
+    "elf_sha256": "503192db7982dc5ff1f910beef3e22d9d436c055e97857835de0ef39a2c4e963",
+    "host_sha256": "46f58d065554fac01de723cf1a0e23f79db9ba3fe0566d920bf066c2f47d7498"
+  },
+  "runner_sha256": "a806c56c7b633beb9bdf492a864f9d8ea64b4a0ce53bf785805470384b887cf4",
+  "question": "Can an owned payload stop native syscall entry, prevent the original pipe write and resume an owned dispatcher on the stopped thread?",
+  "production_changed": false,
+  "wine_integrated": false,
+  "title_launched": false,
+  "host_only": true,
+  "passed": false,
+  "error": "Tracee exited before its ready marker",
+  "seconds": 0.001
+}

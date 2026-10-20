@@ -1,0 +1,210 @@
+From e816ab61c2f4fd3308c81505de04854783189ad9 Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Fri, 2 Oct 2026 23:56:29 -0400
+Subject: [PATCH] ps5: count server round trips, waits and presents for the
+ title
+
+Every client-server round trip, server_select (with the time a thread
+spent blocked on its wakeup), NtWaitFor*Objects by shape, NtDelayExecution
+and both presentation paths (EGL swap, vkQueuePresentKHR) record into
+ntdll's runtime counters (wine/ps5/pw_wine_perf.c in PS5_Proton). Recording
+is relaxed atomic adds and a TSC read, with no lock and no logging; the
+title snapshots the counters from its own thread and prints the difference,
+so nothing is formatted on a game thread. These are the baseline for the
+synchronization, presentation and memory work.
+---
+ dlls/ntdll/unix/server.c | 33 +++++++++++++++++++++++++++++++++
+ dlls/ntdll/unix/sync.c   | 16 ++++++++++++++++
+ dlls/win32u/opengl.c     | 13 +++++++++++++
+ dlls/win32u/vulkan.c     | 20 +++++++++++++++++++-
+ 4 files changed, 81 insertions(+), 1 deletion(-)
+
+diff --git a/dlls/ntdll/unix/server.c b/dlls/ntdll/unix/server.c
+index ae4d72c..4b74029 100644
+--- a/dlls/ntdll/unix/server.c
++++ b/dlls/ntdll/unix/server.c
+@@ -189,6 +189,14 @@ static DECLSPEC_NORETURN void server_protocol_perror( const char *err )
+ }
+ 
+ 
++#ifdef __PROSPERO__
++/* Runtime counters, linked from wine/ps5/pw_wine_perf.c (read by the title). */
++extern unsigned long long pw_wine_perf_ticks(void);
++extern void pw_wine_perf_request( unsigned int code, const char *name, unsigned long long ticks );
++extern void pw_wine_perf_select( int blocked, unsigned long long ticks, unsigned long long block_ticks );
++#endif
++
++
+ /***********************************************************************
+  *           send_request
+  *
+@@ -303,6 +311,10 @@ unsigned int server_call_unlocked( void *req_ptr )
+ {
+     struct __server_request_info * const req = req_ptr;
+     unsigned int ret;
++#ifdef __PROSPERO__
++    const unsigned int code = req->u.req.request_header.req;
++    const unsigned long long start = pw_wine_perf_ticks();
++#endif
+ 
+     FTRACE_BLOCK_START("req %s", req->name)
+     TRACE_(client)("%s start\n", req->name); \
+@@ -310,6 +322,9 @@ unsigned int server_call_unlocked( void *req_ptr )
+         ret = wait_reply( req );
+     TRACE_(client)("%s end\n", req->name);
+     FTRACE_BLOCK_END()
++#ifdef __PROSPERO__
++    pw_wine_perf_request( code, req->name, pw_wine_perf_ticks() - start );
++#endif
+     return ret;
+ }
+ 
+@@ -752,6 +767,12 @@ unsigned int server_select( const union select_op *select_op, data_size_t size,
+         struct context_data context[2];
+     } reply_data;
+ 
++#ifdef __PROSPERO__
++    const unsigned long long select_start = pw_wine_perf_ticks();
++    unsigned long long block_ticks = 0;
++    int blocked = 0;
++#endif
++
+     memset( &result, 0, sizeof(result) );
+ 
+     do
+@@ -794,10 +815,22 @@ unsigned int server_select( const union select_op *select_op, data_size_t size,
+         if (signaled) break;
+ 
+         FTRACE_BLOCK_START("select_reply")
++#ifdef __PROSPERO__
++        {
++            const unsigned long long block_start = pw_wine_perf_ticks();
++            ret = wait_select_reply( &cookie );
++            block_ticks += pw_wine_perf_ticks() - block_start;
++            blocked = 1;
++        }
++#else
+         ret = wait_select_reply( &cookie );
++#endif
+         FTRACE_BLOCK_END()
+     }
+     while (ret == STATUS_USER_APC || ret == STATUS_KERNEL_APC);
++#ifdef __PROSPERO__
++    pw_wine_perf_select( blocked, pw_wine_perf_ticks() - select_start, block_ticks );
++#endif
+ 
+     if (ret == STATUS_USER_APC) *user_apc = reply_data.call.user;
+     if (reply_size > sizeof(reply_data.call))
+diff --git a/dlls/ntdll/unix/sync.c b/dlls/ntdll/unix/sync.c
+index 6f2c89c..0217395 100644
+--- a/dlls/ntdll/unix/sync.c
++++ b/dlls/ntdll/unix/sync.c
+@@ -2331,6 +2331,16 @@ NTSTATUS WINAPI NtQueryTimer( HANDLE handle, TIMER_INFORMATION_CLASS class,
+ }
+ 
+ 
++#ifdef __PROSPERO__
++/* Runtime counters, linked from wine/ps5/pw_wine_perf.c (read by the title). */
++extern void pw_wine_perf_wait( unsigned int handles, int wait_all, int polled );
++extern void pw_wine_perf_delay( long long timeout );
++#define PS5_PERF_WAIT(count, all, timeout) \
++    pw_wine_perf_wait( (count), (all), (timeout) && (timeout)->QuadPart == 0 )
++#else
++#define PS5_PERF_WAIT(count, all, timeout) do { } while (0)
++#endif
++
+ /******************************************************************
+  *		NtWaitForMultipleObjects (NTDLL.@)
+  */
+@@ -2356,6 +2366,7 @@ NTSTATUS WINAPI NtWaitForMultipleObjects( DWORD count, const HANDLE *handles, WA
+     {
+         if (is_pseudo_handle( handles[i] )) return STATUS_INVALID_HANDLE;
+     }
++    PS5_PERF_WAIT( count, type == WaitAll && count > 1, timeout );
+ 
+     if ((ret = inproc_wait( count, handles, type, alertable, timeout )) != STATUS_NOT_IMPLEMENTED)
+     {
+@@ -2382,6 +2393,7 @@ NTSTATUS WINAPI NtWaitForSingleObject( HANDLE handle, BOOLEAN alertable, const L
+     unsigned int ret;
+ 
+     TRACE( "handle %p, alertable %u, timeout %s\n", handle, alertable, debugstr_timeout(timeout) );
++    PS5_PERF_WAIT( 1, 0, timeout );
+ 
+     if ((ret = inproc_wait( 1, &handle, WaitAny, alertable, timeout )) != STATUS_NOT_IMPLEMENTED)
+     {
+@@ -2454,6 +2466,10 @@ NTSTATUS WINAPI NtDelayExecution( BOOLEAN alertable, const LARGE_INTEGER *timeou
+ {
+     unsigned int status = STATUS_SUCCESS;
+ 
++#ifdef __PROSPERO__
++    if (timeout && timeout->QuadPart != TIMEOUT_INFINITE) pw_wine_perf_delay( timeout->QuadPart );
++#endif
++
+     /* if alertable, we need to query the server */
+     if (alertable)
+     {
+diff --git a/dlls/win32u/opengl.c b/dlls/win32u/opengl.c
+index 7c8dd62..7d12e28 100644
+--- a/dlls/win32u/opengl.c
++++ b/dlls/win32u/opengl.c
+@@ -856,12 +856,25 @@ static void ps5_capture_frame( struct opengl_drawable *drawable )
+ static BOOL ps5_screen_swap( struct opengl_drawable *drawable )
+ {
+     static unsigned int frames, start;
++    static unsigned long long (*perf_ticks)(void);
++    static void (*perf_frame)( unsigned int api, unsigned long long ticks );
++    static int perf_looked_up;
+     unsigned int now = NtGetTickCount();
++    unsigned long long swap_start = 0;
+     BOOL result;
+ 
++    if (!perf_looked_up)
++    {
++        /* ntdll's runtime counters (wine/ps5/pw_wine_perf.h): API 0 is OpenGL */
++        perf_ticks = dlsym( RTLD_DEFAULT, "pw_wine_perf_ticks" );
++        perf_frame = dlsym( RTLD_DEFAULT, "pw_wine_perf_frame" );
++        perf_looked_up = 1;
++    }
+     if (!start) start = now;
+     ps5_capture_frame( drawable );
++    if (perf_ticks) swap_start = perf_ticks();
+     result = display_funcs.p_eglSwapBuffers( display_egl.display, drawable->surface );
++    if (result && perf_ticks && perf_frame) perf_frame( 0, perf_ticks() - swap_start );
+     if (result) frames++;
+     if (now - start >= 5000)
+     {
+diff --git a/dlls/win32u/vulkan.c b/dlls/win32u/vulkan.c
+index f289362..5a8ef23 100644
+--- a/dlls/win32u/vulkan.c
++++ b/dlls/win32u/vulkan.c
+@@ -3703,8 +3703,26 @@ static VkResult win32u_vkQueuePresentKHR( VkQueue client_queue, const VkPresentI
+ #ifdef __PROSPERO__
+     if (present_info->swapchainCount == 1)
+         ps5_capture_frame( queue, swapchain_from_handle( client_swapchains[0] ), present_info );
+-#endif
++    {
++        /* ntdll's runtime counters (wine/ps5/pw_wine_perf.h): API 1 is Vulkan */
++        static unsigned long long (*perf_ticks)(void);
++        static void (*perf_frame)( unsigned int api, unsigned long long ticks );
++        static int perf_looked_up;
++        unsigned long long present_start = 0;
++
++        if (!perf_looked_up)
++        {
++            perf_ticks = dlsym( RTLD_DEFAULT, "pw_wine_perf_ticks" );
++            perf_frame = dlsym( RTLD_DEFAULT, "pw_wine_perf_frame" );
++            perf_looked_up = 1;
++        }
++        if (perf_ticks) present_start = perf_ticks();
++        res = device->p_vkQueuePresentKHR( queue->host.queue, present_info );
++        if (res >= VK_SUCCESS && perf_ticks && perf_frame) perf_frame( 1, perf_ticks() - present_start );
++    }
++#else
+     res = device->p_vkQueuePresentKHR( queue->host.queue, present_info );
++#endif
+     pthread_mutex_unlock( &lock );
+ 
+     for (uint32_t i = 0; i < present_info->swapchainCount; i++)
+-- 
+2.56.0
+

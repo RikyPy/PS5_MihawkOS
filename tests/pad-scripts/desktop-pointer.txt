@@ -1,0 +1,43 @@
+# tests/desktop-probe.c in the launcher layout: park the pointer at the top-left corner, move it into the
+# window (200,150, 800x500), then click twice. Repeated, in case the window comes up late.
+anchor frame
+1 touch 1800 1000 0.2
+1.2 touch 900 500 0.2
+1.4 touch 0 0 0.2
+2 touch 100 100 0.2
+2.2 touch 400 300 0.2
+2.4 touch 700 500 0.2
+3 touchpad
+4 touchpad
+11 touch 1800 1000 0.2
+11.2 touch 900 500 0.2
+11.4 touch 0 0 0.2
+12 touch 100 100 0.2
+12.2 touch 400 300 0.2
+12.4 touch 700 500 0.2
+13 touchpad
+14 touchpad
+21 touch 1800 1000 0.2
+21.2 touch 900 500 0.2
+21.4 touch 0 0 0.2
+22 touch 100 100 0.2
+22.2 touch 400 300 0.2
+22.4 touch 700 500 0.2
+23 touchpad
+24 touchpad
+31 touch 1800 1000 0.2
+31.2 touch 900 500 0.2
+31.4 touch 0 0 0.2
+32 touch 100 100 0.2
+32.2 touch 400 300 0.2
+32.4 touch 700 500 0.2
+33 touchpad
+34 touchpad
+41 touch 1800 1000 0.2
+41.2 touch 900 500 0.2
+41.4 touch 0 0 0.2
+42 touch 100 100 0.2
+42.2 touch 400 300 0.2
+42.4 touch 700 500 0.2
+43 touchpad
+44 touchpad

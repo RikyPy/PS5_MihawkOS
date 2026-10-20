@@ -1,0 +1,112 @@
+From: PS5_Proton <local>
+Subject: [PATCH] ntdll: PS5: keep a free address pool for the system's own allocations
+
+The console gives a process about 1 TiB of address space (the probe finds 0xffffff0000). An emulator reserves a placeholder over every free address its three
+guest bands cover (1.6 TiB asked, 921 GiB granted) and the system is left with none: the next 4 MiB allocation, 15 MiB image or 1 MiB stack fails with
+STATUS_NO_MEMORY (2026-10-12, record removed from the tree; in git history; patch 1110 shows 99 views holding 0xe9bce36000 bytes, 17 placeholders 0xe657400000, and no usable gap). That cannot
+happen on Windows, where a program's scan ends far below the top of 128 TiB.
+
+Every 64-bit process now keeps back a 4 GiB free placeholder at the top of its space from the start; the placeholder is a view, so a program's scan and its
+fixed reservations see it as taken. When the ordinary search finds nothing, map_view releases a 16 MiB (or larger) chunk of the pool to the free space and
+searches again. Space the system frees returns to the free space as usual: the pool only shrinks, and only for allocations that would have failed.
+---
+diff --git a/dlls/ntdll/unix/virtual.c b/dlls/ntdll/unix/virtual.c
+--- a/dlls/ntdll/unix/virtual.c
++++ b/dlls/ntdll/unix/virtual.c
+@@ -2961,6 +2961,77 @@
+ }
+ #endif
+ 
++#ifdef __PROSPERO__
++/***********************************************************************
++ *           address pool
++ *
++ * The console gives a process about 1 TiB of address space. A program that reserves every free address it can see (an emulator's guest
++ * placeholders: an emulator's three bands total 1.6 TiB, and the console grants it 921 GiB) leaves the system nothing: the next 4 MiB image,
++ * stack or heap fails with STATUS_NO_MEMORY, which cannot happen on Windows, where the program's scan ends far below the top of 128 TiB.
++ * So the process keeps back a small free placeholder at the top of its space from the start. A program's scan sees it as taken. When the
++ * ordinary search finds nothing, map_view releases a chunk of it to the free space and searches again; space the system frees returns to
++ * the free space as usual, and the pool only ever shrinks.
++ */
++#define PS5_ADDRESS_POOL_SIZE  ((size_t)4 << 30)
++#define PS5_ADDRESS_POOL_CHUNK ((size_t)16 << 20)
++
++static char *ps5_pool_base, *ps5_pool_end;
++
++static NTSTATUS remove_pages_from_view( struct file_view *view, char *base, size_t size );
++
++/* virtual_mutex must be held by caller (virtual_init is single threaded). */
++static void ps5_pool_create(void)
++{
++    struct file_view *view;
++    char *ptr;
++
++    if ((char *)host_addr_space_limit < (char *)((size_t)64 << 30)) return;
++    ptr = alloc_free_area( (char *)0x100000000, (char *)host_addr_space_limit, PS5_ADDRESS_POOL_SIZE, TRUE, PROT_NONE, granularity_mask );
++    if (!ptr)
++    {
++        fprintf( stderr, "wine-ps5: no address pool: no free %#lx bytes below %p\n", (unsigned long)PS5_ADDRESS_POOL_SIZE, host_addr_space_limit );
++        return;
++    }
++    if (create_view( &view, ptr, PS5_ADDRESS_POOL_SIZE, VPROT_PLACEHOLDER | VPROT_FREE_PLACEHOLDER ))
++    {
++        unmap_area( ptr, PS5_ADDRESS_POOL_SIZE );
++        return;
++    }
++    ps5_pool_base = ptr;
++    ps5_pool_end = ptr + PS5_ADDRESS_POOL_SIZE;
++    fprintf( stderr, "wine-ps5: address pool %p-%p kept for the system's own allocations\n", ps5_pool_base, ps5_pool_end );
++}
++
++/* Release the front of the pool to the free space when [start, end) can use it. virtual_mutex must be held by caller. */
++static BOOL ps5_pool_release( const void *start, const void *end, size_t size, size_t align_mask )
++{
++    static int reports;
++    struct file_view *view;
++    size_t chunk;
++
++    if (!ps5_pool_end) return FALSE;
++    if (!(view = find_view( ps5_pool_end - host_page_size, 0 ))) return FALSE;
++    if (!(view->protect & VPROT_FREE_PLACEHOLDER) || (char *)view->base < ps5_pool_base) return FALSE;
++
++    chunk = max( PS5_ADDRESS_POOL_CHUNK, ROUND_SIZE( 0, size + align_mask + 1, host_page_mask ) );
++    if (chunk > view->size) chunk = view->size;
++    if (size + align_mask + 1 > chunk) return FALSE;
++    if ((char *)view->base < (const char *)start || (char *)view->base + chunk > (const char *)end) return FALSE;
++
++    if (reports++ < 16)
++        fprintf( stderr, "wine-ps5: address pool gives %#lx bytes at %p for a %#lx byte allocation (%#lx bytes left)\n",
++                 (unsigned long)chunk, view->base, (unsigned long)size, (unsigned long)(view->size - chunk) );
++    if (chunk == view->size) delete_view( view );
++    else
++    {
++        unmap_area( view->base, chunk );
++        set_page_vprot( view->base, chunk, 0 );
++        remove_pages_from_view( view, view->base, chunk );
++    }
++    return TRUE;
++}
++#endif
++
+ 
+ /***********************************************************************
+  *           map_view
+@@ -3067,6 +3138,8 @@
+ #endif
+             if (!is_win64) increase_try_map_step = TRUE;
+ #ifdef __PROSPERO__
++            if (!ptr && ps5_pool_release( start, end, host_size, align_mask ))
++                ptr = alloc_free_area( start, end, host_size, top_down, unix_prot, align_mask );
+             if (!ptr) ps5_report_no_space( start, end, size );
+ #endif
+             if (!ptr) return STATUS_NO_MEMORY;
+@@ -4576,6 +4649,9 @@
+     size = (char *)address_space_start - (char *)0x10000;
+     if (size && mmap_is_in_reserved_area( (void*)0x10000, size ) == 1)
+         anon_mmap_fixed( (void *)0x10000, size, PROT_READ | PROT_WRITE, 0 );
++#if defined(__PROSPERO__) && defined(_WIN64)
++    ps5_pool_create();
++#endif
+ }
+ 
+ 

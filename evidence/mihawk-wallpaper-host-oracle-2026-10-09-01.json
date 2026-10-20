@@ -1,0 +1,35 @@
+{
+  "wine_revision": "1c78596625336a73dbfc035dbbcf0dbdd95b06eb",
+  "reference": "Pinned Linux Wine, actual headless session initializer with original registry values restored",
+  "cases": [
+    {
+      "bits": 32,
+      "returncode": 0,
+      "seconds": 0.817,
+      "verdicts": [
+        [
+          "PASS",
+          "9",
+          "0"
+        ]
+      ],
+      "probe_sha256": "ccbaa662d9c0c7c698e1cee8510a069171f7b10405440988564277da14c960b4",
+      "passed": true
+    },
+    {
+      "bits": 64,
+      "returncode": 0,
+      "seconds": 0.032,
+      "verdicts": [
+        [
+          "PASS",
+          "9",
+          "0"
+        ]
+      ],
+      "probe_sha256": "103eb3265d9146aadabd80a86a5049f87b7377481a4b8a72be359df92ead2ed7",
+      "passed": true
+    }
+  ],
+  "passed": true
+}

@@ -1,0 +1,55 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Mon, 5 Oct 2026 22:00:00 -0400
+Subject: [PATCH] ntdll: PS5: child processes start their own children by
+ default.
+
+A child process could start one only when its Windows environment said
+WINE_PS5_DESCENDANTS=1. A launcher's browser process got an environment of
+the launcher's making, without it, and every renderer it tried to start was
+refused (2026-10-05; record removed from the tree; in git history). A program that starts a process expects it to
+start: now a child may, unless WINE_PS5_DESCENDANTS=0 is in its
+environment. wineboot stays refused, since the services it would start
+are not set up on the console yet.
+---
+diff --git a/dlls/ntdll/unix/process.c b/dlls/ntdll/unix/process.c
+index f6c046b..0fdf467 100644
+--- a/dlls/ntdll/unix/process.c
++++ b/dlls/ntdll/unix/process.c
+@@ -713,19 +713,30 @@ static NTSTATUS alloc_handle_list( const PS_ATTRIBUTE *handles_attr, obj_handle_
+  *           NtCreateUserProcess  (NTDLL.@)
+  */
+ #ifdef __PROSPERO__
+-/* This Windows-environment opt-in is set by the probe after wineboot, so
+- * unrelated bootstrap processes keep the established restriction. */
++/* Child processes may start their own children by default: a program that starts a
++ * process expects it to start, and a launcher's browser starts its renderers with an
++ * environment of its own, which never carried an opt-in (2026-10-05).
++ * WINE_PS5_DESCENDANTS=0 in a process's Windows environment declines. wineboot is
++ * left out: the services it would start are not set up on the console yet. */
+ static BOOL ps5_descendants_enabled(void)
+ {
+-    const char *key = "WINE_PS5_DESCENDANTS=1";
+-    const WCHAR *env = NtCurrentTeb()->Peb->ProcessParameters->Environment;
++    static const WCHAR wineboot[] = {'w','i','n','e','b','o','o','t','.','e','x','e',0};
++    const char *key = "WINE_PS5_DESCENDANTS=0";
++    const RTL_USER_PROCESS_PARAMETERS *params = NtCurrentTeb()->Peb->ProcessParameters;
++    const WCHAR *env = params->Environment;
++    const UNICODE_STRING *image = &params->ImagePathName;
++    const size_t name = ARRAY_SIZE(wineboot) - 1;
++
+     for (; env && *env; env += wcslen(env) + 1)
+     {
+         unsigned int i = 0;
+         while (key[i] && env[i] == key[i]) ++i;
+-        if (!key[i] && !env[i]) return TRUE;
++        if (!key[i] && !env[i]) return FALSE;
+     }
+-    return FALSE;
++    if (image->Buffer && image->Length / sizeof(WCHAR) >= name &&
++        !wcsnicmp( image->Buffer + image->Length / sizeof(WCHAR) - name, wineboot, name ))
++        return FALSE;
++    return TRUE;
+ }
+ #endif
+ 

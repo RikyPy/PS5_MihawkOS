@@ -1,0 +1,37 @@
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Subject: [PATCH] ntdll: PS5: exclude unmappable host addresses from free queries
+
+Wine measures host_addr_space_limit and rejects fixed allocations past it.
+Its memory query nevertheless advertises the same range as MEM_FREE. An emulator's
+scan then attempts an allocation that Wine already knows cannot succeed.
+
+Keep Windows views authoritative, bound ordinary free gaps by the existing
+measured limit, and describe the unavailable upper range as reserved, using
+Wine's existing fake_reserved query representation. No address constants,
+synthetic allocation success, relocation, or host configuration changes.
+
+SPDX-License-Identifier: LGPL-2.1-or-later
+---
+--- a/dlls/ntdll/unix/virtual.c
++++ b/dlls/ntdll/unix/virtual.c
+@@ -6547,7 +6547,19 @@
+ #ifdef __PROSPERO__
+     {
+         void *start, *end;
+-        int status = pw_wine_vm_gap( base, *region_end, query_wine_reserved_area, &start, &end );
++        int status;
++
++        /* Fixed allocations already reject this range. Do not advertise it
++         * as free to Windows address-space scanners. Existing views above
++         * the measured host limit were handled by the tree lookup first. */
++        if (base >= (char *)host_addr_space_limit)
++        {
++            *region_start = max( *region_start, (char *)host_addr_space_limit );
++            *fake_reserved = TRUE;
++            return NULL;
++        }
++        *region_end = min( *region_end, (char *)host_addr_space_limit );
++        status = pw_wine_vm_gap( base, *region_end, query_wine_reserved_area, &start, &end );
+ 
+         if (status < 0) WARN( "cannot query native mapping at %p\n", base );
+         else

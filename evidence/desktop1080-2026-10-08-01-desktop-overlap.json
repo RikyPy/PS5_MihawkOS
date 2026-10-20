@@ -1,0 +1,228 @@
+{
+ "run": "desktop1080-2026-10-08-01-desktop-overlap",
+ "what": "desktop-overlap-probe.exe",
+ "env": [],
+ "result": "exited",
+ "seconds": 19.2,
+ "probe_verdict": null,
+ "clean_owner_restart": false,
+ "launcher_end_status": null,
+ "initial_status": null,
+ "closed_on_request": false,
+ "child_logs": [
+  "klog/desktop1080-2026-10-08-01-desktop-overlap-wine-child-214.log",
+  "klog/desktop1080-2026-10-08-01-desktop-overlap-wine-child-215.log",
+  "klog/desktop1080-2026-10-08-01-desktop-overlap-wine-child-216.log",
+  "klog/desktop1080-2026-10-08-01-desktop-overlap-wine-child-217.log",
+  "klog/desktop1080-2026-10-08-01-desktop-overlap-wine-child-218.log",
+  "klog/desktop1080-2026-10-08-01-desktop-overlap-wine-child-219.log",
+  "klog/desktop1080-2026-10-08-01-desktop-overlap-wine-child-220.log",
+  "klog/desktop1080-2026-10-08-01-desktop-overlap-wine-child-221.log",
+  "klog/desktop1080-2026-10-08-01-desktop-overlap-wine-child-222.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": false,
+ "passed": false,
+ "bench": {},
+ "steady": {
+  "server": {
+   "calls": 0.0,
+   "per_s": 0.0,
+   "avg_us": 0.0,
+   "selects": 0.0,
+   "blocked": 0.0,
+   "block_avg_us": 0.0,
+   "waits": 0.0,
+   "handles_avg": 0.0,
+   "wait_all": 0.0,
+   "polled": 0.0,
+   "delays": 0.0,
+   "yields": 0.0,
+   "intervals": 1
+  }
+ },
+ "intervals": {
+  "frames": [],
+  "server": [
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   }
+  ],
+  "top": []
+ },
+ "shown": {
+  "frames": 63,
+  "per_10s": [
+   63
+  ],
+  "longest_gap_ms": 1000
+ },
+ "broker": {
+  "local_offer": 8589934592,
+  "host_limit": 1073741824,
+  "refused": [],
+  "refused_count": 0,
+  "clients": [
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   }
+  ],
+  "wedged": false,
+  "failure_reasons": [],
+  "host_peak": null,
+  "local_peak": null
+ },
+ "pad_script": [
+  "anchor frame",
+  "2 capture",
+  "4 capture",
+  "5 capture",
+  "# Request before the close's one new frame; the broker captures the next flip.",
+  "8 capture"
+ ],
+ "captures": [
+  "klog/desktop1080-2026-10-08-01-desktop-overlap-capture-01.png",
+  "klog/desktop1080-2026-10-08-01-desktop-overlap-capture-02.png",
+  "klog/desktop1080-2026-10-08-01-desktop-overlap-capture-03.png",
+  "klog/desktop1080-2026-10-08-01-desktop-overlap-capture-04.png"
+ ],
+ "display_pixels": [
+  {
+   "capture": "klog/desktop1080-2026-10-08-01-desktop-overlap-capture-01.png",
+   "center": [
+    32,
+    224,
+    64
+   ],
+   "expected_center": [
+    32,
+    224,
+    64
+   ],
+   "outside": [
+    32,
+    160,
+    224
+   ],
+   "desktop": [
+    0,
+    0,
+    0
+   ],
+   "passed": true
+  },
+  {
+   "capture": "klog/desktop1080-2026-10-08-01-desktop-overlap-capture-02.png",
+   "center": [
+    32,
+    224,
+    64
+   ],
+   "expected_center": [
+    32,
+    224,
+    64
+   ],
+   "outside": [
+    32,
+    160,
+    224
+   ],
+   "desktop": [
+    0,
+    0,
+    0
+   ],
+   "passed": true
+  },
+  {
+   "capture": "klog/desktop1080-2026-10-08-01-desktop-overlap-capture-03.png",
+   "center": [
+    32,
+    224,
+    64
+   ],
+   "expected_center": [
+    32,
+    224,
+    64
+   ],
+   "outside": [
+    32,
+    160,
+    224
+   ],
+   "desktop": [
+    0,
+    0,
+    0
+   ],
+   "passed": true
+  },
+  {
+   "capture": "klog/desktop1080-2026-10-08-01-desktop-overlap-capture-04.png",
+   "center": [
+    32,
+    160,
+    224
+   ],
+   "expected_center": [
+    32,
+    160,
+    224
+   ],
+   "outside": [
+    32,
+    160,
+    224
+   ],
+   "desktop": [
+    0,
+    0,
+    0
+   ],
+   "passed": true
+  }
+ ],
+ "interruption": {
+  "human_confirmed": true,
+  "actions": [
+   "Closed Proton through PS menu",
+   "Loaded onionHEN during the running test"
+  ],
+  "qualification": "All four full-desktop pixel checks passed; normal completion and clean owner restart are unqualified by this interrupted run. Kernel DMEM leak warnings were observed during PS-menu closure."
+ }
+}

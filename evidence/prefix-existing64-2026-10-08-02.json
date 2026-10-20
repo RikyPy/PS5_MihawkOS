@@ -1,0 +1,112 @@
+{
+ "run": "prefix-existing64-2026-10-08-02",
+ "what": "prefix-baseline64-probe.exe",
+ "env": [
+  "PROTON_LAYOUT=launcher"
+ ],
+ "result": "finished",
+ "seconds": 17.2,
+ "probe_verdict": "PASS",
+ "clean_owner_restart": true,
+ "launcher_end_status": 0,
+ "initial_status": 0,
+ "closed_on_request": false,
+ "child_logs": [
+  "klog/prefix-existing64-2026-10-08-02-wine-child-3796.log",
+  "klog/prefix-existing64-2026-10-08-02-wine-child-3797.log",
+  "klog/prefix-existing64-2026-10-08-02-wine-child-3798.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": true,
+ "bench": {},
+ "steady": {
+  "server": {
+   "calls": 0.0,
+   "per_s": 0.0,
+   "avg_us": 0.0,
+   "selects": 0.0,
+   "blocked": 0.0,
+   "block_avg_us": 0.0,
+   "waits": 0.0,
+   "handles_avg": 0.0,
+   "wait_all": 0.0,
+   "polled": 0.0,
+   "delays": 0.0,
+   "yields": 0.0,
+   "intervals": 1
+  }
+ },
+ "intervals": {
+  "frames": [],
+  "server": [
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   }
+  ],
+  "top": []
+ },
+ "shown": {
+  "frames": 23,
+  "per_10s": [
+   23
+  ],
+  "longest_gap_ms": 1143
+ },
+ "broker": {
+  "local_offer": 8589934592,
+  "host_limit": 1073741824,
+  "refused": [],
+  "refused_count": 0,
+  "clients": [
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": 3797,
+    "frames": 0,
+    "submissions": 0
+   }
+  ],
+  "host_peak": 2113536,
+  "local_peak": 0
+ },
+ "pad_script": [
+  "# Capture the probe's actual presented text, after its bitmap/glyph checks.",
+  "anchor frame",
+  "1 capture",
+  "3 capture"
+ ],
+ "captures": [
+  "klog/prefix-existing64-2026-10-08-02-capture-01.png",
+  "klog/prefix-existing64-2026-10-08-02-capture-02.png"
+ ]
+}

@@ -1,0 +1,16 @@
+{
+  "scope": "Host Wine 11.18 native shell draft, not console qualification",
+  "checks": 54,
+  "failures": 3,
+  "passed": false,
+  "findings": [
+    "Real Start search, registry pins, child launch, Escape, Explorer navigation and copy/paste preserve actual file bytes.",
+    "Both live dark captures remain light on host Wine, which lacks the already-qualified production cross-process theme hook in patch 0973.",
+    "Original clipboard restoration returned failure; diagnostic now records HRESULT and distinguishes an initially empty clipboard."
+  ],
+  "host_adapter": "Explorer desktop-host.o removes only unused EXPLORER_LD_PRELOAD private bridge, as in earlier taskbar host records.",
+  "source_proof": {
+    "explorer_sha256": "54f4573e6a52ff6dbc7675710d66674c8d7fc820a9cfa99b75cafe8245d0dfc8"
+  },
+  "note": "Failed host diagnostic, not an exact-source qualification. The probe changed for further instrumentation after this run; no probe binary hash is asserted."
+}

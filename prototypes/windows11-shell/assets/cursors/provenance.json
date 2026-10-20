@@ -1,0 +1,324 @@
+{
+  "description": "Mouse pointers of the Windows 11 shell POC: original artwork in the shape language of the Windows pointer scheme (white fill, 1 px black outline, pointer shadow). No Microsoft cursor file was copied, traced or converted.",
+  "author": "Authored for this POC (PS5_Proton-design), 2026-10-15",
+  "license": "Same terms as the rest of this prototype",
+  "source": "make-cursors.mjs (vector source; rerun with node to regenerate every file here)",
+  "size": "32x32 CSS px, scaled by the browser for the display scale like Windows scales its cursors",
+  "animation": "busy-* and working-* are 12 frames of one ring turning 30 degrees each; css/cursors.css swaps them with a stepped CSS animation (CSS cursors cannot animate themselves)",
+  "files": {
+    "arrow.svg": {
+      "hotspot": [
+        1,
+        1
+      ],
+      "fallback": "default",
+      "variable": "--cursor-arrow"
+    },
+    "help.svg": {
+      "hotspot": [
+        1,
+        1
+      ],
+      "fallback": "help",
+      "variable": "--cursor-help"
+    },
+    "link.svg": {
+      "hotspot": [
+        8,
+        1
+      ],
+      "fallback": "pointer",
+      "variable": "--cursor-link"
+    },
+    "text.svg": {
+      "hotspot": [
+        16,
+        16
+      ],
+      "fallback": "text",
+      "variable": "--cursor-text"
+    },
+    "precision.svg": {
+      "hotspot": [
+        16,
+        16
+      ],
+      "fallback": "crosshair",
+      "variable": "--cursor-precision"
+    },
+    "unavailable.svg": {
+      "hotspot": [
+        16,
+        16
+      ],
+      "fallback": "not-allowed",
+      "variable": "--cursor-unavailable"
+    },
+    "resize-ns.svg": {
+      "hotspot": [
+        16,
+        16
+      ],
+      "fallback": "ns-resize",
+      "variable": "--cursor-ns"
+    },
+    "resize-ew.svg": {
+      "hotspot": [
+        16,
+        16
+      ],
+      "fallback": "ew-resize",
+      "variable": "--cursor-ew"
+    },
+    "resize-nwse.svg": {
+      "hotspot": [
+        16,
+        16
+      ],
+      "fallback": "nwse-resize",
+      "variable": "--cursor-nwse"
+    },
+    "resize-nesw.svg": {
+      "hotspot": [
+        16,
+        16
+      ],
+      "fallback": "nesw-resize",
+      "variable": "--cursor-nesw"
+    },
+    "move.svg": {
+      "hotspot": [
+        16,
+        16
+      ],
+      "fallback": "move",
+      "variable": "--cursor-move"
+    },
+    "split.svg": {
+      "hotspot": [
+        16,
+        16
+      ],
+      "fallback": "col-resize",
+      "variable": "--cursor-split"
+    },
+    "drag-move.svg": {
+      "hotspot": [
+        1,
+        1
+      ],
+      "fallback": "default",
+      "variable": "--cursor-drag-move"
+    },
+    "drag-copy.svg": {
+      "hotspot": [
+        1,
+        1
+      ],
+      "fallback": "copy",
+      "variable": "--cursor-drag-copy"
+    },
+    "drag-link.svg": {
+      "hotspot": [
+        1,
+        1
+      ],
+      "fallback": "alias",
+      "variable": "--cursor-drag-link"
+    },
+    "busy-00.svg": {
+      "hotspot": [
+        16,
+        16
+      ],
+      "fallback": "wait",
+      "variable": "--cursor-busy",
+      "frame": 0
+    },
+    "working-00.svg": {
+      "hotspot": [
+        1,
+        1
+      ],
+      "fallback": "progress",
+      "variable": "--cursor-working",
+      "frame": 0
+    },
+    "busy-01.svg": {
+      "hotspot": [
+        16,
+        16
+      ],
+      "fallback": "wait",
+      "frame": 1
+    },
+    "working-01.svg": {
+      "hotspot": [
+        1,
+        1
+      ],
+      "fallback": "progress",
+      "frame": 1
+    },
+    "busy-02.svg": {
+      "hotspot": [
+        16,
+        16
+      ],
+      "fallback": "wait",
+      "frame": 2
+    },
+    "working-02.svg": {
+      "hotspot": [
+        1,
+        1
+      ],
+      "fallback": "progress",
+      "frame": 2
+    },
+    "busy-03.svg": {
+      "hotspot": [
+        16,
+        16
+      ],
+      "fallback": "wait",
+      "frame": 3
+    },
+    "working-03.svg": {
+      "hotspot": [
+        1,
+        1
+      ],
+      "fallback": "progress",
+      "frame": 3
+    },
+    "busy-04.svg": {
+      "hotspot": [
+        16,
+        16
+      ],
+      "fallback": "wait",
+      "frame": 4
+    },
+    "working-04.svg": {
+      "hotspot": [
+        1,
+        1
+      ],
+      "fallback": "progress",
+      "frame": 4
+    },
+    "busy-05.svg": {
+      "hotspot": [
+        16,
+        16
+      ],
+      "fallback": "wait",
+      "frame": 5
+    },
+    "working-05.svg": {
+      "hotspot": [
+        1,
+        1
+      ],
+      "fallback": "progress",
+      "frame": 5
+    },
+    "busy-06.svg": {
+      "hotspot": [
+        16,
+        16
+      ],
+      "fallback": "wait",
+      "frame": 6
+    },
+    "working-06.svg": {
+      "hotspot": [
+        1,
+        1
+      ],
+      "fallback": "progress",
+      "frame": 6
+    },
+    "busy-07.svg": {
+      "hotspot": [
+        16,
+        16
+      ],
+      "fallback": "wait",
+      "frame": 7
+    },
+    "working-07.svg": {
+      "hotspot": [
+        1,
+        1
+      ],
+      "fallback": "progress",
+      "frame": 7
+    },
+    "busy-08.svg": {
+      "hotspot": [
+        16,
+        16
+      ],
+      "fallback": "wait",
+      "frame": 8
+    },
+    "working-08.svg": {
+      "hotspot": [
+        1,
+        1
+      ],
+      "fallback": "progress",
+      "frame": 8
+    },
+    "busy-09.svg": {
+      "hotspot": [
+        16,
+        16
+      ],
+      "fallback": "wait",
+      "frame": 9
+    },
+    "working-09.svg": {
+      "hotspot": [
+        1,
+        1
+      ],
+      "fallback": "progress",
+      "frame": 9
+    },
+    "busy-10.svg": {
+      "hotspot": [
+        16,
+        16
+      ],
+      "fallback": "wait",
+      "frame": 10
+    },
+    "working-10.svg": {
+      "hotspot": [
+        1,
+        1
+      ],
+      "fallback": "progress",
+      "frame": 10
+    },
+    "busy-11.svg": {
+      "hotspot": [
+        16,
+        16
+      ],
+      "fallback": "wait",
+      "frame": 11
+    },
+    "working-11.svg": {
+      "hotspot": [
+        1,
+        1
+      ],
+      "fallback": "progress",
+      "frame": 11
+    }
+  }
+}

@@ -1,0 +1,278 @@
+From c7a4af5127c2986b6785cbb268c1dc8469048076 Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Wed, 7 Oct 2026 16:15:02 -0400
+Subject: [PATCH] ntdll: PS5: WoW64 on the console.
+
+Upstream Wine sets a 32-bit code selector only for Linux and macOS and
+gives a WoW64 thread's %fs a selector whose base is its 32-bit TEB
+(a GDT TLS entry on Linux, an LDT entry on FreeBSD). The console has no
+user LDT (I386_SET_LDT answers EINVAL), so on PS5 (measured in
+PS5_Proton's docs/IA32_DESIGN.md, M0):
+
+- the 32-bit code selector is FreeBSD's GUCODE32, 0x33;
+- a WoW64 thread is marked by amd64_thread_data()->fs = 0x13 (GUFS32);
+- its FS base is set through sysarch where code changes sides: the host
+  base on every Unix entry (PW_RESTORE_FS) and in init_handler, the
+  32-bit TEB on every exit (PW_GUEST_FS, where Linux loads the 32-bit
+  selector) and in leave_handler;
+- the 32-bit TEB is set with I386_SET_FSBASE, which gives the 32-bit FS
+  selector's descriptor the base too: wow64cpu loads %fs again when it
+  enters 32-bit code with a full context, and after AMD64_SET_FSBASE the
+  descriptor still held the host base until the next context switch
+  (measured: a reload at once read the host base, after 20 ms the TEB);
+- PW_GUEST_FS calls sysarch on the user stack: at the system call
+  return %rsp still points into the syscall frame, and a call there
+  overwrote the saved registers it was about to restore (the process
+  heap's commit came back with a size of 0x8005446b0);
+- init_handler finds the TEB through %gs: NtCurrentTeb() is
+  pthread_getspecific(), which reads %fs:0x10 and faulted on the 32-bit
+  TEB before the host base was back;
+- in a WoW64 process the signal handlers are registered with the
+  kernel's own sigaction, which the payload loader supplies through
+  __wine_ps5_set_payload_sigaction (a PRX module may not make the
+  system call): libkernel's wrapper reads %fs before the handler and
+  kills a thread that has the 32-bit TEB there.
+
+Each crossing pays two sysarch calls, about 2.7 us on the console.
+---
+ dlls/ntdll/unix/signal_x86_64.c | 145 ++++++++++++++++++++++++++++----
+ 1 file changed, 130 insertions(+), 15 deletions(-)
+
+diff --git a/dlls/ntdll/unix/signal_x86_64.c b/dlls/ntdll/unix/signal_x86_64.c
+index 6f63e25..1649a7b 100644
+--- a/dlls/ntdll/unix/signal_x86_64.c
++++ b/dlls/ntdll/unix/signal_x86_64.c
+@@ -233,11 +233,17 @@ __ASM_GLOBAL_FUNC( modify_ldt,
+  * checks the selector and, when it is null, has libkernel's sysarch() set the
+  * base again: the kernel then reloads the selector and the base together. A
+  * title may not issue the system call itself (PPRBUG-22859), and user-mode
+- * wrfsbase is disabled. %rsi is clobbered; %rbx keeps the stack pointer. */
++ * wrfsbase is disabled. %rsi is clobbered; %rbx keeps the stack pointer.
++ * A WoW64 thread (amd64_thread_data()->fs set) enters with the 32-bit TEB as
++ * its FS base, so it always gets the host base back here (docs/IA32_DESIGN.md,
++ * M3: the console has no user LDT, so the FS base is the only way). */
+ # define PW_RESTORE_FS \
++    "cmpw $0,0x338(%r13)\n\t"      /* amd64_thread_data()->fs: a WoW64 thread */ \
++    "jnz 6f\n\t" \
+     "movw %fs,%si\n\t" \
+     "testw %si,%si\n\t" \
+-    "jnz 7f\n\t" \
++    "jnz 7f\n" \
++    "6:\n\t" \
+     "pushq %rax\n\t" \
+     "pushq %rbx\n\t" \
+     "pushq %rcx\n\t" \
+@@ -266,6 +272,55 @@ __ASM_GLOBAL_FUNC( modify_ldt,
+     "popq %rbx\n\t" \
+     "popq %rax\n" \
+     "7:\n\t"
++/* Leaving the Unix side for a WoW64 thread: the FS base becomes its 32-bit TEB
++ * (the 64-bit TEB plus WowTebOffset), what Linux does by loading the 32-bit
++ * %fs selector. 64-bit PE code never reads %fs, so wow64cpu then enters 32-bit
++ * code with it already in place. It is set with I386_SET_FSBASE, which also
++ * gives the 32-bit FS selector's descriptor that base: wow64cpu, and any 32-bit
++ * code, may load %fs again, and after AMD64_SET_FSBASE the descriptor kept the
++ * host base until the next context switch (M0 fsreload, measured on the
++ * console). Every general register is kept. The call runs
++ * on the stack below `top`, a register: the user stack, which is free below its
++ * pointer, never the syscall frame, whose saved registers are still to be
++ * restored; %rsp stays outside the kernel stack, so a signal meanwhile is
++ * handled as in user mode and leave_handler sets the 32-bit TEB again. */
++# define PW_GUEST_FS(top) \
++    "cmpw $0,0x338(%r13)\n\t"      /* amd64_thread_data()->fs: a WoW64 thread */ \
++    "jz 8f\n\t" \
++    "movq %rsp,-8(" top ")\n\t"    /* the stack pointer to come back to */ \
++    "leaq -8(" top "),%rsp\n\t" \
++    "pushq %rax\n\t" \
++    "pushq %rcx\n\t" \
++    "pushq %rdx\n\t" \
++    "pushq %rsi\n\t" \
++    "pushq %rdi\n\t" \
++    "pushq %r8\n\t" \
++    "pushq %r9\n\t" \
++    "pushq %r10\n\t" \
++    "pushq %r11\n\t" \
++    "pushq %rbx\n\t" \
++    "movq %rsp,%rbx\n\t" \
++    "andq $~15,%rsp\n\t" \
++    "subq $16,%rsp\n\t" \
++    "movslq 0x180c(%r13),%rax\n\t"  /* teb->WowTebOffset */ \
++    "addq %r13,%rax\n\t" \
++    "movl %eax,(%rsp)\n\t"          /* below 4 GiB */ \
++    "movq %rsp,%rsi\n\t" \
++    "movl $8,%edi\n\t"              /* I386_SET_FSBASE */ \
++    "call sysarch@PLT\n\t" \
++    "movq %rbx,%rsp\n\t" \
++    "popq %rbx\n\t" \
++    "popq %r11\n\t" \
++    "popq %r10\n\t" \
++    "popq %r9\n\t" \
++    "popq %r8\n\t" \
++    "popq %rdi\n\t" \
++    "popq %rsi\n\t" \
++    "popq %rdx\n\t" \
++    "popq %rcx\n\t" \
++    "popq %rax\n\t" \
++    "popq %rsp\n" \
++    "8:\n\t"
+ #else
+ # define UCONTEXT_MC(context) ((context)->uc_mcontext)
+ #endif
+@@ -998,6 +1053,21 @@ static inline ucontext_t *init_handler( void *sigcontext )
+         if (((struct amd64_thread_data *)thread_data->cpu_data)->pthread_teb)
+             arch_prctl( ARCH_SET_FS, ((struct amd64_thread_data *)thread_data->cpu_data)->pthread_teb );
+     }
++#elif defined(__PROSPERO__)
++    /* A signal in a WoW64 thread can arrive with the 32-bit TEB as the FS base;
++     * the handler runs with the host base (the handler was registered with the
++     * kernel itself, so nothing ran before this: pw_sigaction). The TEB is found
++     * through %gs, never %fs: NtCurrentTeb() is pthread_getspecific(), which
++     * reads the thread pointer at %fs:0x10. */
++    if (cs32_sel)
++    {
++        TEB *teb;
++        struct amd64_thread_data *thread_data;
++
++        __asm__ volatile( "movq %%gs:0x30,%0" : "=r" (teb) );   /* NT_TIB.Self */
++        thread_data = (struct amd64_thread_data *)((struct ntdll_thread_data *)&teb->GdiTebBatch)->cpu_data;
++        if (thread_data->fs) sysarch( AMD64_SET_FSBASE, &thread_data->pthread_teb );
++    }
+ #elif defined __APPLE__
+     {
+         struct ntdll_thread_data *thread_data = (struct ntdll_thread_data *)&get_current_teb()->GdiTebBatch;
+@@ -1027,6 +1097,15 @@ static inline void leave_handler( ucontext_t *sigcontext )
+         !is_inside_signal_stack( (void *)RSP_sig(sigcontext )) &&
+         !is_inside_syscall( RSP_sig(sigcontext) ))
+         __asm__ volatile( "movw %0,%%fs" :: "r" (fs32_sel) );
++#elif defined(__PROSPERO__)
++    /* Back to user code (32-bit, or 64-bit PE that never reads %fs): the 32-bit TEB as the FS base. */
++    if (amd64_thread_data()->fs &&
++        !is_inside_signal_stack( (void *)RSP_sig(sigcontext )) &&
++        !is_inside_syscall( RSP_sig(sigcontext )))
++    {
++        unsigned int wow_base = PtrToUlong( get_wow_teb( NtCurrentTeb() ) );
++        sysarch( I386_SET_FSBASE, &wow_base );   /* the base and the 32-bit selector's descriptor (PW_GUEST_FS) */
++    }
+ #elif defined __APPLE__
+     if (!is_inside_signal_stack( (void *)RSP_sig(sigcontext )) &&
+         !is_inside_syscall( RSP_sig(sigcontext )))
+@@ -1909,6 +1988,8 @@ __ASM_GLOBAL_FUNC( call_user_mode_callback,
+                    "jz 1f\n\t"
+                    "movw %ax,%fs\n"
+                    "1:\n\t"
++#elif defined(__PROSPERO__)
++                   PW_GUEST_FS("%rsp")             /* the user stack */
+ #elif defined __APPLE__
+                    "movq %rcx,%r10\n\t"
+                    "movq %r13,%rdi\n\t"
+@@ -3231,10 +3312,12 @@ NTSTATUS signal_alloc_thread( TEB *teb )
+         else thread_data->fs = fs32_sel;
+     }
+ #else
+-    /* i386 code runs in the WoW64 CPU backend with its own FS base, so no
+-     * 32-bit %fs selector (and no LDT, which the console refuses) is needed. */
+-    (void)wow_teb;
+-    thread_data->fs = 0;
++    /* No LDT on the console (it refuses i386_set_ldt): a WoW64 thread's 32-bit
++     * FS is its base, set through sysarch where the code changes sides
++     * (PW_RESTORE_FS, PW_GUEST_FS, init_handler, leave_handler). fs holds the
++     * 32-bit FS selector (FreeBSD's GUFS32, 0x13), whose base the kernel keeps
++     * as the low 32 bits of the thread's FS base, and marks the thread. */
++    thread_data->fs = wow_teb ? 0x13 : 0;
+ #endif
+     thread_data->frame_size = frame_size;
+     return STATUS_SUCCESS;
+@@ -3272,6 +3355,29 @@ static void *mac_thread_gsbase(void)
+ #endif
+ 
+ 
++#ifdef __PROSPERO__
++/* The kernel's own sigaction, from the payload loader (a raw system call, which a PRX module may not make). Through
++ * libkernel's sigaction a handler is entered by a wrapper that reads %fs first, which in a WoW64 thread can hold the
++ * 32-bit TEB: the process dies before the handler (docs/IA32_DESIGN.md, M0). Registered with the kernel, Wine's
++ * handler is entered first, and init_handler restores the host FS. */
++static int (*pw_raw_sigaction)( int, const struct sigaction *, struct sigaction * );
++
++DECLSPEC_EXPORT int __wine_ps5_set_payload_sigaction( int (*raw)( int, const struct sigaction *, struct sigaction * ) )
++{
++    if (!raw) return -1;
++    pw_raw_sigaction = raw;
++    return 0;
++}
++
++static int pw_sigaction( int sig, const struct sigaction *act, struct sigaction *old )
++{
++    if (pw_raw_sigaction && get_wow_teb( NtCurrentTeb() )) return pw_raw_sigaction( sig, act, old );
++    return sigaction( sig, act, old );
++}
++#else
++# define pw_sigaction sigaction
++#endif
++
+ /**********************************************************************
+  *		signal_init_process
+  */
+@@ -3316,6 +3422,10 @@ void signal_init_process(void)
+         fs32_sel = alloc_fs_sel( -1, wow_teb );
+ #elif defined(__APPLE__)
+         cs32_sel = ldt_alloc_entry( ldt_make_cs32_entry() );
++#elif defined(__PROSPERO__)
++        cs32_sel = 0x33;   /* FreeBSD's GUCODE32, measured on the console (M0) */
++        if (!pw_raw_sigaction)
++            ERR( "WoW64 without the kernel's sigaction: a fault in 32-bit code ends the process\n" );
+ #endif
+     }
+ 
+@@ -3325,21 +3435,21 @@ void signal_init_process(void)
+     sig_act.sa_flags = SA_SIGINFO | SA_RESTART | SA_ONSTACK;
+ 
+     sig_act.sa_sigaction = int_handler;
+-    if (sigaction( SIGINT, &sig_act, NULL ) == -1) goto error;
++    if (pw_sigaction( SIGINT, &sig_act, NULL ) == -1) goto error;
+     sig_act.sa_sigaction = fpe_handler;
+-    if (sigaction( SIGFPE, &sig_act, NULL ) == -1) goto error;
++    if (pw_sigaction( SIGFPE, &sig_act, NULL ) == -1) goto error;
+     sig_act.sa_sigaction = abrt_handler;
+-    if (sigaction( SIGABRT, &sig_act, NULL ) == -1) goto error;
++    if (pw_sigaction( SIGABRT, &sig_act, NULL ) == -1) goto error;
+     sig_act.sa_sigaction = quit_handler;
+-    if (sigaction( SIGQUIT, &sig_act, NULL ) == -1) goto error;
++    if (pw_sigaction( SIGQUIT, &sig_act, NULL ) == -1) goto error;
+     sig_act.sa_sigaction = usr1_handler;
+-    if (sigaction( SIGUSR1, &sig_act, NULL ) == -1) goto error;
++    if (pw_sigaction( SIGUSR1, &sig_act, NULL ) == -1) goto error;
+     sig_act.sa_sigaction = trap_handler;
+-    if (sigaction( SIGTRAP, &sig_act, NULL ) == -1) goto error;
++    if (pw_sigaction( SIGTRAP, &sig_act, NULL ) == -1) goto error;
+     sig_act.sa_sigaction = segv_handler;
+-    if (sigaction( SIGSEGV, &sig_act, NULL ) == -1) goto error;
+-    if (sigaction( SIGILL, &sig_act, NULL ) == -1) goto error;
+-    if (sigaction( SIGBUS, &sig_act, NULL ) == -1) goto error;
++    if (pw_sigaction( SIGSEGV, &sig_act, NULL ) == -1) goto error;
++    if (pw_sigaction( SIGILL, &sig_act, NULL ) == -1) goto error;
++    if (pw_sigaction( SIGBUS, &sig_act, NULL ) == -1) goto error;
+ #ifdef __APPLE__
+     sig_act.sa_sigaction = sigsys_handler;
+     if (sigaction( SIGSYS, &sig_act, NULL ) == -1) goto error;
+@@ -3685,6 +3795,9 @@ __ASM_GLOBAL_FUNC( __wine_syscall_dispatcher,
+                    "jz 1f\n\t"
+                    "movw %dx,%fs\n"
+                    "1:\n\t"
++#elif defined(__PROSPERO__)
++                   "movq 0x88(%rcx),%rdx\n\t"    /* frame->rsp: %rsp is still inside the frame */
++                   PW_GUEST_FS("%rdx")
+ #elif defined __APPLE__
+                    "movq %rax,%r8\n\t"
+                    "movq %rcx,%rdx\n\t"
+@@ -3998,6 +4111,8 @@ __ASM_GLOBAL_FUNC( __wine_unix_call_dispatcher,
+                    "jz 1f\n\t"
+                    "movw %dx,%fs\n"
+                    "1:\n\t"
++#elif defined(__PROSPERO__)
++                   PW_GUEST_FS("%rsp")             /* the user stack (frame->rsp) */
+ #elif defined __APPLE__
+                    "movq %rax,%rdx\n\t"
+                    "movq %rcx,%r14\n\t"
+-- 
+2.56.0
+

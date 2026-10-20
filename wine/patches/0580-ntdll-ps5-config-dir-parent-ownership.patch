@@ -1,0 +1,37 @@
+From 62f69bea20b65e9681d0f0d390a5dbeb928e7950 Mon Sep 17 00:00:00 2001
+From: prospero-win <prospero-win@invalid>
+Date: Sat, 26 Sep 2026 16:03:01 +0200
+Subject: [PATCH] ntdll: Skip the config-dir parent ownership check on PS5.
+
+setup_config_dir refuses to create the configuration directory when its
+parent is not owned by the current user. A PS5 file system keeps no unix
+owners, so on __PROSPERO__ /download0 and /data both fail that check
+before the prefix is created. Patch 0111 already skips the equivalent
+check after chdir; skip this earlier one for the same reason.
+
+Claude-Session: https://claude.ai/code/session_01W7dtszFRxZRLcH98uRsJpd
+
+Rebased onto 1c7859662533 for PS5_Proton (see wine/patches/README.md).
+---
+ dlls/ntdll/unix/server.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/dlls/ntdll/unix/server.c b/dlls/ntdll/unix/server.c
+index 7006ab3..ae4d72c 100644
+--- a/dlls/ntdll/unix/server.c
++++ b/dlls/ntdll/unix/server.c
+@@ -1353,9 +1353,11 @@ static int setup_config_dir(void)
+         {
+             while (p > config_dir + 1 && p[-1] == '/') p--;
+             *p = 0;
++#ifndef __PROSPERO__  /* one user; its file systems do not keep unix owners */
+             if (!stat( config_dir, &st ) && st.st_uid != getuid())
+                 fatal_error( "'%s' is not owned by you, refusing to create a configuration directory there\n",
+                              config_dir );
++#endif
+             *p = '/';
+         }
+         mkdir( config_dir, 0777 );
+-- 
+2.55.0
+

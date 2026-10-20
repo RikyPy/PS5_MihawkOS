@@ -1,0 +1,9 @@
+{
+ "run": "mc-08-noshaders",
+ "what": "profile 7, Iris shaders switched off in the console copy of config/iris.properties",
+ "env": [],
+ "result": "the console powered off at the end of the run",
+ "note": "Written by hand: the run tool lost the console and wrote no record. The world loaded and rendered (17 fps average with Sodium and no shader pack, 6-17 fps while chunks built); the game exited 47.8 s after Java started, through ExitProcess from the launcher thread while the render thread was killed inside OpenGL; the presenter closed with surfaces 0/1, contexts 1/2, terminate 0 (0x3002 EGL_BAD_ACCESS) where every clean run shows 1/1, 2/2, 1 (0x3000); the kernel log ends with 'gc_gfx_queue_force_close : close in_frame queue'. No Mesa assertion fired in this run.",
+ "returned_to_launcher": false,
+ "passed": false
+}

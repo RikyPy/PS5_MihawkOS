@@ -1,0 +1,98 @@
+From f71b770c52386d6d2b8e7273eb15013772b2b346 Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Fri, 2 Oct 2026 19:37:37 -0400
+Subject: [PATCH] Fix PS5 assembly and registry code against Proton interfaces
+
+Use an indirect jump syntax accepted by Clang, pass unicode_str by address, and avoid Linux-only diagnostic and topology helpers on the console. Discovered by cross-compiling the rebased series; not yet console validated. SPDX-License-Identifier: LGPL-2.1-or-later
+---
+ dlls/ntdll/unix/signal_x86_64.c | 2 +-
+ dlls/ntdll/unix/system.c        | 4 ++++
+ dlls/win32u/vulkan.c            | 9 +++++++--
+ server/registry.c               | 6 +++---
+ 4 files changed, 15 insertions(+), 6 deletions(-)
+
+diff --git a/dlls/ntdll/unix/signal_x86_64.c b/dlls/ntdll/unix/signal_x86_64.c
+index a83a851..127f639 100644
+--- a/dlls/ntdll/unix/signal_x86_64.c
++++ b/dlls/ntdll/unix/signal_x86_64.c
+@@ -2342,7 +2342,7 @@ __ASM_GLOBAL_FUNC( dump_syscall_fault_return,
+                    "movq %rdi,%rsp\n\t"
+                    "movq %rsi,%rax\n\t"
+                    "movq %rdx,%r13\n\t"
+-                   "jmp %rcx")
++                   "jmp *%rcx")
+ 
+ 
+ static void dump_syscall_fault( CONTEXT *context, DWORD exc_code )
+diff --git a/dlls/ntdll/unix/system.c b/dlls/ntdll/unix/system.c
+index 3195c22..6c9431e 100644
+--- a/dlls/ntdll/unix/system.c
++++ b/dlls/ntdll/unix/system.c
+@@ -767,7 +767,11 @@ void init_shared_data_cpuinfo( KUSER_SHARED_DATA *data )
+ #endif /* End architecture specific feature detection for CPUs */
+ 
+ static void fill_performance_core_info(void);
++#ifdef __linux__
+ static BOOL sysfs_parse_bitmap(const char *filename, ULONG_PTR *mask);
++#else
++static BOOL sysfs_parse_bitmap(const char *filename, ULONG_PTR *mask) { return FALSE; }
++#endif
+ 
+ static ULONG popcount( ULONG val )
+ {
+diff --git a/dlls/win32u/vulkan.c b/dlls/win32u/vulkan.c
+index 66fce79..7ee5d44 100644
+--- a/dlls/win32u/vulkan.c
++++ b/dlls/win32u/vulkan.c
+@@ -646,7 +646,12 @@ signal_op_complete:
+ 
+ static void *signaller_worker( void *arg )
+ {
++#ifdef __linux__
+     int unix_tid = gettid();
++#else
++    /* Used only to identify this worker in diagnostic messages. */
++    unsigned long unix_tid = (unsigned long)pthread_self();
++#endif
+     struct vulkan_device *device = arg;
+     struct semaphore *sem;
+     VkSemaphoreWaitInfo wait_info = { 0 };
+@@ -654,7 +659,7 @@ static void *signaller_worker( void *arg )
+     VkResult res;
+ 
+     if (debug_level)
+-        fprintf( stderr, "[%d] msg:winevulkan:signaller_worker started.\n", unix_tid );
++        fprintf( stderr, "[%lu] msg:winevulkan:signaller_worker started.\n", (unsigned long)unix_tid );
+ 
+     wait_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_WAIT_INFO;
+     wait_info.flags = VK_SEMAPHORE_WAIT_ANY_BIT;
+@@ -708,7 +713,7 @@ static void *signaller_worker( void *arg )
+     free( (void *)wait_info.pSemaphores );
+     free( (void *)wait_info.pValues );
+     if (debug_level)
+-        fprintf( stderr, "[%d] msg:winevulkan:signaller_worker exiting.\n", unix_tid );
++        fprintf( stderr, "[%lu] msg:winevulkan:signaller_worker exiting.\n", (unsigned long)unix_tid );
+ 
+     return NULL;
+ }
+diff --git a/server/registry.c b/server/registry.c
+index 52d78de..0dc40d5 100644
+--- a/server/registry.c
++++ b/server/registry.c
+@@ -1991,10 +1991,10 @@ void init_registry(void)
+         static const struct unicode_str audio_name = { audioW, sizeof(audioW) };
+         int index;
+ 
+-        if ((key = create_key_recursive( hkcu, drivers_name, current_time )))
++        if ((key = create_key_recursive( hkcu, &drivers_name, current_time )))
+         {
+-            if (!find_value( key, audio_name, &index ))
+-                set_value( key, audio_name, REG_SZ, ps5W, sizeof(ps5W) );
++            if (!find_value( key, &audio_name, &index ))
++                set_value( key, &audio_name, REG_SZ, ps5W, sizeof(ps5W) );
+             release_object( key );
+         }
+     }
+-- 
+2.55.0
+

@@ -1,0 +1,215 @@
+{
+ "cstub": {
+  "exit_code": 5,
+  "failure_count": 3,
+  "failures": [
+   {
+    "file": "cstub.c",
+    "line": 1230,
+    "text": "CreateProcess failed: 8"
+   },
+   {
+    "file": "cstub.c",
+    "line": 1385,
+    "text": "wait failed"
+   },
+   {
+    "file": "cstub.c",
+    "line": 1399,
+    "text": "got 0x80040154"
+   }
+  ],
+  "guarded": null,
+  "last_line": "cstub.c:1399: Test failed: got 0x80040154",
+  "seconds": 5.2,
+  "skipped_lines": [],
+  "status": "incomplete",
+  "summary": null,
+  "todo_lines": 2
+ },
+ "generated": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 0.1,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 0,
+   "todo": 0
+  },
+  "todo_lines": 0
+ },
+ "ndr_marshall": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 0.1,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 31859,
+   "todo": 12
+  },
+  "todo_lines": 12
+ },
+ "rpc": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 0.2,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 16501,
+   "todo": 12
+  },
+  "todo_lines": 12
+ },
+ "rpc_async": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 0.1,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 19,
+   "todo": 2
+  },
+  "todo_lines": 2
+ },
+ "server": {
+  "exit_code": 186,
+  "failure_count": 20,
+  "failures": [
+   {
+    "file": "server.c",
+    "line": 1336,
+    "text": "CreateProcess"
+   },
+   {
+    "file": "server.c",
+    "line": 1337,
+    "text": "No child process handle (CreateProcess failed?)"
+   },
+   {
+    "file": "server.c",
+    "line": 1336,
+    "text": "CreateProcess"
+   },
+   {
+    "file": "server.c",
+    "line": 1337,
+    "text": "No child process handle (CreateProcess failed?)"
+   },
+   {
+    "file": "server.c",
+    "line": 1336,
+    "text": "CreateProcess"
+   },
+   {
+    "file": "server.c",
+    "line": 1337,
+    "text": "No child process handle (CreateProcess failed?)"
+   },
+   {
+    "file": "server.c",
+    "line": 1336,
+    "text": "CreateProcess"
+   },
+   {
+    "file": "server.c",
+    "line": 1337,
+    "text": "No child process handle (CreateProcess failed?)"
+   },
+   {
+    "file": "server.c",
+    "line": 1336,
+    "text": "CreateProcess"
+   },
+   {
+    "file": "server.c",
+    "line": 1337,
+    "text": "No child process handle (CreateProcess failed?)"
+   },
+   {
+    "file": "server.c",
+    "line": 2375,
+    "text": "WaitForSingleObject"
+   },
+   {
+    "file": "server.c",
+    "line": 1336,
+    "text": "CreateProcess"
+   },
+   {
+    "file": "server.c",
+    "line": 1337,
+    "text": "No child process handle (CreateProcess failed?)"
+   },
+   {
+    "file": "server.c",
+    "line": 2418,
+    "text": "RpcMgmtIsServerListening returned 0, expected 1715"
+   },
+   {
+    "file": "server.c",
+    "line": 2420,
+    "text": "RpcServerListen failed with status 1713"
+   },
+   {
+    "file": "server.c",
+    "line": 1336,
+    "text": "CreateProcess"
+   },
+   {
+    "file": "server.c",
+    "line": 1337,
+    "text": "No child process handle (CreateProcess failed?)"
+   },
+   {
+    "file": "server.c",
+    "line": 2435,
+    "text": "WaitForSingleObject"
+   },
+   {
+    "file": "server.c",
+    "line": 2594,
+    "text": "CreateProcess"
+   },
+   {
+    "file": "server.c",
+    "line": 2596,
+    "text": "WaitForSingleObject"
+   }
+  ],
+  "guarded": null,
+  "last_line": "server.c:2596: Test failed: WaitForSingleObject",
+  "seconds": 12.2,
+  "skipped_lines": [],
+  "status": "incomplete",
+  "summary": null,
+  "todo_lines": 0
+ }
+}

@@ -1,0 +1,9 @@
+tls https://github.com/GloriousEggroll/proton-ge-custom/releases/download/GE-Proton11-7/GE-Proton11-7-x86_64.sha512sum ok 4096 158
+tls https://dl.winehq.org/wine/wine-mono/10.4.1/wine-mono-10.4.1-x86.msi ok 1073741824 85504000
+tls https://wrong.host.badssl.com/ fail 65536
+tls https://expired.badssl.com/ fail 65536
+tls https://self-signed.badssl.com/ fail 65536
+tls https://untrusted-root.badssl.com/ fail 65536
+tls http://dl.winehq.org/ any 65536
+notify
+launcher 1800

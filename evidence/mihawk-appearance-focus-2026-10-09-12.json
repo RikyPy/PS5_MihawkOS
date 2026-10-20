@@ -1,0 +1,112 @@
+{
+  "battery": "mihawk-appearance-focus-2026-10-09-12",
+  "expected_cases": [
+    "appearance32",
+    "appearance64",
+    "theme-notify32",
+    "theme-notify64"
+  ],
+  "revision": "e29ae6769db99f71f46cbcb3d8c6879ac574b8d2",
+  "dirty": true,
+  "cases": [
+    {
+      "case": "appearance32",
+      "run": "mihawk-appearance-focus-2026-10-09-12-appearance32",
+      "runner_status": 0,
+      "seconds": 31.9,
+      "result": "finished",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "run_seconds": 27.6,
+      "launch_readiness": {
+        "ready": true,
+        "seconds": 0.184,
+        "settle_seconds": 0.0,
+        "census_seconds": 0.147,
+        "previous_cleanup_verified": true
+      },
+      "runner_overhead_seconds": 4.3,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 8,
+      "protocol_errors": 0
+    },
+    {
+      "case": "appearance64",
+      "run": "mihawk-appearance-focus-2026-10-09-12-appearance64",
+      "runner_status": 0,
+      "seconds": 19.3,
+      "result": "finished",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "run_seconds": 15.9,
+      "launch_readiness": {
+        "ready": true,
+        "seconds": 0.185,
+        "settle_seconds": 0.0,
+        "census_seconds": 0.165,
+        "previous_cleanup_verified": true
+      },
+      "runner_overhead_seconds": 3.4,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 8,
+      "protocol_errors": 0
+    },
+    {
+      "case": "theme-notify32",
+      "run": "mihawk-appearance-focus-2026-10-09-12-theme-notify32",
+      "runner_status": 0,
+      "seconds": 13.8,
+      "result": "finished",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "run_seconds": 12.9,
+      "launch_readiness": {
+        "ready": true,
+        "seconds": 0.19,
+        "settle_seconds": 0.0,
+        "census_seconds": 0.166,
+        "previous_cleanup_verified": true
+      },
+      "runner_overhead_seconds": 0.9,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 9,
+      "protocol_errors": 0
+    },
+    {
+      "case": "theme-notify64",
+      "run": "mihawk-appearance-focus-2026-10-09-12-theme-notify64",
+      "runner_status": 0,
+      "seconds": 12.8,
+      "result": "finished",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "run_seconds": 12.0,
+      "launch_readiness": {
+        "ready": true,
+        "seconds": 0.179,
+        "settle_seconds": 0.0,
+        "census_seconds": 0.165,
+        "previous_cleanup_verified": true
+      },
+      "runner_overhead_seconds": 0.8,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 9,
+      "protocol_errors": 0
+    }
+  ],
+  "complete": true,
+  "seconds": 77.9,
+  "passed": true
+}

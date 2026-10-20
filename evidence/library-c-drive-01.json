@@ -1,0 +1,35 @@
+{
+  "title": "PPSA99170",
+  "identity": "2ebecae0e088431ba2cd8576acb20d91",
+  "frames_requested": 120,
+  "eboot_sha256": "ec1d416023f891b35dc0f84ecea42e242b6342082fe66bc4ec61d59d688ca57f",
+  "fresh_identity_seen": true,
+  "shell_idle_after_run": true,
+  "title_finished_successfully": true,
+  "picture_and_log_check_passed": true,
+  "post_launch_fault_records": 0,
+  "post_launch_driver_errors": 0,
+  "elevation": [
+    "ok (filesystem access)"
+  ],
+  "sample": [
+    "starts",
+    "ok, 120 frames in 2.40 s, 59.9 fps after the first half"
+  ],
+  "library": [
+    "8 game(s); searched: /data/ps5proton/games (8 entries); /data/homebrew/PPSA99170/games (not there)"
+  ],
+  "startup_seconds": {
+    "exec": 0.0,
+    "starts": 0.51,
+    "elevation": 0.51,
+    "library": 0.6,
+    "ui": 0.66
+  },
+  "probe": null,
+  "probe_passed": null,
+  "probe_records": [],
+  "passed": true,
+  "capture": "klog/library-c-drive-01",
+  "forced_close": false
+}

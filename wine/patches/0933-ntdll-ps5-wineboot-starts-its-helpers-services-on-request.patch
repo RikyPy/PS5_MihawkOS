@@ -1,0 +1,78 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Tue, 6 Oct 2026 00:30:00 -0400
+Subject: [PATCH] ntdll: PS5: wineboot starts its helpers; services where the
+ title asks for them.
+
+Patch 0930 refused wineboot every child, so a prefix could not be made
+or brought up to date on the console, and no service ever ran. wineboot
+may now start what it needs. services.exe, which starts every service of
+the prefix, each a helper process that costs the title memory, starts
+only where WINE_PS5_SERVICES=1 is in the starting process's environment:
+the title sets it while wineboot makes or updates a prefix, and for a
+game that asks for it.
+---
+diff --git a/dlls/ntdll/unix/process.c b/dlls/ntdll/unix/process.c
+index 0fdf467..6593803 100644
+--- a/dlls/ntdll/unix/process.c
++++ b/dlls/ntdll/unix/process.c
+@@ -716,26 +716,36 @@ static NTSTATUS alloc_handle_list( const PS_ATTRIBUTE *handles_attr, obj_handle_
+ /* Child processes may start their own children by default: a program that starts a
+  * process expects it to start, and a launcher's browser starts its renderers with an
+  * environment of its own, which never carried an opt-in (2026-10-05).
+- * WINE_PS5_DESCENDANTS=0 in a process's Windows environment declines. wineboot is
+- * left out: the services it would start are not set up on the console yet. */
+-static BOOL ps5_descendants_enabled(void)
++ * WINE_PS5_DESCENDANTS=0 in a process's Windows environment declines. Services are
++ * each a helper process, which costs the title memory: services.exe starts only
++ * where WINE_PS5_SERVICES=1 is in the starting process's environment (the title
++ * sets it while wineboot sets a prefix up, and for a game that asks for it). */
++static BOOL ps5_env_set( const WCHAR *env, const char *key )
+ {
+-    static const WCHAR wineboot[] = {'w','i','n','e','b','o','o','t','.','e','x','e',0};
+-    const char *key = "WINE_PS5_DESCENDANTS=0";
+-    const RTL_USER_PROCESS_PARAMETERS *params = NtCurrentTeb()->Peb->ProcessParameters;
+-    const WCHAR *env = params->Environment;
+-    const UNICODE_STRING *image = &params->ImagePathName;
+-    const size_t name = ARRAY_SIZE(wineboot) - 1;
+-
+     for (; env && *env; env += wcslen(env) + 1)
+     {
+         unsigned int i = 0;
+         while (key[i] && env[i] == key[i]) ++i;
+-        if (!key[i] && !env[i]) return FALSE;
++        if (!key[i] && !env[i]) return TRUE;
+     }
+-    if (image->Buffer && image->Length / sizeof(WCHAR) >= name &&
+-        !wcsnicmp( image->Buffer + image->Length / sizeof(WCHAR) - name, wineboot, name ))
+-        return FALSE;
++    return FALSE;
++}
++
++static BOOL ps5_ends_with( const UNICODE_STRING *path, const WCHAR *name )
++{
++    const size_t length = wcslen( name ), count = path && path->Buffer ? path->Length / sizeof(WCHAR) : 0;
++
++    return count >= length && !wcsnicmp( path->Buffer + count - length, name, length ) &&
++           (count == length || path->Buffer[count - length - 1] == '\\');
++}
++
++static BOOL ps5_descendants_enabled( const UNICODE_STRING *child )
++{
++    static const WCHAR services[] = {'s','e','r','v','i','c','e','s','.','e','x','e',0};
++    const WCHAR *env = NtCurrentTeb()->Peb->ProcessParameters->Environment;
++
++    if (ps5_env_set( env, "WINE_PS5_DESCENDANTS=0" )) return FALSE;
++    if (ps5_ends_with( child, services )) return ps5_env_set( env, "WINE_PS5_SERVICES=1" );
+     return TRUE;
+ }
+ #endif
+@@ -837,7 +847,7 @@ NTSTATUS WINAPI NtCreateUserProcess( HANDLE *process_handle_ptr, HANDLE *thread_
+     /* Experimental Sony service loader: only PE64, explicitly enabled. */
+     if (!getenv("WINE_PS5_CHILDREN") || strcmp(getenv("WINE_PS5_CHILDREN"), "1") ||
+         (getenv("WINE_PS5_CHILD") && !getenv("WINE_PS5_INITIAL_CLIENT") &&
+-         !ps5_descendants_enabled()) || debug ||
++         !ps5_descendants_enabled( &params->ImagePathName )) || debug ||
+         pe_info.machine != IMAGE_FILE_MACHINE_AMD64 || (machine && machine != IMAGE_FILE_MACHINE_AMD64))
+     {
+         status = STATUS_NOT_SUPPORTED;

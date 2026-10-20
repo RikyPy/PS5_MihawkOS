@@ -1,0 +1,514 @@
+{
+  "case": "descendants-repeat",
+  "loader": {
+    "sdk_revision": "611893fc25ef3e138f5bc2c90d829d8b58174cd2",
+    "converter_revision": "ab37acd506305ba3e575435e3ae9a351cfaf7cf4",
+    "converter_sha256": "614377a0e37006e1454c67f228fc370a2f785c060205cb9f0264f27af04b5f18",
+    "recipe_sha256": "78f517f89c9b5261436c3fabd78a06c32be403f021bbd8099980cbeed634f47f",
+    "sources": {
+      "native/proton_wine_child.c": "14f87cc1f65c4a30a5a0024b7a71552f3a9252ea07b26180cc11102f43c598d3",
+      "src/pw_wine_start.c": "52bdf039228ca13e9931fc7f7097b196ece76868990b6ea44588990714bf22e2",
+      "wine/ps5/pw_wine_prx.c": "67b8393fca62a72a7aaf53a409c9a34684dd7704037bf194066e5173808c16a2",
+      "wine/ps5/pw_wine_process_io.c": "dd3ccac3b63058aaf743146fbf5791217ec9b6451ad0dc4c61dcbbad7abbd6c5",
+      "wine/ps5/pw_wine_process.h": "9e526e94a15be492069674705d9d339f5efca9bd28db1630da68314a938a28e4",
+      "wine/ps5/pw_wine_process_io.h": "c375a67872391d47ef20cb7bc0001b66655aa29c44c446af31102c0fe5f937a7",
+      "src/pw_wine_start.h": "f450215176a5bf7b898728ab0a84cbd6b8a3bfd497a4996ee4f590aab95c6ed7",
+      "wine/ps5/pw_wine_prx.h": "82e4cf6b56377bb3ca9e007bd78a3302633fa8675e77d5b507823829959f9bb0",
+      "native/proton_gpu_identity.h": "9dea30f7e9e109050efb992844bfdb4101afddb1021d11b6da3b09a4ad4dce31",
+      "src/pw_gpu_broker.h": "0854ed93a20b79735d92f372764dea49f8faccb0f52e13b28804e0b244c24602"
+    },
+    "preload_mask": "0x8000000000000002",
+    "gpu_preflight": false,
+    "gpu_device_query": false,
+    "gpu_broker": true,
+    "ps5-pie.ld": "fbc52518761b58b703a2225c847c5f44a81523cd0e751755adf890ae0f0dd74c",
+    "app-symbols.map": "470ce72a27a7be8e35dd7a25b485faa733d61570bdaf24d3c75bb4e3e3c63cf7",
+    "identity": "d06051dc575425b2993e368e24c960bf5cd394a3774f28db1549ff8631a8d6b1",
+    "sha256": "7e8e1ceccac2935eb5b18beaec208b546534293d1d09920d9aa48dbd6db7a942"
+  },
+  "runtime": {
+    "ntdll": "486b758bc693da75e508491ae839aa214b180a59973a4aa79006ec1845c7fe0a",
+    "wineserver": "f86adb67a6ae7fe8d15344e3d51e867588636212ba591aba82883d5b9466077e"
+  },
+  "passed": true,
+  "production_restored": true,
+  "helper_removed": true,
+  "status": "complete",
+  "payload": {
+    "payload": true,
+    "gpu_broker": true,
+    "sdk_revision": "611893fc25ef3e138f5bc2c90d829d8b58174cd2",
+    "sha256": "1935369823f5c7e49e3ddcfe5e5dbecd26b3135f5b4d5fd4c2702c12050e775b",
+    "sources": {
+      "native/proton_payload_child.c": "c3aaf09cc89cadd59c0c73b4b35ae9f47f451636c1fd44d173ce976f73e66591",
+      "native/proton_wine_child.c": "14f87cc1f65c4a30a5a0024b7a71552f3a9252ea07b26180cc11102f43c598d3",
+      "src/pw_wine_start.c": "52bdf039228ca13e9931fc7f7097b196ece76868990b6ea44588990714bf22e2",
+      "wine/ps5/pw_wine_prx.c": "67b8393fca62a72a7aaf53a409c9a34684dd7704037bf194066e5173808c16a2",
+      "wine/ps5/pw_wine_process_io.c": "dd3ccac3b63058aaf743146fbf5791217ec9b6451ad0dc4c61dcbbad7abbd6c5",
+      "wine/ps5/pw_wine_process.h": "9e526e94a15be492069674705d9d339f5efca9bd28db1630da68314a938a28e4",
+      "src/pw_gpu_broker.h": "0854ed93a20b79735d92f372764dea49f8faccb0f52e13b28804e0b244c24602",
+      "tools/build-payload-loader.sh": "426088aa312293aa8d55d7896982a097dfa430987ff6fb970c9dc7be036e20f3"
+    }
+  },
+  "owner_title": {
+    "revision": "a1d1bdf6b375b55ea94e8ff392cdeca9ad0f8d9f",
+    "kind": "wine-owner",
+    "elevate_gpu_helper": false,
+    "vulkan_gpu_helper": false,
+    "gpu_draw_helper": false,
+    "gpu_present_helper": false,
+    "wine_gpu_broker": true,
+    "sdk_revision": "611893fc25ef3e138f5bc2c90d829d8b58174cd2",
+    "source_sha256": {
+      "ps5/src/main.cpp": "f1eb468f9603425c6543f0b02d8cf91e3e85a6919d7248dec85a24fd2f5aa457",
+      "ps5/CMakeLists.txt": "a095a0d2a12332ca548fed973dcff72ba55457ce950ebc3b3c08430c4a266ade",
+      "native/proton_wine.cpp": "0423b96e4812cb40ff756e0dc8ad094cb266067642a74d3818686897c7442060",
+      "native/proton_gpu_identity.h": "9dea30f7e9e109050efb992844bfdb4101afddb1021d11b6da3b09a4ad4dce31",
+      "wine/ps5/pw_wine_process.h": "9e526e94a15be492069674705d9d339f5efca9bd28db1630da68314a938a28e4",
+      "native/proton_service_helper.c": "f94aa45c3f382c0c8da3e0206865be9fe1e54c92977c759a71823d6e91894064",
+      "native/proton_gpu_broker_probe.h": "b97e700b601a5af3ad3e7328fdec9024d6c586887a9a5b773bd18e449dd34f35",
+      "native/proton_gpu_broker_probe.cpp": "9452f23403ba3fce4899ce3f6e7944bf95af35f77bc238f6086477f60bd87817",
+      "native/proton_gpu_memory_probe.cpp": "a6da45b08e0cfef1e2f2890231a49bba0727ea85c4784e2dd82a522758005eb9",
+      "native/proton_fd_budget_probe.cpp": "739d02ea9c684a670c37857f97a725e2db452e0853f443920b24c45e5ddbae94",
+      "native/proton_channel_probe.cpp": "d2bd85a00c0a3719a8a49c43794174aec9ca426c6690f579e416c377fd53ff44",
+      "native/proton_gpu_server_probe.cpp": "519ccfc360f442a8c0c2364f80f45c1473215586c04d7e10e0d43e02c15496f4",
+      "native/proton_gpu_display.cpp": "947607a507edd86d85ebc5591154c34d6f6e52d4ba5daa3930bb64e21d4d0479",
+      "native/proton_gpu_display.h": "2498d730a8948150cff2f184ee72826b15b1594606f7cdb023ffa94d1a128971",
+      "native/proton_gpu_server.h": "0d007877c96fc451b8f593c579796e62bf3e304c1782ddeb6003d2aa0e104255",
+      "src/pw_gpu_broker.h": "0854ed93a20b79735d92f372764dea49f8faccb0f52e13b28804e0b244c24602",
+      "wine/ps5/pw_wine_process_io.c": "dd3ccac3b63058aaf743146fbf5791217ec9b6451ad0dc4c61dcbbad7abbd6c5",
+      "wine/ps5/pw_wine_process_io.h": "c375a67872391d47ef20cb7bc0001b66655aa29c44c446af31102c0fe5f937a7",
+      "ps5/tools/link-title.sh": "08260eba2eeab01b82b284b7e65376d62b95fe1d036d9c3a45519a13b1ca0807"
+    },
+    "radv_recipe_sha256": "efef0a82c7ba4ffd97c225f6969a31bc550938689b03e9fafe2cf69734e8d7c9",
+    "identity": "626f9391b4ec5a3dc11f56ca11a397c2f9428bae53b7171ea8a0f3e2eb18c654",
+    "eboot_sha256": "41ca3b384b172de5c0c043b3946f131af111e70228d8569aa490481bd6fa4d0a"
+  },
+  "parent_restored": true,
+  "production_files": {
+    "wine-child.bin": "ecccc428b05a3053f896df4c7ee7597d49f8c07c745055189035b9e655819166",
+    "process-probe.exe": "62eca3aeda3a98c7d723f17d7706c43888160d4755ca2d2b212913dd0bc462e6",
+    "graphics-render-probe.exe": "4ca0cce268f05f5c25253d26eca30b21a857c0dd14c4b8ab299793267a85ecfc"
+  },
+  "parent_deployed": true,
+  "deployed_modules": [
+    "ntdll",
+    "wineserver"
+  ],
+  "payload_uploaded": true,
+  "helper_uploaded": true,
+  "probe_uploaded": true,
+  "deployment_verified": true,
+  "probe_sha256": "b867f7000b5afcd41ba5932dd85eb5b1f46a7b2943e83983a67f01fe5b8cdff9",
+  "descendant_patch_sha256": "57fb947935f4178616a4ce3faeb753acd370fa737d691a86bf73d18c0322713f",
+  "graphics_patch_sha256": "c781a26850dfa9c68dbece702d9349185a7025dc51f65c61bba00da9e2606adc",
+  "patch_sha256": "2767c06d7ca2d2355275e644fe22f0045b713e90ab5f7946da7c3b22af5712a1",
+  "adapter_sha256": {
+    "pw_wine_process.c": "db211c55c7f275242d23b7b9f843767b6ed4e104966e996199122475cdff8937",
+    "pw_wine_process.h": "9e526e94a15be492069674705d9d339f5efca9bd28db1630da68314a938a28e4",
+    "pw_wine_threads.c": "9fb82ed67f775782a8ec9d9d0dbaf0837adb004cc1241ceebf6f58e60bbe38a0",
+    "pw_wine_threads.h": "a28177375ad16666504b3d05cb285c8f23634b800c2e4bd9b3c20ead21722d30",
+    "pw_wine_process_io.c": "dd3ccac3b63058aaf743146fbf5791217ec9b6451ad0dc4c61dcbbad7abbd6c5",
+    "pw_wine_process_io.h": "c375a67872391d47ef20cb7bc0001b66655aa29c44c446af31102c0fe5f937a7"
+  },
+  "runner_status": 0,
+  "post_launch_fault_records": 0,
+  "kernel_fmem": [
+    "0x40000000"
+  ],
+  "native_descriptor_samples": [
+    {
+      "stage": "before_spawn",
+      "count": 29,
+      "limit": 12555
+    },
+    {
+      "stage": "before_spawn",
+      "count": 37,
+      "limit": 12555
+    },
+    {
+      "stage": "before_spawn",
+      "count": 92,
+      "limit": 12555
+    },
+    {
+      "stage": "closed",
+      "count": 93,
+      "limit": 12555
+    },
+    {
+      "stage": "before_spawn",
+      "count": 100,
+      "limit": 12555
+    },
+    {
+      "stage": "before_spawn",
+      "count": 109,
+      "limit": 12555
+    },
+    {
+      "stage": "before_spawn",
+      "count": 94,
+      "limit": 12555
+    },
+    {
+      "stage": "closed",
+      "count": 95,
+      "limit": 12555
+    },
+    {
+      "stage": "closed",
+      "count": 94,
+      "limit": 12555
+    },
+    {
+      "stage": "closed",
+      "count": 92,
+      "limit": 12555
+    },
+    {
+      "stage": "before_spawn",
+      "count": 100,
+      "limit": 12555
+    },
+    {
+      "stage": "before_spawn",
+      "count": 109,
+      "limit": 12555
+    },
+    {
+      "stage": "before_spawn",
+      "count": 94,
+      "limit": 12555
+    },
+    {
+      "stage": "closed",
+      "count": 95,
+      "limit": 12555
+    },
+    {
+      "stage": "closed",
+      "count": 94,
+      "limit": 12555
+    },
+    {
+      "stage": "closed",
+      "count": 92,
+      "limit": 12555
+    },
+    {
+      "stage": "before_spawn",
+      "count": 100,
+      "limit": 12555
+    },
+    {
+      "stage": "before_spawn",
+      "count": 109,
+      "limit": 12555
+    },
+    {
+      "stage": "before_spawn",
+      "count": 94,
+      "limit": 12555
+    },
+    {
+      "stage": "closed",
+      "count": 95,
+      "limit": 12555
+    },
+    {
+      "stage": "closed",
+      "count": 94,
+      "limit": 12555
+    },
+    {
+      "stage": "closed",
+      "count": 92,
+      "limit": 12555
+    },
+    {
+      "stage": "before_spawn",
+      "count": 100,
+      "limit": 12555
+    },
+    {
+      "stage": "before_spawn",
+      "count": 109,
+      "limit": 12555
+    },
+    {
+      "stage": "closed",
+      "count": 71,
+      "limit": 12555
+    },
+    {
+      "stage": "closed",
+      "count": 70,
+      "limit": 12555
+    },
+    {
+      "stage": "closed",
+      "count": 68,
+      "limit": 12555
+    },
+    {
+      "stage": "closed",
+      "count": 67,
+      "limit": 12555
+    },
+    {
+      "stage": "all_children_closed",
+      "count": 67,
+      "limit": 12555
+    }
+  ],
+  "windows_handle_samples": [],
+  "native_children": [
+    {
+      "pid": 4561,
+      "service_id": 1
+    },
+    {
+      "pid": 4562,
+      "service_id": 1
+    },
+    {
+      "pid": 4563,
+      "service_id": 1
+    },
+    {
+      "pid": 4564,
+      "service_id": 1
+    },
+    {
+      "pid": 4565,
+      "service_id": 1
+    },
+    {
+      "pid": 4566,
+      "service_id": 1
+    },
+    {
+      "pid": 4567,
+      "service_id": 1
+    },
+    {
+      "pid": 4568,
+      "service_id": 1
+    },
+    {
+      "pid": 4569,
+      "service_id": 1
+    },
+    {
+      "pid": 4570,
+      "service_id": 1
+    },
+    {
+      "pid": 4571,
+      "service_id": 1
+    },
+    {
+      "pid": 4572,
+      "service_id": 1
+    },
+    {
+      "pid": 4573,
+      "service_id": 1
+    },
+    {
+      "pid": 4574,
+      "service_id": 1
+    }
+  ],
+  "native_child_deletions": [],
+  "native_children_absent": [
+    4561,
+    4562,
+    4563,
+    4564,
+    4565,
+    4566,
+    4567,
+    4568,
+    4569,
+    4570,
+    4571,
+    4572,
+    4573,
+    4574
+  ],
+  "payload_lifecycle": [
+    {
+      "pid": 4561,
+      "status": -1,
+      "errno": 3,
+      "absent": 1
+    },
+    {
+      "pid": 4562,
+      "status": -1,
+      "errno": 3,
+      "absent": 1
+    },
+    {
+      "pid": 4563,
+      "status": -1,
+      "errno": 3,
+      "absent": 1
+    },
+    {
+      "pid": 4564,
+      "status": -1,
+      "errno": 3,
+      "absent": 1
+    },
+    {
+      "pid": 4565,
+      "status": -1,
+      "errno": 3,
+      "absent": 1
+    },
+    {
+      "pid": 4566,
+      "status": -1,
+      "errno": 3,
+      "absent": 1
+    },
+    {
+      "pid": 4567,
+      "status": -1,
+      "errno": 3,
+      "absent": 1
+    },
+    {
+      "pid": 4568,
+      "status": -1,
+      "errno": 3,
+      "absent": 1
+    },
+    {
+      "pid": 4569,
+      "status": -1,
+      "errno": 3,
+      "absent": 1
+    },
+    {
+      "pid": 4570,
+      "status": -1,
+      "errno": 3,
+      "absent": 1
+    },
+    {
+      "pid": 4571,
+      "status": -1,
+      "errno": 3,
+      "absent": 1
+    },
+    {
+      "pid": 4572,
+      "status": -1,
+      "errno": 3,
+      "absent": 1
+    },
+    {
+      "pid": 4573,
+      "status": -1,
+      "errno": 3,
+      "absent": 1
+    },
+    {
+      "pid": 4574,
+      "status": -1,
+      "errno": 3,
+      "absent": 1
+    }
+  ],
+  "child_logs": [
+    "wine-child-4561.log",
+    "wine-child-4562.log",
+    "wine-child-4563.log",
+    "wine-child-4564.log",
+    "wine-child-4565.log",
+    "wine-child-4566.log",
+    "wine-child-4567.log",
+    "wine-child-4568.log",
+    "wine-child-4569.log",
+    "wine-child-4570.log",
+    "wine-child-4571.log",
+    "wine-child-4572.log",
+    "wine-child-4573.log",
+    "wine-child-4574.log"
+  ],
+  "descendant_node_verdicts": 12,
+  "broker_spawns": [
+    {
+      "requester": 4561,
+      "child": 4562,
+      "status": 0
+    },
+    {
+      "requester": 4561,
+      "child": 4563,
+      "status": 0
+    },
+    {
+      "requester": 4563,
+      "child": 4564,
+      "status": 0
+    },
+    {
+      "requester": 4564,
+      "child": 4565,
+      "status": 0
+    },
+    {
+      "requester": 4561,
+      "child": 4566,
+      "status": 0
+    },
+    {
+      "requester": 4566,
+      "child": 4567,
+      "status": 0
+    },
+    {
+      "requester": 4567,
+      "child": 4568,
+      "status": 0
+    },
+    {
+      "requester": 4561,
+      "child": 4569,
+      "status": 0
+    },
+    {
+      "requester": 4569,
+      "child": 4570,
+      "status": 0
+    },
+    {
+      "requester": 4570,
+      "child": 4571,
+      "status": 0
+    },
+    {
+      "requester": 4561,
+      "child": 4572,
+      "status": 0
+    },
+    {
+      "requester": 4572,
+      "child": 4573,
+      "status": 0
+    },
+    {
+      "requester": 4573,
+      "child": 4574,
+      "status": 0
+    }
+  ],
+  "payload_restored": true,
+  "probe_removed": true
+}

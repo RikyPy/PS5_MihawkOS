@@ -1,0 +1,32 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Sun, 4 Oct 2026 15:30:00 -0400
+Subject: [PATCH] server: on PS5, ask for a handle's in-process sync object on the client thread
+
+With the in-process synchronization device on (patch 0890, WINE_PS5_NTSYNC=1) waits no longer reach
+the server, but ntdll asks get_inproc_sync_fd for each handle it has not seen, and in a .NET game that
+was about 375 requests a second at 16.5 us through the pipes, which kept the server time where it was
+without the device. On the PS5 the handler looks the handle up, reads the object's device number
+and takes a device reference for the client: no descriptor is passed (send_client_fd is the
+non-PS5 branch), nothing sleeps, and the request carries a handle only. It joins the requests
+patches 0918 and 0919 run on the calling thread.
+---
+  server/request.c | 3 +++
+  1 file changed, 3 insertions(+)
+
+diff --git a/server/request.c b/server/request.c
+index aea3463..c322de1 100644
+--- a/server/request.c
++++ b/server/request.c
+@@ -372,6 +372,9 @@ static int is_direct_request( enum request req )
+     case REQ_remove_completion:
+     case REQ_get_thread_completion:
+     case REQ_query_completion:
++    /* the in-process device's number for a handle (patch 0890): a lookup and a
++     * device reference, no descriptor passed on the PS5 */
++    case REQ_get_inproc_sync_fd:
+         return 1;
+     default:
+         return 0;
+-- 
+2.55.0

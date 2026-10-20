@@ -1,0 +1,573 @@
+{
+  "source_fingerprint": "9e68484ce4282f3570a8aaafe33e9baa3a1e380840074005a48a029132c8a5aa",
+  "raw_batch_passed": false,
+  "harness_failure": "Captured paths are omitted without --pad-script; downloaded pixels are independently reviewed here, not a retroactive gate pass.",
+  "cases": [
+    {
+      "bits": 32,
+      "display_review_passed": true,
+      "probe_verdicts": [
+        [
+          "PASS",
+          "14",
+          "0",
+          "5"
+        ]
+      ],
+      "pixels": [
+        {
+          "capture": "klog/mihawk-composition-focused-2026-10-09-02-window-compose32-capture-01.png",
+          "number": 1,
+          "pixels": [
+            {
+              "phase": "interleaved",
+              "point": [
+                300,
+                200
+              ],
+              "expected": [
+                30,
+                110,
+                210
+              ],
+              "actual": [
+                30,
+                110,
+                210
+              ],
+              "passed": true
+            },
+            {
+              "phase": "interleaved",
+              "point": [
+                500,
+                300
+              ],
+              "expected": [
+                30,
+                180,
+                70
+              ],
+              "actual": [
+                30,
+                180,
+                70
+              ],
+              "passed": true
+            },
+            {
+              "phase": "interleaved",
+              "point": [
+                650,
+                400
+              ],
+              "expected": [
+                220,
+                50,
+                60
+              ],
+              "actual": [
+                220,
+                50,
+                60
+              ],
+              "passed": true
+            }
+          ],
+          "passed": true
+        },
+        {
+          "capture": "klog/mihawk-composition-focused-2026-10-09-02-window-compose32-capture-02.png",
+          "number": 2,
+          "pixels": [
+            {
+              "phase": "raised",
+              "point": [
+                500,
+                700
+              ],
+              "expected": [
+                30,
+                180,
+                70
+              ],
+              "actual": [
+                30,
+                180,
+                70
+              ],
+              "passed": true
+            },
+            {
+              "phase": "raised",
+              "point": [
+                650,
+                400
+              ],
+              "expected": [
+                30,
+                110,
+                210
+              ],
+              "actual": [
+                30,
+                110,
+                210
+              ],
+              "passed": true
+            },
+            {
+              "phase": "raised",
+              "point": [
+                950,
+                400
+              ],
+              "expected": [
+                220,
+                50,
+                60
+              ],
+              "actual": [
+                220,
+                50,
+                60
+              ],
+              "passed": true
+            }
+          ],
+          "passed": true
+        },
+        {
+          "capture": "klog/mihawk-composition-focused-2026-10-09-02-window-compose32-capture-03.png",
+          "number": 3,
+          "pixels": [
+            {
+              "phase": "moved-minimized",
+              "point": [
+                200,
+                200
+              ],
+              "expected": [
+                30,
+                110,
+                210
+              ],
+              "actual": [
+                30,
+                110,
+                210
+              ],
+              "passed": true
+            },
+            {
+              "phase": "moved-minimized",
+              "point": [
+                650,
+                400
+              ],
+              "expected": [
+                220,
+                50,
+                60
+              ],
+              "actual": [
+                220,
+                50,
+                60
+              ],
+              "passed": true
+            }
+          ],
+          "passed": true
+        },
+        {
+          "capture": "klog/mihawk-composition-focused-2026-10-09-02-window-compose32-capture-04.png",
+          "number": 4,
+          "pixels": [
+            {
+              "phase": "owned-modal",
+              "point": [
+                200,
+                200
+              ],
+              "expected": [
+                30,
+                110,
+                210
+              ],
+              "actual": [
+                30,
+                110,
+                210
+              ],
+              "passed": true
+            },
+            {
+              "phase": "owned-modal",
+              "point": [
+                650,
+                400
+              ],
+              "expected": [
+                220,
+                50,
+                60
+              ],
+              "actual": [
+                220,
+                50,
+                60
+              ],
+              "passed": true
+            },
+            {
+              "phase": "owned-modal",
+              "point": [
+                800,
+                500
+              ],
+              "expected": [
+                240,
+                180,
+                30
+              ],
+              "actual": [
+                240,
+                180,
+                30
+              ],
+              "passed": true
+            }
+          ],
+          "passed": true
+        },
+        {
+          "capture": "klog/mihawk-composition-focused-2026-10-09-02-window-compose32-capture-05.png",
+          "number": 5,
+          "pixels": [
+            {
+              "phase": "restored",
+              "point": [
+                200,
+                200
+              ],
+              "expected": [
+                30,
+                110,
+                210
+              ],
+              "actual": [
+                30,
+                110,
+                210
+              ],
+              "passed": true
+            },
+            {
+              "phase": "restored",
+              "point": [
+                650,
+                400
+              ],
+              "expected": [
+                30,
+                180,
+                70
+              ],
+              "actual": [
+                30,
+                180,
+                70
+              ],
+              "passed": true
+            }
+          ],
+          "passed": true
+        }
+      ]
+    },
+    {
+      "bits": 64,
+      "display_review_passed": true,
+      "probe_verdicts": [
+        [
+          "PASS",
+          "14",
+          "0",
+          "5"
+        ]
+      ],
+      "pixels": [
+        {
+          "capture": "klog/mihawk-composition-focused-2026-10-09-02-window-compose64-capture-01.png",
+          "number": 1,
+          "pixels": [
+            {
+              "phase": "interleaved",
+              "point": [
+                300,
+                200
+              ],
+              "expected": [
+                30,
+                110,
+                210
+              ],
+              "actual": [
+                30,
+                110,
+                210
+              ],
+              "passed": true
+            },
+            {
+              "phase": "interleaved",
+              "point": [
+                500,
+                300
+              ],
+              "expected": [
+                30,
+                180,
+                70
+              ],
+              "actual": [
+                30,
+                180,
+                70
+              ],
+              "passed": true
+            },
+            {
+              "phase": "interleaved",
+              "point": [
+                650,
+                400
+              ],
+              "expected": [
+                220,
+                50,
+                60
+              ],
+              "actual": [
+                220,
+                50,
+                60
+              ],
+              "passed": true
+            }
+          ],
+          "passed": true
+        },
+        {
+          "capture": "klog/mihawk-composition-focused-2026-10-09-02-window-compose64-capture-02.png",
+          "number": 2,
+          "pixels": [
+            {
+              "phase": "raised",
+              "point": [
+                500,
+                700
+              ],
+              "expected": [
+                30,
+                180,
+                70
+              ],
+              "actual": [
+                30,
+                180,
+                70
+              ],
+              "passed": true
+            },
+            {
+              "phase": "raised",
+              "point": [
+                650,
+                400
+              ],
+              "expected": [
+                30,
+                110,
+                210
+              ],
+              "actual": [
+                30,
+                110,
+                210
+              ],
+              "passed": true
+            },
+            {
+              "phase": "raised",
+              "point": [
+                950,
+                400
+              ],
+              "expected": [
+                220,
+                50,
+                60
+              ],
+              "actual": [
+                220,
+                50,
+                60
+              ],
+              "passed": true
+            }
+          ],
+          "passed": true
+        },
+        {
+          "capture": "klog/mihawk-composition-focused-2026-10-09-02-window-compose64-capture-03.png",
+          "number": 3,
+          "pixels": [
+            {
+              "phase": "moved-minimized",
+              "point": [
+                200,
+                200
+              ],
+              "expected": [
+                30,
+                110,
+                210
+              ],
+              "actual": [
+                30,
+                110,
+                210
+              ],
+              "passed": true
+            },
+            {
+              "phase": "moved-minimized",
+              "point": [
+                650,
+                400
+              ],
+              "expected": [
+                220,
+                50,
+                60
+              ],
+              "actual": [
+                220,
+                50,
+                60
+              ],
+              "passed": true
+            }
+          ],
+          "passed": true
+        },
+        {
+          "capture": "klog/mihawk-composition-focused-2026-10-09-02-window-compose64-capture-04.png",
+          "number": 4,
+          "pixels": [
+            {
+              "phase": "owned-modal",
+              "point": [
+                200,
+                200
+              ],
+              "expected": [
+                30,
+                110,
+                210
+              ],
+              "actual": [
+                30,
+                110,
+                210
+              ],
+              "passed": true
+            },
+            {
+              "phase": "owned-modal",
+              "point": [
+                650,
+                400
+              ],
+              "expected": [
+                220,
+                50,
+                60
+              ],
+              "actual": [
+                220,
+                50,
+                60
+              ],
+              "passed": true
+            },
+            {
+              "phase": "owned-modal",
+              "point": [
+                800,
+                500
+              ],
+              "expected": [
+                240,
+                180,
+                30
+              ],
+              "actual": [
+                240,
+                180,
+                30
+              ],
+              "passed": true
+            }
+          ],
+          "passed": true
+        },
+        {
+          "capture": "klog/mihawk-composition-focused-2026-10-09-02-window-compose64-capture-05.png",
+          "number": 5,
+          "pixels": [
+            {
+              "phase": "restored",
+              "point": [
+                200,
+                200
+              ],
+              "expected": [
+                30,
+                110,
+                210
+              ],
+              "actual": [
+                30,
+                110,
+                210
+              ],
+              "passed": true
+            },
+            {
+              "phase": "restored",
+              "point": [
+                650,
+                400
+              ],
+              "expected": [
+                30,
+                180,
+                70
+              ],
+              "actual": [
+                30,
+                180,
+                70
+              ],
+              "passed": true
+            }
+          ],
+          "passed": true
+        }
+      ]
+    }
+  ]
+}

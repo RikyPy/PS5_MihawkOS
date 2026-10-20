@@ -1,0 +1,185 @@
+{
+ "telemetry_hold": null,
+ "launch_readiness": {
+  "ready": true,
+  "seconds": 0.164,
+  "settle_seconds": 0.0,
+  "census_seconds": 0.147,
+  "previous_cleanup_verified": false
+ },
+ "native_close_failures": [],
+ "run": "desktop-items-2026-10-12-07",
+ "what": "profile mihawk-os",
+ "env": [],
+ "result": "crashed",
+ "seconds": 29.1,
+ "probe_verdict": "PASS",
+ "clean_owner_restart": false,
+ "launcher_end_status": null,
+ "initial_status": null,
+ "closed_on_request": false,
+ "child_logs": [
+  "klog/desktop-items-2026-10-12-07-wine-child-8411.log",
+  "klog/desktop-items-2026-10-12-07-wine-child-8412.log",
+  "klog/desktop-items-2026-10-12-07-wine-child-8413.log",
+  "klog/desktop-items-2026-10-12-07-wine-child-8414.log",
+  "klog/desktop-items-2026-10-12-07-wine-child-8415.log",
+  "klog/desktop-items-2026-10-12-07-wine-child-8416.log",
+  "klog/desktop-items-2026-10-12-07-wine-child-8417.log",
+  "klog/desktop-items-2026-10-12-07-wine-child-8418.log",
+  "klog/desktop-items-2026-10-12-07-wine-child-8419.log",
+  "klog/desktop-items-2026-10-12-07-wine-child-8420.log",
+  "klog/desktop-items-2026-10-12-07-wine-child-8421.log",
+  "klog/desktop-items-2026-10-12-07-wine-child-8422.log",
+  "klog/desktop-items-2026-10-12-07-wine-child-8423.log",
+  "klog/desktop-items-2026-10-12-07-wine-child-8424.log",
+  "klog/desktop-items-2026-10-12-07-wine-child-8425.log",
+  "klog/desktop-items-2026-10-12-07-wine-child-8426.log",
+  "klog/desktop-items-2026-10-12-07-wine-child-8427.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": false,
+ "passed": false,
+ "bench": {},
+ "steady": {
+  "server": {
+   "calls": 0.0,
+   "per_s": 0.0,
+   "avg_us": 0.0,
+   "selects": 0.0,
+   "blocked": 0.0,
+   "block_avg_us": 0.0,
+   "waits": 0.0,
+   "handles_avg": 0.0,
+   "wait_all": 0.0,
+   "polled": 0.0,
+   "delays": 0.0,
+   "yields": 0.0,
+   "intervals": 3
+  }
+ },
+ "intervals": {
+  "frames": [],
+  "server": [
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   }
+  ],
+  "top": []
+ },
+ "shown": {
+  "frames": 418,
+  "per_10s": [
+   1,
+   75,
+   342
+  ],
+  "longest_gap_ms": 2337
+ },
+ "broker": {
+  "local_offer": 8589934592,
+  "host_limit": 1073741824,
+  "windows": null,
+  "refused": [],
+  "refused_count": 0,
+  "clients": [
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": 8421,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": 8427,
+    "frames": 0,
+    "submissions": 0
+   }
+  ],
+  "wedged": false,
+  "failure_reasons": [],
+  "host_peak": null,
+  "local_peak": null
+ },
+ "pacing": null,
+ "captures": [],
+ "cleanup_verified": false,
+ "hooks_removed": false
+}

@@ -1,0 +1,20 @@
+{
+  "run": "helperhost-06",
+  "step": "module",
+  "elf_sha256": "caee9769ccc2e64a766d600a49aa338b0bbcb920d61044e4a403695c86c02f14",
+  "started": "2026-10-05T22:59:01",
+  "lines": [
+    "helperhostprobe pid=4428 uid=1 euid=0 gid=1 argc=1",
+    "  argv[0]=module",
+    "memory: direct 0 MiB in all; flexible available 8159 MiB (status 0)",
+    "runtime: stat ntdll.prx -> 0 errno=0 size=899519",
+    "runtime: open -> 12 errno=0, first bytes 54 14 f5 ee (4 read)",
+    "module: about to load /data/ps5proton/runtime/ge11-7/lib/wine/x86_64-unix/ntdll.prx",
+    "module: load -> 0x22 (start result 0)",
+    "module: about to unload",
+    "module: unload -> 0",
+    "helperhostprobe done"
+  ],
+  "finished": true,
+  "console_after": "answers"
+}

@@ -1,0 +1,454 @@
+/* Small apps (owner: small-apps, js/apps/small.js): Notepad, Calculator, Terminal and the game
+   splash. Colours are WinUI tokens; the one palette of literals is Windows Terminal's Campbell
+   colour scheme, which is the terminal's content and draws the same in both themes. Metrics
+   come from winui-controls.json (TabView, MenuFlyout, Button) and tier-a.json. */
+
+/* ---------- title bar tabs (WinUI TabView: header padding 8 top, items 100-240 px wide,
+   8 px top corners, close button 32 x 24, add button 32 x 24, separators 0,8,0,8) ---------- */
+.sa-tabs {
+  display: flex;
+  align-items: stretch;
+  min-width: 0;
+  height: 100%;
+  margin-right: 48px; /* a drag region always remains after the tabs */
+  padding-top: 8px;
+}
+.sa-tab-list { display: flex; min-width: 0; padding: 0 8px; overflow: hidden; }
+.sa-tab {
+  position: relative;
+  flex: 0 1 auto;
+  width: 240px; /* TabWidthMode Equal: tabs take their maximum width, then shrink to 100 */
+  min-width: 100px;
+  display: flex;
+  align-items: center;
+  padding: 3px 4px 3px 8px;
+  border-radius: var(--radius-overlay) var(--radius-overlay) 0 0;
+  background-color: var(--SubtleFillColorTransparent);
+  color: var(--TextFillColorSecondary);
+  font: var(--type-caption);
+  transition: background-color var(--dur-faster) linear, color var(--dur-faster) linear;
+}
+.sa-tab:hover { background-color: var(--SubtleFillColorSecondary); color: var(--TextFillColorPrimary); }
+.sa-tab:active { background-color: var(--SubtleFillColorTertiary); }
+.sa-tab:focus-visible { outline-offset: -2px; }
+.sa-tab.selected { z-index: 1; background-color: var(--sa-tab-selected); color: var(--TextFillColorPrimary); }
+/* the selected tab flows into the content below through two concave 8 px corners */
+.sa-tab.selected::before, .sa-tab.selected::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  width: 8px;
+  height: 8px;
+  pointer-events: none;
+}
+.sa-tab.selected::before { left: -8px; background: radial-gradient(circle at 0 0, transparent 7.5px, var(--sa-tab-selected) 8px); }
+.sa-tab.selected::after { right: -8px; background: radial-gradient(circle at 100% 0, transparent 7.5px, var(--sa-tab-selected) 8px); }
+.sa-tab:not(.selected)::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 50%;
+  width: 1px;
+  height: 16px;
+  margin-top: -8px;
+  background-color: var(--DividerStrokeColorDefault);
+  transition: opacity var(--dur-faster) linear;
+}
+.sa-tab:not(.selected):is(:hover, :last-child, :has(+ .sa-tab:is(.selected, :hover)))::after { opacity: 0; }
+.sa-tab-icon { margin-right: 10px; }
+.sa-tab-title { flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.sa-tab-close {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 24px;
+  margin: 0 0 0 4px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-control);
+  background-color: var(--SubtleFillColorTransparent);
+  color: var(--TextFillColorSecondary);
+  transition: background-color var(--dur-faster) linear, color var(--dur-faster) linear, opacity var(--dur-faster) linear;
+}
+.sa-tab-close:hover { background-color: var(--SubtleFillColorSecondary); color: var(--TextFillColorPrimary); }
+.sa-tab-close:active { background-color: var(--SubtleFillColorTertiary); color: var(--TextFillColorTertiary); }
+.sa-tab:not(.selected):not(:hover):not(.dirty) .sa-tab-close { opacity: 0; }
+/* unsaved: a dot takes the close glyph's place until the button is hovered */
+.sa-tab-dot { display: none; width: 8px; height: 8px; border-radius: 50%; background-color: currentColor; }
+.sa-tab.dirty .sa-tab-close:not(:hover) .icon { display: none; }
+.sa-tab.dirty .sa-tab-close:not(:hover) .sa-tab-dot { display: block; }
+.sa-tab-add.btn.icon-only { flex: none; align-self: center; width: 32px; height: 24px; min-height: 24px; }
+
+/* menus dropped from a button keep the button lit while open */
+.btn.subtle.open { background-color: var(--SubtleFillColorSecondary); }
+
+/* ---------- Notepad ---------- */
+.np-tabs { --sa-tab-selected: var(--LayerFillColorDefault); }
+.np-app-icon { align-self: center; margin: -8px 4px 0 16px; }
+.np {
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--LayerFillColorDefault);
+}
+.np-menubar { flex: none; display: flex; align-items: center; height: 40px; padding: 0 4px; }
+.np-menu-btn.btn { height: 32px; min-height: 32px; padding: 0 10px; }
+.np-gear.btn.icon-only { width: 40px; }
+.np-menubar-fill { flex: 1 1 auto; }
+.np-editor {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  border-top: 1px solid var(--DividerStrokeColorDefault);
+  background-color: var(--LayerFillColorAlt);
+}
+.np-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  padding: 8px 12px;
+  border: 0;
+  resize: none;
+  overflow: auto;
+  background: transparent;
+  color: var(--TextFillColorPrimary);
+  font-family: Consolas, "Cascadia Mono", "DejaVu Sans Mono", "Noto Sans Mono", monospace; /* open fallbacks before the Courier-like generic */
+  font-size: 14.667px; /* Consolas 11 pt, Notepad's default */
+  line-height: normal;
+  tab-size: 8;
+  outline: none;
+  user-select: text;
+  -webkit-user-select: text;
+  cursor: var(--cursor-text);
+}
+.np-text:focus-visible { outline: none; box-shadow: none; }
+.np-status {
+  flex: none;
+  display: flex;
+  align-items: center;
+  height: 32px;
+  padding: 0 4px;
+  border-top: 1px solid var(--DividerStrokeColorDefault);
+  color: var(--TextFillColorPrimary);
+  font: var(--type-caption);
+  white-space: nowrap;
+  overflow: hidden;
+}
+.np-st { padding: 0 12px; }
+.np-st + .np-st { border-left: 1px solid var(--DividerStrokeColorDefault); }
+.np-st-fill { flex: 1 1 auto; }
+@container (max-width: 520px) { .np-st-opt { display: none; } }
+
+/* find and replace: floating card at the editor's top right */
+.np-find {
+  position: absolute;
+  top: 8px;
+  right: 24px;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: min(420px, calc(100% - 40px));
+  padding: 4px;
+}
+.np-find-row { display: flex; align-items: center; gap: 4px; }
+.np-find-input.textbox { flex: 1 1 auto; min-width: 0; }
+.np-find-input.np-nomatch { border-bottom-color: var(--SystemFillColorCritical); box-shadow: inset 0 -1px 0 var(--SystemFillColorCritical); }
+.np-replace-row { display: none; padding-left: 36px; }
+.np-find.replace .np-replace-row { display: flex; }
+.np-find-action.btn { flex: none; }
+
+/* "Do you want to save changes": Notepad's WinUI ContentDialog (320-548 px wide, 24 px padding,
+   12 px under the title, 8 px between equal-width buttons; the text part is LayerFillColorAlt over
+   SolidBackgroundFillColorBase with a CardStrokeColorDefault rule; smoke over the whole window,
+   caption buttons stay on top and usable, as Windows draws them above the app's content). */
+.np { position: relative; }
+.np-smoke {
+  position: absolute;
+  inset: calc(-1 * var(--wm-titlebar-h, var(--titlebar-tall-height))) 0 0;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background-color: var(--SmokeFillColorDefault);
+}
+.window:has(.np-smoke) .window-caption { position: relative; z-index: 4; }
+.np-dialog {
+  width: max-content;
+  min-width: min(320px, 100%);
+  max-width: min(548px, 100%);
+  overflow: hidden;
+  border: 1px solid var(--SurfaceStrokeColorDefault);
+  border-radius: var(--radius-overlay);
+  background-color: var(--SolidBackgroundFillColorBase);
+  box-shadow: var(--shadow-64);
+  color: var(--TextFillColorPrimary);
+}
+.np-dialog-body { padding: 24px; border-bottom: 1px solid var(--CardStrokeColorDefault); background-color: var(--LayerFillColorAlt); }
+.np-dialog-title { margin: 0 0 12px; font: var(--type-subtitle); }
+.np-dialog-text { margin: 0; font: var(--type-body); overflow-wrap: anywhere; }
+.np-dialog-foot { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 8px; padding: 24px; }
+.np-dialog-foot .btn { min-width: 0; }
+
+/* ---------- Calculator (Standard) ---------- */
+.calc {
+  position: relative;
+  container-type: size;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  outline: none;
+}
+.calc:focus-visible { outline: none; box-shadow: none; }
+.calc-layout { position: relative; flex: 1 1 auto; min-height: 0; display: flex; }
+.calc-main { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; padding: 0 4px 4px; }
+.calc-fill { flex: 1 1 auto; }
+.calc-head { flex: none; display: flex; align-items: center; height: 44px; }
+.calc .calc-nav-btn.btn.icon-only { width: 40px; height: 36px; }
+.calc-mode { margin: 0 0 0 8px; font: var(--type-subtitle); white-space: nowrap; }
+.calc .calc-hist-btn.btn.icon-only { width: 40px; height: 36px; }
+.calc .calc-top-btn.btn.icon-only { width: 40px; height: 36px; margin-left: 4px; }
+
+/* Keep on top: the compact overlay keeps the display and keypad, and its title bar the close button */
+.calc.compact :is(.calc-nav-btn, .calc-mode, .calc-hist-btn, .calc-memory, .calc-side) { display: none; }
+.calc.compact .calc-top-btn.btn.icon-only { margin-left: 0; }
+.calc.compact .calc-head { height: 40px; }
+.calc.compact .calc-value { font-size: 40px; line-height: 52px; }
+.window:has(.calc.compact) :is(.window-titlebar-icon, .window-title) { visibility: hidden; }
+
+.calc-display { flex: none; display: flex; flex-direction: column; padding: 4px 12px 0; text-align: right; }
+.calc-expr {
+  height: 20px;
+  overflow: hidden;
+  white-space: nowrap;
+  color: var(--TextFillColorSecondary);
+  font: var(--type-body);
+}
+.calc-value { overflow: hidden; white-space: nowrap; font: 600 46px/64px var(--font-display); }
+
+.calc-memory { flex: none; display: flex; margin: 4px 0; }
+.calc-mem.btn { flex: 1 1 0; min-width: 0; height: 32px; min-height: 32px; padding: 0; gap: 2px; font: 600 12px/16px var(--font-ui); }
+
+.calc-keys {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-rows: repeat(6, minmax(0, 1fr));
+  gap: 2px;
+}
+.calc-key {
+  --calc-op: var(--ControlFillColorSecondary);
+  --calc-op-hover: var(--ControlFillColorDefault);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  border: 1px solid;
+  border-color: var(--ui-stroke-top, var(--ControlStrokeColorDefault)) var(--ControlStrokeColorDefault) var(--ui-stroke-bottom, var(--ControlStrokeColorSecondary));
+  border-radius: var(--radius-control);
+  background-clip: padding-box;
+  color: var(--TextFillColorPrimary);
+  font: 400 14px/20px var(--font-ui);
+  transition: background-color var(--dur-faster) linear, color var(--dur-faster) linear;
+}
+[data-theme="dark"] .calc-key { --calc-op: var(--ControlFillColorTertiary); --calc-op-hover: var(--ControlFillColorSecondary); }
+.calc-key sup, .calc-key sub { font-size: 10px; line-height: 0; }
+.calc-key i { font-style: italic; }
+.calc-key svg { width: 20px; height: 20px; }
+.calc-key.num { background-color: var(--ControlFillColorDefault); font: 600 20px/28px var(--font-display); }
+.calc-key.num:hover { background-color: var(--ControlFillColorSecondary); }
+.calc-key.num:is(:active, .pressed) { background-color: var(--ControlFillColorTertiary); color: var(--TextFillColorSecondary); }
+.calc-key:is(.fn, .op) { background-color: var(--calc-op); }
+.calc-key.op { font: 400 20px/28px var(--font-ui); }
+.calc-key:is(.fn, .op):hover { background-color: var(--calc-op-hover); }
+.calc-key:is(.fn, .op):is(:active, .pressed) { background-color: var(--ControlFillColorTertiary); color: var(--TextFillColorSecondary); }
+.calc-key.eq {
+  border-color: var(--ControlStrokeColorOnAccentDefault) var(--ControlStrokeColorOnAccentDefault) var(--ControlStrokeColorOnAccentSecondary);
+  background-color: var(--AccentFillColorDefault);
+  color: var(--TextOnAccentFillColorPrimary);
+  font: 400 20px/28px var(--font-ui);
+}
+.calc-key.eq:hover { background-color: var(--AccentFillColorSecondary); }
+.calc-key.eq:is(:active, .pressed) { border-color: transparent; background-color: var(--AccentFillColorTertiary); color: var(--TextOnAccentFillColorSecondary); }
+.calc-key:disabled { background-color: var(--ControlFillColorDisabled); color: var(--TextFillColorDisabled); }
+
+/* Calculator grows its type with the window, as the Store app does */
+@container (min-height: 640px) {
+  .calc-value { font-size: 64px; line-height: 88px; }
+  .calc-key:is(.num, .op, .eq) { font-size: 24px; line-height: 32px; }
+  .calc-key.fn { font-size: 16px; }
+}
+
+/* History and Memory: docked at wide sizes, a flyout over the keypad at narrow ones */
+.calc-side { display: none; flex: none; flex-direction: column; width: 320px; padding: 0 4px 4px; }
+.calc-side.flyout {
+  display: flex;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  width: auto;
+  border: 1px solid var(--SurfaceStrokeColorFlyout);
+  border-bottom: 0;
+  border-radius: var(--radius-overlay) var(--radius-overlay) 0 0;
+  box-shadow: var(--shadow-flyout);
+}
+.calc-side.flyout .calc-pivot { display: none; }
+@container (min-width: 560px) {
+  .calc-side { display: flex; }
+  .calc .calc-hist-btn, .calc .calc-mem-fly { display: none; }
+}
+.calc-pivot { flex: none; display: flex; align-items: stretch; height: 44px; padding: 0 4px; }
+.calc-pivot-item {
+  position: relative;
+  margin: 0;
+  padding: 0 12px;
+  border: 0;
+  border-radius: var(--radius-control);
+  background-color: var(--SubtleFillColorTransparent);
+  color: var(--TextFillColorSecondary);
+  font: 600 14px/20px var(--font-ui);
+  transition: color var(--dur-faster) linear, background-color var(--dur-faster) linear;
+}
+.calc-pivot-item:hover { color: var(--TextFillColorPrimary); }
+.calc-pivot-item:active { color: var(--TextFillColorTertiary); }
+.calc-pivot-item.selected { color: var(--TextFillColorPrimary); }
+.calc-pivot-item.selected::after {
+  content: "";
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 6px;
+  height: 3px;
+  border-radius: 2px;
+  background-color: var(--AccentFillColorDefault);
+}
+.calc-list { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 4px 0; }
+.calc-empty { margin: 8px 12px; font: var(--type-body); }
+.calc-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  margin: 0 4px 2px;
+  padding: 8px 12px;
+  border-radius: var(--radius-control);
+  text-align: right;
+  transition: background-color var(--dur-faster) linear;
+}
+.calc-item:hover { background-color: var(--SubtleFillColorSecondary); }
+.calc-item:active { background-color: var(--SubtleFillColorTertiary); }
+.calc-item:focus-visible { outline-offset: -2px; }
+.calc-item-expr { max-width: 100%; overflow-wrap: anywhere; color: var(--TextFillColorSecondary); font: var(--type-body); }
+.calc-item-value { max-width: 100%; overflow-wrap: anywhere; font: 600 20px/28px var(--font-display); }
+.calc-item-actions { display: flex; gap: 4px; margin-top: 4px; opacity: 0; transition: opacity var(--dur-faster) linear; }
+.calc-item:is(:hover, :focus-within) .calc-item-actions { opacity: 1; }
+.calc-item-btn.btn { min-height: 24px; height: 24px; padding: 0 8px; font: var(--type-caption); }
+.calc-side-foot { flex: none; display: flex; justify-content: flex-end; }
+.calc-clear.btn.icon-only { width: 40px; height: 40px; }
+
+/* navigation pane: overlays the calculator from the left */
+.calc-nav {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  width: min(320px, calc(100% - 48px));
+  padding: 4px 0;
+  border: 1px solid var(--SurfaceStrokeColorFlyout);
+  border-left: 0;
+  border-radius: 0 var(--radius-overlay) var(--radius-overlay) 0;
+  box-shadow: var(--shadow-flyout);
+}
+.calc-nav > .calc-nav-btn { flex: none; margin: 0 0 4px 4px; }
+.calc-nav-header { padding: 8px 16px 4px; font: 600 14px/20px var(--font-ui); }
+.calc-nav .nav-item { flex: none; }
+
+/* ---------- Terminal (Windows Terminal, Campbell scheme) ---------- */
+.term, .term-tabs {
+  --term-bg: #0c0c0c;
+  --term-fg: #cccccc;
+  --term-cursor: #ffffff;
+  --term-selection: rgba(255, 255, 255, 0.25);
+  --term-yellow: #f9f1a5; /* bright yellow: commands */
+  --term-gray: #767676;   /* bright black: parameters */
+  --term-cyan: #3a96dd;   /* cyan: strings */
+  --term-white: #f2f2f2;  /* bright white: numbers */
+  --term-red: #e74856;    /* bright red: errors */
+}
+.term-tabs { --sa-tab-selected: var(--term-bg); }
+/* Windows Terminal's tab row is 40 px when windowed (tier-a: MinMaxCloseControl) */
+.window[data-app="terminal"].titlebar-tall { --wm-titlebar-h: 40px; }
+.term-tabs .sa-tab-add.btn { border-radius: var(--radius-control) 0 0 var(--radius-control); }
+.term-profiles.btn.icon-only { flex: none; align-self: center; width: 24px; height: 24px; min-height: 24px; border-radius: 0 var(--radius-control) var(--radius-control) 0; }
+.term {
+  position: relative;
+  display: flex;
+  background-color: var(--term-bg);
+  color: var(--term-fg);
+  font: 16px/1.2 "Cascadia Mono", Consolas, "DejaVu Sans Mono", "Noto Sans Mono", monospace; /* 12 pt, Terminal's default */
+}
+.term-screen {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-y: auto;
+  padding: 8px;
+  cursor: var(--cursor-text);
+  user-select: text;
+  -webkit-user-select: text;
+}
+.term-screen ::selection { background-color: var(--term-selection); color: inherit; }
+.term-out { white-space: pre-wrap; overflow-wrap: anywhere; }
+.term-cmd { color: var(--term-yellow); }
+.term-param { color: var(--term-gray); }
+.term-str { color: var(--term-cyan); }
+.term-num { color: var(--term-white); }
+.term-err { color: var(--term-red); }
+.term-cursor {
+  display: inline-block;
+  width: 0;
+  height: 1.2em;
+  margin-right: -2px;
+  border-left: 2px solid var(--term-cursor);
+  vertical-align: top;
+  animation: term-blink 1.06s step-end infinite;
+}
+.term:not(.focused) .term-cursor { visibility: hidden; }
+.term.hung .term-cursor { visibility: visible; animation: none; } /* a hung window paints nothing new */
+@keyframes term-blink { 50% { opacity: 0; } }
+.term-input {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ---------- game splash ---------- */
+.game-splash {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px;
+  text-align: center;
+}
+.game-title { max-width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font: var(--type-subtitle); }
+.game-status { display: flex; align-items: center; gap: 12px; color: var(--TextFillColorSecondary); font: var(--type-body); }
+.game-status .progress-ring { width: 20px; height: 20px; }

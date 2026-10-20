@@ -1,0 +1,59 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Fri, 17 Oct 2026 20:30:00 -0400
+Subject: [PATCH] win32u: a virtual desktop offers the display's rate
+
+With PROTON_120HZ=1 every process in the Mihawk OS session published the PS5 driver's 1920x1080@120, yet programs
+there were offered only 60 Hz (PS5_Proton's modes-p2-2026-10-17-03: all six publishes at 120, the probe reading 36
+modes at 60; the same probe outside a virtual desktop read 60 and 120). In a virtual desktop win32u reports the driver's
+source as detached and adds its own: add_virtual_source made that source's starting mode the display's with the rate
+forced to 60, and Proton's emulate_modeset then collapsed the virtual modes it had generated (at 60 and the display's
+rate) to that one mode and rebuilt them from its 60. The virtual source now starts at the display's own rate, and keeps
+the modes add_virtual_source generated, so a game's later 60 Hz mode change no longer drops the 120 Hz modes for the
+rest of the session. Outside a virtual desktop nothing changes.
+---
+ dlls/win32u/sysparams.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
+
+--- a/dlls/win32u/sysparams.c
++++ b/dlls/win32u/sysparams.c
+@@ -1098,6 +1098,7 @@
+     /* for the virtual desktop settings */
+     BOOL is_primary;
+     DEVMODEW primary;
++    BOOL adding_virtual;   /* add_virtual_source's modes, already the virtual desktop's own */
+ };
+ 
+ static void link_device( const char *instance, const char *class )
+@@ -2326,7 +2327,10 @@
+     assert( !list_empty( &sources ) );
+     source = LIST_ENTRY( list_tail( &sources ), struct source, entry );
+ 
+-    if (emulate_modeset)
++    /* A virtual desktop's source keeps the modes add_virtual_source generated: rebuilding them from its current mode
++     * would take that mode's rate (the display's 119.88 Hz lost to the 60 a game set). */
++    if (ctx->adding_virtual) {}
++    else if (emulate_modeset)
+     {
+         modes = current;
+         modes_count = 1;
+@@ -2988,7 +2992,8 @@
+     if (!read_source_mode( source->key, ENUM_CURRENT_SETTINGS, &current ))
+     {
+         current = ctx->primary;
+-        current.dmDisplayFrequency = 60;
++        /* the display's own rate (the PS5's 119.88 Hz under PROTON_120HZ), as get_virtual_modes offers it */
++        if (current.dmDisplayFrequency <= 1) current.dmDisplayFrequency = 60;
+         current.dmPelsWidth = initial.dmPelsWidth;
+         current.dmPelsHeight = initial.dmPelsHeight;
+     }
+@@ -3001,7 +3006,9 @@
+ 
+     /* Expose the virtual source display modes as physical modes, to avoid DPI scaling */
+     if (!(modes = get_virtual_modes( &initial, &maximum, NULL, 0, &modes_count ))) return STATUS_NO_MEMORY;
++    ctx->adding_virtual = TRUE;
+     add_modes( &current, modes_count, modes, ctx );
++    ctx->adding_virtual = FALSE;
+     free( modes );
+ 
+     return STATUS_SUCCESS;

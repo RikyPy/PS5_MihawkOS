@@ -1,0 +1,26 @@
+From: PS5_Proton <local@invalid>
+Subject: [PATCH] ntdll: preserve PS5 mapping bounds when retrying native views
+
+After an image allocation fails, clearing native-view metadata cannot extend
+Sony's measured address aperture. Retry within the same clipped bounds and
+with the same host-page-rounded length. An asset-free probe reproduces the
+assertion when loading uxtheme after large placeholder reservations; pinned
+Linux Wine completes the same contract. Keep other platforms unchanged.
+
+diff --git a/dlls/ntdll/unix/virtual.c b/dlls/ntdll/unix/virtual.c
+--- a/dlls/ntdll/unix/virtual.c
++++ b/dlls/ntdll/unix/virtual.c
+@@ -3007,7 +3007,13 @@
+ 
+             clear_native_views();
+             if (!is_win64) increase_try_map_step = FALSE;
++#ifdef __PROSPERO__
++            /* Native views are only metadata. Removing them does not extend
++             * the measured host aperture or change its page granularity. */
++            ptr = alloc_free_area( start, end, host_size, top_down, unix_prot, align_mask );
++#else
+             ptr = alloc_free_area( (void *)limit_low, (void *)limit_high, size, top_down, unix_prot, align_mask );
++#endif
+             if (!is_win64) increase_try_map_step = TRUE;
+             if (!ptr) return STATUS_NO_MEMORY;
+         }

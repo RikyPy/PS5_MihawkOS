@@ -1,0 +1,40 @@
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Subject: [PATCH] ntdll: PS5: provision runtime-owned prefix files after wineboot
+
+New prefixes lacked native graphics DLLs and ICU. Install the staged baseline
+after wineboot completes, before the initial program imports DLLs or discovers
+fonts. The portable adapter handles current prefixes and interrupted upgrades.
+---
+--- a/dlls/ntdll/unix/env.c
++++ b/dlls/ntdll/unix/env.c
+@@ -1992,6 +1992,30 @@
+     is_prefix_bootstrap = TRUE;
+     env[env_pos] = 0;
+     run_wineboot( env, env_pos );
++#ifdef __PROSPERO__
++    {
++        extern int pw_wine_prefix_prepare( const char *, const char * );
++        const char *runtime = getenv( "WINE_PS5_NTDLL_DIR" );
++        char *source, *target;
++        int copied;
++        if (!runtime || asprintf( &source, "%s/../prefix/drive_c/windows", runtime ) < 0)
++            exit_initial_process( STATUS_NO_MEMORY );
++        if (asprintf( &target, "%s/drive_c/windows", config_dir ) < 0)
++        {
++            free( source );
++            exit_initial_process( STATUS_NO_MEMORY );
++        }
++        copied = pw_wine_prefix_prepare( source, target );
++        free( source );
++        free( target );
++        if (copied < 0)
++        {
++            ERR( "PS5 prefix baseline incomplete: errno %d\n", errno );
++            exit_initial_process( STATUS_DLL_NOT_FOUND );
++        }
++        MESSAGE( "PS5 prefix baseline ready: %d files updated\n", copied );
++    }
++#endif
+ 
+     /* reload environment now that wineboot has run */
+     set_env_var( &env, &env_pos, &env_size, pathW, 4, path );  /* reset PATH */

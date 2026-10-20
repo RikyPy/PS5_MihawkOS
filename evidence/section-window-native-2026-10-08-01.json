@@ -1,0 +1,31 @@
+{
+ "run": "section-window-native-2026-10-08-01",
+ "read_only": false,
+ "temporary_direct_backing_bytes": 0,
+ "kernel_reads": false,
+ "kernel_writes": false,
+ "no_overwrite": true,
+ "payload": true,
+ "elf_sha256": "a305270b1804be5fc6358d4421503d36e75dd37afeb3edbc18d7d15a470dfe9e",
+ "source_sha256": "ac87eab6a1f1cba7c627dd62a587d9d6453e61c1900f667b1ed6112549819fa8",
+ "completed": true,
+ "full_contiguous_view_supported": false,
+ "small_window_alias_contract_passed": true,
+ "passed": true,
+ "purpose": "two small sparse-file aliases, bidirectional coherence, flush/unmap/remap persistence; three touched pages only",
+ "lines": [
+  "section-arena reserve=0 exact=1",
+  "section-arena open=1 errno=0",
+  "section-arena truncate=0 errno=0",
+  "section-account phase=before fmem_status=0 resident_bytes=3588096 mapped_bytes=17268736 available_status=0 available_bytes=8555331584 configured_status=0 configured_bytes=8589934592",
+  "section-window offset=0 coherent=1 sync=0 first_unmap=0 alias_unmap=0 persisted=1 remap_unmap=0 passed=1",
+  "section-window offset=8589934592 coherent=1 sync=0 first_unmap=0 alias_unmap=0 persisted=1 remap_unmap=0 passed=1",
+  "section-window offset=14495498240 coherent=1 sync=0 first_unmap=0 alias_unmap=0 persisted=1 remap_unmap=0 passed=1",
+  "section-account phase=released fmem_status=0 resident_bytes=3588096 mapped_bytes=68736712704 available_status=0 available_bytes=8555331584 configured_status=0 configured_bytes=8589934592",
+  "section-window completed=3 expected=3 maximum_mapped_bytes=32768 written_pages=3",
+  "section-arena close=0",
+  "section-arena unlink=0",
+  "section-arena arena_unmap=0",
+  "section-arena result=PASS"
+ ]
+}

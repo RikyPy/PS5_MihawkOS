@@ -1,0 +1,155 @@
+{
+  "title": "PPSA99170",
+  "identity": "1da065b028f44c0bb6821a4af76fab95",
+  "kind": "install-probe",
+  "build": {
+    "graphics_foundation_revision": "f410e67a0241b3e8edcdbcd2a9b285dfc4a412ed",
+    "revision": "515899b092b9bce5be03b96ba2dedb2230325e06",
+    "kind": "install-probe",
+    "elevate_gpu_helper": false,
+    "vulkan_gpu_helper": false,
+    "gpu_draw_helper": false,
+    "gpu_present_helper": false,
+    "wine_gpu_broker": false,
+    "sdk_revision": "611893fc25ef3e138f5bc2c90d829d8b58174cd2",
+    "source_sha256": {
+      "ps5/src/main.cpp": "c8f5dcec7e4781d8a4087f3dd44b35e2f260b4f07c148908dc6784a982581bdc",
+      "ps5/CMakeLists.txt": "01a4ba6085a5da81ab0c51b6b0315d49664a1bdfa00cd45ce478c10168ad8ceb",
+      "native/proton_install_probe.h": "8c5c368262aa5698573716942ce7bf09dfb076c0aab365ae9cde17a0b7a47e4a",
+      "native/proton_install_probe.cpp": "2da4888dc2b380e0110796d1a62068c00d906324c1670a3bcbaaf23cafd4c4e7",
+      "ps5/tools/link-title.sh": "e4d037c3c0a355038ec844499daf0e21ebd79c5030738755e98c3cbbfb41e39f",
+      "tools/setup-graphics-foundation.sh": "aecce2c413007d2a7b397cd3491ff7ebf9e28499ccf4665f41447f7ef1b0ea1c",
+      "src/pw_frame_page.h": "86b25bacd193fc37dd5dc099166f1bef1bca071f944d73c8c58838a252fc0c87"
+    },
+    "radv_recipe_sha256": "efef0a82c7ba4ffd97c225f6969a31bc550938689b03e9fafe2cf69734e8d7c9",
+    "identity": "5588ac8dfac0eda90c398cac9aeec69881a9fc39202ca4ce82d318a5d5cef5f5",
+    "eboot_sha256": "a058bda39fb54819e0e42d92e36295cf5678367874393b6558ca185ceb75a1f8"
+  },
+  "capture": "klog/probe-install-2026-10-18-02",
+  "expected_missing_image": false,
+  "mode": "normal",
+  "passed": false,
+  "status": "complete",
+  "production_sha256": "5e804ea268ebf23b94d80c4b6b73b44764ca984d954f195b89042e522c93b10d",
+  "production_restored": true,
+  "production_backup": "the installed eboot.bin, read back raw",
+  "root_reference_balance_verified": false,
+  "forced_title_close": false,
+  "transfer_stage": "read eboot.bin",
+  "installed_readback_sha256": "edb51113bfb5939accb608f9f88fe2dffcc8cc0ca3bef3cd202e0ff4647e69db",
+  "probe_readback_sha256": "91f38ff2f4de0e0657e7ca8db2b045797563adfac6c3af9c1b0accb7dd0da5d5",
+  "probe_executable_sha256": "400791cac5f45f3bb41728fc8b0099baa15655cf122162c18a5b49db873bda16",
+  "plan": [
+    "https https://github.com/GloriousEggroll/proton-ge-custom/releases/download/GE-Proton11-7/GE-Proton11-7-x86_64.sha512sum ok 4096 158",
+    "https https://dl.winehq.org/wine/wine-mono/10.4.1/wine-mono-10.4.1-x86.msi ok 1073741824 85504000",
+    "https http://dl.winehq.org/ any 65536",
+    "https https://wrong.host.badssl.com/ fail 65536",
+    "https https://expired.badssl.com/ fail 65536",
+    "https https://self-signed.badssl.com/ fail 65536",
+    "https https://untrusted-root.badssl.com/ fail 65536",
+    "post 10101 /api/v1/scan",
+    "usb",
+    "writes 1216 150 64",
+    "small 2048 16",
+    "loadexec",
+    "writes 256 45 64",
+    "notify",
+    "launcher 1800"
+  ],
+  "host_clock_at_launch": 1792360482,
+  "shell_idle_after_run": true,
+  "post_launch_fault_records": 2,
+  "kernel_fmem": [
+    "0x40000000"
+  ],
+  "kernel_dmem": [
+    "0x2dc000000"
+  ],
+  "parent_shell_exit_seen": false,
+  "observations": [
+    "install-probe identity=1da065b028f44c0bb6821a4af76fab95 phase=1 pid=2196 uid=0 elevated=1",
+    "preroot uid=1 euid=1 stat_data=0 stat_homebrew=0 stat_ps5proton=0 stat_devconf=0 mkdir_data=0 create_homebrew=0",
+    "https url=https://github.com/GloriousEggroll/proton-ge-custom/releases/download/GE-Proton11-7/GE-Proton11-7-x86_64.sha512sum expect=ok template=0x50000001 request=0x60000001 send=0x8095f00c status=0 read_last=0x00000000 bytes=0 seconds=0.05 mib_s=0.00 console_clock=1792360482 date_header=- as_expected=0",
+    "https url=https://dl.winehq.org/wine/wine-mono/10.4.1/wine-mono-10.4.1-x86.msi expect=ok template=0x50000002 request=0x60000002 send=0x8095f00c status=0 read_last=0x00000000 bytes=0 seconds=0.06 mib_s=0.00 console_clock=1792360482 date_header=- as_expected=0",
+    "https url=http://dl.winehq.org/ expect=any template=0x50000003 request=0x60000003 send=0x00000000 status=200 read_last=0x00000000 bytes=4964 seconds=0.18 mib_s=0.03 console_clock=1792360482 date_header=Sun,_18_Oct_2026_21:54:43_GMT as_expected=1",
+    "https url=https://wrong.host.badssl.com/ expect=fail template=0x50000004 request=0x60000004 send=0x8095f00b status=0 read_last=0x00000000 bytes=0 seconds=0.22 mib_s=0.00 console_clock=1792360483 date_header=- as_expected=1",
+    "https url=https://expired.badssl.com/ expect=fail template=0x50000005 request=0x60000005 send=0x8095f00c status=0 read_last=0x00000000 bytes=0 seconds=0.22 mib_s=0.00 console_clock=1792360483 date_header=- as_expected=1",
+    "https url=https://self-signed.badssl.com/ expect=fail template=0x50000006 request=0x60000006 send=0x8095f00c status=0 read_last=0x00000000 bytes=0 seconds=0.22 mib_s=0.00 console_clock=1792360483 date_header=- as_expected=1",
+    "https url=https://untrusted-root.badssl.com/ expect=fail template=0x50000007 request=0x60000007 send=0x8095f00c status=0 read_last=0x00000000 bytes=0 seconds=0.19 mib_s=0.00 console_clock=1792360483 date_header=- as_expected=1",
+    "post port=10101 path=/api/v1/scan connect_errno=0 reply_bytes=233 seconds=0.01 reply=HTTP/1.1 200 OK  Date: Sun, 18 Oct 2026 21:54:43 GMT  Connection: close  Access-Control-Allow-Origin: *  Content-Type: application/json  Cache-Control: no-store  Content-Length: 49    {\"status\":0,\"queued\":true,\"reset_attempts\":false}",
+    "usb root=/mnt/usb0 stat_errno=0 mode=040555 opendir_errno=0 entries=0",
+    "usb root=/mnt/usb1 stat_errno=0 mode=040555 opendir_errno=0 entries=0",
+    "usb root=/mnt/usb2 stat_errno=0 mode=040555 opendir_errno=0 entries=0",
+    "usb root=/mnt/usb3 stat_errno=0 mode=040555 opendir_errno=0 entries=0",
+    "usb root=/mnt/usb4 stat_errno=0 mode=040555 opendir_errno=0 entries=0",
+    "usb root=/mnt/usb5 stat_errno=0 mode=040555 opendir_errno=0 entries=0",
+    "usb root=/mnt/usb6 stat_errno=0 mode=040555 opendir_errno=0 entries=0",
+    "usb root=/mnt/usb7 stat_errno=0 mode=040555 opendir_errno=0 entries=0",
+    "usb root=/mnt/ext0 stat_errno=0 mode=040770 opendir_errno=0 entries=0",
+    "usb done",
+    "first file=0 mib=64 write_s=0.47 fsync_s=0.00 mib_s=134.8 fsync_errno=0 at_s=0.5",
+    "first file=1 mib=64 write_s=0.41 fsync_s=0.00 mib_s=155.9 fsync_errno=0 at_s=0.9",
+    "first file=2 mib=64 write_s=0.39 fsync_s=0.00 mib_s=162.2 fsync_errno=0 at_s=1.3",
+    "first file=3 mib=64 write_s=0.41 fsync_s=0.00 mib_s=156.9 fsync_errno=0 at_s=1.7",
+    "first file=4 mib=64 write_s=0.58 fsync_s=0.00 mib_s=109.2 fsync_errno=0 at_s=2.3",
+    "first file=5 mib=64 write_s=0.39 fsync_s=0.00 mib_s=165.2 fsync_errno=0 at_s=2.7",
+    "first file=6 mib=64 write_s=0.40 fsync_s=0.00 mib_s=159.6 fsync_errno=0 at_s=3.1",
+    "first file=7 mib=64 write_s=0.39 fsync_s=0.00 mib_s=164.3 fsync_errno=0 at_s=3.5",
+    "first file=8 mib=64 write_s=0.38 fsync_s=0.00 mib_s=166.7 fsync_errno=0 at_s=3.9",
+    "first file=9 mib=64 write_s=0.38 fsync_s=0.00 mib_s=165.0 fsync_errno=0 at_s=4.3",
+    "first file=10 mib=64 write_s=0.43 fsync_s=0.00 mib_s=149.1 fsync_errno=0 at_s=4.7",
+    "first file=11 mib=64 write_s=0.46 fsync_s=0.00 mib_s=139.3 fsync_errno=0 at_s=5.2",
+    "first file=12 mib=64 write_s=0.49 fsync_s=0.00 mib_s=131.7 fsync_errno=0 at_s=5.7",
+    "first file=13 mib=64 write_s=0.46 fsync_s=0.00 mib_s=140.1 fsync_errno=0 at_s=6.1",
+    "first file=14 mib=64 write_s=0.46 fsync_s=0.00 mib_s=138.9 fsync_errno=0 at_s=6.6",
+    "first file=15 mib=64 write_s=0.47 fsync_s=0.00 mib_s=137.3 fsync_errno=0 at_s=7.1",
+    "first file=16 mib=64 write_s=0.47 fsync_s=0.00 mib_s=137.1 fsync_errno=0 at_s=7.5",
+    "first file=17 mib=64 write_s=0.47 fsync_s=0.00 mib_s=134.2 fsync_errno=0 at_s=8.0",
+    "first file=18 mib=64 write_s=0.48 fsync_s=0.00 mib_s=133.0 fsync_errno=0 at_s=8.5",
+    "first total_mib=1216 seconds=8.5 mib_s=143.0 stopped=size errno=0",
+    "small files=2048 kib=16 seconds=14.02 ms_each=6.85 ms_slowest=16.7 errno=0",
+    "loadexec at_clock=1792360506",
+    "phase=2 pid=2199 uid=0 elevated=1",
+    "after-loadexec file=0 mib=64 write_s=0.38 fsync_s=0.00 mib_s=166.8 fsync_errno=0 at_s=0.4",
+    "after-loadexec file=1 mib=64 write_s=0.42 fsync_s=0.00 mib_s=151.2 fsync_errno=0 at_s=0.8",
+    "after-loadexec file=2 mib=64 write_s=0.45 fsync_s=0.00 mib_s=140.9 fsync_errno=0 at_s=1.3",
+    "after-loadexec file=3 mib=64 write_s=0.45 fsync_s=0.00 mib_s=142.0 fsync_errno=0 at_s=1.7",
+    "after-loadexec total_mib=256 seconds=1.7 mib_s=148.1 stopped=size errno=0",
+    "launcher frames=1800",
+    "notify kind=kernel result=0x00000000 at_clock=1792360513"
+  ],
+  "fresh_identity_seen": true,
+  "clock_skew_s": [
+    {
+      "url": "https://github.com/GloriousEggroll/proton-ge-custom/releases/download/GE-Proton11-7/GE-Proton11-7-x86_64.sha512sum",
+      "date_header": "-"
+    },
+    {
+      "url": "https://dl.winehq.org/wine/wine-mono/10.4.1/wine-mono-10.4.1-x86.msi",
+      "date_header": "-"
+    },
+    {
+      "url": "http://dl.winehq.org/",
+      "console_minus_server": -1
+    },
+    {
+      "url": "https://wrong.host.badssl.com/",
+      "date_header": "-"
+    },
+    {
+      "url": "https://expired.badssl.com/",
+      "date_header": "-"
+    },
+    {
+      "url": "https://self-signed.badssl.com/",
+      "date_header": "-"
+    },
+    {
+      "url": "https://untrusted-root.badssl.com/",
+      "date_header": "-"
+    }
+  ],
+  "restored_readback_sha256": "edb51113bfb5939accb608f9f88fe2dffcc8cc0ca3bef3cd202e0ff4647e69db",
+  "owner_observation": "Relayed by the coordinator (2026-10-18): the owner saw no notification over the launcher (\"I haven't seen one\"); they were not sure they were watching at that moment. The title crashed about 4 s after the send (the toast). A watched re-run with no toast (build bf7da101b4e7cbd9) did not run: ps5vkctl stopped answering first.",
+  "stick_note": "The stick was empty and GPT-partitioned during this run (the coordinator, 2026-10-18): the PS5 did not mount it, so /mnt/usb0 was a tmpfs placeholder. Not a console limit: after it was made MBR + exFAT with mihawkos/probe.bin, probe-install-usb-2026-10-18-03 and probe-usb-wine-2026-10-18-02 read it."
+}

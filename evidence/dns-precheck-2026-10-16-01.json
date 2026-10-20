@@ -1,0 +1,16 @@
+{
+ "run": "dns-precheck-2026-10-16-01",
+ "what": "dnsapi64-probe.exe",
+ "env": [
+  "PROTON_LAYOUT=launcher",
+  "PROTON_STOP_TERMINATE=0"
+ ],
+ "passed": false,
+ "result": "runner_error",
+ "error": "no launch: the console dropped off the network (ps5vkctl (pid 101) answered this boot and is gone: rest mode or a dead payload, 2026-10-16 07:12:32). It must be restarted by hand, then: tools/console_guard.py new-boot",
+ "loaded": false,
+ "probe_verdict": null,
+ "stop_requested": null,
+ "cleanup_verified": false,
+ "hooks_removed": false
+}

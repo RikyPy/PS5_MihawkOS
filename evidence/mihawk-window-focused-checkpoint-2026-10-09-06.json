@@ -1,0 +1,40 @@
+{
+  "passed": true,
+  "source_fingerprint": "d6d774c24aa76a75ccce0af142fc0ced87e833f63202e3a8250a0fb9d82575a5",
+  "battery_seconds": 50.1,
+  "cases": [
+    {
+      "bits": 32,
+      "passed": true,
+      "verdicts": [
+        {
+          "verdict": "PASS",
+          "checks": 24,
+          "failures": 0
+        }
+      ],
+      "seconds": 31.4,
+      "initial_status": 0,
+      "exit_stall": false,
+      "faults": 0,
+      "protocol_errors": 0
+    },
+    {
+      "bits": 64,
+      "passed": true,
+      "verdicts": [
+        {
+          "verdict": "PASS",
+          "checks": 24,
+          "failures": 0
+        }
+      ],
+      "seconds": 17.0,
+      "initial_status": 0,
+      "exit_stall": false,
+      "faults": 0,
+      "protocol_errors": 0
+    }
+  ],
+  "scope": "Authoritative window identity, ownership, stacking, geometry, visibility, lifetime and bounded overflow. Not per-window displayed pixels."
+}

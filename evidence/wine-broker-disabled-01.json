@@ -1,0 +1,25 @@
+{
+ "run": "wine-broker-disabled-01",
+ "what": "process-probe.exe",
+ "env": [
+  "WINE_PS5_CHILD_METRICS=1",
+  "WINE_PS5_NTSYNC=0",
+  "WINE_PS5_SCHED=0",
+  "PROTON_LOADING_SCREEN=0",
+  "WINE_PS5_HID=0"
+ ],
+ "result": "finished",
+ "seconds": 4.4,
+ "probe_verdict": "PASS",
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": true,
+ "bench": {},
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [],
+  "top": []
+ }
+}

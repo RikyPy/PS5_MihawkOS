@@ -1,0 +1,806 @@
+{
+  "case": "graphics-broker",
+  "loader": {
+    "sdk_revision": "611893fc25ef3e138f5bc2c90d829d8b58174cd2",
+    "converter_revision": "ab37acd506305ba3e575435e3ae9a351cfaf7cf4",
+    "converter_sha256": "614377a0e37006e1454c67f228fc370a2f785c060205cb9f0264f27af04b5f18",
+    "recipe_sha256": "9fac8671433c5a08e8657c404629bc9aac87b5f9a5f954c80fb047278b3c962c",
+    "sources": {
+      "native/proton_wine_child.c": "5ee8f819d92a7eb1e89088c8cf41871bd3c93512e2d0f2838020d2acaf8a9d03",
+      "src/pw_wine_start.c": "52bdf039228ca13e9931fc7f7097b196ece76868990b6ea44588990714bf22e2",
+      "wine/ps5/pw_wine_prx.c": "67b8393fca62a72a7aaf53a409c9a34684dd7704037bf194066e5173808c16a2",
+      "wine/ps5/pw_wine_process_io.c": "dd3ccac3b63058aaf743146fbf5791217ec9b6451ad0dc4c61dcbbad7abbd6c5",
+      "wine/ps5/pw_wine_process.h": "bfb28a10adf4c5fd0f4a9da989915d310ced897bd9c58576d6cb3f8fec248410",
+      "wine/ps5/pw_wine_process_io.h": "c375a67872391d47ef20cb7bc0001b66655aa29c44c446af31102c0fe5f937a7",
+      "src/pw_wine_start.h": "f450215176a5bf7b898728ab0a84cbd6b8a3bfd497a4996ee4f590aab95c6ed7",
+      "wine/ps5/pw_wine_prx.h": "82e4cf6b56377bb3ca9e007bd78a3302633fa8675e77d5b507823829959f9bb0",
+      "native/proton_gpu_identity.h": "9dea30f7e9e109050efb992844bfdb4101afddb1021d11b6da3b09a4ad4dce31",
+      "src/pw_gpu_broker.h": "0854ed93a20b79735d92f372764dea49f8faccb0f52e13b28804e0b244c24602"
+    },
+    "preload_mask": "0x8000000000000002",
+    "gpu_preflight": false,
+    "gpu_device_query": false,
+    "gpu_broker": true,
+    "ps5-pie.ld": "fbc52518761b58b703a2225c847c5f44a81523cd0e751755adf890ae0f0dd74c",
+    "app-symbols.map": "470ce72a27a7be8e35dd7a25b485faa733d61570bdaf24d3c75bb4e3e3c63cf7",
+    "identity": "95f3441afdb81dba2ecced8cf46544f4f3f160c4601c278bf8d362302be9c012",
+    "sha256": "4f4dcd459ea7ae894cebb1e02c5dd7139b276dc7a723bdd0b72ded222e186541"
+  },
+  "runtime": {
+    "ntdll": "17f08f6c9ae13deb15239f63fc290a6f493bef35db8d5ad23daebfb43770b5c5",
+    "wineserver": "b042227f4e94210c9ee347a22bd9722366299f54e35aefa6e492545faa1a9ae8",
+    "win32u": "eaeeb6850893e810c262f3d0493fe113ae37a103c6bd782851c305ad0a4986f2",
+    "libvulkan": "f02b64c0d62695ab496d3d620c28791af0329ace1ead1f1864d286fb36f4b17e"
+  },
+  "passed": false,
+  "production_restored": false,
+  "helper_removed": false,
+  "status": "complete",
+  "gpu_broker": true,
+  "gpu_client": {
+    "wsi": true,
+    "sha256": "f02b64c0d62695ab496d3d620c28791af0329ace1ead1f1864d286fb36f4b17e",
+    "elf_sha256": "84f2a3de7f92c5f46cca3f7543e72d35c8c4ddbfb9cb8b348ddc90a690268e79",
+    "needed": [
+      "libSceLibcInternal.sprx",
+      "libkernel.sprx"
+    ],
+    "sdk_revision": "611893fc25ef3e138f5bc2c90d829d8b58174cd2",
+    "mesa_revision": "7b59ef27c1b09b9671bc4153c41940c3155c3af2",
+    "archive_sha256": "0ffa39311881236b4872ec77a56bca417ce56c71cefca5954224b9ea8f3a1bf5",
+    "recipe_sha256": "e2844f49e4af12a9718d5b8b6055ace83e7eaa1d68870de2a79d39d1c92fa674",
+    "tool_sha256": "678c1a4bce88bfdb42d24b042917a824f68ef01394793f64198bfd3beebb55ec",
+    "source_sha256": {
+      "native/proton_gpu_client.c": "f04b38c8e9a6b40f8e05e8ab987f9b5650d248c9ad5cdac5cd863b80c9900828",
+      "native/proton_gpu_vulkan_probe.c": "d34e2e9ea69c6a6c637d0c46ff96f0725e4ef5b02df53a5c67048469808cd146",
+      "native/proton_gpu_headless_wsi.c": "38c3fcae128403c592f77c5eb9f56bdc33fb52121a5fc18d1a51c89f4967f0e8",
+      "native/proton_gpu_vulkan_exports.c": "59f6c34baba38666da55d2e94fe47832de793b52fe0728502ad77eba3756a3d4",
+      "src/pw_gpu_broker.h": "0854ed93a20b79735d92f372764dea49f8faccb0f52e13b28804e0b244c24602",
+      "wine/ps5/pw_wine_process_io.c": "dd3ccac3b63058aaf743146fbf5791217ec9b6451ad0dc4c61dcbbad7abbd6c5",
+      "wine/ps5/pw_wine_process_io.h": "c375a67872391d47ef20cb7bc0001b66655aa29c44c446af31102c0fe5f937a7",
+      "tools/link_gpu_client.sh": "3233004324bb1f750a34b568f49e2c6b5bad7f21faf932ce361138aedefef9ff",
+      "tools/patches/radv-gpu-broker-features.patch": "3672d8035f45c808ddfb8c588daf387d19fcbccb254103ef0645af3075b5f1a6",
+      "tools/patches/radv-gpu-broker-wsi.patch": "69c4efbc526941309a58cb67db4ad7e4421cf17f7075a268d56c3f0d8fd9b6db",
+      "tools/patches/radv-gpu-broker-local-memory.patch": "41ef0950f29dbca7be251c48f99a86926271ee227ce28e4ba43cf7140c7f7957",
+      "tools/patches/radv-gpu-broker-client-wait.patch": "64759d65fc31c50ff8fa89a4d0d06d8aebee9809cf4a1f5002c745f1530c594e",
+      "native/proton_gpu_probe_spv.h": "99b42cc15257777a91efd4f8b7212a6f254ce0b5d680362400146551b254e4fd",
+      "tools/gen_prx_descriptor.py": "3be71c5df76a6695a0e4f7ec0fe28257c6c98596c93bac30d32e771ea8f34cd5",
+      "wine/ps5/prx_eh_frame.ld": "ebf4f2bc7c4f49e85a895053c8f2162c5bcef323cdb99563bb45439c10f34264"
+    }
+  },
+  "owner_title": {
+    "revision": "ba644f34de676ef8d553717937e8bba26c574aa3",
+    "kind": "wine-owner",
+    "elevate_gpu_helper": false,
+    "vulkan_gpu_helper": false,
+    "gpu_draw_helper": false,
+    "gpu_present_helper": false,
+    "wine_gpu_broker": true,
+    "sdk_revision": "611893fc25ef3e138f5bc2c90d829d8b58174cd2",
+    "source_sha256": {
+      "ps5/src/main.cpp": "f1eb468f9603425c6543f0b02d8cf91e3e85a6919d7248dec85a24fd2f5aa457",
+      "ps5/CMakeLists.txt": "100c9ea15664ff118f3206617e36b07d4a2b000462269da91eafb474016d37eb",
+      "native/proton_wine.cpp": "50852265cca6520038ff0c838411a02cdeb9785142a2733b51139ad792e07816",
+      "native/proton_gpu_identity.h": "9dea30f7e9e109050efb992844bfdb4101afddb1021d11b6da3b09a4ad4dce31",
+      "wine/ps5/pw_wine_process.h": "bfb28a10adf4c5fd0f4a9da989915d310ced897bd9c58576d6cb3f8fec248410",
+      "native/proton_service_helper.c": "a1bb1b337904b2ad5618f48fa6b168da3dd7f3069baaebe3368a115fd509cf6e",
+      "native/proton_gpu_broker_probe.h": "a07a63a7109a48fa2685cebfb7ba15fbd380f7ed3171fbef36cb8dc5cb615e23",
+      "native/proton_gpu_broker_probe.cpp": "9452f23403ba3fce4899ce3f6e7944bf95af35f77bc238f6086477f60bd87817",
+      "native/proton_gpu_memory_probe.cpp": "a6da45b08e0cfef1e2f2890231a49bba0727ea85c4784e2dd82a522758005eb9",
+      "native/proton_gpu_server_probe.cpp": "00306b0111da9ee5af968052286ca93ba4ed49871a34be90f6e77601b932452a",
+      "native/proton_gpu_display.cpp": "da3ebf3c5a76e5014c70657acdba8a49bd8756bbfed8dbab9b3cd758c72acac8",
+      "native/proton_gpu_display.h": "655fae4efb21e4c9c7ca8c6244590c5915e777781d82619e80b2697248c2c243",
+      "native/proton_gpu_server.h": "5a72c6284a2c6a015a1d39d1536fd5f400087f4959bd600def1a8a03933a9c39",
+      "src/pw_gpu_broker.h": "0854ed93a20b79735d92f372764dea49f8faccb0f52e13b28804e0b244c24602",
+      "wine/ps5/pw_wine_process_io.c": "dd3ccac3b63058aaf743146fbf5791217ec9b6451ad0dc4c61dcbbad7abbd6c5",
+      "wine/ps5/pw_wine_process_io.h": "c375a67872391d47ef20cb7bc0001b66655aa29c44c446af31102c0fe5f937a7"
+    },
+    "radv_recipe_sha256": "e2844f49e4af12a9718d5b8b6055ace83e7eaa1d68870de2a79d39d1c92fa674",
+    "identity": "721c1da32eb1c56984a96f6ae569d1b5e299223066b0eec9ebcde3cc3255598e",
+    "eboot_sha256": "af063a9e789bf24ad7fd916635f041e00f4ba046b1ca300c0ce474e9ba55ea4b"
+  },
+  "parent_restored": false,
+  "graphics_uploaded": true,
+  "graphics_sha256": "4ca0cce268f05f5c25253d26eca30b21a857c0dd14c4b8ab299793267a85ecfc",
+  "parent_deployed": true,
+  "deployed_modules": [
+    "ntdll",
+    "wineserver",
+    "win32u",
+    "libvulkan"
+  ],
+  "helper_uploaded": true,
+  "probe_uploaded": true,
+  "deployment_verified": true,
+  "probe_sha256": "cf8373320ce4d256c1b6a8ed2376810a27d64ba3788eecc42d229b4dec5020b0",
+  "descendant_patch_sha256": "57fb947935f4178616a4ce3faeb753acd370fa737d691a86bf73d18c0322713f",
+  "graphics_patch_sha256": "c781a26850dfa9c68dbece702d9349185a7025dc51f65c61bba00da9e2606adc",
+  "patch_sha256": "2767c06d7ca2d2355275e644fe22f0045b713e90ab5f7946da7c3b22af5712a1",
+  "adapter_sha256": {
+    "pw_wine_process.c": "ca87cd04bd4504c6e44ebb4b7fb4b70e0f93f01f177c155e4e3e85f6e06c6f83",
+    "pw_wine_process.h": "bfb28a10adf4c5fd0f4a9da989915d310ced897bd9c58576d6cb3f8fec248410",
+    "pw_wine_threads.c": "9fb82ed67f775782a8ec9d9d0dbaf0837adb004cc1241ceebf6f58e60bbe38a0",
+    "pw_wine_threads.h": "a28177375ad16666504b3d05cb285c8f23634b800c2e4bd9b3c20ead21722d30",
+    "pw_wine_process_io.c": "dd3ccac3b63058aaf743146fbf5791217ec9b6451ad0dc4c61dcbbad7abbd6c5",
+    "pw_wine_process_io.h": "c375a67872391d47ef20cb7bc0001b66655aa29c44c446af31102c0fe5f937a7"
+  },
+  "runner_status": 1,
+  "post_launch_fault_records": 0,
+  "native_descriptor_samples": [
+    {
+      "stage": "before_spawn",
+      "count": 32,
+      "limit": 12555
+    },
+    {
+      "stage": "before_spawn",
+      "count": 41,
+      "limit": 12555
+    },
+    {
+      "stage": "before_spawn",
+      "count": 93,
+      "limit": 12555
+    },
+    {
+      "stage": "closed",
+      "count": 94,
+      "limit": 12555
+    },
+    {
+      "stage": "before_spawn",
+      "count": 100,
+      "limit": 12555
+    },
+    {
+      "stage": "closed",
+      "count": 231,
+      "limit": 12555
+    },
+    {
+      "stage": "closed",
+      "count": 219,
+      "limit": 12555
+    }
+  ],
+  "windows_handle_samples": [
+    {
+      "before": 14,
+      "after": 14
+    }
+  ],
+  "native_children": [
+    {
+      "pid": 956,
+      "service_id": 469862065
+    },
+    {
+      "pid": 959,
+      "service_id": 469862082
+    },
+    {
+      "pid": 962,
+      "service_id": 469862098
+    },
+    {
+      "pid": 965,
+      "service_id": 469862115
+    }
+  ],
+  "native_child_deletions": [
+    956,
+    959,
+    962
+  ],
+  "child_logs": [
+    "wine-child-956.log",
+    "wine-child-959.log",
+    "wine-child-962.log",
+    "wine-child-965.log"
+  ],
+  "gpu_broker_results": [
+    "gpu-broker warmup_submit=0 gpu_value=77",
+    "gpu-broker host_range base=0x240000000 bytes=536870912 reserved=1",
+    "gpu-broker host_range base=0x3000000000 bytes=17179869184 reserved=1",
+    "gpu-wine broker test_fail_submit=20",
+    "gpu-wine broker local_memory=1 local_offer=8589934592 local_floor=1073741824 host_limit=134217728",
+    "gpu-wine open cookie=1 flexible=408944640",
+    "gpu-wine open cookie=2 flexible=394264576",
+    "gpu-wine open cookie=3 flexible=389021696",
+    "gpu-wine cookie=2 pid=-1 closed=1 absent=1 frames=0 submissions=0 backing_released=0 local_released=0 local_peak=0 flexible=389021696",
+    "gpu-wine open cookie=4 flexible=358612992",
+    "gpu-wine cookie=3 pid=962 local_offer=8589934592 host_limit=134217728 flexible=342884352 ranges_reserved=1",
+    "gpu-wine cookie=4 pid=965 local_offer=8589934592 host_limit=134217728 flexible=284164096 ranges_reserved=1",
+    "gpu-broker fences address=0x4000400000",
+    "gpu-display flip=1 shown=1 source=640x360 copy_us=3186 status=0",
+    "gpu-wine cookie=3 pid=962 frame=1 extent=640x360 flip=1 status=0",
+    "gpu-display flip=2 shown=2 source=640x360 copy_us=3101 status=0",
+    "gpu-wine cookie=4 pid=965 frame=1 extent=640x360 flip=2 status=0",
+    "gpu-display flip=3 shown=3 source=640x360 copy_us=3097 status=0",
+    "gpu-wine cookie=3 pid=962 frame=2 extent=640x360 flip=3 status=0",
+    "gpu-display flip=4 shown=4 source=640x360 copy_us=3093 status=0",
+    "gpu-wine cookie=4 pid=965 frame=2 extent=640x360 flip=4 status=0",
+    "gpu-display flip=5 shown=5 source=640x360 copy_us=3158 status=0",
+    "gpu-wine cookie=3 pid=962 frame=3 extent=640x360 flip=5 status=0",
+    "gpu-broker wedged=1 reason=test_submit_failure",
+    "gpu-wine cookie=3 pid=962 operation=4 status=0x5 live_bytes=18579456 local_bytes=7143424",
+    "gpu-wine allocation_failed=1 cookie=3 pid=962 stage=complete bytes=921600 flexible_status=0 flexible_available=226492416",
+    "gpu-wine cookie=3 pid=962 operation=2 status=0x5 live_bytes=15630336 local_bytes=4194304",
+    "gpu-wine cookie=3 pid=962 closed=1 absent=1 frames=3 submissions=11 backing_released=15630336 local_released=4194304 local_peak=7143424 flexible=289406976",
+    "gpu-display flip=6 shown=6 source=640x360 copy_us=3075 status=0",
+    "gpu-wine cookie=4 pid=965 frame=3 extent=640x360 flip=6 status=0",
+    "gpu-wine cookie=4 pid=965 operation=4 status=0x5 live_bytes=18563072 local_bytes=7143424",
+    "gpu-wine allocation_failed=1 cookie=4 pid=965 stage=complete bytes=16384 flexible_status=0 flexible_available=289406976",
+    "gpu-wine cookie=4 pid=965 operation=2 status=0x5 live_bytes=18546688 local_bytes=7143424",
+    "gpu-wine cookie=1 pid=-1 closed=1 absent=1 frames=0 submissions=0 backing_released=0 local_released=0 local_peak=0 flexible=307232768"
+  ],
+  "gpu_clients_closed": [
+    {
+      "cookie": 2,
+      "pid": -1,
+      "frames": 0,
+      "submissions": 0,
+      "backing_released": 0
+    },
+    {
+      "cookie": 3,
+      "pid": 962,
+      "frames": 3,
+      "submissions": 11,
+      "backing_released": 15630336
+    },
+    {
+      "cookie": 1,
+      "pid": -1,
+      "frames": 0,
+      "submissions": 0,
+      "backing_released": 0
+    }
+  ],
+  "gpu_transport_errors": 4,
+  "gpu_allocation_failures": [
+    {
+      "cookie": 3,
+      "pid": 962,
+      "stage": "complete",
+      "bytes": 921600,
+      "flexible_status": 0,
+      "flexible_available": 226492416
+    },
+    {
+      "cookie": 4,
+      "pid": 965,
+      "stage": "complete",
+      "bytes": 16384,
+      "flexible_status": 0,
+      "flexible_available": 289406976
+    }
+  ],
+  "gpu_shared_peak_bytes": 18579456,
+  "gpu_local": true,
+  "gpu_local_offers": [
+    8589934592,
+    8589934592
+  ],
+  "gpu_local_peaks": [
+    {
+      "cookie": 2,
+      "pid": -1,
+      "local_peak": 0
+    },
+    {
+      "cookie": 3,
+      "pid": 962,
+      "local_peak": 7143424
+    },
+    {
+      "cookie": 1,
+      "pid": -1,
+      "local_peak": 0
+    }
+  ],
+  "gpu_local_total_peak_bytes": 7143424,
+  "gpu_flexible_min": null,
+  "gpu_direct_min": null,
+  "bootstrap_threads": [
+    {
+      "log": "wine-child-956.log",
+      "stack_bytes": 4194304,
+      "status": 0
+    },
+    {
+      "log": "wine-child-959.log",
+      "stack_bytes": 4194304,
+      "status": 0
+    },
+    {
+      "log": "wine-child-962.log",
+      "stack_bytes": 4194304,
+      "status": 0
+    },
+    {
+      "log": "wine-child-965.log",
+      "stack_bytes": 4194304,
+      "status": 0
+    }
+  ],
+  "broker_wedged": [
+    "test_submit_failure"
+  ],
+  "gpu_display_captures": [
+    {
+      "name": "gpu-child-3-0.ppm",
+      "sha256": "a4b7e385d56ae52fc0fc7a59b56c0e4a3edfa07d5f68fc48ed4ae3adf9bec94a",
+      "format_passed": true,
+      "samples": [
+        {
+          "rgb": [
+            6,
+            13,
+            25
+          ],
+          "expected": [
+            6,
+            13,
+            26
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            127,
+            64,
+            64
+          ],
+          "expected": [
+            127,
+            64,
+            64
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            242,
+            7,
+            6
+          ],
+          "expected": [
+            242,
+            6,
+            6
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            8,
+            19,
+            228
+          ],
+          "expected": [
+            8,
+            19,
+            228
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            8,
+            228,
+            19
+          ],
+          "expected": [
+            8,
+            228,
+            19
+          ],
+          "passed": true
+        }
+      ],
+      "pixels_passed": true
+    },
+    {
+      "name": "gpu-child-4-0.ppm",
+      "sha256": "a4b7e385d56ae52fc0fc7a59b56c0e4a3edfa07d5f68fc48ed4ae3adf9bec94a",
+      "format_passed": true,
+      "samples": [
+        {
+          "rgb": [
+            6,
+            13,
+            25
+          ],
+          "expected": [
+            6,
+            13,
+            26
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            127,
+            64,
+            64
+          ],
+          "expected": [
+            127,
+            64,
+            64
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            242,
+            7,
+            6
+          ],
+          "expected": [
+            242,
+            6,
+            6
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            8,
+            19,
+            228
+          ],
+          "expected": [
+            8,
+            19,
+            228
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            8,
+            228,
+            19
+          ],
+          "expected": [
+            8,
+            228,
+            19
+          ],
+          "passed": true
+        }
+      ],
+      "pixels_passed": true
+    },
+    {
+      "name": "gpu-child-3-1.ppm",
+      "sha256": "a4b7e385d56ae52fc0fc7a59b56c0e4a3edfa07d5f68fc48ed4ae3adf9bec94a",
+      "format_passed": true,
+      "samples": [
+        {
+          "rgb": [
+            6,
+            13,
+            25
+          ],
+          "expected": [
+            6,
+            13,
+            26
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            127,
+            64,
+            64
+          ],
+          "expected": [
+            127,
+            64,
+            64
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            242,
+            7,
+            6
+          ],
+          "expected": [
+            242,
+            6,
+            6
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            8,
+            19,
+            228
+          ],
+          "expected": [
+            8,
+            19,
+            228
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            8,
+            228,
+            19
+          ],
+          "expected": [
+            8,
+            228,
+            19
+          ],
+          "passed": true
+        }
+      ],
+      "pixels_passed": true
+    },
+    {
+      "name": "gpu-child-4-1.ppm",
+      "sha256": "a4b7e385d56ae52fc0fc7a59b56c0e4a3edfa07d5f68fc48ed4ae3adf9bec94a",
+      "format_passed": true,
+      "samples": [
+        {
+          "rgb": [
+            6,
+            13,
+            25
+          ],
+          "expected": [
+            6,
+            13,
+            26
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            127,
+            64,
+            64
+          ],
+          "expected": [
+            127,
+            64,
+            64
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            242,
+            7,
+            6
+          ],
+          "expected": [
+            242,
+            6,
+            6
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            8,
+            19,
+            228
+          ],
+          "expected": [
+            8,
+            19,
+            228
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            8,
+            228,
+            19
+          ],
+          "expected": [
+            8,
+            228,
+            19
+          ],
+          "passed": true
+        }
+      ],
+      "pixels_passed": true
+    },
+    {
+      "name": "gpu-child-3-2.ppm",
+      "sha256": "a4b7e385d56ae52fc0fc7a59b56c0e4a3edfa07d5f68fc48ed4ae3adf9bec94a",
+      "format_passed": true,
+      "samples": [
+        {
+          "rgb": [
+            6,
+            13,
+            25
+          ],
+          "expected": [
+            6,
+            13,
+            26
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            127,
+            64,
+            64
+          ],
+          "expected": [
+            127,
+            64,
+            64
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            242,
+            7,
+            6
+          ],
+          "expected": [
+            242,
+            6,
+            6
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            8,
+            19,
+            228
+          ],
+          "expected": [
+            8,
+            19,
+            228
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            8,
+            228,
+            19
+          ],
+          "expected": [
+            8,
+            228,
+            19
+          ],
+          "passed": true
+        }
+      ],
+      "pixels_passed": true
+    },
+    {
+      "name": "gpu-child-4-2.ppm",
+      "sha256": "a4b7e385d56ae52fc0fc7a59b56c0e4a3edfa07d5f68fc48ed4ae3adf9bec94a",
+      "format_passed": true,
+      "samples": [
+        {
+          "rgb": [
+            6,
+            13,
+            25
+          ],
+          "expected": [
+            6,
+            13,
+            26
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            127,
+            64,
+            64
+          ],
+          "expected": [
+            127,
+            64,
+            64
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            242,
+            7,
+            6
+          ],
+          "expected": [
+            242,
+            6,
+            6
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            8,
+            19,
+            228
+          ],
+          "expected": [
+            8,
+            19,
+            228
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            8,
+            228,
+            19
+          ],
+          "expected": [
+            8,
+            228,
+            19
+          ],
+          "passed": true
+        }
+      ],
+      "pixels_passed": true
+    }
+  ],
+  "gpu_readbacks": [],
+  "child_input": [],
+  "child_input_pages": 4,
+  "graphics_metadata_passes": 2,
+  "graphics_teardown_passes": 0,
+  "graphics_descendant_passes": 0,
+  "title_returned": false,
+  "restoration_error": "Console busy; signed production backups retained",
+  "later_restoration": {
+    "parent_restored": true,
+    "modules_restored": {
+      "ntdll": true,
+      "wineserver": true,
+      "win32u": true,
+      "libvulkan": true
+    },
+    "removed": {
+      "wine-child.bin": true,
+      "process-probe.exe": true,
+      "graphics-render-probe.exe": true,
+      "graphics-child-probe.ppm": true,
+      "gpu-broker-results.txt": true,
+      "wine-child-956.log": true,
+      "wine-child-959.log": true,
+      "wine-child-962.log": true,
+      "wine-child-965.log": true,
+      "gpu-child-3-0.ppm": true,
+      "gpu-child-4-0.ppm": true,
+      "gpu-child-3-1.ppm": true,
+      "gpu-child-4-1.ppm": true,
+      "gpu-child-3-2.ppm": true,
+      "gpu-child-4-2.ppm": true
+    },
+    "production_restored": true,
+    "probe_files_removed": true
+  }
+}

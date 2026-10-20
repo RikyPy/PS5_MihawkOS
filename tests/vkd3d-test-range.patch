@@ -1,0 +1,92 @@
+diff --git a/include/private/vkd3d_test.h b/include/private/vkd3d_test.h
+index f4b4d25e..fdd4c30a 100644
+--- a/include/private/vkd3d_test.h
++++ b/include/private/vkd3d_test.h
+@@ -34,6 +34,9 @@ static void vkd3d_test_main(int argc, char **argv);
+ #endif
+ 
+ extern const char *vkd3d_test_name;
++#ifdef _WIN32
++static volatile LONG vkd3d_test_progress;  /* PS5_Proton: see vkd3d_test_watchdog */
++#endif
+ extern const char *vkd3d_test_platform;
+ 
+ static void vkd3d_test_start_todo(bool is_todo);
+@@ -272,6 +275,36 @@ vkd3d_test_debug(const char *fmt, ...)
+ }
+ 
+ #ifdef VKD3D_TEST_DECLARE_MAIN
++#ifdef _WIN32
++/* PS5_Proton: a test that makes no progress for VKD3D_TEST_TIMEOUT seconds ends the program, after naming it, so that
++ * a console title closes the normal way instead of being killed (tools/run-vkd3d-tests.py) */
++static DWORD WINAPI vkd3d_test_watchdog(void *arg)
++{
++    unsigned int limit = (unsigned int)(ULONG_PTR)arg;
++    ULONGLONG since = GetTickCount64();
++    LONG seen = -1;
++
++    for (;;)
++    {
++        Sleep(1000);
++        if (seen != vkd3d_test_progress)
++        {
++            seen = vkd3d_test_progress;
++            since = GetTickCount64();
++        }
++        else if (GetTickCount64() - since >= (ULONGLONG)limit * 1000)
++        {
++            char text[256];
++            DWORD written;
++            int length = snprintf(text, sizeof(text), "\nvkd3d-batch: timeout %s %u\n",
++                    vkd3d_test_name ? vkd3d_test_name : "?", limit);
++            WriteFile(GetStdHandle(STD_OUTPUT_HANDLE), text, length, &written, NULL);
++            ExitProcess(124);
++        }
++    }
++}
++#endif
++
+ int main(int argc, char **argv)
+ {
+     const char *exclude_list = getenv("VKD3D_TEST_EXCLUDE");
+@@ -312,6 +345,11 @@ int main(int argc, char **argv)
+     if (vkd3d_test_state.debug_level > 1)
+         printf("Test platform: '%s'.\n", vkd3d_test_platform);
+ 
++#ifdef _WIN32
++    if (getenv("VKD3D_TEST_TIMEOUT") && atoi(getenv("VKD3D_TEST_TIMEOUT")) > 0)
++        CreateThread(NULL, 0, vkd3d_test_watchdog, (void *)(ULONG_PTR)atoi(getenv("VKD3D_TEST_TIMEOUT")), 0, NULL);
++#endif
++
+     vkd3d_test_main(argc, argv);
+ 
+     printf("%s: %lu tests executed (%lu failures, %lu successful todo, %lu skipped, %lu todo, %lu bugs).\n",
+@@ -382,6 +420,18 @@ typedef void (*vkd3d_test_pfn)(void);
+ static inline void vkd3d_run_test(const char *name, vkd3d_test_pfn test_pfn)
+ {
+     const char *old_test_name;
++    static unsigned int test_index;
++    const char *range = getenv("VKD3D_TEST_RANGE");
++
++    /* PS5_Proton: VKD3D_TEST_RANGE=from-to runs the tests whose position in the list is in [from, to), so that a
++     * console launch can run a slice of the suite (tools/run-vkd3d-tests.py) */
++    if (range)
++    {
++        unsigned int from = 0, to = 0, index = test_index++;
++
++        if (sscanf(range, "%u-%u", &from, &to) == 2 && (index < from || index >= to))
++            return;
++    }
+ 
+     if (vkd3d_test_state.test_name_match && strcmp(name, vkd3d_test_state.test_name_match))
+         return;
+@@ -393,6 +443,9 @@ static inline void vkd3d_run_test(const char *name, vkd3d_test_pfn test_pfn)
+             && vkd3d_debug_list_has_member(vkd3d_test_state.test_exclude_list, name))
+         return;
+ 
++#ifdef _WIN32
++    InterlockedIncrement(&vkd3d_test_progress);
++#endif
+     old_test_name = vkd3d_test_name;
+     vkd3d_test_debug("======== %s begin ========", name);
+     vkd3d_test_name = name;

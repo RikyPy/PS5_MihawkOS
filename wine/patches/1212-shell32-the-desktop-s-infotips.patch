@@ -1,0 +1,116 @@
+From: PS5_Proton <local>
+Subject: [PATCH] shell32: the desktop's infotips
+
+The approved prototype's desktop (js/desktop.js infotip) shows a tip over an item: the Recycle Bin's "Contains the
+files and folders that you have deleted.", a file's type, size and date modified on three lines, a folder's date
+created and "Empty folder" when it is, nothing for This PC or a shortcut. The desktop's list now asks for infotips
+(LVS_EX_INFOTIP, patch 1211) and the view answers LVN_GETINFOTIP: from the item's IQueryInfo when its folder has one
+(Wine's own folders have none), otherwise with the prototype's texts: the type from SHGetFileInfo, the size as the
+prototype writes it (bytes below 1 KB, one decimal below 10 of a unit: 2150 bytes is 2.1 KB), the date in the user's
+short date and the time without seconds (10/9/2026 7:22 PM in en-US). The texts are English, as the prototype's.
+---
+diff --git a/dlls/shell32/shlview.c b/dlls/shell32/shlview.c
+--- a/dlls/shell32/shlview.c
++++ b/dlls/shell32/shlview.c
+@@ -756,7 +756,8 @@ static void desktop_style(IShellViewImpl *This)
+         IImageList_Release(list);   /* the list is the system's, and shared (LVS_SHAREIMAGELISTS) */
+     }
+     SendMessageW(This->hWndList, LVM_SETICONSPACING, 0, MAKELPARAM(grid.cell_w, grid.cell_h));
+-    SendMessageW(This->hWndList, LVM_SETEXTENDEDLISTVIEWSTYLE, LVS_EX_TRANSPARENTSHADOWTEXT, LVS_EX_TRANSPARENTSHADOWTEXT);
++    SendMessageW(This->hWndList, LVM_SETEXTENDEDLISTVIEWSTYLE, LVS_EX_TRANSPARENTSHADOWTEXT | LVS_EX_INFOTIP,
++                 LVS_EX_TRANSPARENTSHADOWTEXT | LVS_EX_INFOTIP);
+ }
+ 
+ /* The grid's size in the view (the work area; the list, which fills it, has no size yet while the view fills), and the farthest
+@@ -1780,6 +1781,80 @@ static LRESULT ShellView_OnCommand(IShellViewImpl * This,DWORD dwCmdID, DWORD dw
+ * ShellView_OnNotify()
+ */
+ 
++/* A size as the prototype's desktop writes it (Shell.fs.formatSize): bytes below 1 KB, then one decimal below 10. */
++static void infotip_size(ULONGLONG bytes, WCHAR *text)
++{
++    static const WCHAR *units[] = { L"bytes", L"KB", L"MB", L"GB", L"TB" };
++    ULONGLONG scale = 1;
++    int unit = 0;
++
++    while (bytes >= scale * 1024 && unit < 4)
++    {
++        scale *= 1024;
++        unit++;
++    }
++    if (!unit) wsprintfW(text, L"%u bytes", (UINT)bytes);
++    else if (bytes < scale * 10)
++    {
++        UINT tenths = (UINT)((bytes * 10 + scale / 2) / scale);
++        wsprintfW(text, L"%u.%u %s", tenths / 10, tenths % 10, units[unit]);
++    }
++    else wsprintfW(text, L"%u %s", (UINT)((bytes + scale / 2) / scale), units[unit]);
++}
++
++/* An item's infotip (LVN_GETINFOTIP): its folder's IQueryInfo when it has one, else the approved prototype's desktop
++ * tip (js/desktop.js infotip): the Recycle Bin's description, a file's type, size and date modified, a folder's date
++ * created and whether it is empty; nothing for This PC, other system folders and shortcuts. Wine's own folders have
++ * no IQueryInfo. shortcut: the texts are English, as the prototype's; shell32.rc strings once the shell is translated. */
++static void ShellView_GetInfoTip(IShellViewImpl *This, NMLVGETINFOTIPW *tip)
++{
++    LPCITEMIDLIST pidl = (LPCITEMIDLIST)tip->lParam;
++    WCHAR path[MAX_PATH], date[64], time[64], size[32], text[INFOTIPSIZE], *answer;
++    WIN32_FILE_ATTRIBUTE_DATA data;
++    SFGAOF attributes = SFGAO_LINK;
++    SHFILEINFOW file = { 0 };
++    IQueryInfo *query;
++    const GUID *guid;
++    SYSTEMTIME when;
++    FILETIME local;
++    STRRET name;
++
++    if (!pidl || !tip->pszText || tip->cchTextMax <= 0) return;
++    if (SUCCEEDED(IShellFolder_GetUIObjectOf(This->pSFParent, This->hWnd, 1, &pidl, &IID_IQueryInfo, NULL, (void **)&query)))
++    {
++        if (SUCCEEDED(IQueryInfo_GetInfoTip(query, 0, &answer)) && answer)
++        {
++            lstrcpynW(tip->pszText, answer, tip->cchTextMax);
++            CoTaskMemFree(answer);
++        }
++        IQueryInfo_Release(query);
++        return;
++    }
++    if ((guid = _ILGetGUIDPointer(pidl)))
++    {
++        if (IsEqualGUID(guid, &CLSID_RecycleBin))
++            lstrcpynW(tip->pszText, L"Contains the files and folders that you have deleted.", tip->cchTextMax);
++        return;
++    }
++    if (FAILED(IShellFolder_GetAttributesOf(This->pSFParent, 1, &pidl, &attributes)) || (attributes & SFGAO_LINK)) return;
++    if (FAILED(IShellFolder_GetDisplayNameOf(This->pSFParent, pidl, SHGDN_FORPARSING, &name)) ||
++        FAILED(StrRetToBufW(&name, pidl, path, ARRAY_SIZE(path))) || !GetFileAttributesExW(path, GetFileExInfoStandard, &data))
++        return;
++    FileTimeToLocalFileTime(data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY ? &data.ftCreationTime : &data.ftLastWriteTime, &local);
++    FileTimeToSystemTime(&local, &when);
++    GetDateFormatW(LOCALE_USER_DEFAULT, DATE_SHORTDATE, &when, NULL, date, ARRAY_SIZE(date));
++    GetTimeFormatW(LOCALE_USER_DEFAULT, TIME_NOSECONDS, &when, NULL, time, ARRAY_SIZE(time));
++    if (data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
++        wsprintfW(text, L"Date created: %s %s%s", date, time, PathIsDirectoryEmptyW(path) ? L"\nEmpty folder" : L"");
++    else
++    {
++        SHGetFileInfoW(path, data.dwFileAttributes, &file, sizeof(file), SHGFI_TYPENAME);
++        infotip_size((ULONGLONG)data.nFileSizeHigh << 32 | data.nFileSizeLow, size);
++        wsprintfW(text, L"Type: %s\nSize: %s\nDate modified: %s %s", file.szTypeName, size, date, time);
++    }
++    lstrcpynW(tip->pszText, text, tip->cchTextMax);
++}
++
+ static LRESULT ShellView_OnNotify(IShellViewImpl * This, UINT CtlID, LPNMHDR lpnmh)
+ {	LPNMLISTVIEW lpnmlv = (LPNMLISTVIEW)lpnmh;
+ 	NMLVDISPINFOW *lpdi = (NMLVDISPINFOW *)lpnmh;
+@@ -1922,6 +1997,10 @@ static LRESULT ShellView_OnNotify(IShellViewImpl * This, UINT CtlID, LPNMHDR lpn
+ 	    }
+ 	    break;
+ 
++	  case LVN_GETINFOTIPW:
++	    ShellView_GetInfoTip(This, (NMLVGETINFOTIPW *)lpnmh);
++	    break;
++
+ 	  case LVN_ITEMCHANGED:
+ 	    TRACE("-- LVN_ITEMCHANGED %p\n",This);
+ 	    OnStateChange(This, CDBOSC_SELCHANGE);  /* the browser will get the IDataObject now */

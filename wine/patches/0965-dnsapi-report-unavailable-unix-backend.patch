@@ -1,0 +1,18 @@
+From: PS5_Proton <local@invalid>
+Subject: [PATCH] dnsapi: report unavailable Unix backend without dispatching through null
+
+DllMain logs an unavailable resolver backend but still permits PE imports.
+DnsQueryConfig must report that unavailable capability, rather than dispatch
+through a null Unix function table. A console GetAdaptersAddresses trace
+reproduces STATUS_ACCESS_VIOLATION at table index 1 with handle zero.
+Keep the ordinary error visible; this does not provide DNS configuration.
+
+--- a/dlls/dnsapi/dnsapi.h
++++ b/dlls/dnsapi/dnsapi.h
+@@ -130,4 +130,5 @@
+     unix_funcs_count
+ };
+ 
+-#define RESOLV_CALL( func, params ) WINE_UNIX_CALL( unix_ ## func, params )
++#define RESOLV_CALL( func, params ) \
++    (__wine_unixlib_handle ? WINE_UNIX_CALL( unix_ ## func, params ) : ERROR_NOT_SUPPORTED)

@@ -1,0 +1,18 @@
+{
+ "run": "modern-direct-2026-10-08-01",
+ "read_only": false,
+ "temporary_direct_backing_bytes": 16384,
+ "kernel_reads": false,
+ "kernel_writes": false,
+ "no_overwrite": true,
+ "payload": true,
+ "elf_sha256": "115bef9cb385f24f1949a764234f447fe10f42cd67dc48b52ec43c1b5b56b6d9",
+ "source_sha256": "9104341318ea2bba85a6abea57ee52489aa41eaadceacaa228c882d92ca2045b",
+ "passed": false,
+ "lines": [
+  "modern-direct allocation=0",
+  "modern-direct band=ordinary status=0x8002002d exact=0",
+  "modern-direct band=extended status=0x8002002d exact=0",
+  "modern-direct release=0"
+ ]
+}

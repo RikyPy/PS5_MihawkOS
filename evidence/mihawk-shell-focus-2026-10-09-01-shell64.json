@@ -1,0 +1,222 @@
+{
+ "launch_readiness": {
+  "ready": true,
+  "seconds": 0.185,
+  "settle_seconds": 0.0,
+  "census_seconds": 0.162,
+  "previous_cleanup_verified": true
+ },
+ "run": "mihawk-shell-focus-2026-10-09-01-shell64",
+ "what": "C:\\windows\\system32\\mihawk.exe",
+ "env": [
+  "PROTON_LAYOUT=launcher",
+  "WINE_PS5_WINDOW_SURFACES=1",
+  "MIHAWK_DESKTOP=1",
+  "MIHAWK_SHELL_CAPTURE=1"
+ ],
+ "result": "finished",
+ "seconds": 26.1,
+ "probe_verdict": "PASS",
+ "clean_owner_restart": true,
+ "launcher_end_status": 0,
+ "initial_status": 0,
+ "closed_on_request": false,
+ "child_logs": [
+  "klog/mihawk-shell-focus-2026-10-09-01-shell64-wine-child-5799.log",
+  "klog/mihawk-shell-focus-2026-10-09-01-shell64-wine-child-5800.log",
+  "klog/mihawk-shell-focus-2026-10-09-01-shell64-wine-child-5801.log",
+  "klog/mihawk-shell-focus-2026-10-09-01-shell64-wine-child-5802.log",
+  "klog/mihawk-shell-focus-2026-10-09-01-shell64-wine-child-5803.log",
+  "klog/mihawk-shell-focus-2026-10-09-01-shell64-wine-child-5804.log",
+  "klog/mihawk-shell-focus-2026-10-09-01-shell64-wine-child-5805.log",
+  "klog/mihawk-shell-focus-2026-10-09-01-shell64-wine-child-5806.log",
+  "klog/mihawk-shell-focus-2026-10-09-01-shell64-wine-child-5807.log",
+  "klog/mihawk-shell-focus-2026-10-09-01-shell64-wine-child-5808.log",
+  "klog/mihawk-shell-focus-2026-10-09-01-shell64-wine-child-5809.log",
+  "klog/mihawk-shell-focus-2026-10-09-01-shell64-wine-child-5810.log",
+  "klog/mihawk-shell-focus-2026-10-09-01-shell64-wine-child-5811.log",
+  "klog/mihawk-shell-focus-2026-10-09-01-shell64-wine-child-5812.log",
+  "klog/mihawk-shell-focus-2026-10-09-01-shell64-wine-child-5813.log",
+  "klog/mihawk-shell-focus-2026-10-09-01-shell64-wine-child-5814.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": true,
+ "bench": {},
+ "steady": {
+  "server": {
+   "calls": 0.0,
+   "per_s": 0.0,
+   "avg_us": 0.0,
+   "selects": 0.0,
+   "blocked": 0.0,
+   "block_avg_us": 0.0,
+   "waits": 0.0,
+   "handles_avg": 0.0,
+   "wait_all": 0.0,
+   "polled": 0.0,
+   "delays": 0.0,
+   "yields": 0.0,
+   "intervals": 2
+  }
+ },
+ "intervals": {
+  "frames": [],
+  "server": [
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   }
+  ],
+  "top": []
+ },
+ "shown": {
+  "frames": 97,
+  "per_10s": [
+   1,
+   96
+  ],
+  "longest_gap_ms": 2148
+ },
+ "broker": {
+  "local_offer": null,
+  "host_limit": null,
+  "refused": [],
+  "refused_count": 0,
+  "clients": [],
+  "wedged": false,
+  "failure_reasons": [],
+  "host_peak": null,
+  "local_peak": null
+ },
+ "captures": [
+  "klog/mihawk-shell-focus-2026-10-09-01-shell64-capture-01.png",
+  "klog/mihawk-shell-focus-2026-10-09-01-shell64-capture-02.png",
+  "klog/mihawk-shell-focus-2026-10-09-01-shell64-capture-03.png",
+  "klog/mihawk-shell-focus-2026-10-09-01-shell64-capture-04.png"
+ ],
+ "cleanup_verified": true,
+ "hooks_removed": true,
+ "semantics_passed": true,
+ "shell_pixels": [
+  {
+   "capture": "klog/mihawk-shell-focus-2026-10-09-01-shell64-capture-01.png",
+   "number": 1,
+   "phase": "start-light",
+   "point": [
+    670,
+    464
+   ],
+   "expected": [
+    238,
+    242,
+    248
+   ],
+   "actual": [
+    238,
+    242,
+    248
+   ],
+   "passed": true
+  },
+  {
+   "capture": "klog/mihawk-shell-focus-2026-10-09-01-shell64-capture-02.png",
+   "number": 2,
+   "phase": "start-dark",
+   "point": [
+    670,
+    464
+   ],
+   "expected": [
+    34,
+    38,
+    45
+   ],
+   "actual": [
+    34,
+    38,
+    45
+   ],
+   "passed": true
+  },
+  {
+   "capture": "klog/mihawk-shell-focus-2026-10-09-01-shell64-capture-03.png",
+   "number": 3,
+   "phase": "explorer-light",
+   "point": [
+    14,
+    49
+   ],
+   "expected": [
+    238,
+    242,
+    248
+   ],
+   "actual": [
+    238,
+    242,
+    248
+   ],
+   "passed": true
+  },
+  {
+   "capture": "klog/mihawk-shell-focus-2026-10-09-01-shell64-capture-04.png",
+   "number": 4,
+   "phase": "explorer-dark",
+   "point": [
+    14,
+    49
+   ],
+   "expected": [
+    34,
+    38,
+    45
+   ],
+   "actual": [
+    34,
+    38,
+    45
+   ],
+   "passed": true
+  }
+ ]
+}

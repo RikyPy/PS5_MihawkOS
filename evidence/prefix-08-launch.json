@@ -1,0 +1,2407 @@
+{
+ "run": "prefix-08-launch",
+ "what": "profile proton-prefix-test",
+ "env": [],
+ "result": "finished",
+ "seconds": 389.7,
+ "probe_verdict": "FAIL",
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": false,
+ "bench": {},
+ "steady": {
+  "server": {
+   "calls": 6875.0,
+   "per_s": 1357.0,
+   "avg_us": 3.8,
+   "selects": 1875.0,
+   "blocked": 625.0,
+   "block_avg_us": 8033.35,
+   "waits": 1875.0,
+   "handles_avg": 1.33,
+   "wait_all": 0.0,
+   "polled": 1250.0,
+   "delays": 0.0,
+   "yields": 0.0,
+   "intervals": 74
+  }
+ },
+ "intervals": {
+  "frames": [],
+  "server": [
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 6963.0,
+    "per_s": 1375.0,
+    "avg_us": 21.6,
+    "selects": 1412.0,
+    "blocked": 472.0,
+    "block_avg_us": 8756.9,
+    "waits": 1410.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 934.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 6878.0,
+    "per_s": 1357.0,
+    "avg_us": 3.8,
+    "selects": 1877.0,
+    "blocked": 626.0,
+    "block_avg_us": 8033.5,
+    "waits": 1876.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 1251.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 6883.0,
+    "per_s": 1358.0,
+    "avg_us": 3.8,
+    "selects": 1876.0,
+    "blocked": 625.0,
+    "block_avg_us": 8033.2,
+    "waits": 1877.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 1251.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 6875.0,
+    "per_s": 1357.0,
+    "avg_us": 3.8,
+    "selects": 1875.0,
+    "blocked": 625.0,
+    "block_avg_us": 8033.9,
+    "waits": 1875.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 1250.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 6875.0,
+    "per_s": 1357.0,
+    "avg_us": 3.8,
+    "selects": 1875.0,
+    "blocked": 625.0,
+    "block_avg_us": 8030.7,
+    "waits": 1875.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 1250.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 6875.0,
+    "per_s": 1357.0,
+    "avg_us": 3.8,
+    "selects": 1875.0,
+    "blocked": 625.0,
+    "block_avg_us": 8032.1,
+    "waits": 1875.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 1250.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 6875.0,
+    "per_s": 1357.0,
+    "avg_us": 3.8,
+    "selects": 1875.0,
+    "blocked": 625.0,
+    "block_avg_us": 8033.2,
+    "waits": 1875.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 1250.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 6886.0,
+    "per_s": 1359.0,
+    "avg_us": 3.8,
+    "selects": 1878.0,
+    "blocked": 626.0,
+    "block_avg_us": 8030.6,
+    "waits": 1878.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 1252.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 6875.0,
+    "per_s": 1357.0,
+    "avg_us": 3.8,
+    "selects": 1875.0,
+    "blocked": 625.0,
+    "block_avg_us": 8034.4,
+    "waits": 1875.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 1250.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 6875.0,
+    "per_s": 1357.0,
+    "avg_us": 3.8,
+    "selects": 1875.0,
+    "blocked": 625.0,
+    "block_avg_us": 8030.4,
+    "waits": 1875.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 1250.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 6875.0,
+    "per_s": 1357.0,
+    "avg_us": 3.8,
+    "selects": 1875.0,
+    "blocked": 625.0,
+    "block_avg_us": 8034.8,
+    "waits": 1875.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 1250.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 6875.0,
+    "per_s": 1357.0,
+    "avg_us": 3.8,
+    "selects": 1875.0,
+    "blocked": 625.0,
+    "block_avg_us": 8030.4,
+    "waits": 1875.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 1250.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 6879.0,
+    "per_s": 1357.0,
+    "avg_us": 3.8,
+    "selects": 1877.0,
+    "blocked": 626.0,
+    "block_avg_us": 8034.9,
+    "waits": 1876.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 1251.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 6882.0,
+    "per_s": 1358.0,
+    "avg_us": 3.8,
+    "selects": 1876.0,
+    "blocked": 625.0,
+    "block_avg_us": 8033.7,
+    "waits": 1877.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 1251.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 6875.0,
+    "per_s": 1357.0,
+    "avg_us": 3.8,
+    "selects": 1875.0,
+    "blocked": 625.0,
+    "block_avg_us": 8033.1,
+    "waits": 1875.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 1250.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 6875.0,
+    "per_s": 1357.0,
+    "avg_us": 3.8,
+    "selects": 1875.0,
+    "blocked": 625.0,
+    "block_avg_us": 8033.5,
+    "waits": 1875.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 1250.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 6875.0,
+    "per_s": 1357.0,
+    "avg_us": 3.7,
+    "selects": 1875.0,
+    "blocked": 625.0,
+    "block_avg_us": 8034.0,
+    "waits": 1875.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 1250.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 6875.0,
+    "per_s": 1357.0,
+    "avg_us": 3.8,
+    "selects": 1875.0,
+    "blocked": 625.0,
+    "block_avg_us": 8034.2,
+    "waits": 1875.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 1250.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 6875.0,
+    "per_s": 1357.0,
+    "avg_us": 3.8,
+    "selects": 1875.0,
+    "blocked": 625.0,
+    "block_avg_us": 8032.6,
+    "waits": 1875.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 1250.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 6875.0,
+    "per_s": 1357.0,
+    "avg_us": 3.8,
+    "selects": 1875.0,
+    "blocked": 625.0,
+    "block_avg_us": 8034.6,
+    "waits": 1875.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 1250.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 6875.0,
+    "per_s": 1357.0,
+    "avg_us": 3.8,
+    "selects": 1875.0,
+    "blocked": 625.0,
+    "block_avg_us": 8033.1,
+    "waits": 1875.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 1250.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 6886.0,
+    "per_s": 1359.0,
+    "avg_us": 3.8,
+    "selects": 1878.0,
+    "blocked": 626.0,
+    "block_avg_us": 8033.7,
+    "waits": 1878.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 1252.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 6875.0,
+    "per_s": 1357.0,
+    "avg_us": 3.8,
+    "selects": 1875.0,
+    "blocked": 625.0,
+    "block_avg_us": 8033.5,
+    "waits": 1875.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 1250.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 6875.0,
+    "per_s": 1357.0,
+    "avg_us": 3.8,
+    "selects": 1875.0,
+    "blocked": 625.0,
+    "block_avg_us": 8032.7,
+    "waits": 1875.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 1250.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 6875.0,
+    "per_s": 1357.0,
+    "avg_us": 3.8,
+    "selects": 1875.0,
+    "blocked": 625.0,
+    "block_avg_us": 8033.3,
+    "waits": 1875.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 1250.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 6875.0,
+    "per_s": 1357.0,
+    "avg_us": 3.8,
+    "selects": 1875.0,
+    "blocked": 625.0,
+    "block_avg_us": 8034.4,
+    "waits": 1875.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 1250.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 6875.0,
+    "per_s": 1357.0,
+    "avg_us": 3.8,
+    "selects": 1875.0,
+    "blocked": 625.0,
+    "block_avg_us": 8034.2,
+    "waits": 1875.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 1250.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 6875.0,
+    "per_s": 1357.0,
+    "avg_us": 3.8,
+    "selects": 1875.0,
+    "blocked": 625.0,
+    "block_avg_us": 8033.4,
+    "waits": 1875.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 1250.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 6875.0,
+    "per_s": 1357.0,
+    "avg_us": 3.8,
+    "selects": 1875.0,
+    "blocked": 625.0,
+    "block_avg_us": 8034.3,
+    "waits": 1875.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 1250.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 6875.0,
+    "per_s": 1357.0,
+    "avg_us": 3.8,
+    "selects": 1875.0,
+    "blocked": 625.0,
+    "block_avg_us": 8035.3,
+    "waits": 1875.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 1250.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 6875.0,
+    "per_s": 1357.0,
+    "avg_us": 3.8,
+    "selects": 1875.0,
+    "blocked": 625.0,
+    "block_avg_us": 8034.6,
+    "waits": 1875.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 1250.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 6875.0,
+    "per_s": 1357.0,
+    "avg_us": 3.8,
+    "selects": 1875.0,
+    "blocked": 625.0,
+    "block_avg_us": 8033.5,
+    "waits": 1875.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 1250.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 6875.0,
+    "per_s": 1357.0,
+    "avg_us": 3.8,
+    "selects": 1875.0,
+    "blocked": 625.0,
+    "block_avg_us": 8035.9,
+    "waits": 1875.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 1250.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 6875.0,
+    "per_s": 1357.0,
+    "avg_us": 3.8,
+    "selects": 1875.0,
+    "blocked": 625.0,
+    "block_avg_us": 8034.7,
+    "waits": 1875.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 1250.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 6875.0,
+    "per_s": 1357.0,
+    "avg_us": 3.8,
+    "selects": 1875.0,
+    "blocked": 625.0,
+    "block_avg_us": 8033.1,
+    "waits": 1875.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 1250.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 6875.0,
+    "per_s": 1357.0,
+    "avg_us": 3.8,
+    "selects": 1875.0,
+    "blocked": 625.0,
+    "block_avg_us": 8032.5,
+    "waits": 1875.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 1250.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 6875.0,
+    "per_s": 1357.0,
+    "avg_us": 3.8,
+    "selects": 1875.0,
+    "blocked": 625.0,
+    "block_avg_us": 8034.6,
+    "waits": 1875.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 1250.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 6875.0,
+    "per_s": 1357.0,
+    "avg_us": 3.8,
+    "selects": 1875.0,
+    "blocked": 625.0,
+    "block_avg_us": 8031.9,
+    "waits": 1875.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 1250.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 6875.0,
+    "per_s": 1357.0,
+    "avg_us": 3.8,
+    "selects": 1875.0,
+    "blocked": 625.0,
+    "block_avg_us": 8034.3,
+    "waits": 1875.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 1250.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 6886.0,
+    "per_s": 1359.0,
+    "avg_us": 3.8,
+    "selects": 1878.0,
+    "blocked": 626.0,
+    "block_avg_us": 8027.8,
+    "waits": 1878.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 1252.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 6875.0,
+    "per_s": 1357.0,
+    "avg_us": 3.8,
+    "selects": 1875.0,
+    "blocked": 625.0,
+    "block_avg_us": 8033.6,
+    "waits": 1875.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 1250.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 6875.0,
+    "per_s": 1357.0,
+    "avg_us": 3.8,
+    "selects": 1875.0,
+    "blocked": 625.0,
+    "block_avg_us": 8031.1,
+    "waits": 1875.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 1250.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 6886.0,
+    "per_s": 1359.0,
+    "avg_us": 3.8,
+    "selects": 1878.0,
+    "blocked": 626.0,
+    "block_avg_us": 8032.9,
+    "waits": 1878.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 1252.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 6875.0,
+    "per_s": 1357.0,
+    "avg_us": 3.8,
+    "selects": 1875.0,
+    "blocked": 625.0,
+    "block_avg_us": 8034.5,
+    "waits": 1875.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 1250.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 6875.0,
+    "per_s": 1357.0,
+    "avg_us": 3.8,
+    "selects": 1875.0,
+    "blocked": 625.0,
+    "block_avg_us": 8033.9,
+    "waits": 1875.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 1250.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 6875.0,
+    "per_s": 1357.0,
+    "avg_us": 3.8,
+    "selects": 1875.0,
+    "blocked": 625.0,
+    "block_avg_us": 8034.8,
+    "waits": 1875.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 1250.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 6875.0,
+    "per_s": 1357.0,
+    "avg_us": 3.8,
+    "selects": 1875.0,
+    "blocked": 625.0,
+    "block_avg_us": 8033.7,
+    "waits": 1875.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 1250.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 6875.0,
+    "per_s": 1357.0,
+    "avg_us": 3.8,
+    "selects": 1875.0,
+    "blocked": 625.0,
+    "block_avg_us": 8035.1,
+    "waits": 1875.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 1250.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 6875.0,
+    "per_s": 1357.0,
+    "avg_us": 3.8,
+    "selects": 1875.0,
+    "blocked": 625.0,
+    "block_avg_us": 8034.8,
+    "waits": 1875.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 1250.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 6875.0,
+    "per_s": 1357.0,
+    "avg_us": 3.8,
+    "selects": 1875.0,
+    "blocked": 625.0,
+    "block_avg_us": 8032.9,
+    "waits": 1875.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 1250.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 6875.0,
+    "per_s": 1357.0,
+    "avg_us": 3.8,
+    "selects": 1875.0,
+    "blocked": 625.0,
+    "block_avg_us": 8032.8,
+    "waits": 1875.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 1250.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 6875.0,
+    "per_s": 1357.0,
+    "avg_us": 3.8,
+    "selects": 1875.0,
+    "blocked": 625.0,
+    "block_avg_us": 8032.7,
+    "waits": 1875.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 1250.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 6875.0,
+    "per_s": 1357.0,
+    "avg_us": 3.8,
+    "selects": 1875.0,
+    "blocked": 625.0,
+    "block_avg_us": 8034.6,
+    "waits": 1875.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 1250.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 6875.0,
+    "per_s": 1357.0,
+    "avg_us": 3.8,
+    "selects": 1875.0,
+    "blocked": 625.0,
+    "block_avg_us": 8031.5,
+    "waits": 1875.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 1250.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 6875.0,
+    "per_s": 1357.0,
+    "avg_us": 3.8,
+    "selects": 1875.0,
+    "blocked": 625.0,
+    "block_avg_us": 8036.3,
+    "waits": 1875.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 1250.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 6875.0,
+    "per_s": 1357.0,
+    "avg_us": 3.8,
+    "selects": 1875.0,
+    "blocked": 625.0,
+    "block_avg_us": 8032.1,
+    "waits": 1875.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 1250.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 6875.0,
+    "per_s": 1357.0,
+    "avg_us": 3.8,
+    "selects": 1875.0,
+    "blocked": 625.0,
+    "block_avg_us": 8034.7,
+    "waits": 1875.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 1250.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 6875.0,
+    "per_s": 1357.0,
+    "avg_us": 3.8,
+    "selects": 1875.0,
+    "blocked": 625.0,
+    "block_avg_us": 8033.5,
+    "waits": 1875.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 1250.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 6875.0,
+    "per_s": 1357.0,
+    "avg_us": 3.8,
+    "selects": 1875.0,
+    "blocked": 625.0,
+    "block_avg_us": 8034.2,
+    "waits": 1875.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 1250.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 6618.0,
+    "per_s": 1305.0,
+    "avg_us": 43.5,
+    "selects": 1779.0,
+    "blocked": 596.0,
+    "block_avg_us": 1022548.3,
+    "waits": 1776.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 1182.0,
+    "delays": 0.0,
+    "yields": 0.0
+   }
+  ],
+  "top": [
+   {
+    "event_op": {
+     "count": 469,
+     "avg_us": 197.0
+    },
+    "create_mapping": {
+     "count": 44,
+     "avg_us": 194.8
+    },
+    "send_hardware_message": {
+     "count": 468,
+     "avg_us": 18.3
+    },
+    "close_handle": {
+     "count": 1767,
+     "avg_us": 3.7
+    },
+    "get_key_value": {
+     "count": 342,
+     "avg_us": 15.8
+    }
+   },
+   {
+    "send_hardware_message": {
+     "count": 625,
+     "avg_us": 17.2
+    },
+    "event_op": {
+     "count": 626,
+     "avg_us": 6.4
+    },
+    "close_handle": {
+     "count": 1877,
+     "avg_us": 2.1
+    },
+    "select": {
+     "count": 1875,
+     "avg_us": 2.0
+    },
+    "create_event": {
+     "count": 1875,
+     "avg_us": 2.0
+    }
+   },
+   {
+    "send_hardware_message": {
+     "count": 626,
+     "avg_us": 17.1
+    },
+    "close_handle": {
+     "count": 1876,
+     "avg_us": 2.1
+    },
+    "event_op": {
+     "count": 625,
+     "avg_us": 6.2
+    },
+    "create_event": {
+     "count": 1878,
+     "avg_us": 2.0
+    },
+    "select": {
+     "count": 1878,
+     "avg_us": 2.0
+    }
+   },
+   {
+    "send_hardware_message": {
+     "count": 625,
+     "avg_us": 17.2
+    },
+    "event_op": {
+     "count": 625,
+     "avg_us": 6.8
+    },
+    "close_handle": {
+     "count": 1875,
+     "avg_us": 2.1
+    },
+    "create_event": {
+     "count": 1875,
+     "avg_us": 2.0
+    },
+    "select": {
+     "count": 1875,
+     "avg_us": 2.0
+    }
+   },
+   {
+    "send_hardware_message": {
+     "count": 625,
+     "avg_us": 17.3
+    },
+    "close_handle": {
+     "count": 1875,
+     "avg_us": 2.1
+    },
+    "event_op": {
+     "count": 625,
+     "avg_us": 6.2
+    },
+    "create_event": {
+     "count": 1875,
+     "avg_us": 2.0
+    },
+    "select": {
+     "count": 1875,
+     "avg_us": 2.0
+    }
+   },
+   {
+    "send_hardware_message": {
+     "count": 625,
+     "avg_us": 17.1
+    },
+    "close_handle": {
+     "count": 1875,
+     "avg_us": 2.1
+    },
+    "event_op": {
+     "count": 625,
+     "avg_us": 6.2
+    },
+    "select": {
+     "count": 1875,
+     "avg_us": 2.0
+    },
+    "create_event": {
+     "count": 1875,
+     "avg_us": 2.0
+    }
+   },
+   {
+    "send_hardware_message": {
+     "count": 625,
+     "avg_us": 17.2
+    },
+    "event_op": {
+     "count": 625,
+     "avg_us": 6.6
+    },
+    "close_handle": {
+     "count": 1875,
+     "avg_us": 2.1
+    },
+    "create_event": {
+     "count": 1875,
+     "avg_us": 2.0
+    },
+    "select": {
+     "count": 1875,
+     "avg_us": 2.0
+    }
+   },
+   {
+    "send_hardware_message": {
+     "count": 626,
+     "avg_us": 17.2
+    },
+    "close_handle": {
+     "count": 1878,
+     "avg_us": 2.1
+    },
+    "event_op": {
+     "count": 626,
+     "avg_us": 6.2
+    },
+    "create_event": {
+     "count": 1878,
+     "avg_us": 2.0
+    },
+    "select": {
+     "count": 1878,
+     "avg_us": 2.0
+    }
+   },
+   {
+    "send_hardware_message": {
+     "count": 625,
+     "avg_us": 17.2
+    },
+    "event_op": {
+     "count": 625,
+     "avg_us": 6.3
+    },
+    "close_handle": {
+     "count": 1875,
+     "avg_us": 2.1
+    },
+    "create_event": {
+     "count": 1875,
+     "avg_us": 2.0
+    },
+    "select": {
+     "count": 1875,
+     "avg_us": 2.0
+    }
+   },
+   {
+    "send_hardware_message": {
+     "count": 625,
+     "avg_us": 17.0
+    },
+    "close_handle": {
+     "count": 1875,
+     "avg_us": 2.1
+    },
+    "event_op": {
+     "count": 625,
+     "avg_us": 6.2
+    },
+    "create_event": {
+     "count": 1875,
+     "avg_us": 2.0
+    },
+    "select": {
+     "count": 1875,
+     "avg_us": 2.0
+    }
+   },
+   {
+    "send_hardware_message": {
+     "count": 625,
+     "avg_us": 17.1
+    },
+    "event_op": {
+     "count": 625,
+     "avg_us": 6.3
+    },
+    "close_handle": {
+     "count": 1875,
+     "avg_us": 2.1
+    },
+    "create_event": {
+     "count": 1875,
+     "avg_us": 2.0
+    },
+    "select": {
+     "count": 1875,
+     "avg_us": 2.0
+    }
+   },
+   {
+    "send_hardware_message": {
+     "count": 625,
+     "avg_us": 17.1
+    },
+    "close_handle": {
+     "count": 1875,
+     "avg_us": 2.1
+    },
+    "event_op": {
+     "count": 625,
+     "avg_us": 6.2
+    },
+    "create_event": {
+     "count": 1875,
+     "avg_us": 2.0
+    },
+    "select": {
+     "count": 1875,
+     "avg_us": 2.0
+    }
+   },
+   {
+    "send_hardware_message": {
+     "count": 625,
+     "avg_us": 17.0
+    },
+    "event_op": {
+     "count": 626,
+     "avg_us": 6.4
+    },
+    "close_handle": {
+     "count": 1877,
+     "avg_us": 2.1
+    },
+    "select": {
+     "count": 1876,
+     "avg_us": 2.0
+    },
+    "create_event": {
+     "count": 1875,
+     "avg_us": 2.0
+    }
+   },
+   {
+    "send_hardware_message": {
+     "count": 626,
+     "avg_us": 17.1
+    },
+    "event_op": {
+     "count": 625,
+     "avg_us": 6.9
+    },
+    "close_handle": {
+     "count": 1876,
+     "avg_us": 2.1
+    },
+    "create_event": {
+     "count": 1878,
+     "avg_us": 2.0
+    },
+    "select": {
+     "count": 1877,
+     "avg_us": 2.0
+    }
+   },
+   {
+    "send_hardware_message": {
+     "count": 625,
+     "avg_us": 17.1
+    },
+    "close_handle": {
+     "count": 1875,
+     "avg_us": 2.1
+    },
+    "event_op": {
+     "count": 625,
+     "avg_us": 6.3
+    },
+    "create_event": {
+     "count": 1875,
+     "avg_us": 2.0
+    },
+    "select": {
+     "count": 1875,
+     "avg_us": 2.0
+    }
+   },
+   {
+    "send_hardware_message": {
+     "count": 625,
+     "avg_us": 17.0
+    },
+    "event_op": {
+     "count": 625,
+     "avg_us": 6.2
+    },
+    "close_handle": {
+     "count": 1875,
+     "avg_us": 2.1
+    },
+    "create_event": {
+     "count": 1875,
+     "avg_us": 2.0
+    },
+    "select": {
+     "count": 1875,
+     "avg_us": 2.0
+    }
+   },
+   {
+    "send_hardware_message": {
+     "count": 625,
+     "avg_us": 16.9
+    },
+    "event_op": {
+     "count": 625,
+     "avg_us": 6.2
+    },
+    "close_handle": {
+     "count": 1875,
+     "avg_us": 2.1
+    },
+    "create_event": {
+     "count": 1875,
+     "avg_us": 2.0
+    },
+    "select": {
+     "count": 1875,
+     "avg_us": 2.0
+    }
+   },
+   {
+    "send_hardware_message": {
+     "count": 625,
+     "avg_us": 17.0
+    },
+    "event_op": {
+     "count": 625,
+     "avg_us": 6.2
+    },
+    "close_handle": {
+     "count": 1875,
+     "avg_us": 2.1
+    },
+    "create_event": {
+     "count": 1875,
+     "avg_us": 2.0
+    },
+    "select": {
+     "count": 1875,
+     "avg_us": 2.0
+    }
+   },
+   {
+    "send_hardware_message": {
+     "count": 625,
+     "avg_us": 17.2
+    },
+    "close_handle": {
+     "count": 1875,
+     "avg_us": 2.1
+    },
+    "event_op": {
+     "count": 625,
+     "avg_us": 6.2
+    },
+    "create_event": {
+     "count": 1875,
+     "avg_us": 2.0
+    },
+    "select": {
+     "count": 1875,
+     "avg_us": 2.0
+    }
+   },
+   {
+    "send_hardware_message": {
+     "count": 625,
+     "avg_us": 17.2
+    },
+    "event_op": {
+     "count": 625,
+     "avg_us": 6.3
+    },
+    "close_handle": {
+     "count": 1875,
+     "avg_us": 2.1
+    },
+    "create_event": {
+     "count": 1875,
+     "avg_us": 2.0
+    },
+    "select": {
+     "count": 1875,
+     "avg_us": 2.0
+    }
+   },
+   {
+    "send_hardware_message": {
+     "count": 625,
+     "avg_us": 17.1
+    },
+    "event_op": {
+     "count": 625,
+     "avg_us": 6.3
+    },
+    "close_handle": {
+     "count": 1875,
+     "avg_us": 2.1
+    },
+    "create_event": {
+     "count": 1875,
+     "avg_us": 2.0
+    },
+    "select": {
+     "count": 1875,
+     "avg_us": 2.0
+    }
+   },
+   {
+    "send_hardware_message": {
+     "count": 626,
+     "avg_us": 17.2
+    },
+    "close_handle": {
+     "count": 1878,
+     "avg_us": 2.1
+    },
+    "event_op": {
+     "count": 626,
+     "avg_us": 6.3
+    },
+    "select": {
+     "count": 1878,
+     "avg_us": 2.0
+    },
+    "create_event": {
+     "count": 1878,
+     "avg_us": 2.0
+    }
+   },
+   {
+    "send_hardware_message": {
+     "count": 625,
+     "avg_us": 17.1
+    },
+    "close_handle": {
+     "count": 1875,
+     "avg_us": 2.1
+    },
+    "event_op": {
+     "count": 625,
+     "avg_us": 6.3
+    },
+    "create_event": {
+     "count": 1875,
+     "avg_us": 2.0
+    },
+    "select": {
+     "count": 1875,
+     "avg_us": 2.0
+    }
+   },
+   {
+    "send_hardware_message": {
+     "count": 625,
+     "avg_us": 17.0
+    },
+    "event_op": {
+     "count": 625,
+     "avg_us": 6.5
+    },
+    "close_handle": {
+     "count": 1875,
+     "avg_us": 2.1
+    },
+    "create_event": {
+     "count": 1875,
+     "avg_us": 2.0
+    },
+    "select": {
+     "count": 1875,
+     "avg_us": 2.0
+    }
+   },
+   {
+    "send_hardware_message": {
+     "count": 625,
+     "avg_us": 17.0
+    },
+    "event_op": {
+     "count": 625,
+     "avg_us": 6.7
+    },
+    "close_handle": {
+     "count": 1875,
+     "avg_us": 2.1
+    },
+    "create_event": {
+     "count": 1875,
+     "avg_us": 2.0
+    },
+    "select": {
+     "count": 1875,
+     "avg_us": 2.0
+    }
+   },
+   {
+    "send_hardware_message": {
+     "count": 625,
+     "avg_us": 17.1
+    },
+    "event_op": {
+     "count": 625,
+     "avg_us": 6.2
+    },
+    "close_handle": {
+     "count": 1875,
+     "avg_us": 2.1
+    },
+    "create_event": {
+     "count": 1875,
+     "avg_us": 2.0
+    },
+    "select": {
+     "count": 1875,
+     "avg_us": 2.0
+    }
+   },
+   {
+    "send_hardware_message": {
+     "count": 625,
+     "avg_us": 17.1
+    },
+    "close_handle": {
+     "count": 1875,
+     "avg_us": 2.1
+    },
+    "event_op": {
+     "count": 625,
+     "avg_us": 6.2
+    },
+    "create_event": {
+     "count": 1875,
+     "avg_us": 2.0
+    },
+    "select": {
+     "count": 1875,
+     "avg_us": 2.0
+    }
+   },
+   {
+    "send_hardware_message": {
+     "count": 625,
+     "avg_us": 17.1
+    },
+    "close_handle": {
+     "count": 1875,
+     "avg_us": 2.1
+    },
+    "event_op": {
+     "count": 625,
+     "avg_us": 6.2
+    },
+    "select": {
+     "count": 1875,
+     "avg_us": 2.0
+    },
+    "create_event": {
+     "count": 1875,
+     "avg_us": 2.0
+    }
+   },
+   {
+    "send_hardware_message": {
+     "count": 625,
+     "avg_us": 17.1
+    },
+    "event_op": {
+     "count": 625,
+     "avg_us": 6.3
+    },
+    "close_handle": {
+     "count": 1875,
+     "avg_us": 2.1
+    },
+    "create_event": {
+     "count": 1875,
+     "avg_us": 2.0
+    },
+    "select": {
+     "count": 1875,
+     "avg_us": 2.0
+    }
+   },
+   {
+    "send_hardware_message": {
+     "count": 625,
+     "avg_us": 17.2
+    },
+    "close_handle": {
+     "count": 1875,
+     "avg_us": 2.1
+    },
+    "event_op": {
+     "count": 625,
+     "avg_us": 6.2
+    },
+    "create_event": {
+     "count": 1875,
+     "avg_us": 2.0
+    },
+    "select": {
+     "count": 1875,
+     "avg_us": 2.0
+    }
+   },
+   {
+    "send_hardware_message": {
+     "count": 625,
+     "avg_us": 17.1
+    },
+    "event_op": {
+     "count": 625,
+     "avg_us": 6.3
+    },
+    "close_handle": {
+     "count": 1875,
+     "avg_us": 2.1
+    },
+    "create_event": {
+     "count": 1875,
+     "avg_us": 2.0
+    },
+    "select": {
+     "count": 1875,
+     "avg_us": 2.0
+    }
+   },
+   {
+    "send_hardware_message": {
+     "count": 625,
+     "avg_us": 17.0
+    },
+    "close_handle": {
+     "count": 1875,
+     "avg_us": 2.1
+    },
+    "event_op": {
+     "count": 625,
+     "avg_us": 6.2
+    },
+    "create_event": {
+     "count": 1875,
+     "avg_us": 2.0
+    },
+    "select": {
+     "count": 1875,
+     "avg_us": 2.0
+    }
+   },
+   {
+    "send_hardware_message": {
+     "count": 625,
+     "avg_us": 17.3
+    },
+    "close_handle": {
+     "count": 1875,
+     "avg_us": 2.1
+    },
+    "event_op": {
+     "count": 625,
+     "avg_us": 6.1
+    },
+    "create_event": {
+     "count": 1875,
+     "avg_us": 2.0
+    },
+    "select": {
+     "count": 1875,
+     "avg_us": 2.0
+    }
+   },
+   {
+    "send_hardware_message": {
+     "count": 625,
+     "avg_us": 17.2
+    },
+    "event_op": {
+     "count": 625,
+     "avg_us": 6.4
+    },
+    "close_handle": {
+     "count": 1875,
+     "avg_us": 2.1
+    },
+    "create_event": {
+     "count": 1875,
+     "avg_us": 2.0
+    },
+    "select": {
+     "count": 1875,
+     "avg_us": 2.0
+    }
+   },
+   {
+    "send_hardware_message": {
+     "count": 625,
+     "avg_us": 17.2
+    },
+    "close_handle": {
+     "count": 1875,
+     "avg_us": 2.1
+    },
+    "event_op": {
+     "count": 625,
+     "avg_us": 6.2
+    },
+    "select": {
+     "count": 1875,
+     "avg_us": 2.0
+    },
+    "create_event": {
+     "count": 1875,
+     "avg_us": 2.0
+    }
+   },
+   {
+    "send_hardware_message": {
+     "count": 625,
+     "avg_us": 17.2
+    },
+    "close_handle": {
+     "count": 1875,
+     "avg_us": 2.1
+    },
+    "event_op": {
+     "count": 625,
+     "avg_us": 6.2
+    },
+    "create_event": {
+     "count": 1875,
+     "avg_us": 2.0
+    },
+    "select": {
+     "count": 1875,
+     "avg_us": 2.0
+    }
+   },
+   {
+    "send_hardware_message": {
+     "count": 625,
+     "avg_us": 17.2
+    },
+    "event_op": {
+     "count": 625,
+     "avg_us": 6.3
+    },
+    "close_handle": {
+     "count": 1875,
+     "avg_us": 2.1
+    },
+    "select": {
+     "count": 1875,
+     "avg_us": 2.0
+    },
+    "create_event": {
+     "count": 1875,
+     "avg_us": 2.0
+    }
+   },
+   {
+    "send_hardware_message": {
+     "count": 625,
+     "avg_us": 17.1
+    },
+    "close_handle": {
+     "count": 1875,
+     "avg_us": 2.1
+    },
+    "event_op": {
+     "count": 625,
+     "avg_us": 6.1
+    },
+    "select": {
+     "count": 1875,
+     "avg_us": 2.0
+    },
+    "create_event": {
+     "count": 1875,
+     "avg_us": 2.0
+    }
+   },
+   {
+    "send_hardware_message": {
+     "count": 625,
+     "avg_us": 17.2
+    },
+    "close_handle": {
+     "count": 1875,
+     "avg_us": 2.1
+    },
+    "event_op": {
+     "count": 625,
+     "avg_us": 6.2
+    },
+    "create_event": {
+     "count": 1875,
+     "avg_us": 2.0
+    },
+    "select": {
+     "count": 1875,
+     "avg_us": 2.0
+    }
+   },
+   {
+    "send_hardware_message": {
+     "count": 626,
+     "avg_us": 17.2
+    },
+    "close_handle": {
+     "count": 1878,
+     "avg_us": 2.1
+    },
+    "create_event": {
+     "count": 1878,
+     "avg_us": 2.0
+    },
+    "event_op": {
+     "count": 626,
+     "avg_us": 6.0
+    },
+    "select": {
+     "count": 1878,
+     "avg_us": 2.0
+    }
+   },
+   {
+    "send_hardware_message": {
+     "count": 625,
+     "avg_us": 17.1
+    },
+    "event_op": {
+     "count": 625,
+     "avg_us": 6.3
+    },
+    "close_handle": {
+     "count": 1875,
+     "avg_us": 2.1
+    },
+    "select": {
+     "count": 1875,
+     "avg_us": 2.0
+    },
+    "create_event": {
+     "count": 1875,
+     "avg_us": 2.0
+    }
+   },
+   {
+    "send_hardware_message": {
+     "count": 625,
+     "avg_us": 17.4
+    },
+    "event_op": {
+     "count": 625,
+     "avg_us": 6.4
+    },
+    "close_handle": {
+     "count": 1875,
+     "avg_us": 2.1
+    },
+    "select": {
+     "count": 1875,
+     "avg_us": 2.0
+    },
+    "create_event": {
+     "count": 1875,
+     "avg_us": 2.0
+    }
+   },
+   {
+    "send_hardware_message": {
+     "count": 626,
+     "avg_us": 17.1
+    },
+    "close_handle": {
+     "count": 1878,
+     "avg_us": 2.1
+    },
+    "event_op": {
+     "count": 626,
+     "avg_us": 6.2
+    },
+    "create_event": {
+     "count": 1878,
+     "avg_us": 2.0
+    },
+    "select": {
+     "count": 1878,
+     "avg_us": 2.0
+    }
+   },
+   {
+    "send_hardware_message": {
+     "count": 625,
+     "avg_us": 17.2
+    },
+    "close_handle": {
+     "count": 1875,
+     "avg_us": 2.1
+    },
+    "event_op": {
+     "count": 625,
+     "avg_us": 6.3
+    },
+    "create_event": {
+     "count": 1875,
+     "avg_us": 2.0
+    },
+    "select": {
+     "count": 1875,
+     "avg_us": 2.0
+    }
+   },
+   {
+    "send_hardware_message": {
+     "count": 625,
+     "avg_us": 17.3
+    },
+    "event_op": {
+     "count": 625,
+     "avg_us": 6.3
+    },
+    "close_handle": {
+     "count": 1875,
+     "avg_us": 2.1
+    },
+    "create_event": {
+     "count": 1875,
+     "avg_us": 2.0
+    },
+    "select": {
+     "count": 1875,
+     "avg_us": 2.0
+    }
+   },
+   {
+    "send_hardware_message": {
+     "count": 625,
+     "avg_us": 17.1
+    },
+    "event_op": {
+     "count": 625,
+     "avg_us": 6.3
+    },
+    "close_handle": {
+     "count": 1875,
+     "avg_us": 2.1
+    },
+    "create_event": {
+     "count": 1875,
+     "avg_us": 2.0
+    },
+    "select": {
+     "count": 1875,
+     "avg_us": 2.0
+    }
+   },
+   {
+    "send_hardware_message": {
+     "count": 625,
+     "avg_us": 17.1
+    },
+    "event_op": {
+     "count": 625,
+     "avg_us": 6.3
+    },
+    "close_handle": {
+     "count": 1875,
+     "avg_us": 2.1
+    },
+    "create_event": {
+     "count": 1875,
+     "avg_us": 2.0
+    },
+    "select": {
+     "count": 1875,
+     "avg_us": 2.0
+    }
+   },
+   {
+    "send_hardware_message": {
+     "count": 625,
+     "avg_us": 17.1
+    },
+    "event_op": {
+     "count": 625,
+     "avg_us": 6.4
+    },
+    "close_handle": {
+     "count": 1875,
+     "avg_us": 2.1
+    },
+    "create_event": {
+     "count": 1875,
+     "avg_us": 2.0
+    },
+    "select": {
+     "count": 1875,
+     "avg_us": 2.0
+    }
+   },
+   {
+    "send_hardware_message": {
+     "count": 625,
+     "avg_us": 17.1
+    },
+    "event_op": {
+     "count": 625,
+     "avg_us": 6.3
+    },
+    "close_handle": {
+     "count": 1875,
+     "avg_us": 2.1
+    },
+    "create_event": {
+     "count": 1875,
+     "avg_us": 2.0
+    },
+    "select": {
+     "count": 1875,
+     "avg_us": 2.0
+    }
+   },
+   {
+    "send_hardware_message": {
+     "count": 625,
+     "avg_us": 17.3
+    },
+    "close_handle": {
+     "count": 1875,
+     "avg_us": 2.1
+    },
+    "event_op": {
+     "count": 625,
+     "avg_us": 6.2
+    },
+    "select": {
+     "count": 1875,
+     "avg_us": 2.0
+    },
+    "create_event": {
+     "count": 1875,
+     "avg_us": 2.0
+    }
+   },
+   {
+    "send_hardware_message": {
+     "count": 625,
+     "avg_us": 17.2
+    },
+    "close_handle": {
+     "count": 1875,
+     "avg_us": 2.1
+    },
+    "event_op": {
+     "count": 625,
+     "avg_us": 6.2
+    },
+    "select": {
+     "count": 1875,
+     "avg_us": 2.0
+    },
+    "create_event": {
+     "count": 1875,
+     "avg_us": 2.0
+    }
+   },
+   {
+    "send_hardware_message": {
+     "count": 625,
+     "avg_us": 17.4
+    },
+    "close_handle": {
+     "count": 1875,
+     "avg_us": 2.1
+    },
+    "event_op": {
+     "count": 625,
+     "avg_us": 6.2
+    },
+    "create_event": {
+     "count": 1875,
+     "avg_us": 2.0
+    },
+    "select": {
+     "count": 1875,
+     "avg_us": 2.0
+    }
+   },
+   {
+    "send_hardware_message": {
+     "count": 625,
+     "avg_us": 17.1
+    },
+    "event_op": {
+     "count": 625,
+     "avg_us": 6.8
+    },
+    "close_handle": {
+     "count": 1875,
+     "avg_us": 2.1
+    },
+    "select": {
+     "count": 1875,
+     "avg_us": 2.0
+    },
+    "create_event": {
+     "count": 1875,
+     "avg_us": 2.0
+    }
+   },
+   {
+    "send_hardware_message": {
+     "count": 625,
+     "avg_us": 17.4
+    },
+    "create_event": {
+     "count": 1875,
+     "avg_us": 2.2
+    },
+    "close_handle": {
+     "count": 1875,
+     "avg_us": 2.1
+    },
+    "event_op": {
+     "count": 625,
+     "avg_us": 6.1
+    },
+    "select": {
+     "count": 1875,
+     "avg_us": 2.0
+    }
+   },
+   {
+    "send_hardware_message": {
+     "count": 625,
+     "avg_us": 17.2
+    },
+    "event_op": {
+     "count": 625,
+     "avg_us": 6.3
+    },
+    "close_handle": {
+     "count": 1875,
+     "avg_us": 2.1
+    },
+    "create_event": {
+     "count": 1875,
+     "avg_us": 2.0
+    },
+    "select": {
+     "count": 1875,
+     "avg_us": 2.0
+    }
+   },
+   {
+    "send_hardware_message": {
+     "count": 625,
+     "avg_us": 17.3
+    },
+    "close_handle": {
+     "count": 1875,
+     "avg_us": 2.1
+    },
+    "event_op": {
+     "count": 625,
+     "avg_us": 6.3
+    },
+    "select": {
+     "count": 1875,
+     "avg_us": 2.0
+    },
+    "create_event": {
+     "count": 1875,
+     "avg_us": 2.0
+    }
+   },
+   {
+    "send_hardware_message": {
+     "count": 625,
+     "avg_us": 17.2
+    },
+    "event_op": {
+     "count": 625,
+     "avg_us": 6.3
+    },
+    "close_handle": {
+     "count": 1875,
+     "avg_us": 2.1
+    },
+    "select": {
+     "count": 1875,
+     "avg_us": 2.0
+    },
+    "create_event": {
+     "count": 1875,
+     "avg_us": 2.0
+    }
+   },
+   {
+    "send_hardware_message": {
+     "count": 625,
+     "avg_us": 17.1
+    },
+    "event_op": {
+     "count": 625,
+     "avg_us": 6.4
+    },
+    "close_handle": {
+     "count": 1875,
+     "avg_us": 2.1
+    },
+    "select": {
+     "count": 1875,
+     "avg_us": 2.0
+    },
+    "create_event": {
+     "count": 1875,
+     "avg_us": 2.0
+    }
+   },
+   {
+    "send_hardware_message": {
+     "count": 625,
+     "avg_us": 17.2
+    },
+    "event_op": {
+     "count": 625,
+     "avg_us": 6.5
+    },
+    "close_handle": {
+     "count": 1875,
+     "avg_us": 2.1
+    },
+    "select": {
+     "count": 1875,
+     "avg_us": 2.0
+    },
+    "create_event": {
+     "count": 1875,
+     "avg_us": 2.0
+    }
+   },
+   {
+    "event_op": {
+     "count": 591,
+     "avg_us": 425.5
+    },
+    "send_hardware_message": {
+     "count": 591,
+     "avg_us": 17.3
+    },
+    "select": {
+     "count": 1776,
+     "avg_us": 3.7
+    },
+    "close_handle": {
+     "count": 1799,
+     "avg_us": 3.5
+    },
+    "create_event": {
+     "count": 1773,
+     "avg_us": 3.2
+    }
+   }
+  ]
+ }
+}

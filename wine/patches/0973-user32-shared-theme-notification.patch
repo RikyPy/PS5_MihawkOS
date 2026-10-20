@@ -1,0 +1,149 @@
+From: PS5_Proton
+Subject: [PATCH] user32: refresh receiver caches before shared appearance notifications
+
+An existing PE32 or PE64 process receives WM_THEMECHANGED but continues to
+report and open its previous theme. Its cached system colours also survive
+WM_SYSCOLORCHANGE. Refresh the local theme file through the existing USER
+hook before application dispatch, without writing registry state or metrics.
+Invalidate local colour values and cached GDI objects at the common receiver
+boundary. Old HTHEME references remain valid until their owners close them.
+
+The paired cross-process probe reproduces three failed assertions in each
+architecture on the preceding runtime: theme name, pane colour and new theme
+caption colour. This changes shared Wine behavior without title conditions.
+
+--- a/include/winuser.h
++++ b/include/winuser.h
+@@ -4874,6 +4874,7 @@
+                                   const struct SCROLL_TRACKING_INFO *, BOOL, BOOL, RECT *, UINT,
+                                   INT, INT, INT, BOOL);
+     LRESULT (WINAPI *pScrollBarWndProc)(HWND, UINT, WPARAM, LPARAM, BOOL);
++    void (WINAPI *pThemeChanged)(void);
+ };
+ 
+ WINUSERAPI BOOL WINAPI RegisterUserApiHook(const struct user_api_hook *new_hook, struct user_api_hook *old_hook);
+--- a/dlls/user32/hook.c
++++ b/dlls/user32/hook.c
+@@ -77,6 +77,7 @@
+     USER_NonClientButtonDraw,
+     USER_ScrollBarDraw,
+     USER_ScrollBarProc,
++    NULL, /* no theme cache when uxtheme is not installed */
+ };
+ static struct user_api_hook hooked_user_api;
+ struct user_api_hook *user_api = &original_user_api;
+--- a/dlls/user32/winproc.c
++++ b/dlls/user32/winproc.c
+@@ -701,6 +701,9 @@
+     DPI_AWARENESS_CONTEXT context = SetThreadDpiAwarenessContext( ULongToHandle( params->dpi_context ) );
+     LRESULT result = 0;
+ 
++    if (params->msg == WM_THEMECHANGED && user_api->pThemeChanged)
++        user_api->pThemeChanged();
++
+     if (!params->ansi)
+     {
+         if (params->procW == WINPROC_PROC16)
+--- a/dlls/uxtheme/system.c
++++ b/dlls/uxtheme/system.c
+@@ -1261,10 +1261,47 @@
+     return S_OK;
+ }
+ 
++/* Another process owns theme selection. Reload only this process's theme
++ * file before delivering WM_THEMECHANGED; do not publish metrics or rewrite
++ * ThemeManager here. Existing theme handles retain their file references. */
++static void WINAPI UXTHEME_RefreshTheme(void)
++{
++    HKEY key;
++    WCHAR active[10] = {0}, path[MAX_PATH] = {0}, color[64] = {0}, size[64] = {0};
++    DWORD count;
++    PTHEME_FILE theme = NULL;
++    BOOL enabled;
++
++    if (RegOpenKeyW(HKEY_CURRENT_USER, szThemeManager, &key)) return;
++    count = sizeof(active);
++    RegQueryValueExW(key, L"ThemeActive", NULL, NULL, (BYTE *)active, &count);
++    count = sizeof(color);
++    RegQueryValueExW(key, L"ColorName", NULL, NULL, (BYTE *)color, &count);
++    count = sizeof(size);
++    RegQueryValueExW(key, L"SizeName", NULL, NULL, (BYTE *)size, &count);
++    if (query_reg_path(key, L"DllName", path)) path[0] = 0;
++    RegCloseKey(key);
++    active[ARRAY_SIZE(active)-1] = color[ARRAY_SIZE(color)-1] = size[ARRAY_SIZE(size)-1] = 0;
++    path[ARRAY_SIZE(path)-1] = 0;
++    enabled = active[0] && active[0] != '0';
++    if (enabled == bThemeActive && (!enabled ||
++        (!lstrcmpW(path, szCurrentTheme) && !lstrcmpW(color, szCurrentColor) &&
++         !lstrcmpW(size, szCurrentSize)))) return;
++    if (enabled && FAILED(MSSTYLES_OpenThemeFile(path, color[0] ? color : NULL,
++                                               size[0] ? size : NULL, &theme))) return;
++    MSSTYLES_SetActiveTheme(theme, FALSE);
++    bThemeActive = enabled;
++    lstrcpynW(szCurrentTheme, enabled ? path : L"", ARRAY_SIZE(szCurrentTheme));
++    lstrcpynW(szCurrentColor, theme ? theme->pszSelectedColor : L"", ARRAY_SIZE(szCurrentColor));
++    lstrcpynW(szCurrentSize, theme ? theme->pszSelectedSize : L"", ARRAY_SIZE(szCurrentSize));
++    if (theme) MSSTYLES_CloseThemeFile(theme);
++}
++
+ BOOL WINAPI ThemeHooksInstall(void)
+ {
+     struct user_api_hook hooks;
+ 
++    hooks.pThemeChanged = UXTHEME_RefreshTheme;
+     hooks.pDefDlgProc = UXTHEME_DefDlgProc;
+     hooks.pNonClientButtonDraw = UXTHEME_NonClientButtonDraw;
+     hooks.pScrollBarDraw = UXTHEME_ScrollBarDraw;
+--- a/dlls/win32u/win32u_private.h
++++ b/dlls/win32u/win32u_private.h
+@@ -174,6 +174,7 @@
+ extern UINT round_fractional_dpi( UINT dpi );
+ extern RECT get_primary_monitor_rect( UINT dpi );
+ extern DWORD get_process_layout(void);
++extern void invalidate_sys_colors(void);
+ extern COLORREF get_sys_color( int index );
+ extern HBRUSH get_sys_color_brush( unsigned int index );
+ extern HPEN get_sys_color_pen( unsigned int index );
+--- a/dlls/win32u/sysparams.c
++++ b/dlls/win32u/sysparams.c
+@@ -7500,6 +7500,30 @@
+     }
+ }
+ 
++/* SetSysColors publishes to the shared volatile registry. Drop process-local
++ * values and GDI objects before a receiver handles WM_SYSCOLORCHANGE. */
++void invalidate_sys_colors(void)
++{
++    unsigned int i;
++    HBRUSH brush;
++    HPEN pen;
++
++    for (i = 0; i < ARRAY_SIZE(system_colors); ++i)
++    {
++        system_colors[i].hdr.loaded = FALSE;
++        if ((brush = InterlockedExchangePointer((void **)&system_colors[i].brush, NULL)))
++        {
++            make_gdi_object_system(brush, FALSE);
++            NtGdiDeleteObjectApp(brush);
++        }
++        if ((pen = InterlockedExchangePointer((void **)&system_colors[i].pen, NULL)))
++        {
++            make_gdi_object_system(pen, FALSE);
++            NtGdiDeleteObjectApp(pen);
++        }
++    }
++}
++
+ COLORREF get_sys_color( int index )
+ {
+     COLORREF ret = 0;
+--- a/dlls/win32u/message.c
++++ b/dlls/win32u/message.c
+@@ -469,6 +469,7 @@
+     NTSTATUS status;
+ 
+     if (thread_info->recursion_count > MAX_WINPROC_RECURSION) return 0;
++    if (params->msg == WM_SYSCOLORCHANGE) invalidate_sys_colors();
+     thread_info->recursion_count++;
+     status = KeUserModeCallback( NtUserCallWinProc, params, size, &ret_ptr, &ret_len );
+     thread_info->recursion_count--;

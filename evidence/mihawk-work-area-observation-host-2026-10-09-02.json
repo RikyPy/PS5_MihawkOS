@@ -1,0 +1,17 @@
+{
+ "scope": "Owned bootstrap observations only; no transport behavior change or startup fix claim",
+ "command": "bash tools/host-tests.sh process_io",
+ "passed": true,
+ "sanitizers": [
+  "address",
+  "undefined"
+ ],
+ "suites": 1,
+ "build_fingerprint": "769acb894a94c69af517c48629df3df3819a880bb2908a1aaff04afc8ddee0e1",
+ "sources": {
+  "native/proton_wine_child.c": "1a565fc35fab40b11f971b2dbf40654d6d1611f1d2908a3f090147be630e464b",
+  "wine/ps5/pw_wine_process.c": "ee0cf01c7e8ec35f7cc7fe16285c2b00c866fd057651bf117fe938d3c94acf57",
+  "wine/ps5/pw_wine_process_io.c": "3d7f260826d507bf276943415a3531bfeb18c3e040ea64b401cb95ab7030aeb7",
+  "tests/test_pw_wine_process_io.c": "1db172c77a904e0cd36a193ab320e4f6eba8ac533ec08708a38b42fb12db1731"
+ }
+}

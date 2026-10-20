@@ -1,0 +1,33 @@
+{
+ "run": "r5-sched-barrier-off-01",
+ "what": "priority-probe.exe",
+ "env": [
+  "WINE_PS5_SCHED=0"
+ ],
+ "result": "finished",
+ "seconds": 9.7,
+ "probe_verdict": "FAIL",
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": false,
+ "passed": false,
+ "bench": {
+  "cpus": 16.0,
+  "equal_periods": 0.0,
+  "equal_p50_us": 0.0,
+  "equal_p99_us": 0.0,
+  "time_critical_periods": 0.0,
+  "time_critical_p50_us": 0.0,
+  "time_critical_p99_us": 0.0,
+  "below_normal_permille_of_normal": 0.0,
+  "idle_permille_of_normal": 0.0,
+  "inversion_holder_started": 0.0,
+  "inversion_wait_us": 1.0
+ },
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [],
+  "top": []
+ }
+}

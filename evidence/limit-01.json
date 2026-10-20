@@ -1,0 +1,145 @@
+{
+ "run": "limit-01",
+ "what": "process-probe.exe",
+ "env": [],
+ "result": "finished",
+ "seconds": 23.6,
+ "probe_verdict": "PASS",
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": true,
+ "bench": {},
+ "steady": {
+  "server": {
+   "calls": 7096.0,
+   "per_s": 1399.0,
+   "avg_us": 4.85,
+   "selects": 1888.5,
+   "blocked": 635.5,
+   "block_avg_us": 8638.2,
+   "waits": 1888.5,
+   "handles_avg": 1.33,
+   "wait_all": 0.0,
+   "polled": 1250.0,
+   "delays": 0.0,
+   "yields": 0.0,
+   "intervals": 2
+  }
+ },
+ "intervals": {
+  "frames": [],
+  "server": [
+   {
+    "calls": 6818.0,
+    "per_s": 1347.0,
+    "avg_us": 8.5,
+    "selects": 1375.0,
+    "blocked": 459.0,
+    "block_avg_us": 9016.5,
+    "waits": 1372.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 910.0,
+    "delays": 1.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 7073.0,
+    "per_s": 1394.0,
+    "avg_us": 5.0,
+    "selects": 1885.0,
+    "blocked": 635.0,
+    "block_avg_us": 8653.4,
+    "waits": 1885.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 1250.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 7119.0,
+    "per_s": 1404.0,
+    "avg_us": 4.7,
+    "selects": 1892.0,
+    "blocked": 636.0,
+    "block_avg_us": 8623.0,
+    "waits": 1892.0,
+    "handles_avg": 1.33,
+    "wait_all": 0.0,
+    "polled": 1250.0,
+    "delays": 0.0,
+    "yields": 0.0
+   }
+  ],
+  "top": [
+   {
+    "create_mapping": {
+     "count": 37,
+     "avg_us": 240.2
+    },
+    "create_file": {
+     "count": 42,
+     "avg_us": 191.6
+    },
+    "send_hardware_message": {
+     "count": 456,
+     "avg_us": 17.4
+    },
+    "get_key_value": {
+     "count": 372,
+     "avg_us": 15.3
+    },
+    "close_handle": {
+     "count": 1731,
+     "avg_us": 2.4
+    }
+   },
+   {
+    "send_hardware_message": {
+     "count": 625,
+     "avg_us": 18.9
+    },
+    "event_op": {
+     "count": 625,
+     "avg_us": 10.1
+    },
+    "close_handle": {
+     "count": 1921,
+     "avg_us": 2.5
+    },
+    "create_event": {
+     "count": 1875,
+     "avg_us": 2.4
+    },
+    "select": {
+     "count": 1885,
+     "avg_us": 2.2
+    }
+   },
+   {
+    "send_hardware_message": {
+     "count": 625,
+     "avg_us": 18.4
+    },
+    "event_op": {
+     "count": 639,
+     "avg_us": 8.4
+    },
+    "close_handle": {
+     "count": 1939,
+     "avg_us": 2.4
+    },
+    "select": {
+     "count": 1892,
+     "avg_us": 2.3
+    },
+    "create_event": {
+     "count": 1875,
+     "avg_us": 2.1
+    }
+   }
+  ]
+ }
+}

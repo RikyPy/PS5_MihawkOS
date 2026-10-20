@@ -1,0 +1,90 @@
+From 4caae0d644dcc8444884a398e96361db98fa22c3 Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Wed, 7 Oct 2026 09:10:00 -0400
+Subject: [PATCH] ntdll: count the images a process holds, and the file bytes
+ it read in
+
+On the PS5 a host page is 16 KiB and an image's sections are 4 KiB apart,
+so map_file_into_view reads every section into the process's own memory
+instead of mapping the file: each process holds its own copy of every
+image it loads, the same DLLs over and over. A launcher's browser processes,
+each with its own copy of the browser library, held 245 and 299 MiB of
+the console's system memory (2026-10-07; record removed from the tree; in git history).
+
+__wine_virtual_image_stats reports the images mapped now and their bytes,
+and __wine_virtual_stats gains the bytes read into private memory where a
+file could not be mapped, so a helper can say how much of it is images
+before any of it is shared.
+---
+ dlls/ntdll/unix/virtual.c | 34 +++++++++++++++++++++++++++++++---
+ 1 file changed, 31 insertions(+), 3 deletions(-)
+
+diff --git a/dlls/ntdll/unix/virtual.c b/dlls/ntdll/unix/virtual.c
+index 05d462f..1b495ef 100644
+--- a/dlls/ntdll/unix/virtual.c
++++ b/dlls/ntdll/unix/virtual.c
+@@ -115,7 +115,7 @@ WINE_DECLARE_DEBUG_CHANNEL(virtstat);
+  * never skipped. Counters are readable through __wine_virtual_stats. */
+ enum { VM_STAT_MMAP, VM_STAT_MUNMAP, VM_STAT_MPROTECT, VM_STAT_MPROTECT_BYTES,
+        VM_STAT_MPROTECT_SKIPPED, VM_STAT_FAULTS, VM_STAT_IMAGES, VM_STAT_IMAGE_MMAP,
+-       VM_STAT_IMAGE_MPROTECT, VM_STAT_COUNT };
++       VM_STAT_IMAGE_MPROTECT, VM_STAT_FILE_READ, VM_STAT_COUNT };
+ static ULONG64 vm_stats[VM_STAT_COUNT];
+ 
+ static inline void vm_stat_add( unsigned int index, ULONG64 value )
+@@ -320,8 +320,9 @@ DECLSPEC_EXPORT unsigned int __wine_virtual_fault_top( ULONG64 *out, unsigned in
+  *           __wine_virtual_stats
+  *
+  * Copy up to count counters (mmap, munmap, mprotect, mprotect bytes, skipped
+- * mprotect, resolved faults, images, image mmap, image mprotect); returns how
+- * many counters exist.
++ * mprotect, resolved faults, images, image mmap, image mprotect, bytes of files
++ * read into private memory where they could not be mapped); returns how many
++ * counters exist.
+  */
+ DECLSPEC_EXPORT unsigned int __wine_virtual_stats( ULONG64 *out, unsigned int count )
+ {
+@@ -2228,6 +2229,32 @@ static void delete_view( struct file_view *view ) /* [in] View */
+ }
+ 
+ 
++/***********************************************************************
++ *           __wine_virtual_image_stats
++ *
++ * The images this process has mapped now, and their bytes. Where the host's
++ * pages are larger than an image's sections (16 KiB on the PS5, 4 KiB
++ * sections), map_file_into_view reads each section into the process's own
++ * memory, so this is what the process holds of images that every other
++ * process with the same image holds too.
++ */
++DECLSPEC_EXPORT void __wine_virtual_image_stats( ULONG64 *views, ULONG64 *bytes )
++{
++    struct file_view *view;
++    sigset_t sigset;
++
++    *views = *bytes = 0;
++    server_enter_uninterrupted_section( &virtual_mutex, &sigset );
++    WINE_RB_FOR_EACH_ENTRY( view, &views_tree, struct file_view, entry )
++    {
++        if (!(view->protect & SEC_IMAGE)) continue;
++        ++*views;
++        *bytes += view->size;
++    }
++    server_leave_uninterrupted_section( &virtual_mutex, &sigset );
++}
++
++
+ /***********************************************************************
+  *           register_view
+  *
+@@ -3023,6 +3050,7 @@ static NTSTATUS map_file_into_view( struct file_view *view, int fd, size_t start
+ 
+     mprotect( map_addr, map_size, PROT_READ | PROT_WRITE );
+     pread( fd, map_addr, size, offset );
++    vm_stat_add( VM_STAT_FILE_READ, size );
+     return STATUS_SUCCESS;
+ }
+ 
+-- 
+2.56.0
+

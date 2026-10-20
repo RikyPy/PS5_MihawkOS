@@ -1,0 +1,708 @@
+{
+ "cred": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 0.1,
+  "skipped_lines": [
+   "cred.c:816: Tests skipped: CRED_TYPE_DOMAIN_VISIBLE_PASSWORD credentials are not supported or are disabled. Skipping"
+  ],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 1,
+   "tests": 349,
+   "todo": 4
+  },
+  "todo_lines": 4
+ },
+ "crypt": {
+  "exit_code": 1,
+  "failure_count": 1,
+  "failures": [
+   {
+    "file": "crypt.c",
+    "line": 168,
+    "text": "got 203"
+   }
+  ],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 0.1,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 1,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 167,
+   "todo": 0
+  },
+  "todo_lines": 0
+ },
+ "crypt_lmhash": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 0.1,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 75,
+   "todo": 0
+  },
+  "todo_lines": 0
+ },
+ "crypt_md4": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 0.1,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 11,
+   "todo": 0
+  },
+  "todo_lines": 0
+ },
+ "crypt_md5": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 0.1,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 5,
+   "todo": 0
+  },
+  "todo_lines": 0
+ },
+ "crypt_sha": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 0.1,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 1,
+   "todo": 0
+  },
+  "todo_lines": 0
+ },
+ "eventlog": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 0.2,
+  "skipped_lines": [
+   "eventlog.c:584: Tests skipped: We don't have a backup eventlog to work with",
+   "eventlog.c:514: Tests skipped: No records in the 'Application' log",
+   "eventlog.c:938: Tests skipped: No events were written to the eventlog"
+  ],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 3,
+   "tests": 290,
+   "todo": 115
+  },
+  "todo_lines": 115
+ },
+ "lsa": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 0.1,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 94,
+   "todo": 0
+  },
+  "todo_lines": 0
+ },
+ "perf": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 0.1,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 101,
+   "todo": 0
+  },
+  "todo_lines": 0
+ },
+ "registry": {
+  "exit_code": 18,
+  "failure_count": 18,
+  "failures": [
+   {
+    "file": "registry.c",
+    "line": 3190,
+    "text": "RegOpenKeyExA failed: 0"
+   },
+   {
+    "file": "registry.c",
+    "line": 3217,
+    "text": "RegOpenKeyExA failed: 0"
+   },
+   {
+    "file": "registry.c",
+    "line": 3220,
+    "text": "RegOpenKeyExA failed: 0"
+   },
+   {
+    "file": "registry.c",
+    "line": 3236,
+    "text": "00000200: wrong value 64/32"
+   },
+   {
+    "file": "registry.c",
+    "line": 3237,
+    "text": "00000000: wrong value 64/32"
+   },
+   {
+    "file": "registry.c",
+    "line": 3238,
+    "text": "00000100: wrong value 64/32"
+   },
+   {
+    "file": "registry.c",
+    "line": 3239,
+    "text": "00000200: wrong value 64/32"
+   },
+   {
+    "file": "registry.c",
+    "line": 3246,
+    "text": "00000200: wrong value 64/32"
+   },
+   {
+    "file": "registry.c",
+    "line": 3252,
+    "text": "00000000: wrong value 64/32"
+   },
+   {
+    "file": "registry.c",
+    "line": 3253,
+    "text": "00000100: wrong value 64/32"
+   },
+   {
+    "file": "registry.c",
+    "line": 3254,
+    "text": "00000200: wrong value 64/32"
+   },
+   {
+    "file": "registry.c",
+    "line": 3259,
+    "text": "00000200: wrong value 64/32"
+   },
+   {
+    "file": "registry.c",
+    "line": 3264,
+    "text": "00000000: wrong value 0/64"
+   },
+   {
+    "file": "registry.c",
+    "line": 3265,
+    "text": "00000100: wrong value 0/64"
+   },
+   {
+    "file": "registry.c",
+    "line": 3271,
+    "text": "00000000: wrong value 0/64"
+   },
+   {
+    "file": "registry.c",
+    "line": 3272,
+    "text": "00000100: wrong value 0/64"
+   },
+   {
+    "file": "registry.c",
+    "line": 3286,
+    "text": "00000000: wrong value 32/0"
+   },
+   {
+    "file": "registry.c",
+    "line": 3287,
+    "text": "00000100: wrong value 32/0"
+   }
+  ],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 0.4,
+  "skipped_lines": [
+   "registry.c:3486: Tests skipped: HKCR key merging not supported",
+   "registry.c:3782: Tests skipped: HKCR key merging not supported"
+  ],
+  "status": "complete",
+  "summary": {
+   "failures": 18,
+   "flaky": 0,
+   "skipped": 2,
+   "tests": 7393,
+   "todo": 82
+  },
+  "todo_lines": 82
+ },
+ "security": {
+  "exit_code": 77,
+  "failure_count": 72,
+  "failures": [
+   {
+    "file": "security.c",
+    "line": 6288,
+    "text": "CreateProcess() error 8"
+   },
+   {
+    "file": "security.c",
+    "line": 5684,
+    "text": "NtQueryObject error 0xc0000008"
+   },
+   {
+    "file": "security.c",
+    "line": 6294,
+    "text": "expected PROCESS_ALL_ACCESS, got 0x1"
+   },
+   {
+    "file": "security.c",
+    "line": 6301,
+    "text": "DuplicateHandle error 6"
+   },
+   {
+    "file": "security.c",
+    "line": 5684,
+    "text": "NtQueryObject error 0xc0000008"
+   },
+   {
+    "file": "security.c",
+    "line": 6301,
+    "text": "DuplicateHandle error 6"
+   },
+   {
+    "file": "security.c",
+    "line": 5684,
+    "text": "NtQueryObject error 0xc0000008"
+   },
+   {
+    "file": "security.c",
+    "line": 6307,
+    "text": "1: expected 0x20410, got 0"
+   },
+   {
+    "file": "security.c",
+    "line": 6301,
+    "text": "DuplicateHandle error 6"
+   },
+   {
+    "file": "security.c",
+    "line": 5684,
+    "text": "NtQueryObject error 0xc0000008"
+   },
+   {
+    "file": "security.c",
+    "line": 6311,
+    "text": "2: expected 0x20bea, got 0"
+   },
+   {
+    "file": "security.c",
+    "line": 6301,
+    "text": "DuplicateHandle error 6"
+   },
+   {
+    "file": "security.c",
+    "line": 5684,
+    "text": "NtQueryObject error 0xc0000008"
+   },
+   {
+    "file": "security.c",
+    "line": 6318,
+    "text": "3: expected 0x120000, got 0"
+   },
+   {
+    "file": "security.c",
+    "line": 6301,
+    "text": "DuplicateHandle error 6"
+   },
+   {
+    "file": "security.c",
+    "line": 5684,
+    "text": "NtQueryObject error 0xc0000008"
+   },
+   {
+    "file": "security.c",
+    "line": 6322,
+    "text": "4: expected 0x1f0fff, got 0"
+   },
+   {
+    "file": "security.c",
+    "line": 6336,
+    "text": "DuplicateHandle error 6"
+   },
+   {
+    "file": "security.c",
+    "line": 5684,
+    "text": "NtQueryObject error 0xc0000008"
+   },
+   {
+    "file": "security.c",
+    "line": 6338,
+    "text": "expected PROCESS_QUERY_INFORMATION|PROCESS_QUERY_LIMITED_INFORMATION, got 0x1"
+   },
+   {
+    "file": "security.c",
+    "line": 6346,
+    "text": "DuplicateHandle error 6"
+   },
+   {
+    "file": "security.c",
+    "line": 5684,
+    "text": "NtQueryObject error 0xc0000008"
+   },
+   {
+    "file": "security.c",
+    "line": 6348,
+    "text": "unexpected access right 1"
+   },
+   {
+    "file": "security.c",
+    "line": 6354,
+    "text": "DuplicateHandle error 6"
+   },
+   {
+    "file": "security.c",
+    "line": 5684,
+    "text": "NtQueryObject error 0xc0000008"
+   },
+   {
+    "file": "security.c",
+    "line": 6356,
+    "text": "unexpected access right 1"
+   },
+   {
+    "file": "security.c",
+    "line": 6362,
+    "text": "DuplicateHandle error 6"
+   },
+   {
+    "file": "security.c",
+    "line": 5684,
+    "text": "NtQueryObject error 0xc0000008"
+   },
+   {
+    "file": "security.c",
+    "line": 6364,
+    "text": "expected PROCESS_VM_OPERATION|PROCESS_VM_WRITE|PROCESS_QUERY_LIMITED_INFORMATION, got 0x1"
+   },
+   {
+    "file": "security.c",
+    "line": 6372,
+    "text": "DuplicateHandle error 6"
+   },
+   {
+    "file": "security.c",
+    "line": 5684,
+    "text": "NtQueryObject error 0xc0000008"
+   },
+   {
+    "file": "security.c",
+    "line": 6374,
+    "text": "unexpected access right 1"
+   },
+   {
+    "file": "security.c",
+    "line": 2991,
+    "text": "LookupAccountSid failed with 0"
+   },
+   {
+    "file": "security.c",
+    "line": 2992,
+    "text": "expect SidTypeGroup, got 28671"
+   },
+   {
+    "file": "security.c",
+    "line": 2996,
+    "text": "expect None, got "
+   },
+   {
+    "file": "security.c",
+    "line": 3008,
+    "text": "TokenPrimaryGroup Sid and TokenUser Sid don't match."
+   },
+   {
+    "file": "security.c",
+    "line": 3109,
+    "text": "CreateProcess with err:8"
+   },
+   {
+    "file": "security.c",
+    "line": 3111,
+    "text": "NtQueryObject with err: c0000008"
+   },
+   {
+    "file": "security.c",
+    "line": 3111,
+    "text": "Granted access should be 0x001f0fff or 0x001fffff, instead of 0x00000001"
+   },
+   {
+    "file": "security.c",
+    "line": 3113,
+    "text": "NtQueryObject with err: c0000008"
+   },
+   {
+    "file": "security.c",
+    "line": 3113,
+    "text": "Granted access should be 0x001f03ff or 0x001fffff, instead of 0x00000001"
+   },
+   {
+    "file": "security.c",
+    "line": 3114,
+    "text": "No child process handle (CreateProcess failed?)"
+   },
+   {
+    "file": "security.c",
+    "line": 3674,
+    "text": "Current User ACE has unexpected mask (0x10000000 != 0x1f01ff)"
+   },
+   {
+    "file": "security.c",
+    "line": 3674,
+    "text": "Administators Group ACE has unexpected mask (0x10000000 != 0x1f01ff)"
+   },
+   {
+    "file": "security.c",
+    "line": 3841,
+    "text": "CreateDirectoryA failed with error 5"
+   },
+   {
+    "file": "security.c",
+    "line": 3847,
+    "text": "GetNamedSecurityInfo failed with error 5"
+   },
+   {
+    "file": "security.c",
+    "line": 3871,
+    "text": "SetNamedSecurityInfoA failed with error 5"
+   },
+   {
+    "file": "security.c",
+    "line": 3875,
+    "text": "RemoveDirectoryA failed with error 5"
+   },
+   {
+    "file": "security.c",
+    "line": 3926,
+    "text": "NtCreateFile failed with c0000022"
+   },
+   {
+    "file": "security.c",
+    "line": 3933,
+    "text": "GetNamedSecurityInfo failed with error 6"
+   },
+   {
+    "file": "security.c",
+    "line": 3944,
+    "text": "GetNamedSecurityInfo failed with error 5"
+   },
+   {
+    "file": "security.c",
+    "line": 3956,
+    "text": "RemoveDirectoryA should always succeed"
+   },
+   {
+    "file": "security.c",
+    "line": 4115,
+    "text": "Current User ACE has unexpected mask (0x10000000 != 0x1f01ff)"
+   },
+   {
+    "file": "security.c",
+    "line": 4127,
+    "text": "Administators Group ACE has unexpected mask (0x10000000 != 0x1f01ff)"
+   },
+   {
+    "file": "security.c",
+    "line": 4950,
+    "text": "Current User ACE has unexpected mask (0x10000000 != 0x1f01ff)"
+   },
+   {
+    "file": "security.c",
+    "line": 4961,
+    "text": "Administators Group ACE has unexpected mask (0x10000000 != 0x1f01ff)"
+   },
+   {
+    "file": "security.c",
+    "line": 4995,
+    "text": "Process group SID != Domain Users SID."
+   },
+   {
+    "file": "security.c",
+    "line": 5019,
+    "text": "Domain Users ACE not found."
+   },
+   {
+    "file": "security.c",
+    "line": 8026,
+    "text": "got error 8"
+   },
+   {
+    "file": "security.c",
+    "line": 8029,
+    "text": "got error 6"
+   },
+   {
+    "file": "security.c",
+    "line": 8034,
+    "text": "got error 6"
+   },
+   {
+    "file": "security.c",
+    "line": 8037,
+    "text": "wait failed"
+   },
+   {
+    "file": "security.c",
+    "line": 8134,
+    "text": "got error 8"
+   },
+   {
+    "file": "security.c",
+    "line": 8135,
+    "text": "wait failed"
+   },
+   {
+    "file": "security.c",
+    "line": 8145,
+    "text": "got error 8"
+   },
+   {
+    "file": "security.c",
+    "line": 8170,
+    "text": "got error 8"
+   },
+   {
+    "file": "security.c",
+    "line": 8180,
+    "text": "got error 8"
+   },
+   {
+    "file": "security.c",
+    "line": 8181,
+    "text": "wait failed"
+   },
+   {
+    "file": "security.c",
+    "line": 8786,
+    "text": "unexpected elevation type 3"
+   },
+   {
+    "file": "security.c",
+    "line": 8791,
+    "text": "expected token to be elevated"
+   },
+   {
+    "file": "security.c",
+    "line": 7566,
+    "text": "CreateProcess failed with error 8"
+   },
+   {
+    "file": "security.c",
+    "line": 7567,
+    "text": "No child process handle (CreateProcess failed?)"
+   }
+  ],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 0.2,
+  "skipped_lines": [
+   "security.c:2184: Tests skipped: Well known SID 38 not implemented",
+   "security.c:2184: Tests skipped: Well known SID 39 not implemented",
+   "security.c:2184: Tests skipped: Well known SID 40 not implemented",
+   "security.c:2184: Tests skipped: Well known SID 41 not implemented",
+   "security.c:2184: Tests skipped: Well known SID 42 not implemented",
+   "security.c:2184: Tests skipped: Well known SID 43 not implemented",
+   "security.c:2184: Tests skipped: Well known SID 44 not implemented",
+   "security.c:2184: Tests skipped: Well known SID 45 not implemented",
+   "security.c:2184: Tests skipped: Well known SID 46 not implemented",
+   "security.c:2184: Tests skipped: Well known SID 47 not implemented",
+   "security.c:2184: Tests skipped: Well known SID 48 not implemented",
+   "security.c:2184: Tests skipped: Well known SID 49 not implemented",
+   "security.c:2184: Tests skipped: Well known SID 50 not implemented",
+   "security.c:2184: Tests skipped: Well known SID 62 not implemented",
+   "security.c:2184: Tests skipped: Well known SID 63 not implemented",
+   "security.c:2184: Tests skipped: Well known SID 64 not implemented",
+   "security.c:2184: Tests skipped: Well known SID 65 not implemented",
+   "security.c:2184: Tests skipped: Well known SID 70 not implemented",
+   "security.c:2184: Tests skipped: Well known SID 72 not implemented",
+   "security.c:2184: Tests skipped: Well known SID 73 not implemented"
+  ],
+  "status": "complete",
+  "summary": {
+   "failures": 77,
+   "flaky": 0,
+   "skipped": 28,
+   "tests": 3638,
+   "todo": 171
+  },
+  "todo_lines": 171
+ },
+ "service": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 1.7,
+  "skipped_lines": [
+   "service.c:1946: Tests skipped: Not running under WoW64."
+  ],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 1,
+   "tests": 723,
+   "todo": 25
+  },
+  "todo_lines": 25
+ }
+}

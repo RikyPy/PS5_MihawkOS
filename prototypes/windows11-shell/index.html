@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mihawk OS Desktop</title>
+  <meta name="description" content="Local proof of concept of the Windows 11 desktop shell for the PS5 Wine runtime.">
+  <link rel="icon" href="../../themes/windows11/start.svg">
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/ui.css">
+  <link rel="stylesheet" href="css/window.css">
+  <link rel="stylesheet" href="css/desktop.css">
+  <link rel="stylesheet" href="css/taskbar.css">
+  <link rel="stylesheet" href="css/start.css">
+  <link rel="stylesheet" href="css/flyouts.css">
+  <link rel="stylesheet" href="css/taskview.css">
+  <link rel="stylesheet" href="css/session.css">
+  <link rel="stylesheet" href="css/apps/explorer.css">
+  <link rel="stylesheet" href="css/apps/settings.css">
+  <link rel="stylesheet" href="css/apps/small.css">
+  <link rel="stylesheet" href="css/apps/browser.css">
+  <link rel="stylesheet" href="css/dialogs.css">
+  <link rel="stylesheet" href="css/popups.css">
+  <link rel="stylesheet" href="css/apps/controls.css">
+  <link rel="stylesheet" href="css/apps/taskmgr.css">
+  <link rel="stylesheet" href="css/cursors.css">
+</head>
+<body>
+  <div id="wallpaper" aria-hidden="true"></div>
+  <main id="desktop" aria-label="Desktop"></main>
+  <div id="windows"></div>
+  <footer id="taskbar"></footer>
+  <div id="flyouts"></div>
+  <div id="overlays"></div>
+  <div id="menus"></div>
+  <div id="tooltips" aria-live="polite"></div>
+
+  <script src="js/core.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/wm.js"></script>
+  <script src="js/desktop.js"></script>
+  <script src="js/taskbar.js"></script>
+  <script src="js/start.js"></script>
+  <script src="js/search.js"></script>
+  <script src="js/quicksettings.js"></script>
+  <script src="js/notifications.js"></script>
+  <script src="js/taskview.js"></script>
+  <script src="js/session.js"></script>
+  <script src="js/apps/explorer.js"></script>
+  <script src="js/apps/settings.js"></script>
+  <script src="js/apps/small.js"></script>
+  <script src="js/apps/browser.js"></script>
+  <script src="js/dialogs.js"></script>
+  <script src="js/popups.js"></script>
+  <script src="js/apps/controls.js"></script>
+  <script src="js/apps/taskmgr.js"></script>
+  <script>Shell.boot();</script>
+</body>
+</html>

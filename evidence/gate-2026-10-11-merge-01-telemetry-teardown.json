@@ -1,0 +1,191 @@
+{
+ "telemetry_hold": {
+  "pid": 2547,
+  "native_states": [
+   {
+    "pid": 2546,
+    "status": -1,
+    "errno": 3,
+    "absent": 1
+   },
+   {
+    "pid": 2547,
+    "status": -1,
+    "errno": 3,
+    "absent": 1
+   },
+   {
+    "pid": 2548,
+    "status": -1,
+    "errno": 3,
+    "absent": 1
+   },
+   {
+    "pid": 2549,
+    "status": -1,
+    "errno": 3,
+    "absent": 1
+   },
+   {
+    "pid": 2550,
+    "status": -1,
+    "errno": 3,
+    "absent": 1
+   },
+   {
+    "pid": 2551,
+    "status": -1,
+    "errno": 3,
+    "absent": 1
+   },
+   {
+    "pid": 2552,
+    "status": -1,
+    "errno": 3,
+    "absent": 1
+   },
+   {
+    "pid": 2553,
+    "status": -1,
+    "errno": 3,
+    "absent": 1
+   },
+   {
+    "pid": 2554,
+    "status": -1,
+    "errno": 3,
+    "absent": 1
+   }
+  ],
+  "absence_elapsed_seconds": 12.475,
+  "passed": true
+ },
+ "launch_readiness": {
+  "ready": true,
+  "seconds": 0.152,
+  "settle_seconds": 0.0,
+  "census_seconds": 0.139,
+  "previous_cleanup_verified": true
+ },
+ "native_close_failures": [],
+ "run": "gate-2026-10-11-merge-01-telemetry-teardown",
+ "what": "C:\\window-probe.exe",
+ "env": [
+  "PROTON_LAYOUT=launcher",
+  "WINETEST_TELEMETRY_HOLD=1"
+ ],
+ "result": "finished",
+ "seconds": 12.1,
+ "probe_verdict": null,
+ "clean_owner_restart": true,
+ "launcher_end_status": 0,
+ "initial_status": 0,
+ "closed_on_request": true,
+ "child_logs": [
+  "klog/gate-2026-10-11-merge-01-telemetry-teardown-wine-child-2546.log",
+  "klog/gate-2026-10-11-merge-01-telemetry-teardown-wine-child-2547.log",
+  "klog/gate-2026-10-11-merge-01-telemetry-teardown-wine-child-2548.log",
+  "klog/gate-2026-10-11-merge-01-telemetry-teardown-wine-child-2549.log",
+  "klog/gate-2026-10-11-merge-01-telemetry-teardown-wine-child-2550.log",
+  "klog/gate-2026-10-11-merge-01-telemetry-teardown-wine-child-2551.log",
+  "klog/gate-2026-10-11-merge-01-telemetry-teardown-wine-child-2552.log",
+  "klog/gate-2026-10-11-merge-01-telemetry-teardown-wine-child-2553.log",
+  "klog/gate-2026-10-11-merge-01-telemetry-teardown-wine-child-2554.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": "telemetry worker hold observed",
+ "returned_to_launcher": true,
+ "passed": true,
+ "bench": {},
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   }
+  ],
+  "top": []
+ },
+ "shown": {
+  "frames": 0,
+  "per_10s": [],
+  "longest_gap_ms": 0
+ },
+ "broker": {
+  "local_offer": 8589934592,
+  "host_limit": 1073741824,
+  "windows": {
+   "presents": 0,
+   "effect_bytes": 0,
+   "mica_builds": 0,
+   "thumbnail_builds": 0,
+   "compositions": 0,
+   "compose_avg_us": 0,
+   "compose_max_us": 0
+  },
+  "refused": [],
+  "refused_count": 0,
+  "clients": [
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": 2547,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   }
+  ],
+  "wedged": false,
+  "failure_reasons": [],
+  "host_peak": 2113536,
+  "local_peak": 0
+ },
+ "pacing": null,
+ "captures": [],
+ "cleanup_verified": true,
+ "hooks_removed": true
+}

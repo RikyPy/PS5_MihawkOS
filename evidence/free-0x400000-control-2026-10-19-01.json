@@ -1,0 +1,52 @@
+{
+  "battery": "free-0x400000-control-2026-10-19-01",
+  "expected_cases": [
+    "wow64"
+  ],
+  "revision": "f6e3a02b1f5be6e169c6c751f3d541cf8f2bdf76",
+  "dirty": true,
+  "cases": [
+    {
+      "case": "wow64",
+      "run": "free-0x400000-control-2026-10-19-01-wow64",
+      "runner_status": 0,
+      "seconds": 79.5,
+      "result": "finished",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "run_seconds": 27.5,
+      "launch_readiness": {
+        "ready": true,
+        "seconds": 0.142,
+        "settle_seconds": 0.0,
+        "census_seconds": 0.129,
+        "previous_cleanup_verified": false
+      },
+      "stages": {
+        "launched": 0.99,
+        "title_started": 1.51,
+        "elevated": 1.51,
+        "wine_loaded": 1.71,
+        "wineboot_started": 4.75,
+        "wineboot_ended": 10.75,
+        "program_started": 20.61,
+        "marker": 22.63,
+        "program_ended": 22.72,
+        "wine_ended": 25.13,
+        "launcher_started": 26.68,
+        "launcher_ended": 27.01,
+        "closed": 27.55
+      },
+      "runner_overhead_seconds": 52.0,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 9,
+      "protocol_errors": 0
+    }
+  ],
+  "complete": true,
+  "seconds": 79.5,
+  "passed": true
+}

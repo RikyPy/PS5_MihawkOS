@@ -1,0 +1,78 @@
+From: PS5_Proton <local>
+Subject: [PATCH] ntdll: PS5: say what the address space holds when an allocation finds no space
+
+The guest scan of the earlier emulator experiment (removed) reserved nearly every address the console offers, and later allocations (a 4 MiB DLL image, 2461 on 2026-10-12; record removed from the tree; in git history) then
+fail with STATUS_NO_MEMORY and the record says only that: not whether views, placeholders or fragmentation hold the space. The first eight failures print
+the host and user limits, the views and placeholders with their bytes, the gaps between views and the largest one. A diagnostic only; it changes no allocation.
+---
+diff --git a/dlls/ntdll/unix/virtual.c b/dlls/ntdll/unix/virtual.c
+--- a/dlls/ntdll/unix/virtual.c
++++ b/dlls/ntdll/unix/virtual.c
+@@ -2911,6 +2911,57 @@
+ #endif
+ }
+ 
++#ifdef __PROSPERO__
++/***********************************************************************
++ *           ps5_report_no_space
++ *
++ * An allocation that finds no free address: say what the address space holds, so a failure names its cause (a program that reserves
++ * everything it can see, as an emulator's guest placeholders do, or fragmentation) and is not left to be guessed. The first eight only.
++ * virtual_mutex must be held by caller.
++ */
++static void ps5_report_no_space( const void *start, const void *end, size_t size )
++{
++    static int reports;
++    const char *cursor = start, *largest_at = NULL;
++    size_t views = 0, view_bytes = 0, placeholders = 0, placeholder_bytes = 0, gaps = 0, gap_bytes = 0, largest = 0;
++    struct file_view *view;
++
++    if (reports++ >= 8) return;
++
++    WINE_RB_FOR_EACH_ENTRY( view, &views_tree, struct file_view, entry )
++    {
++        const char *view_base = view->base, *view_end = view_base + view->size;
++
++        if (view_end <= (const char *)start) continue;
++        if (view_base >= (const char *)end) break;
++        views++;
++        view_bytes += view->size;
++        if (view->protect & VPROT_PLACEHOLDER) { placeholders++; placeholder_bytes += view->size; }
++        if (view_base > cursor)
++        {
++            size_t gap = view_base - cursor;
++            gaps++;
++            gap_bytes += gap;
++            if (gap > largest) { largest = gap; largest_at = cursor; }
++        }
++        if (view_end > cursor) cursor = view_end;
++    }
++    if ((const char *)end > cursor)
++    {
++        size_t gap = (const char *)end - cursor;
++        gaps++;
++        gap_bytes += gap;
++        if (gap > largest) { largest = gap; largest_at = cursor; }
++    }
++    fprintf( stderr, "wine-ps5: no address for %#lx bytes in %p-%p (host limit %p, user limit %p): %lu views hold %#lx bytes, "
++             "%lu of them placeholders hold %#lx bytes; %lu gaps between views total %#lx bytes, the largest %#lx at %p\n",
++             (unsigned long)size, start, end, host_addr_space_limit, user_space_limit, (unsigned long)views,
++             (unsigned long)view_bytes, (unsigned long)placeholders, (unsigned long)placeholder_bytes, (unsigned long)gaps,
++             (unsigned long)gap_bytes, (unsigned long)largest, largest_at );
++}
++#endif
++
++
+ /***********************************************************************
+  *           map_view
+  *
+@@ -3015,6 +3066,9 @@
+             ptr = alloc_free_area( (void *)limit_low, (void *)limit_high, size, top_down, unix_prot, align_mask );
+ #endif
+             if (!is_win64) increase_try_map_step = TRUE;
++#ifdef __PROSPERO__
++            if (!ptr) ps5_report_no_space( start, end, size );
++#endif
+             if (!ptr) return STATUS_NO_MEMORY;
+         }
+     }

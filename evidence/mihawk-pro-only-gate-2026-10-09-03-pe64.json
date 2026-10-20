@@ -1,0 +1,59 @@
+{
+ "launch_readiness": {
+  "ready": true,
+  "seconds": 0.173,
+  "settle_seconds": 0.0,
+  "census_seconds": 0.154,
+  "previous_cleanup_verified": true
+ },
+ "run": "mihawk-pro-only-gate-2026-10-09-03-pe64",
+ "what": "wine-probe.exe",
+ "env": [],
+ "result": "finished",
+ "seconds": 5.4,
+ "probe_verdict": null,
+ "clean_owner_restart": false,
+ "launcher_end_status": 0,
+ "initial_status": 1,
+ "closed_on_request": false,
+ "child_logs": [
+  "klog/mihawk-pro-only-gate-2026-10-09-03-pe64-wine-child-697.log",
+  "klog/mihawk-pro-only-gate-2026-10-09-03-pe64-wine-child-698.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": false,
+ "bench": {},
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [],
+  "top": []
+ },
+ "shown": {
+  "frames": 0,
+  "per_10s": [],
+  "longest_gap_ms": 0
+ },
+ "broker": {
+  "local_offer": 8589934592,
+  "host_limit": 1073741824,
+  "refused": [],
+  "refused_count": 0,
+  "clients": [
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   }
+  ],
+  "wedged": false,
+  "failure_reasons": [],
+  "host_peak": 0,
+  "local_peak": 0
+ },
+ "captures": [],
+ "cleanup_verified": false,
+ "hooks_removed": true
+}

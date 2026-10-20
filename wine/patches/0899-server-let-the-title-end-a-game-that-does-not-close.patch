@@ -1,0 +1,151 @@
+From 2724359a17e6aa96d57d37b9a13a67978857fc6d Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Sat, 3 Oct 2026 10:18:53 -0400
+Subject: [PATCH] server: let the title end a game that does not close, as
+ TerminateProcess from outside
+
+The title asks a game to close with WM_CLOSE and, after 10 s, with an
+NtTerminateProcess that the PS5 driver runs on the game's own thread. Both
+travel as inputs that a thread consumes only from inside a message function:
+A Java game's threads never did, so after 25 s of "stop requested" nothing had
+been delivered (the log's mouse counter stayed 0 of 2 posted), the title gave
+up on its third fallback and replaced the still running process with LoadExec
+while the OpenGL presenter was live. That switch, with a presenter or display
+live, is what powered the console off on 2026-10-03.
+
+pw_wine_server_terminate (ntdll, for the title) sends 'T' to the in-process
+server through the same channel as the registry flush, and the server thread
+runs kill_all_processes, the routine wineserver itself uses on shutdown, after
+printing the threads it is about to kill. Every thread of the game is stopped
+by the server, the last one leaves through abort_process, which runs the
+graphics drivers' exit hooks (0892) before the title replaces the process. No
+thread of the game has to pump messages.
+---
+ dlls/ntdll/unix/server.c | 14 ++++++++++++++
+ server/process.c         | 21 +++++++++++++++++++++
+ server/process.h         |  3 +++
+ server/request.c         | 16 ++++++++++++++++
+ 4 files changed, 54 insertions(+)
+
+diff --git a/dlls/ntdll/unix/server.c b/dlls/ntdll/unix/server.c
+index d330050..41ab77e 100644
+--- a/dlls/ntdll/unix/server.c
++++ b/dlls/ntdll/unix/server.c
+@@ -1495,6 +1495,8 @@ static int (*register_server_thread)( long tid, pthread_t thread );
+ static void (*unregister_server_thread)( long tid );
+ /* and saves the registry on request (the title asks before replacing the process) */
+ static int (*flush_server)( unsigned int timeout_ms );
++/* and ends every process on request, for a game that does not close */
++static int (*terminate_server)( void );
+ 
+ /***********************************************************************
+  *           pw_wine_server_flush
+@@ -1507,6 +1509,17 @@ DECLSPEC_EXPORT int pw_wine_server_flush( unsigned int timeout_ms )
+     return flush_server ? flush_server( timeout_ms ) : -1;
+ }
+ 
++/***********************************************************************
++ *           pw_wine_server_terminate
++ *
++ * For the title: have the in-process server end the game as a TerminateProcess
++ * from outside would. 0 when asked, -1 with no server.
++ */
++DECLSPEC_EXPORT int pw_wine_server_terminate(void)
++{
++    return terminate_server ? terminate_server() : -1;
++}
++
+ /***********************************************************************
+  *           connect_inprocess_server
+  *
+@@ -1549,6 +1562,7 @@ static int connect_inprocess_server(void)
+     register_server_thread = dlsym( module, "pw_wine_thread_register" );
+     unregister_server_thread = dlsym( module, "pw_wine_thread_unregister" );
+     flush_server = dlsym( module, "pw_wineserver_flush" );
++    terminate_server = dlsym( module, "pw_wineserver_terminate" );
+     {
+         /* The synchronization device lives in ntdll (wine/ps5_ntsync.h); the
+          * server creates and signals its objects through the same operations.
+diff --git a/server/process.c b/server/process.c
+index cefbdd1..b043ece 100644
+--- a/server/process.c
++++ b/server/process.c
+@@ -995,6 +995,27 @@ static void kill_all_processes(void)
+     }
+ }
+ 
++#ifdef __PROSPERO__
++/* The title ends the game from outside, as a TerminateProcess would
++ * (pw_wineserver_terminate in request.c). Each thread is named first: the
++ * process leaves with its last thread, and the ones that print "killed" in
++ * ntdll (abort_thread) are the ones that ended. */
++void terminate_all_processes(void)
++{
++    struct process *process;
++    struct thread *thread;
++
++    LIST_FOR_EACH_ENTRY( process, &process_list, struct process, entry )
++    {
++        fprintf( stderr, "wine-ps5: ending process %04x, threads:", process->id );
++        LIST_FOR_EACH_ENTRY( thread, &process->thread_list, struct thread, proc_entry )
++            fprintf( stderr, " %04x(unix %ld%s)", thread->id, (long)thread->unix_tid, thread->wait ? ", waiting" : "" );
++        fprintf( stderr, "\n" );
++    }
++    kill_all_processes();
++}
++#endif
++
+ /* kill all processes being attached to a console renderer */
+ void kill_console_processes( struct thread *renderer, int exit_code )
+ {
+diff --git a/server/process.h b/server/process.h
+index 5d157d6..efc11e6 100644
+--- a/server/process.h
++++ b/server/process.h
+@@ -117,6 +117,9 @@ extern void remove_process_thread( struct process *process,
+ extern void suspend_process( struct process *process );
+ extern void resume_process( struct process *process );
+ extern void kill_process( struct process *process, int violent_death );
++#ifdef __PROSPERO__
++extern void terminate_all_processes(void);
++#endif
+ extern void kill_console_processes( struct thread *renderer, int exit_code );
+ extern void detach_debugged_processes( struct debug_obj *debug_obj, int exit_code );
+ extern void enum_processes( int (*cb)(struct process*, void*), void *user);
+diff --git a/server/request.c b/server/request.c
+index 100864a..d54fe88 100644
+--- a/server/request.c
++++ b/server/request.c
+@@ -576,6 +576,7 @@ static int receive_inprocess_client( int channel )
+     }
+ #ifdef __PROSPERO__
+     if (dummy == 'F') inprocess_flush_requested();
++    else if (dummy == 'T') terminate_all_processes();
+ #endif
+     return -1;
+ }
+@@ -598,6 +599,21 @@ static void inprocess_flush_requested(void)
+     pthread_mutex_unlock( &flush_mutex );
+ }
+ 
++/* The title ends the game from outside: pw_wineserver_terminate sends 'T' and
++ * the server thread kills every process, exactly as a TerminateProcess from
++ * another process would. Each thread of the game is stopped by the server, the
++ * last one leaves through Wine's exit (which runs the graphics drivers' exit
++ * hooks, patch 0892), and no thread of the game has to be in a message loop:
++ * the request a driver turns into NtTerminateProcess is delivered only to a
++ * thread that pumps messages, and a game that does not is never reached. */
++DECLSPEC_EXPORT int pw_wineserver_terminate(void)
++{
++    char request = 'T';
++
++    if (client_channel == -1) return -1;
++    return send( client_channel, &request, 1, 0 ) == 1 ? 0 : -1;
++}
++
+ /* Save the registry and wait for it, at most timeout_ms: 0 when saved. */
+ DECLSPEC_EXPORT int pw_wineserver_flush( unsigned int timeout_ms )
+ {
+-- 
+2.56.0
+

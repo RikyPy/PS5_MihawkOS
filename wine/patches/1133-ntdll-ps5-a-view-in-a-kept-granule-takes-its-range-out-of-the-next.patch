@@ -1,0 +1,35 @@
+From: PS5_Proton <local>
+Subject: [PATCH] ntdll: PS5: a view that begins in a granule its neighbour keeps takes its range out of the next one
+
+free_ranges_insert_view finds the free range at the view's granule-rounded base. When the view begins inside a 64 KiB
+granule a previous view still holds (an emulator splits placeholders on 16 KiB pages), that range ends exactly at the
+granule, the clipping shrank the removal to nothing, and the free range the view runs into stayed listed under it.
+A HashLink game mapped a 20 MiB section view at 0x2002c4000 after a 16 KiB view at 0x2002c0000; 0x2002d0000-0x2016c0000 stayed
+free, the next allocation was given 0x2002d0000 and create_view asserted (view->protect & VPROT_SYSTEM), and the earlier emulator experiment (removed)
+ended 24 s in (2026-10-15; record removed from the tree; in git history). Upstream places a new view inside one free range, so it never meets this case;
+patch 1119 fixed the same split on the removal side. The range to shrink is the next one.
+
+Host: tests/test_crash_replays.c ("free-range order": a view beginning in a kept granule leaves no free range under it).
+Console: not yet run.
+---
+diff --git a/dlls/ntdll/unix/virtual.c b/dlls/ntdll/unix/virtual.c
+--- a/dlls/ntdll/unix/virtual.c
++++ b/dlls/ntdll/unix/virtual.c
+@@ -1433,6 +1433,17 @@
+ 
+     /* Free ranges addresses are aligned at granularity_mask while the views may be not. */
+ 
++#ifdef __PROSPERO__
++    /* A view can begin in a granule the previous view keeps and run on into the next free range (an emulator splits its
++     * placeholders on 16 KiB pages). The range found ends at that granule and is not the one to shrink: the next free
++     * range stayed listed under the view, and a later allocation there made create_view assert (a 20 MiB view at
++     * 0x2002c4000 left 0x2002d0000-0x2016c0000 free, 2026-10-15). */
++    if (range->end <= view_base && next != free_ranges_end)
++    {
++        range = next;
++        next = range + 1;
++    }
++#endif
+     if (range->base > view_base)
+         view_base = range->base;
+     if (range->end < view_end)

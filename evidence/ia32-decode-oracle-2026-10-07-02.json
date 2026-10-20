@@ -1,0 +1,98 @@
+{
+ "run": "ia32-decode-oracle-2026-10-07-02",
+ "where": "host PC (no console run)",
+ "what": "src/pw_ia32_decode.c and src/pw_ia32_print.c against LLVM's disassembler (tools/ia32-decode-oracle.sh): legacy corpus plus a VEX/EVEX/XOP corpus whose lengths only are compared",
+ "oracle": {
+  "verdict": "PASS",
+  "encodings": 12486072,
+  "agree_text": 2464038,
+  "agree_invalid": 8448062,
+  "vex_evex_xop_length_agree": 976132,
+  "groups": 10267,
+  "unexplained_groups": 0,
+  "LENGTH": {
+   "encodings": 3016,
+   "unexplained_groups": 0
+  },
+  "TEXT": {
+   "encodings": 50250,
+   "unexplained_groups": 0
+  },
+  "OURS_ONLY": {
+   "encodings": 10490,
+   "unexplained_groups": 0
+  },
+  "LLVM_ONLY": {
+   "encodings": 0,
+   "unexplained_groups": 0
+  },
+  "NOFORM": {
+   "encodings": 534084,
+   "unexplained_groups": 0
+  },
+  "forms": 914,
+  "llvm": "23.1.1"
+ },
+ "explained_encodings": {
+  "LENGTH": 3016,
+  "TEXT": 50250,
+  "OURS_ONLY": 10490
+ },
+ "explained_by": "tests/ia32-llvm-differences.txt (14 lines)",
+ "host_test": "tests/test_pw_ia32_decode.c passed under ASan/UBSan: table rules, 54 exact cases with every truncation, the 15-byte limit, 200000 random byte streams; all 25 host tests pass",
+ "noform_top": [
+  [
+   "0F:02",
+   10464
+  ],
+  [
+   "0F:03",
+   10464
+  ],
+  [
+   "0F:79",
+   10464
+  ],
+  [
+   "0F:B9",
+   10464
+  ],
+  [
+   "0F38:F6",
+   9440
+  ],
+  [
+   "0F:01",
+   9252
+  ],
+  [
+   "0F:1F",
+   9156
+  ],
+  [
+   "0F38:F9",
+   8928
+  ],
+  [
+   "0F38:FC",
+   8928
+  ],
+  [
+   "0F:00",
+   7848
+  ],
+  [
+   "0F:78",
+   7632
+  ],
+  [
+   "0F:C7",
+   5580
+  ]
+ ],
+ "not_covered": [
+  "system, CET and virtualization forms (lar, lsl, sgdt, vmread, wrssd...) and SSE encodings with a prefix that selects nothing: length checked, no form",
+  "VEX/EVEX/XOP: length only",
+  "semantics: M2 compares execution with the CPU"
+ ]
+}

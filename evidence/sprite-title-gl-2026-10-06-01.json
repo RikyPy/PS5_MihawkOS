@@ -1,0 +1,26 @@
+{
+ "run": "sprite-title-gl-2026-10-06-01",
+ "what": "gl-sprite-probe.exe",
+ "env": [
+  "PROTON_LAYOUT=title",
+  "WINE_PS5_OPENGL=1"
+ ],
+ "result": "finished",
+ "seconds": 8.2,
+ "probe_verdict": "FAIL",
+ "clean_owner_restart": false,
+ "child_logs": [
+  "klog/sprite-title-gl-2026-10-06-01-wine-child-219.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": false,
+ "bench": {},
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [],
+  "top": []
+ }
+}

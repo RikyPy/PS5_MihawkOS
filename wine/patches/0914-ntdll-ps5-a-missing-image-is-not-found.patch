@@ -1,0 +1,80 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Sun, 4 Oct 2026 10:40:00 -0400
+Subject: [PATCH] ntdll: on PS5, a process whose image is missing is not found
+
+Patch 0550 made NtCreateUserProcess return STATUS_NOT_SUPPORTED before it looked at its arguments, so
+CreateProcess of a file that does not exist failed with ERROR_NOT_SUPPORTED instead of
+ERROR_FILE_NOT_FOUND (kernel32 process.c:1131 and 1136). A program that tries an optional helper and
+checks for "not found" took that as something else. The image is now opened first, as on Windows: a
+missing or unreadable one fails with the status get_pe_file_info gives, and only an image that is there
+is refused as not supported. The not-a-PE-file branch, which forks a Unix program on Linux, is left out
+on the console, and so is fork_and_exec itself.
+---
+  dlls/ntdll/unix/process.c | 21 ++++++++++++++-------
+  1 file changed, 14 insertions(+), 7 deletions(-)
+
+diff --git a/dlls/ntdll/unix/process.c b/dlls/ntdll/unix/process.c
+index 41de799..7cb41a5 100644
+--- a/dlls/ntdll/unix/process.c
++++ b/dlls/ntdll/unix/process.c
+@@ -560,6 +560,7 @@ NTSTATUS wow64_wine_spawnvp( void *args )
+ }
+ #endif
+ 
++#ifndef __PROSPERO__
+ /***********************************************************************
+  *           fork_and_exec
+  *
+@@ -657,6 +658,7 @@ static NTSTATUS fork_and_exec( OBJECT_ATTRIBUTES *attr, const char *unix_name, i
+     if (stdout_fd != -1 && stdout_fd != 1) close( stdout_fd );
+     return status;
+ }
++#endif  /* __PROSPERO__: a title cannot fork */
+ 
+ static NTSTATUS alloc_handle_list( const PS_ATTRIBUTE *handles_attr, obj_handle_t **handles, data_size_t *handles_len )
+ {
+@@ -712,13 +714,6 @@ NTSTATUS WINAPI NtCreateUserProcess( HANDLE *process_handle_ptr, HANDLE *thread_
+     data_size_t handles_size, jobs_size;
+     obj_handle_t *handles, *jobs;
+ 
+-#ifdef __PROSPERO__
+-    /* A PS5 title is a single process: it can neither fork nor exec, so
+-     * Windows process creation fails cleanly instead of spawning a loader. */
+-    TRACE( "process creation is not supported on PS5\n" );
+-    return STATUS_NOT_SUPPORTED;
+-#endif
+-
+     if (thread_flags & THREAD_CREATE_FLAGS_HIDE_FROM_DEBUGGER)
+     {
+         WARN( "Invalid thread flags %#x.\n", thread_flags );
+@@ -772,6 +767,7 @@ NTSTATUS WINAPI NtCreateUserProcess( HANDLE *process_handle_ptr, HANDLE *thread_
+     InitializeObjectAttributes( &attr, &path, OBJ_CASE_INSENSITIVE, 0, 0 );
+     if ((status = get_pe_file_info( &attr, &nt_name, &unix_name, &file_handle, &pe_info )))
+     {
++#ifndef __PROSPERO__
+         if (status == STATUS_INVALID_IMAGE_NOT_MZ && !fork_and_exec( &attr, unix_name, unixdir, params ))
+         {
+             *process_handle_ptr = *thread_handle_ptr = 0;
+@@ -780,8 +776,19 @@ NTSTATUS WINAPI NtCreateUserProcess( HANDLE *process_handle_ptr, HANDLE *thread_
+             free( nt_name.Buffer );
+             return STATUS_SUCCESS;
+         }
++#endif
+         goto done;
+     }
++#ifdef __PROSPERO__
++    /* A PS5 title is a single process: it can neither fork nor exec, so Windows process
++     * creation fails cleanly instead of spawning a loader. The image is opened first, as on
++     * Windows, so a missing or unreadable one fails with the status Windows gives
++     * (ERROR_FILE_NOT_FOUND for CreateProcess), which programs check; only an image that is
++     * there is refused as not supported. */
++    TRACE( "process creation is not supported on PS5\n" );
++    status = STATUS_NOT_SUPPORTED;
++    goto done;
++#endif
+     if (!machine)
+     {
+         machine = pe_info.machine;
+-- 
+2.55.0

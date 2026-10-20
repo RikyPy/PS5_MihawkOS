@@ -1,0 +1,27 @@
+{
+  "title": "PPSA99170",
+  "identity": "b4ce808dddaa416fa62c3f735edf06b8",
+  "build": {
+    "revision": "31a46b89b6a8db4eb16fe8b0fada56afad0c4dc6",
+    "sdk_revision": "611893fc25ef3e138f5bc2c90d829d8b58174cd2",
+    "source_sha256": {
+      "native/proton_child_probe.h": "a3a0c1324b7fa4c2482ea22e7a206df63a385d2467bc5abe1ba041166faf668e",
+      "native/proton_child_probe.cpp": "91eccecb89a69cfccb8015e562e69eb43805ebf6d2b055d87f05d044a6518f1d",
+      "ps5/src/main.cpp": "0dcea5cd6aed4575c7609fa658e44d2d729dc1bc9f6d9cb3ca161658e257375e",
+      "ps5/CMakeLists.txt": "c6e22feae5b334d2a8396bc06bc635a49306393b5d3a3e5a09a9482b3a982597"
+    },
+    "radv_recipe_sha256": "bcb92ff14ae32fbee7991399a7b79c065c78bda3162c76d41c49d170a46b4022",
+    "identity": "24122cda382e2a76cdf6992d9f709bea9dc0e4fdf2e13a7b803740137dc2228e",
+    "eboot_sha256": "8532f91817044d08110a68c4ce71bd991251dd57b84fd41211cb32112b04e7a7"
+  },
+  "capture": "klog/child-native-01",
+  "passed": false,
+  "status": "preflight_failed",
+  "production_sha256": "8f63bbc57bd9203520653d9e3eb765798a434b737ac6c1f79b106437542761c3",
+  "production_restored": false,
+  "root_reference_balance_verified": false,
+  "forced_title_close": false,
+  "error": "Installed executable differs from local production ELF; no replacement performed",
+  "title_launch_attempted": false,
+  "probe_result": "not run"
+}

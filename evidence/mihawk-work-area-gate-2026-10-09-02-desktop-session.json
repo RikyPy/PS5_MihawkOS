@@ -1,0 +1,173 @@
+{
+ "launch_readiness": {
+  "ready": true,
+  "seconds": 0.179,
+  "settle_seconds": 0.0,
+  "census_seconds": 0.153,
+  "previous_cleanup_verified": true
+ },
+ "run": "mihawk-work-area-gate-2026-10-09-02-desktop-session",
+ "what": "profile mihawk-os",
+ "env": [],
+ "result": "finished",
+ "seconds": 24.6,
+ "probe_verdict": "PASS",
+ "clean_owner_restart": true,
+ "launcher_end_status": 0,
+ "initial_status": 0,
+ "closed_on_request": false,
+ "child_logs": [
+  "klog/mihawk-work-area-gate-2026-10-09-02-desktop-session-wine-child-5677.log",
+  "klog/mihawk-work-area-gate-2026-10-09-02-desktop-session-wine-child-5678.log",
+  "klog/mihawk-work-area-gate-2026-10-09-02-desktop-session-wine-child-5679.log",
+  "klog/mihawk-work-area-gate-2026-10-09-02-desktop-session-wine-child-5680.log",
+  "klog/mihawk-work-area-gate-2026-10-09-02-desktop-session-wine-child-5681.log",
+  "klog/mihawk-work-area-gate-2026-10-09-02-desktop-session-wine-child-5682.log",
+  "klog/mihawk-work-area-gate-2026-10-09-02-desktop-session-wine-child-5683.log",
+  "klog/mihawk-work-area-gate-2026-10-09-02-desktop-session-wine-child-5684.log",
+  "klog/mihawk-work-area-gate-2026-10-09-02-desktop-session-wine-child-5685.log",
+  "klog/mihawk-work-area-gate-2026-10-09-02-desktop-session-wine-child-5686.log",
+  "klog/mihawk-work-area-gate-2026-10-09-02-desktop-session-wine-child-5687.log",
+  "klog/mihawk-work-area-gate-2026-10-09-02-desktop-session-wine-child-5688.log",
+  "klog/mihawk-work-area-gate-2026-10-09-02-desktop-session-wine-child-5689.log",
+  "klog/mihawk-work-area-gate-2026-10-09-02-desktop-session-wine-child-5690.log",
+  "klog/mihawk-work-area-gate-2026-10-09-02-desktop-session-wine-child-5691.log",
+  "klog/mihawk-work-area-gate-2026-10-09-02-desktop-session-wine-child-5692.log",
+  "klog/mihawk-work-area-gate-2026-10-09-02-desktop-session-wine-child-5693.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": true,
+ "bench": {},
+ "steady": {
+  "server": {
+   "calls": 0.0,
+   "per_s": 0.0,
+   "avg_us": 0.0,
+   "selects": 0.0,
+   "blocked": 0.0,
+   "block_avg_us": 0.0,
+   "waits": 0.0,
+   "handles_avg": 0.0,
+   "wait_all": 0.0,
+   "polled": 0.0,
+   "delays": 0.0,
+   "yields": 0.0,
+   "intervals": 2
+  }
+ },
+ "intervals": {
+  "frames": [],
+  "server": [
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   }
+  ],
+  "top": []
+ },
+ "shown": {
+  "frames": 0,
+  "per_10s": [],
+  "longest_gap_ms": 0
+ },
+ "broker": {
+  "local_offer": null,
+  "host_limit": null,
+  "refused": [],
+  "refused_count": 0,
+  "clients": [],
+  "wedged": false,
+  "failure_reasons": [],
+  "host_peak": null,
+  "local_peak": null
+ },
+ "captures": [
+  "klog/mihawk-work-area-gate-2026-10-09-02-desktop-session-capture-01.png",
+  "klog/mihawk-work-area-gate-2026-10-09-02-desktop-session-capture-02.png",
+  "klog/mihawk-work-area-gate-2026-10-09-02-desktop-session-capture-03.png"
+ ],
+ "pad_script": [
+  "# The probe requests each displayed capture after the actual child/browser is ready."
+ ],
+ "cleanup_verified": true,
+ "hooks_removed": true,
+ "session_passed": true,
+ "display_pixels": [
+  {
+   "capture": "klog/mihawk-work-area-gate-2026-10-09-02-desktop-session-capture-01.png",
+   "architecture": 64,
+   "actual": [
+    30,
+    110,
+    210
+   ],
+   "expected": [
+    30,
+    110,
+    210
+   ],
+   "passed": true
+  },
+  {
+   "capture": "klog/mihawk-work-area-gate-2026-10-09-02-desktop-session-capture-02.png",
+   "architecture": 32,
+   "actual": [
+    30,
+    180,
+    70
+   ],
+   "expected": [
+    30,
+    180,
+    70
+   ],
+   "passed": true
+  },
+  {
+   "capture": "klog/mihawk-work-area-gate-2026-10-09-02-desktop-session-capture-03.png",
+   "window": "File Explorer",
+   "light_pixels": 559338,
+   "passed": true
+  }
+ ]
+}

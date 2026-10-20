@@ -1,0 +1,220 @@
+{
+ "telemetry_hold": null,
+ "launch_readiness": {
+  "ready": true,
+  "seconds": 0.156,
+  "settle_seconds": 0.0,
+  "census_seconds": 0.141,
+  "previous_cleanup_verified": true
+ },
+ "native_close_failures": [],
+ "run": "desktop-view-2026-10-12-19",
+ "what": "profile mihawk-os",
+ "env": [],
+ "result": "finished",
+ "seconds": 40.0,
+ "probe_verdict": "PASS",
+ "clean_owner_restart": true,
+ "launcher_end_status": 0,
+ "initial_status": 0,
+ "closed_on_request": false,
+ "child_logs": [
+  "klog/desktop-view-2026-10-12-19-wine-child-4830.log",
+  "klog/desktop-view-2026-10-12-19-wine-child-4831.log",
+  "klog/desktop-view-2026-10-12-19-wine-child-4832.log",
+  "klog/desktop-view-2026-10-12-19-wine-child-4833.log",
+  "klog/desktop-view-2026-10-12-19-wine-child-4834.log",
+  "klog/desktop-view-2026-10-12-19-wine-child-4835.log",
+  "klog/desktop-view-2026-10-12-19-wine-child-4836.log",
+  "klog/desktop-view-2026-10-12-19-wine-child-4837.log",
+  "klog/desktop-view-2026-10-12-19-wine-child-4838.log",
+  "klog/desktop-view-2026-10-12-19-wine-child-4839.log",
+  "klog/desktop-view-2026-10-12-19-wine-child-4840.log",
+  "klog/desktop-view-2026-10-12-19-wine-child-4841.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": true,
+ "bench": {},
+ "steady": {
+  "server": {
+   "calls": 0.0,
+   "per_s": 0.0,
+   "avg_us": 0.0,
+   "selects": 0.0,
+   "blocked": 0.0,
+   "block_avg_us": 0.0,
+   "waits": 0.0,
+   "handles_avg": 0.0,
+   "wait_all": 0.0,
+   "polled": 0.0,
+   "delays": 0.0,
+   "yields": 0.0,
+   "intervals": 5
+  }
+ },
+ "intervals": {
+  "frames": [],
+  "server": [
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   }
+  ],
+  "top": []
+ },
+ "shown": {
+  "frames": 242,
+  "per_10s": [
+   1,
+   6,
+   196,
+   39
+  ],
+  "longest_gap_ms": 5356
+ },
+ "broker": {
+  "local_offer": null,
+  "host_limit": null,
+  "windows": {
+   "presents": 251,
+   "effect_bytes": 388800,
+   "mica_builds": 119,
+   "thumbnail_builds": 0,
+   "compositions": 174,
+   "compose_avg_us": 5385,
+   "compose_max_us": 7834
+  },
+  "refused": [],
+  "refused_count": 0,
+  "clients": [],
+  "wedged": false,
+  "failure_reasons": [],
+  "host_peak": null,
+  "local_peak": null
+ },
+ "pacing": null,
+ "captures": [
+  "klog/desktop-view-2026-10-12-19-capture-01.png",
+  "klog/desktop-view-2026-10-12-19-capture-02.png",
+  "klog/desktop-view-2026-10-12-19-capture-03.png",
+  "klog/desktop-view-2026-10-12-19-capture-04.png",
+  "klog/desktop-view-2026-10-12-19-capture-05.png"
+ ],
+ "cleanup_verified": true,
+ "hooks_removed": true,
+ "view_passed": true,
+ "display_pixels": [
+  {
+   "capture": "klog/desktop-view-2026-10-12-19-capture-01.png",
+   "passed": true,
+   "white_label_pixels": 5792,
+   "distinct_colours": 27754
+  },
+  {
+   "capture": "klog/desktop-view-2026-10-12-19-capture-02.png",
+   "passed": true,
+   "white_label_pixels": 2730,
+   "distinct_colours": 27672,
+   "selection_tint_pixels": 486440
+  },
+  {
+   "capture": "klog/desktop-view-2026-10-12-19-capture-03.png",
+   "passed": true,
+   "white_label_pixels": 2588,
+   "distinct_colours": 27790
+  },
+  {
+   "capture": "klog/desktop-view-2026-10-12-19-capture-04.png",
+   "passed": true,
+   "menu_light_pixels": 13213
+  },
+  {
+   "capture": "klog/desktop-view-2026-10-12-19-capture-05.png",
+   "passed": true,
+   "white_label_pixels": 5066,
+   "distinct_colours": 28026
+  }
+ ]
+}

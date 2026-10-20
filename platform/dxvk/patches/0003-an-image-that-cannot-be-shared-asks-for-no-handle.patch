@@ -1,0 +1,25 @@
+DXVK 601930949d111edbbcf9dd463948426d9f8f6ddd
+
+A shared D3D11 resource on a driver without VK_KHR_external_memory_win32
+(the PS5's RADV has no external memory) is refused by canShareImage, which
+logs "Failed to create shared resource" and leaves m_shared false; the image
+is then created as an ordinary one. createImageResource was still told the
+requested handle type, so it called initKmtHandles, which calls
+vkGetMemoryWin32HandleKHR, a function pointer that is null when the
+extension is not enabled: a call through null, a crash at start in Unity
+games (a Unity game, 2026-10-12). Ask for a handle only when the image is
+shared; the image then falls back to a private one, as the log already says.
+
+--- a/src/dxvk/dxvk_image.cpp
++++ b/src/dxvk/dxvk_image.cpp
+@@ -334,7 +334,9 @@
+     allocationInfo.resourceCookie = cookie();
+     allocationInfo.properties = m_properties;
+     allocationInfo.mode = mode;
+-    allocationInfo.handleType = m_info.sharing.type;
++    allocationInfo.handleType = m_shared
++      ? m_info.sharing.type
++      : VK_EXTERNAL_MEMORY_HANDLE_TYPE_FLAG_BITS_MAX_ENUM;
+ 
+     if (m_info.transient)
+       allocationInfo.mode.set(DxvkAllocationMode::NoDedicated);

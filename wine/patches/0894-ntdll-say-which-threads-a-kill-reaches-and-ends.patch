@@ -1,0 +1,81 @@
+From dc5b3b520955c3f24e5a4a04f5e2f5bd1e71ef56 Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Sat, 3 Oct 2026 10:42:56 -0400
+Subject: [PATCH] ntdll: say which threads a kill reaches and ends on PS5
+
+The process ends with its last thread. A game that the server killed (the
+title's terminate request, patch 0899) but that stayed up gave no sign which
+thread was still counted or whether its kill had reached it. A killed thread
+now prints its id and the number still counted when it ends, and a thread
+killed inside the Unix side says when it was marked to end at the user-mode
+boundary, so the straggler is the one that prints neither.
+---
+ dlls/ntdll/unix/signal_x86_64.c | 17 +++++++++++++++++
+ dlls/ntdll/unix/thread.c        | 13 +++++++++++++
+ 2 files changed, 30 insertions(+)
+
+diff --git a/dlls/ntdll/unix/signal_x86_64.c b/dlls/ntdll/unix/signal_x86_64.c
+index 55319e8..a5d6b90 100644
+--- a/dlls/ntdll/unix/signal_x86_64.c
++++ b/dlls/ntdll/unix/signal_x86_64.c
+@@ -2985,6 +2985,16 @@ static void quit_handler( int signal, siginfo_t *siginfo, void *sigcontext )
+ {
+     ucontext_t *ucontext = init_handler( sigcontext );
+ 
++#ifdef __PROSPERO__
++    {
++        /* which way a kill goes: a thread inside a syscall or Unix call is marked, one in user mode ends */
++        char line[80];
++        int length = snprintf( line, sizeof(line), "wine-ps5: kill signal on thread %04x, in syscall: %d\n",
++                               (UINT)HandleToULong( NtCurrentTeb()->ClientId.UniqueThread ),
++                               is_inside_syscall( RSP_sig(ucontext) ) );
++        if (length > 0) write( 2, line, length );
++    }
++#endif
+     if (!is_inside_syscall( RSP_sig(ucontext) )) user_mode_abort_thread( 0, get_syscall_frame() );
+ #ifdef __PROSPERO__
+     /* Inside the Unix side the thread may hold any of its locks: the heap,
+@@ -2995,6 +3005,13 @@ static void quit_handler( int signal, siginfo_t *siginfo, void *sigcontext )
+      * Unix call dispatcher ends it there (ps5_dispatcher_terminate), once
+      * every Unix-side frame has returned and released what it held. */
+     __atomic_store_n( &ntdll_get_thread_data()->ps5_terminating, 1, __ATOMIC_RELAXED );
++    {
++        /* a thread that was signalled but never ends: say that the mark was made */
++        char line[64];
++        int length = snprintf( line, sizeof(line), "wine-ps5: thread %04x marked to end\n",
++                               (UINT)HandleToULong( NtCurrentTeb()->ClientId.UniqueThread ));
++        if (length > 0) write( 2, line, length );
++    }
+     return;
+ #endif
+     abort_thread( 0 );
+diff --git a/dlls/ntdll/unix/thread.c b/dlls/ntdll/unix/thread.c
+index 9cc633f..e3956a6 100644
+--- a/dlls/ntdll/unix/thread.c
++++ b/dlls/ntdll/unix/thread.c
+@@ -1503,9 +1503,22 @@ extern void pw_wine_run_exit_hooks(void);
+  */
+ void abort_thread( int status )
+ {
++#ifdef __PROSPERO__
++    LONG left;
++
++    pthread_sigmask( SIG_BLOCK, &server_block_set, NULL );
++    left = InterlockedDecrement( &nb_threads );
++    /* The process ends with its last thread. When a killed game stays up, this
++     * line says which threads ended and how many are still counted. */
++    fprintf( stderr, "wine-ps5: thread %04x killed, %d left\n",
++             (UINT)HandleToULong( NtCurrentTeb()->ClientId.UniqueThread ), (int)left );
++    if (left <= 0) abort_process( status );
++    pthread_exit_wrapper( status );
++#else
+     pthread_sigmask( SIG_BLOCK, &server_block_set, NULL );
+     if (InterlockedDecrement( &nb_threads ) <= 0) abort_process( status );
+     pthread_exit_wrapper( status );
++#endif
+ }
+ 
+ 
+-- 
+2.56.0
+

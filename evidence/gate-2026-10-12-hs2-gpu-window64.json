@@ -1,0 +1,890 @@
+{
+ "telemetry_hold": null,
+ "launch_readiness": {
+  "ready": true,
+  "seconds": 0.142,
+  "settle_seconds": 0.0,
+  "census_seconds": 0.129,
+  "previous_cleanup_verified": true
+ },
+ "native_close_failures": [],
+ "run": "gate-2026-10-12-hs2-gpu-window64",
+ "what": "C:\\windows\\system32\\mihawk.exe",
+ "env": [
+  "PROTON_LAYOUT=launcher",
+  "WINE_PS5_WINDOW_SURFACES=1"
+ ],
+ "result": "finished",
+ "seconds": 35.7,
+ "probe_verdict": "PASS",
+ "clean_owner_restart": true,
+ "launcher_end_status": 0,
+ "initial_status": 0,
+ "closed_on_request": false,
+ "child_logs": [
+  "klog/gate-2026-10-12-hs2-gpu-window64-wine-child-1248.log",
+  "klog/gate-2026-10-12-hs2-gpu-window64-wine-child-1249.log",
+  "klog/gate-2026-10-12-hs2-gpu-window64-wine-child-1250.log",
+  "klog/gate-2026-10-12-hs2-gpu-window64-wine-child-1251.log",
+  "klog/gate-2026-10-12-hs2-gpu-window64-wine-child-1252.log",
+  "klog/gate-2026-10-12-hs2-gpu-window64-wine-child-1253.log",
+  "klog/gate-2026-10-12-hs2-gpu-window64-wine-child-1254.log",
+  "klog/gate-2026-10-12-hs2-gpu-window64-wine-child-1255.log",
+  "klog/gate-2026-10-12-hs2-gpu-window64-wine-child-1256.log",
+  "klog/gate-2026-10-12-hs2-gpu-window64-wine-child-1257.log",
+  "klog/gate-2026-10-12-hs2-gpu-window64-wine-child-1258.log",
+  "klog/gate-2026-10-12-hs2-gpu-window64-wine-child-1259.log",
+  "klog/gate-2026-10-12-hs2-gpu-window64-wine-child-1260.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": true,
+ "bench": {},
+ "steady": {
+  "server": {
+   "calls": 0.0,
+   "per_s": 0.0,
+   "avg_us": 0.0,
+   "selects": 0.0,
+   "blocked": 0.0,
+   "block_avg_us": 0.0,
+   "waits": 0.0,
+   "handles_avg": 0.0,
+   "wait_all": 0.0,
+   "polled": 0.0,
+   "delays": 0.0,
+   "yields": 0.0,
+   "intervals": 1
+  }
+ },
+ "intervals": {
+  "frames": [],
+  "server": [
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   }
+  ],
+  "top": []
+ },
+ "shown": {
+  "frames": 646,
+  "per_10s": [
+   1,
+   645
+  ],
+  "longest_gap_ms": 2176
+ },
+ "broker": {
+  "local_offer": 8589934592,
+  "host_limit": 1073741824,
+  "windows": {
+   "presents": 1100,
+   "effect_bytes": 0,
+   "mica_builds": 0,
+   "thumbnail_builds": 0,
+   "compositions": 1091,
+   "compose_avg_us": 2726,
+   "compose_max_us": 3799
+  },
+  "refused": [],
+  "refused_count": 0,
+  "clients": [
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": 1259,
+    "frames": 243,
+    "submissions": 498
+   },
+   {
+    "pid": 1260,
+    "frames": 135,
+    "submissions": 278
+   },
+   {
+    "pid": 1249,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": 1257,
+    "frames": 644,
+    "submissions": 1320
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   }
+  ],
+  "wedged": false,
+  "failure_reasons": [],
+  "host_peak": 26001408,
+  "local_peak": 199065600
+ },
+ "pacing": {
+  "windows": [
+   {
+    "cookie": 9,
+    "pid": 1257,
+    "route": "composed",
+    "final": false,
+    "refused": "off",
+    "direct": 0.0,
+    "composed": 283.0,
+    "seconds": 10.0,
+    "frames": 283.0,
+    "hidden": 0.0,
+    "fps": 28.3,
+    "mean": 35.47,
+    "p50": 33.25,
+    "p95": 33.75,
+    "p99": 681.94,
+    "max": 681.94,
+    "over20": 178.0,
+    "over34": 14.0,
+    "present_avg": 28.86,
+    "present_max": 681.48
+   },
+   {
+    "cookie": 11,
+    "pid": 1259,
+    "route": "composed",
+    "final": false,
+    "refused": "off",
+    "direct": 0.0,
+    "composed": 194.0,
+    "seconds": 10.0,
+    "frames": 194.0,
+    "hidden": 0.0,
+    "fps": 19.4,
+    "mean": 51.86,
+    "p50": 33.5,
+    "p95": 34.0,
+    "p99": 2294.18,
+    "max": 2294.18,
+    "over20": 180.0,
+    "over34": 8.0,
+    "present_avg": 37.91,
+    "present_max": 689.37
+   },
+   {
+    "cookie": 11,
+    "pid": 1259,
+    "route": "composed",
+    "final": true,
+    "refused": "off",
+    "direct": 0.0,
+    "composed": 49.0,
+    "seconds": 2.6,
+    "frames": 49.0,
+    "hidden": 0.0,
+    "fps": 18.9,
+    "mean": 45.62,
+    "p50": 33.5,
+    "p95": 34.0,
+    "p99": 702.44,
+    "max": 702.44,
+    "over20": 44.0,
+    "over34": 2.0,
+    "present_avg": 44.99,
+    "present_max": 701.82
+   },
+   {
+    "cookie": 9,
+    "pid": 1257,
+    "route": "composed",
+    "final": false,
+    "refused": "off",
+    "direct": 0.0,
+    "composed": 309.0,
+    "seconds": 10.0,
+    "frames": 309.0,
+    "hidden": 0.0,
+    "fps": 30.8,
+    "mean": 32.45,
+    "p50": 33.5,
+    "p95": 33.75,
+    "p99": 693.14,
+    "max": 693.14,
+    "over20": 199.0,
+    "over34": 5.0,
+    "present_avg": 28.43,
+    "present_max": 692.71
+   },
+   {
+    "cookie": 12,
+    "pid": 1260,
+    "route": "composed",
+    "final": true,
+    "refused": "off",
+    "direct": 0.0,
+    "composed": 135.0,
+    "seconds": 5.3,
+    "frames": 135.0,
+    "hidden": 0.0,
+    "fps": 25.6,
+    "mean": 37.6,
+    "p50": 33.5,
+    "p95": 33.75,
+    "p99": 33.75,
+    "max": 678.74,
+    "over20": 130.0,
+    "over34": 1.0,
+    "present_avg": 36.92,
+    "present_max": 678.19
+   },
+   {
+    "cookie": 9,
+    "pid": 1257,
+    "route": "composed",
+    "final": true,
+    "refused": "off",
+    "direct": 0.0,
+    "composed": 52.0,
+    "seconds": 2.7,
+    "frames": 52.0,
+    "hidden": 0.0,
+    "fps": 19.1,
+    "mean": 46.2,
+    "p50": 33.5,
+    "p95": 33.75,
+    "p99": 688.04,
+    "max": 688.04,
+    "over20": 49.0,
+    "over34": 2.0,
+    "present_avg": 43.9,
+    "present_max": 687.6
+   }
+  ],
+  "clients": {
+   "9": {
+    "pid": 1257,
+    "route": "composed",
+    "routes": {
+     "composed": 644
+    },
+    "windows": 3,
+    "seconds": 22.7,
+    "frames": 644,
+    "hidden": 0,
+    "direct": 0,
+    "composed": 644,
+    "refused": [
+     "off"
+    ],
+    "fps": 28.4,
+    "p50_median_ms": 33.5,
+    "p95_worst_ms": 33.75,
+    "p99_worst_ms": 693.14,
+    "max_ms": 693.14,
+    "over20": 426,
+    "over34": 21,
+    "present_avg_ms": 29.87,
+    "present_max_ms": 692.71
+   },
+   "11": {
+    "pid": 1259,
+    "route": "composed",
+    "routes": {
+     "composed": 243
+    },
+    "windows": 2,
+    "seconds": 12.6,
+    "frames": 243,
+    "hidden": 0,
+    "direct": 0,
+    "composed": 243,
+    "refused": [
+     "off"
+    ],
+    "fps": 19.3,
+    "p50_median_ms": 33.5,
+    "p95_worst_ms": 34.0,
+    "p99_worst_ms": 2294.18,
+    "max_ms": 2294.18,
+    "over20": 224,
+    "over34": 10,
+    "present_avg_ms": 39.34,
+    "present_max_ms": 701.82
+   },
+   "12": {
+    "pid": 1260,
+    "route": "composed",
+    "routes": {
+     "composed": 135
+    },
+    "windows": 1,
+    "seconds": 5.3,
+    "frames": 135,
+    "hidden": 0,
+    "direct": 0,
+    "composed": 135,
+    "refused": [
+     "off"
+    ],
+    "fps": 25.5,
+    "p50_median_ms": 33.5,
+    "p95_worst_ms": 33.75,
+    "p99_worst_ms": 33.75,
+    "max_ms": 678.74,
+    "over20": 130,
+    "over34": 1,
+    "present_avg_ms": 36.92,
+    "present_max_ms": 678.19
+   }
+  }
+ },
+ "captures": [
+  "klog/gate-2026-10-12-hs2-gpu-window64-capture-01.png",
+  "klog/gate-2026-10-12-hs2-gpu-window64-capture-02.png",
+  "klog/gate-2026-10-12-hs2-gpu-window64-capture-03.png",
+  "klog/gate-2026-10-12-hs2-gpu-window64-capture-04.png",
+  "klog/gate-2026-10-12-hs2-gpu-window64-capture-05.png",
+  "klog/gate-2026-10-12-hs2-gpu-window64-capture-06.png"
+ ],
+ "cleanup_verified": true,
+ "hooks_removed": true,
+ "semantics_passed": true,
+ "window_pixels": [
+  {
+   "capture": "klog/gate-2026-10-12-hs2-gpu-window64-capture-01.png",
+   "number": 1,
+   "pixels": [
+    {
+     "phase": "gpu-controls",
+     "point": [
+      1801,
+      102
+     ],
+     "expected": [
+      255,
+      255,
+      255
+     ],
+     "actual": [
+      255,
+      255,
+      255
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-controls",
+     "point": [
+      304,
+      439
+     ],
+     "expected": [
+      30,
+      180,
+      70
+     ],
+     "actual": [
+      30,
+      180,
+      70
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-controls",
+     "point": [
+      634,
+      319
+     ],
+     "expected": [
+      240,
+      180,
+      30
+     ],
+     "actual": [
+      240,
+      180,
+      30
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-controls",
+     "point": [
+      754,
+      409
+     ],
+     "expected": [
+      220,
+      50,
+      60
+     ],
+     "actual": [
+      220,
+      50,
+      60
+     ],
+     "passed": true
+    }
+   ],
+   "desktop_background": [
+    11,
+    52,
+    142
+   ],
+   "expected_background": [
+    11,
+    52,
+    142
+   ],
+   "passed": true
+  },
+  {
+   "capture": "klog/gate-2026-10-12-hs2-gpu-window64-capture-02.png",
+   "number": 2,
+   "pixels": [
+    {
+     "phase": "gpu-modal",
+     "point": [
+      1801,
+      102
+     ],
+     "expected": [
+      255,
+      255,
+      255
+     ],
+     "actual": [
+      255,
+      255,
+      255
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-modal",
+     "point": [
+      304,
+      439
+     ],
+     "expected": [
+      30,
+      110,
+      210
+     ],
+     "actual": [
+      30,
+      110,
+      210
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-modal",
+     "point": [
+      634,
+      319
+     ],
+     "expected": [
+      240,
+      180,
+      30
+     ],
+     "actual": [
+      240,
+      180,
+      30
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-modal",
+     "point": [
+      754,
+      409
+     ],
+     "expected": [
+      220,
+      50,
+      60
+     ],
+     "actual": [
+      220,
+      50,
+      60
+     ],
+     "passed": true
+    }
+   ],
+   "desktop_background": [
+    11,
+    52,
+    142
+   ],
+   "expected_background": [
+    11,
+    52,
+    142
+   ],
+   "passed": true
+  },
+  {
+   "capture": "klog/gate-2026-10-12-hs2-gpu-window64-capture-03.png",
+   "number": 3,
+   "pixels": [
+    {
+     "phase": "gpu-resize-hidden",
+     "point": [
+      1801,
+      102
+     ],
+     "expected": [
+      255,
+      255,
+      255
+     ],
+     "actual": [
+      255,
+      255,
+      255
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-resize-hidden",
+     "point": [
+      204,
+      389
+     ],
+     "expected": [
+      30,
+      110,
+      210
+     ],
+     "actual": [
+      30,
+      110,
+      210
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-resize-hidden",
+     "point": [
+      534,
+      269
+     ],
+     "expected": [
+      240,
+      180,
+      30
+     ],
+     "actual": [
+      240,
+      180,
+      30
+     ],
+     "passed": true
+    }
+   ],
+   "desktop_background": [
+    11,
+    52,
+    142
+   ],
+   "expected_background": [
+    11,
+    52,
+    142
+   ],
+   "passed": true
+  },
+  {
+   "capture": "klog/gate-2026-10-12-hs2-gpu-window64-capture-04.png",
+   "number": 4,
+   "pixels": [
+    {
+     "phase": "gpu-restored",
+     "point": [
+      1801,
+      102
+     ],
+     "expected": [
+      255,
+      255,
+      255
+     ],
+     "actual": [
+      255,
+      255,
+      255
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-restored",
+     "point": [
+      204,
+      389
+     ],
+     "expected": [
+      30,
+      180,
+      70
+     ],
+     "actual": [
+      30,
+      180,
+      70
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-restored",
+     "point": [
+      534,
+      269
+     ],
+     "expected": [
+      240,
+      180,
+      30
+     ],
+     "actual": [
+      240,
+      180,
+      30
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-restored",
+     "point": [
+      654,
+      359
+     ],
+     "expected": [
+      30,
+      110,
+      210
+     ],
+     "actual": [
+      30,
+      110,
+      210
+     ],
+     "passed": true
+    }
+   ],
+   "desktop_background": [
+    11,
+    52,
+    142
+   ],
+   "expected_background": [
+    11,
+    52,
+    142
+   ],
+   "passed": true
+  },
+  {
+   "capture": "klog/gate-2026-10-12-hs2-gpu-window64-capture-05.png",
+   "number": 5,
+   "pixels": [
+    {
+     "phase": "gpu-child-exited",
+     "point": [
+      1801,
+      102
+     ],
+     "expected": [
+      255,
+      255,
+      255
+     ],
+     "actual": [
+      255,
+      255,
+      255
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-child-exited",
+     "point": [
+      204,
+      389
+     ],
+     "expected": [
+      220,
+      50,
+      60
+     ],
+     "actual": [
+      220,
+      50,
+      60
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-child-exited",
+     "point": [
+      534,
+      269
+     ],
+     "expected": [
+      240,
+      180,
+      30
+     ],
+     "actual": [
+      240,
+      180,
+      30
+     ],
+     "passed": true
+    }
+   ],
+   "desktop_background": [
+    11,
+    52,
+    142
+   ],
+   "expected_background": [
+    11,
+    52,
+    142
+   ],
+   "passed": true
+  },
+  {
+   "capture": "klog/gate-2026-10-12-hs2-gpu-window64-capture-06.png",
+   "number": 6,
+   "pixels": [
+    {
+     "phase": "gpu-into-owner",
+     "point": [
+      1801,
+      102
+     ],
+     "expected": [
+      255,
+      255,
+      255
+     ],
+     "actual": [
+      255,
+      255,
+      255
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-into-owner",
+     "point": [
+      314,
+      549
+     ],
+     "expected": [
+      30,
+      180,
+      70
+     ],
+     "actual": [
+      30,
+      180,
+      70
+     ],
+     "passed": true
+    },
+    {
+     "phase": "gpu-into-owner",
+     "point": [
+      534,
+      269
+     ],
+     "expected": [
+      240,
+      180,
+      30
+     ],
+     "actual": [
+      240,
+      180,
+      30
+     ],
+     "passed": true
+    }
+   ],
+   "desktop_background": [
+    11,
+    52,
+    142
+   ],
+   "expected_background": [
+    11,
+    52,
+    142
+   ],
+   "passed": true
+  }
+ ]
+}

@@ -1,0 +1,47 @@
+From: PS5_Proton <local>
+Subject: [PATCH] ntdll: PS5: host-protection tables come from Wine's heap
+
+The table of known host protections (patch 0540: one byte a host page, prot|0x80, in a 1 MiB top array and 64 KiB
+leaves) was placed by mmap(NULL), where the kernel chose. A leaf landed in a hole of a Windows view, and the program
+read its bytes as its own: a HashLink game's GPU pool allocator in the earlier emulator experiment (removed) loaded 0x8383838383838383 and
+0x8080808080808080 as pointers (2026-10-13; record removed from the tree; in git history). The table now comes from calloc on the console, as
+patch 0960 did for the vprot tables, so it lives where Wine's heap lives.
+
+calloc's large blocks come from the heap's own area only once direct memory is in use (pw_wine_dmem_ps5.c); in the
+flexible-memory path (WINE_PS5_PAYLOAD_DMEM=0), when the heap area is refused or used up, and before the first region
+exists, the heap itself falls back to mmap(NULL). Those placements are counted when they land over the section arena
+(pw_wine_section_ps5.c, the helper census's misplaced=). Not yet run on the console.
+---
+diff --git a/dlls/ntdll/unix/virtual.c b/dlls/ntdll/unix/virtual.c
+index 43b3d53..2fbebc8 100644
+--- a/dlls/ntdll/unix/virtual.c
++++ b/dlls/ntdll/unix/virtual.c
+@@ -157,18 +157,28 @@ static unsigned char *host_prot_entry( size_t host_page, int create )
+ 
+         if (!create) return NULL;
+         host_prot_leaf_count = ((size_t)1 << 47 >> shift) >> HOST_PROT_LEAF_SHIFT;
++#ifdef __PROSPERO__
++        /* Wine's heap, as the vprot tables (patch 0960): a table mmap(NULL) placed landed in a hole of a Windows view,
++         * and the program read its prot|0x80 bytes as pointers (2026-10-13). */
++        if (!(top = calloc( host_prot_leaf_count, sizeof(*host_prot_leaves) ))) return NULL;
++#else
+         top = mmap( NULL, host_prot_leaf_count * sizeof(*host_prot_leaves), PROT_READ | PROT_WRITE,
+                     MAP_PRIVATE | MAP_ANON, -1, 0 );
+         if (top == MAP_FAILED) return NULL;
++#endif
+         host_prot_leaves = top;
+     }
+     if (leaf >= host_prot_leaf_count) return NULL;
+     if (!(ptr = host_prot_leaves[leaf]))
+     {
+         if (!create) return NULL;
++#ifdef __PROSPERO__
++        if (!(ptr = calloc( 1, (size_t)1 << HOST_PROT_LEAF_SHIFT ))) return NULL;
++#else
+         ptr = mmap( NULL, (size_t)1 << HOST_PROT_LEAF_SHIFT, PROT_READ | PROT_WRITE,
+                     MAP_PRIVATE | MAP_ANON, -1, 0 );
+         if (ptr == MAP_FAILED) return NULL;
++#endif
+         host_prot_leaves[leaf] = ptr;
+     }
+     return ptr + (host_page & (((size_t)1 << HOST_PROT_LEAF_SHIFT) - 1));

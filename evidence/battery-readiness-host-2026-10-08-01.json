@@ -1,0 +1,54 @@
+{
+  "review": "battery-readiness-host-2026-10-08-01",
+  "baseline_production_fingerprint": "cc8fb4a2dab4fe5a34560e6a8a4f9fb73b70e990b81008ef7ad5b08dfb179710",
+  "original_gate_case_count": 37,
+  "gate_cases_unchanged": true,
+  "case_commands_unchanged": true,
+  "readiness_checks_passed": 12,
+  "battery_orchestration_checks_passed": 5,
+  "sanitized_actual_pad_scripts_passed": true,
+  "other_python_regressions": [
+    "wine-conformance",
+    "child-probe-tools",
+    "lapy-capture",
+    "wow64-input"
+  ],
+  "changes": [
+    "Verified normal completion and hook cleanup permit readiness-driven launches without fixed 60-second pacing.",
+    "Idle is checked before and after the unchanged native helper census.",
+    "Outage refusal and unknown/failed cleanup protection remain; legacy tools retain 60-second pacing.",
+    "First-rendered-frame input scripts preserve actions and controller mappings.",
+    "Per-case run/readiness/overhead timing and safe stop-at-case-boundary.",
+    "Partial gate cannot pass."
+  ],
+  "fixed_pacing_floor_removed_seconds": 2160,
+  "timing_limit": "Removed artificial scheduling floor, not a measured console speedup. Actual new console timing remains pending.",
+  "production_console_qualified": false,
+  "code_committed": false,
+  "sources": {
+    "tools/console_guard.py": "288ae10a6b32e32c99ef2883061df2ada9efd2b1db67a2280993a64176ae99ea",
+    "tools/run-console.py": "6a36ec2d1f4512a1434887ce074e255df0c741a7730594a71e855c5b71688179",
+    "tools/run-launcher.py": "4a676d675b6cddfb050953ab73568510b112e164bd3c770e3cfd50c3908bc593",
+    "tools/run-battery.py": "9a5acbf1e0a71c69d349d95a099421ae4bf51611925e8dfc9e64a8489ed6026b",
+    "tools/host-tests.sh": "226dcd3a269635fcec668b4ec7ca52c4d74d86b1684dfcc234bc4a4db3a50bf7",
+    "tests/test_console_guard.py": "4b576f1b6a0e51dbc63b5e41790a15b67d970e1d4329069c0a4b6b67c5598c7f",
+    "tests/test_battery_runner.py": "1d0214ce968faf62d5451388e2426aab10b3a2c0e630ca18d89b2b5105278d93",
+    "tests/test_pw_pad_script.c": "491e9b72f5024c271fdc98b907550f9ecdfdafbe4cdf7d15d2f55a6edd824153",
+    "tests/pad-scripts/desktop-pointer.txt": "b09887ec9ec6f2625613d3c2256b50f197c2d565e226f53bfd035b996f437308",
+    "tests/pad-scripts/mouse-controls.txt": "7df41b22e10f4477dc504db4be9cc706ae595214522367cdf2ebe609c273022a"
+  },
+  "progress_output_checked": [
+    "Test 1/37",
+    "Test 37/37",
+    "Test 1/2 and 2/2 for a selected subset",
+    "completed/passed/failed totals, including partial stop"
+  ],
+  "production_build": {
+    "passed": true,
+    "fingerprint": "20294822ed0713a979689d2808699772ec32e2c468fb5d44f2e278b7966cac5a",
+    "matches_current_source": true,
+    "staged_files": 4324,
+    "log": "klog/battery-readiness-build-02.log",
+    "deployed": false
+  }
+}

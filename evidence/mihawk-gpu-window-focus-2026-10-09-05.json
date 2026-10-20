@@ -1,0 +1,39 @@
+{
+ "battery": "mihawk-gpu-window-focus-2026-10-09-05",
+ "expected_cases": [
+  "dxvk-window64"
+ ],
+ "revision": "94185f8d4f7ce5ef9077656d98ba2f83060446c4",
+ "dirty": true,
+ "cases": [
+  {
+   "case": "dxvk-window64",
+   "run": "mihawk-gpu-window-focus-2026-10-09-05-dxvk-window64",
+   "runner_status": 1,
+   "seconds": 42.7,
+   "result": "finished",
+   "probe_verdict": "FAIL",
+   "returned_to_launcher": true,
+   "exit_stall": false,
+   "passed": false,
+   "run_seconds": 35.7,
+   "launch_readiness": {
+    "ready": true,
+    "seconds": 0.193,
+    "settle_seconds": 0.0,
+    "census_seconds": 0.178,
+    "previous_cleanup_verified": true
+   },
+   "runner_overhead_seconds": 7.0,
+   "layout": "launcher",
+   "fault_records": 0,
+   "helpers": 13,
+   "protocol_errors": 0
+  }
+ ],
+ "complete": true,
+ "seconds": 42.7,
+ "passed": false,
+ "build_fingerprint": "1e885d9ea5872e1b1984bd218efb5c334481b9b01023b22e1933b0aadc3a387e",
+ "finding": "Both acknowledged GPU HWNDs have canonical CLIENT/VISIBLE flags and nonempty clips. All nine fence-completed backing samples remain black in the first eight presentations per client. This locates the missing colour before retained composition. An explicit pre-Present Direct3D staging readback follows; default gate presentations remain without readback."
+}

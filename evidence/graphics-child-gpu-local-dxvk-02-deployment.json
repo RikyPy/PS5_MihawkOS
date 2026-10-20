@@ -1,0 +1,2365 @@
+{
+  "case": "graphics-broker",
+  "loader": {
+    "sdk_revision": "611893fc25ef3e138f5bc2c90d829d8b58174cd2",
+    "converter_revision": "ab37acd506305ba3e575435e3ae9a351cfaf7cf4",
+    "converter_sha256": "614377a0e37006e1454c67f228fc370a2f785c060205cb9f0264f27af04b5f18",
+    "recipe_sha256": "5d5a2624cc15bd110457cf51d9a6e0e79269c32cd40828097d4c95b6844076ae",
+    "sources": {
+      "native/proton_wine_child.c": "c02b42933c97d20a143ce738af8f5aa1d512f3aa08879416085c4bc0a7f203b8",
+      "src/pw_wine_start.c": "52bdf039228ca13e9931fc7f7097b196ece76868990b6ea44588990714bf22e2",
+      "wine/ps5/pw_wine_prx.c": "67b8393fca62a72a7aaf53a409c9a34684dd7704037bf194066e5173808c16a2",
+      "wine/ps5/pw_wine_process_io.c": "dd3ccac3b63058aaf743146fbf5791217ec9b6451ad0dc4c61dcbbad7abbd6c5",
+      "wine/ps5/pw_wine_process.h": "8dfcebec46ad948b2b0b9975b2ade680f01d6c93e2ed37c4e961a45f0cac7eab",
+      "wine/ps5/pw_wine_process_io.h": "c375a67872391d47ef20cb7bc0001b66655aa29c44c446af31102c0fe5f937a7",
+      "src/pw_wine_start.h": "f450215176a5bf7b898728ab0a84cbd6b8a3bfd497a4996ee4f590aab95c6ed7",
+      "wine/ps5/pw_wine_prx.h": "82e4cf6b56377bb3ca9e007bd78a3302633fa8675e77d5b507823829959f9bb0",
+      "native/proton_gpu_identity.h": "9dea30f7e9e109050efb992844bfdb4101afddb1021d11b6da3b09a4ad4dce31"
+    },
+    "preload_mask": "0x8000000000000002",
+    "gpu_preflight": false,
+    "gpu_device_query": false,
+    "gpu_broker": true,
+    "ps5-pie.ld": "fbc52518761b58b703a2225c847c5f44a81523cd0e751755adf890ae0f0dd74c",
+    "app-symbols.map": "470ce72a27a7be8e35dd7a25b485faa733d61570bdaf24d3c75bb4e3e3c63cf7",
+    "identity": "6f1c8928be118ac861bc7a549548effed7483efba25326e9c1f4f2928fe7a2ca",
+    "sha256": "2077dfb8cce9c89d6b3e67725d99921a06a99e128195a2190d33352fe1edb7aa"
+  },
+  "runtime": {
+    "ntdll": "ceec9739d4ccb39d4e0fa494f5568c2ea02244b00cf608789e92c813c84b3236",
+    "wineserver": "b042227f4e94210c9ee347a22bd9722366299f54e35aefa6e492545faa1a9ae8",
+    "win32u": "eaeeb6850893e810c262f3d0493fe113ae37a103c6bd782851c305ad0a4986f2",
+    "libvulkan": "54702bf881e0274e446c805ee40059fedb152099c62c200b0313d2ba4ff3260a"
+  },
+  "passed": false,
+  "production_restored": true,
+  "helper_removed": true,
+  "status": "complete",
+  "gpu_broker": true,
+  "gpu_client": {
+    "wsi": true,
+    "sha256": "54702bf881e0274e446c805ee40059fedb152099c62c200b0313d2ba4ff3260a",
+    "elf_sha256": "8b43d6fd9ffa6f2fe3d77a43c1671e07df1d4d26d383b8580db8645cd23654c6",
+    "needed": [
+      "libSceLibcInternal.sprx",
+      "libkernel.sprx"
+    ],
+    "sdk_revision": "611893fc25ef3e138f5bc2c90d829d8b58174cd2",
+    "mesa_revision": "7b59ef27c1b09b9671bc4153c41940c3155c3af2",
+    "archive_sha256": "0ffa39311881236b4872ec77a56bca417ce56c71cefca5954224b9ea8f3a1bf5",
+    "recipe_sha256": "e2844f49e4af12a9718d5b8b6055ace83e7eaa1d68870de2a79d39d1c92fa674",
+    "tool_sha256": "678c1a4bce88bfdb42d24b042917a824f68ef01394793f64198bfd3beebb55ec",
+    "source_sha256": {
+      "native/proton_gpu_client.c": "eb3eaf7ea4d475109de57b3ff875d281d51c46cc7f82d2fdc3bad93628aa6948",
+      "native/proton_gpu_vulkan_probe.c": "22c4ea3803de328e268ebca8d526dff039ada9360dd8923d898ffcc70dc2e542",
+      "native/proton_gpu_headless_wsi.c": "38c3fcae128403c592f77c5eb9f56bdc33fb52121a5fc18d1a51c89f4967f0e8",
+      "native/proton_gpu_vulkan_exports.c": "59f6c34baba38666da55d2e94fe47832de793b52fe0728502ad77eba3756a3d4",
+      "src/pw_gpu_broker.h": "1721c9ee93d0d56f9aed816c7ceebf02d9416d0e459e5b6707a7fa6d6c748d4c",
+      "wine/ps5/pw_wine_process_io.c": "dd3ccac3b63058aaf743146fbf5791217ec9b6451ad0dc4c61dcbbad7abbd6c5",
+      "wine/ps5/pw_wine_process_io.h": "c375a67872391d47ef20cb7bc0001b66655aa29c44c446af31102c0fe5f937a7",
+      "tools/link_gpu_client.sh": "244b37c6574434be63185e1382ba82de2c05cc524dd5f8fcffda067a98fcff88",
+      "tools/patches/radv-gpu-broker-features.patch": "3672d8035f45c808ddfb8c588daf387d19fcbccb254103ef0645af3075b5f1a6",
+      "tools/patches/radv-gpu-broker-wsi.patch": "69c4efbc526941309a58cb67db4ad7e4421cf17f7075a268d56c3f0d8fd9b6db",
+      "tools/patches/radv-gpu-broker-local-memory.patch": "41ef0950f29dbca7be251c48f99a86926271ee227ce28e4ba43cf7140c7f7957",
+      "native/proton_gpu_probe_spv.h": "99b42cc15257777a91efd4f8b7212a6f254ce0b5d680362400146551b254e4fd",
+      "tools/gen_prx_descriptor.py": "3be71c5df76a6695a0e4f7ec0fe28257c6c98596c93bac30d32e771ea8f34cd5",
+      "wine/ps5/prx_eh_frame.ld": "ebf4f2bc7c4f49e85a895053c8f2162c5bcef323cdb99563bb45439c10f34264"
+    }
+  },
+  "owner_title": {
+    "revision": "2c69e35be59c390ffa765aa40ac641d7e84b0b87",
+    "kind": "wine-owner",
+    "elevate_gpu_helper": false,
+    "vulkan_gpu_helper": false,
+    "gpu_draw_helper": false,
+    "gpu_present_helper": false,
+    "wine_gpu_broker": true,
+    "sdk_revision": "611893fc25ef3e138f5bc2c90d829d8b58174cd2",
+    "source_sha256": {
+      "ps5/src/main.cpp": "f1eb468f9603425c6543f0b02d8cf91e3e85a6919d7248dec85a24fd2f5aa457",
+      "ps5/CMakeLists.txt": "100c9ea15664ff118f3206617e36b07d4a2b000462269da91eafb474016d37eb",
+      "native/proton_wine.cpp": "f1ed58a22503e36037210e4d081a7e5b1b8cabad37ab8b5384efd79627331646",
+      "native/proton_gpu_identity.h": "9dea30f7e9e109050efb992844bfdb4101afddb1021d11b6da3b09a4ad4dce31",
+      "wine/ps5/pw_wine_process.h": "8dfcebec46ad948b2b0b9975b2ade680f01d6c93e2ed37c4e961a45f0cac7eab",
+      "native/proton_service_helper.c": "89f5cc42441cdc74a44fefe819c800d1135fc64399339b820b1ed415dd3ad700",
+      "native/proton_gpu_broker_probe.h": "aa61c6db45fd43e42f0d765b067f0505d2b04772f8c420005ef8864e6edc5813",
+      "native/proton_gpu_broker_probe.cpp": "9452f23403ba3fce4899ce3f6e7944bf95af35f77bc238f6086477f60bd87817",
+      "native/proton_gpu_memory_probe.cpp": "4edb0df02d9fecd9eb1660d5f7034dbc7824c60d89716838d5caac08c79d4bb4",
+      "native/proton_gpu_server_probe.cpp": "3e44f6b28ac865b76385e757ffc80a1a364e13ae9f4fe6705a9480c4ad8ebd50",
+      "native/proton_gpu_display.cpp": "27e04095d61bb7906534fda8a390ae81027f28b18b929fb448fa2c64c94efc82",
+      "native/proton_gpu_display.h": "dfacadd01093f3fb05f0353d1a577678af1ce5c780942cab262c896494e23a35",
+      "native/proton_gpu_server.h": "5a72c6284a2c6a015a1d39d1536fd5f400087f4959bd600def1a8a03933a9c39",
+      "src/pw_gpu_broker.h": "1721c9ee93d0d56f9aed816c7ceebf02d9416d0e459e5b6707a7fa6d6c748d4c",
+      "wine/ps5/pw_wine_process_io.c": "dd3ccac3b63058aaf743146fbf5791217ec9b6451ad0dc4c61dcbbad7abbd6c5",
+      "wine/ps5/pw_wine_process_io.h": "c375a67872391d47ef20cb7bc0001b66655aa29c44c446af31102c0fe5f937a7"
+    },
+    "radv_recipe_sha256": "e2844f49e4af12a9718d5b8b6055ace83e7eaa1d68870de2a79d39d1c92fa674",
+    "identity": "461932c73bce71d4589c9702dc92245328c1899350f5ea8d01ffec26edd46dc3",
+    "eboot_sha256": "f4dbc742a5aa68eac9e3dd9264046d2ff476f81b100103bacc4e72fd29174b9b"
+  },
+  "parent_restored": true,
+  "graphics_uploaded": true,
+  "graphics_sha256": "f8340e770780074bad25e247f4fd7534fd905d531cde0b35bbddbfe31fa9876a",
+  "parent_deployed": true,
+  "deployed_modules": [
+    "ntdll",
+    "wineserver",
+    "win32u",
+    "libvulkan"
+  ],
+  "helper_uploaded": true,
+  "probe_uploaded": true,
+  "deployment_verified": true,
+  "probe_sha256": "d36a4b5cbde765673edae6bfc993cee96c05e07462412b9a84a16f3cc143adbf",
+  "descendant_patch_sha256": "57fb947935f4178616a4ce3faeb753acd370fa737d691a86bf73d18c0322713f",
+  "graphics_patch_sha256": "c781a26850dfa9c68dbece702d9349185a7025dc51f65c61bba00da9e2606adc",
+  "patch_sha256": "2767c06d7ca2d2355275e644fe22f0045b713e90ab5f7946da7c3b22af5712a1",
+  "adapter_sha256": {
+    "pw_wine_process.c": "f58a57bf0cc147f9e01b71b219aa2a518d1ff59f806490ad45781a3fb99ecec8",
+    "pw_wine_process.h": "8dfcebec46ad948b2b0b9975b2ade680f01d6c93e2ed37c4e961a45f0cac7eab",
+    "pw_wine_threads.c": "9fb82ed67f775782a8ec9d9d0dbaf0837adb004cc1241ceebf6f58e60bbe38a0",
+    "pw_wine_threads.h": "a28177375ad16666504b3d05cb285c8f23634b800c2e4bd9b3c20ead21722d30",
+    "pw_wine_process_io.c": "dd3ccac3b63058aaf743146fbf5791217ec9b6451ad0dc4c61dcbbad7abbd6c5",
+    "pw_wine_process_io.h": "c375a67872391d47ef20cb7bc0001b66655aa29c44c446af31102c0fe5f937a7"
+  },
+  "runner_status": 1,
+  "post_launch_fault_records": 0,
+  "native_descriptor_samples": [
+    {
+      "stage": "before_spawn",
+      "count": 29,
+      "limit": 12555
+    },
+    {
+      "stage": "before_spawn",
+      "count": 38,
+      "limit": 12555
+    },
+    {
+      "stage": "before_spawn",
+      "count": 90,
+      "limit": 12555
+    },
+    {
+      "stage": "closed",
+      "count": 91,
+      "limit": 12555
+    },
+    {
+      "stage": "before_spawn",
+      "count": 97,
+      "limit": 12555
+    },
+    {
+      "stage": "before_spawn",
+      "count": 309,
+      "limit": 12555
+    },
+    {
+      "stage": "before_spawn",
+      "count": 314,
+      "limit": 12555
+    },
+    {
+      "stage": "closed",
+      "count": 319,
+      "limit": 12555
+    },
+    {
+      "stage": "closed",
+      "count": 227,
+      "limit": 12555
+    },
+    {
+      "stage": "closed",
+      "count": 122,
+      "limit": 12555
+    },
+    {
+      "stage": "closed",
+      "count": 70,
+      "limit": 12555
+    },
+    {
+      "stage": "closed",
+      "count": 69,
+      "limit": 12555
+    },
+    {
+      "stage": "all_children_closed",
+      "count": 69,
+      "limit": 12555
+    }
+  ],
+  "windows_handle_samples": [
+    {
+      "before": 14,
+      "after": 14
+    }
+  ],
+  "native_children": [
+    {
+      "pid": 439,
+      "service_id": 469862977
+    },
+    {
+      "pid": 442,
+      "service_id": 469862994
+    },
+    {
+      "pid": 445,
+      "service_id": 469863010
+    },
+    {
+      "pid": 448,
+      "service_id": 469863027
+    },
+    {
+      "pid": 451,
+      "service_id": 469863044
+    },
+    {
+      "pid": 454,
+      "service_id": 469863061
+    }
+  ],
+  "native_child_deletions": [
+    439,
+    442,
+    445,
+    448,
+    451,
+    454
+  ],
+  "child_logs": [
+    "wine-child-439.log",
+    "wine-child-442.log",
+    "wine-child-445.log",
+    "wine-child-448.log",
+    "wine-child-451.log",
+    "wine-child-454.log"
+  ],
+  "gpu_broker_results": [
+    "gpu-broker warmup_submit=0 gpu_value=77",
+    "gpu-wine broker local_memory=1 local_offer=8589934592 local_floor=1073741824 host_limit=134217728",
+    "gpu-wine cookie=2 pid=-1 closed=1 absent=1 frames=0 submissions=0 backing_released=0 local_released=0 local_peak=0",
+    "gpu-wine cookie=3 pid=445 local_offer=8589934592 host_limit=134217728",
+    "gpu-wine cookie=3 pid=445 operation=1 status=0 live_bytes=0 local_bytes=0",
+    "gpu-wine cookie=3 pid=445 operation=2 status=0 live_bytes=2097152 local_bytes=0",
+    "gpu-wine cookie=3 pid=445 operation=2 status=0 live_bytes=2113536 local_bytes=0",
+    "gpu-wine cookie=4 pid=448 local_offer=8589934592 host_limit=134217728",
+    "gpu-wine cookie=4 pid=448 operation=1 status=0 live_bytes=0 local_bytes=0",
+    "gpu-wine cookie=4 pid=448 operation=2 status=0 live_bytes=2097152 local_bytes=0",
+    "gpu-wine cookie=4 pid=448 operation=2 status=0 live_bytes=2113536 local_bytes=0",
+    "gpu-wine cookie=3 pid=445 operation=2 status=0 live_bytes=2179072 local_bytes=0",
+    "gpu-wine cookie=3 pid=445 operation=2 status=0 live_bytes=2441216 local_bytes=0",
+    "gpu-wine cookie=3 pid=445 operation=2 status=0 live_bytes=2965504 local_bytes=0",
+    "gpu-wine cookie=3 pid=445 operation=2 status=0 live_bytes=7159808 local_bytes=0",
+    "gpu-wine cookie=4 pid=448 operation=2 status=0 live_bytes=2179072 local_bytes=0",
+    "gpu-wine cookie=3 pid=445 operation=2 status=0 live_bytes=7176192 local_bytes=0",
+    "gpu-wine cookie=4 pid=448 operation=2 status=0 live_bytes=2441216 local_bytes=0",
+    "gpu-wine cookie=3 pid=445 operation=2 status=0 live_bytes=15564800 local_bytes=0",
+    "gpu-wine cookie=4 pid=448 operation=2 status=0 live_bytes=2965504 local_bytes=0",
+    "gpu-wine cookie=3 pid=445 operation=2 status=0 live_bytes=15564800 local_bytes=4194304",
+    "gpu-wine cookie=4 pid=448 operation=2 status=0 live_bytes=7159808 local_bytes=0",
+    "gpu-wine cookie=3 pid=445 operation=2 status=0 live_bytes=15581184 local_bytes=4194304",
+    "gpu-wine cookie=4 pid=448 operation=2 status=0 live_bytes=7176192 local_bytes=0",
+    "gpu-wine cookie=3 pid=445 operation=2 status=0 live_bytes=16515072 local_bytes=4194304",
+    "gpu-wine cookie=4 pid=448 operation=2 status=0 live_bytes=15564800 local_bytes=0",
+    "gpu-wine cookie=3 pid=445 operation=2 status=0 live_bytes=16531456 local_bytes=4194304",
+    "gpu-wine cookie=4 pid=448 operation=2 status=0 live_bytes=15564800 local_bytes=4194304",
+    "gpu-wine cookie=3 pid=445 operation=2 status=0 live_bytes=16531456 local_bytes=5177344",
+    "gpu-wine cookie=4 pid=448 operation=2 status=0 live_bytes=15581184 local_bytes=4194304",
+    "gpu-wine cookie=3 pid=445 operation=2 status=0 live_bytes=16547840 local_bytes=5177344",
+    "gpu-wine cookie=4 pid=448 operation=2 status=0 live_bytes=16515072 local_bytes=4194304",
+    "gpu-vulkan client=3 submission=1 words=1165 final=1 status=0",
+    "gpu-wine cookie=3 pid=445 operation=4 status=0 live_bytes=16547840 local_bytes=5177344",
+    "gpu-wine cookie=4 pid=448 operation=2 status=0 live_bytes=16531456 local_bytes=4194304",
+    "gpu-wine cookie=3 pid=445 operation=2 status=0 live_bytes=16564224 local_bytes=5177344",
+    "gpu-wine cookie=4 pid=448 operation=2 status=0 live_bytes=16531456 local_bytes=5177344",
+    "gpu-wine cookie=3 pid=445 operation=2 status=0 live_bytes=16580608 local_bytes=5177344",
+    "gpu-wine cookie=4 pid=448 operation=2 status=0 live_bytes=16547840 local_bytes=5177344",
+    "gpu-wine cookie=3 pid=445 operation=2 status=0 live_bytes=17514496 local_bytes=5177344",
+    "gpu-vulkan client=4 submission=1 words=1165 final=1 status=0",
+    "gpu-wine cookie=4 pid=448 operation=4 status=0 live_bytes=16547840 local_bytes=5177344",
+    "gpu-wine cookie=3 pid=445 operation=2 status=0 live_bytes=17514496 local_bytes=6160384",
+    "gpu-wine cookie=4 pid=448 operation=2 status=0 live_bytes=16564224 local_bytes=5177344",
+    "gpu-wine cookie=3 pid=445 operation=2 status=0 live_bytes=17530880 local_bytes=6160384",
+    "gpu-wine cookie=4 pid=448 operation=2 status=0 live_bytes=16580608 local_bytes=5177344",
+    "gpu-wine cookie=3 pid=445 operation=2 status=0 live_bytes=17547264 local_bytes=6160384",
+    "gpu-wine cookie=4 pid=448 operation=2 status=0 live_bytes=17514496 local_bytes=5177344",
+    "gpu-wine cookie=3 pid=445 operation=2 status=0 live_bytes=18481152 local_bytes=6160384",
+    "gpu-wine cookie=4 pid=448 operation=2 status=0 live_bytes=17514496 local_bytes=6160384",
+    "gpu-wine cookie=3 pid=445 operation=2 status=0 live_bytes=18481152 local_bytes=7143424",
+    "gpu-wine cookie=4 pid=448 operation=2 status=0 live_bytes=17530880 local_bytes=6160384",
+    "gpu-wine cookie=3 pid=445 operation=2 status=0 live_bytes=18497536 local_bytes=7143424",
+    "gpu-wine cookie=4 pid=448 operation=2 status=0 live_bytes=17547264 local_bytes=6160384",
+    "gpu-wine cookie=3 pid=445 operation=2 status=0 live_bytes=18513920 local_bytes=7143424",
+    "gpu-wine cookie=4 pid=448 operation=2 status=0 live_bytes=18481152 local_bytes=6160384",
+    "gpu-vulkan client=3 submission=2 words=580 final=1 status=0",
+    "gpu-wine cookie=3 pid=445 operation=4 status=0 live_bytes=18513920 local_bytes=7143424",
+    "gpu-wine cookie=4 pid=448 operation=2 status=0 live_bytes=18481152 local_bytes=7143424",
+    "gpu-wine cookie=3 pid=445 operation=2 status=0 live_bytes=18530304 local_bytes=7143424",
+    "gpu-wine cookie=4 pid=448 operation=2 status=0 live_bytes=18497536 local_bytes=7143424",
+    "gpu-vulkan client=3 submission=3 words=268 final=1 status=0",
+    "gpu-wine cookie=3 pid=445 operation=4 status=0 live_bytes=18530304 local_bytes=7143424",
+    "gpu-wine cookie=4 pid=448 operation=2 status=0 live_bytes=18513920 local_bytes=7143424",
+    "gpu-display flip=1 shown=1 source=640x360 status=0",
+    "gpu-wine cookie=3 pid=445 frame=1 extent=640x360 flip=1 status=0",
+    "gpu-wine cookie=3 pid=445 operation=10 status=0 live_bytes=18530304 local_bytes=7143424",
+    "gpu-vulkan client=4 submission=2 words=580 final=1 status=0",
+    "gpu-wine cookie=4 pid=448 operation=4 status=0 live_bytes=18513920 local_bytes=7143424",
+    "gpu-vulkan client=3 submission=4 words=767 final=1 status=0",
+    "gpu-wine cookie=3 pid=445 operation=4 status=0 live_bytes=18530304 local_bytes=7143424",
+    "gpu-wine cookie=4 pid=448 operation=2 status=0 live_bytes=18530304 local_bytes=7143424",
+    "gpu-wine cookie=3 pid=445 operation=2 status=0 live_bytes=18546688 local_bytes=7143424",
+    "gpu-vulkan client=4 submission=3 words=268 final=1 status=0",
+    "gpu-wine cookie=4 pid=448 operation=4 status=0 live_bytes=18530304 local_bytes=7143424",
+    "gpu-vulkan client=3 submission=5 words=580 final=1 status=0",
+    "gpu-wine cookie=3 pid=445 operation=4 status=0 live_bytes=18546688 local_bytes=7143424",
+    "gpu-display flip=2 shown=2 source=640x360 status=0",
+    "gpu-wine cookie=4 pid=448 frame=1 extent=640x360 flip=2 status=0",
+    "gpu-wine cookie=4 pid=448 operation=10 status=0 live_bytes=18530304 local_bytes=7143424",
+    "gpu-vulkan client=3 submission=6 words=268 final=1 status=0",
+    "gpu-wine cookie=3 pid=445 operation=4 status=0 live_bytes=18546688 local_bytes=7143424",
+    "gpu-vulkan client=4 submission=4 words=767 final=1 status=0",
+    "gpu-wine cookie=4 pid=448 operation=4 status=0 live_bytes=18530304 local_bytes=7143424",
+    "gpu-display flip=3 shown=3 source=640x360 status=0",
+    "gpu-wine cookie=3 pid=445 frame=2 extent=640x360 flip=3 status=0",
+    "gpu-wine cookie=3 pid=445 operation=10 status=0 live_bytes=18546688 local_bytes=7143424",
+    "gpu-wine cookie=4 pid=448 operation=2 status=0 live_bytes=18546688 local_bytes=7143424",
+    "gpu-vulkan client=3 submission=7 words=767 final=1 status=0",
+    "gpu-wine cookie=3 pid=445 operation=4 status=0 live_bytes=18546688 local_bytes=7143424",
+    "gpu-vulkan client=4 submission=5 words=580 final=1 status=0",
+    "gpu-wine cookie=4 pid=448 operation=4 status=0 live_bytes=18546688 local_bytes=7143424",
+    "gpu-wine cookie=3 pid=445 operation=2 status=0 live_bytes=18563072 local_bytes=7143424",
+    "gpu-vulkan client=4 submission=6 words=268 final=1 status=0",
+    "gpu-wine cookie=4 pid=448 operation=4 status=0 live_bytes=18546688 local_bytes=7143424",
+    "gpu-vulkan client=3 submission=8 words=580 final=1 status=0",
+    "gpu-wine cookie=3 pid=445 operation=4 status=0 live_bytes=18563072 local_bytes=7143424",
+    "gpu-display flip=4 shown=4 source=640x360 status=0",
+    "gpu-wine cookie=4 pid=448 frame=2 extent=640x360 flip=4 status=0",
+    "gpu-wine cookie=4 pid=448 operation=10 status=0 live_bytes=18546688 local_bytes=7143424",
+    "gpu-vulkan client=3 submission=9 words=268 final=1 status=0",
+    "gpu-wine cookie=3 pid=445 operation=4 status=0 live_bytes=18563072 local_bytes=7143424",
+    "gpu-vulkan client=4 submission=7 words=767 final=1 status=0",
+    "gpu-wine cookie=4 pid=448 operation=4 status=0 live_bytes=18546688 local_bytes=7143424",
+    "gpu-display flip=5 shown=5 source=640x360 status=0",
+    "gpu-wine cookie=3 pid=445 frame=3 extent=640x360 flip=5 status=0",
+    "gpu-wine cookie=3 pid=445 operation=10 status=0 live_bytes=18563072 local_bytes=7143424",
+    "gpu-wine cookie=4 pid=448 operation=2 status=0 live_bytes=18563072 local_bytes=7143424",
+    "gpu-vulkan client=3 submission=10 words=767 final=1 status=0",
+    "gpu-wine cookie=3 pid=445 operation=4 status=0 live_bytes=18563072 local_bytes=7143424",
+    "gpu-vulkan client=4 submission=8 words=580 final=1 status=0",
+    "gpu-wine cookie=4 pid=448 operation=4 status=0 live_bytes=18563072 local_bytes=7143424",
+    "gpu-wine cookie=3 pid=445 operation=2 status=0 live_bytes=18579456 local_bytes=7143424",
+    "gpu-vulkan client=4 submission=9 words=268 final=1 status=0",
+    "gpu-wine cookie=4 pid=448 operation=4 status=0 live_bytes=18563072 local_bytes=7143424",
+    "gpu-vulkan client=3 submission=11 words=580 final=1 status=0",
+    "gpu-wine cookie=3 pid=445 operation=4 status=0 live_bytes=18579456 local_bytes=7143424",
+    "gpu-display flip=6 shown=6 source=640x360 status=0",
+    "gpu-wine cookie=4 pid=448 frame=3 extent=640x360 flip=6 status=0",
+    "gpu-wine cookie=4 pid=448 operation=10 status=0 live_bytes=18563072 local_bytes=7143424",
+    "gpu-vulkan client=3 submission=12 words=268 final=1 status=0",
+    "gpu-wine cookie=3 pid=445 operation=4 status=0 live_bytes=18579456 local_bytes=7143424",
+    "gpu-vulkan client=4 submission=10 words=767 final=1 status=0",
+    "gpu-wine cookie=4 pid=448 operation=4 status=0 live_bytes=18563072 local_bytes=7143424",
+    "gpu-display flip=7 shown=7 source=640x360 status=0",
+    "gpu-wine cookie=3 pid=445 frame=4 extent=640x360 flip=7 status=0",
+    "gpu-wine cookie=3 pid=445 operation=10 status=0 live_bytes=18579456 local_bytes=7143424",
+    "gpu-wine cookie=4 pid=448 operation=2 status=0 live_bytes=18579456 local_bytes=7143424",
+    "gpu-vulkan client=3 submission=13 words=767 final=1 status=0",
+    "gpu-wine cookie=3 pid=445 operation=4 status=0 live_bytes=18579456 local_bytes=7143424",
+    "gpu-vulkan client=4 submission=11 words=580 final=1 status=0",
+    "gpu-wine cookie=4 pid=448 operation=4 status=0 live_bytes=18579456 local_bytes=7143424",
+    "gpu-vulkan client=3 submission=14 words=580 final=1 status=0",
+    "gpu-wine cookie=3 pid=445 operation=4 status=0 live_bytes=18579456 local_bytes=7143424",
+    "gpu-vulkan client=4 submission=12 words=268 final=1 status=0",
+    "gpu-wine cookie=4 pid=448 operation=4 status=0 live_bytes=18579456 local_bytes=7143424",
+    "gpu-vulkan client=3 submission=15 words=268 final=1 status=0",
+    "gpu-wine cookie=3 pid=445 operation=4 status=0 live_bytes=18579456 local_bytes=7143424",
+    "gpu-display flip=8 shown=8 source=640x360 status=0",
+    "gpu-wine cookie=4 pid=448 frame=4 extent=640x360 flip=8 status=0",
+    "gpu-wine cookie=4 pid=448 operation=10 status=0 live_bytes=18579456 local_bytes=7143424",
+    "gpu-display flip=9 shown=9 source=640x360 status=0",
+    "gpu-wine cookie=3 pid=445 frame=5 extent=640x360 flip=9 status=0",
+    "gpu-wine cookie=3 pid=445 operation=10 status=0 live_bytes=18579456 local_bytes=7143424",
+    "gpu-vulkan client=4 submission=13 words=767 final=1 status=0",
+    "gpu-wine cookie=4 pid=448 operation=4 status=0 live_bytes=18579456 local_bytes=7143424",
+    "gpu-vulkan client=3 submission=16 words=767 final=1 status=0",
+    "gpu-wine cookie=3 pid=445 operation=4 status=0 live_bytes=18579456 local_bytes=7143424",
+    "gpu-vulkan client=4 submission=14 words=580 final=1 status=0",
+    "gpu-wine cookie=4 pid=448 operation=4 status=0 live_bytes=18579456 local_bytes=7143424",
+    "gpu-vulkan client=3 submission=17 words=580 final=1 status=0",
+    "gpu-wine cookie=3 pid=445 operation=4 status=0 live_bytes=18579456 local_bytes=7143424",
+    "gpu-vulkan client=4 submission=15 words=268 final=1 status=0",
+    "gpu-wine cookie=4 pid=448 operation=4 status=0 live_bytes=18579456 local_bytes=7143424",
+    "gpu-vulkan client=3 submission=18 words=268 final=1 status=0",
+    "gpu-wine cookie=3 pid=445 operation=4 status=0 live_bytes=18579456 local_bytes=7143424",
+    "gpu-display flip=10 shown=10 source=640x360 status=0",
+    "gpu-wine cookie=4 pid=448 frame=5 extent=640x360 flip=10 status=0",
+    "gpu-wine cookie=4 pid=448 operation=10 status=0 live_bytes=18579456 local_bytes=7143424",
+    "gpu-display flip=11 shown=11 source=640x360 status=0",
+    "gpu-wine cookie=3 pid=445 frame=6 extent=640x360 flip=11 status=0",
+    "gpu-wine cookie=3 pid=445 operation=10 status=0 live_bytes=18579456 local_bytes=7143424",
+    "gpu-vulkan client=4 submission=16 words=767 final=1 status=0",
+    "gpu-wine cookie=4 pid=448 operation=4 status=0 live_bytes=18579456 local_bytes=7143424",
+    "gpu-vulkan client=3 submission=19 words=767 final=1 status=0",
+    "gpu-wine cookie=3 pid=445 operation=4 status=0 live_bytes=18579456 local_bytes=7143424",
+    "gpu-vulkan client=4 submission=17 words=580 final=1 status=0",
+    "gpu-wine cookie=4 pid=448 operation=4 status=0 live_bytes=18579456 local_bytes=7143424",
+    "gpu-wine cookie=3 pid=445 operation=2 status=0 live_bytes=22773760 local_bytes=7143424",
+    "gpu-vulkan client=4 submission=18 words=268 final=1 status=0",
+    "gpu-wine cookie=4 pid=448 operation=4 status=0 live_bytes=18579456 local_bytes=7143424",
+    "gpu-vulkan client=3 submission=20 words=580 final=1 status=0",
+    "gpu-wine cookie=3 pid=445 operation=4 status=0 live_bytes=22773760 local_bytes=7143424",
+    "gpu-display flip=12 shown=12 source=640x360 status=0",
+    "gpu-wine cookie=4 pid=448 frame=6 extent=640x360 flip=12 status=0",
+    "gpu-wine cookie=4 pid=448 operation=10 status=0 live_bytes=18579456 local_bytes=7143424",
+    "gpu-vulkan client=3 submission=21 words=268 final=1 status=0",
+    "gpu-wine cookie=3 pid=445 operation=4 status=0 live_bytes=22773760 local_bytes=7143424",
+    "gpu-vulkan client=4 submission=19 words=767 final=1 status=0",
+    "gpu-wine cookie=4 pid=448 operation=4 status=0 live_bytes=18579456 local_bytes=7143424",
+    "gpu-display flip=13 shown=13 source=640x360 status=0",
+    "gpu-wine cookie=3 pid=445 frame=7 extent=640x360 flip=13 status=0",
+    "gpu-wine cookie=3 pid=445 operation=10 status=0 live_bytes=22773760 local_bytes=7143424",
+    "gpu-wine cookie=4 pid=448 operation=2 status=0 live_bytes=22773760 local_bytes=7143424",
+    "gpu-vulkan client=3 submission=22 words=839 final=1 status=0",
+    "gpu-wine cookie=3 pid=445 operation=4 status=0 live_bytes=22773760 local_bytes=7143424",
+    "gpu-vulkan client=4 submission=20 words=580 final=1 status=0",
+    "gpu-wine cookie=4 pid=448 operation=4 status=0 live_bytes=22773760 local_bytes=7143424",
+    "gpu-vulkan client=3 submission=23 words=580 final=1 status=0",
+    "gpu-wine cookie=3 pid=445 operation=4 status=0 live_bytes=22773760 local_bytes=7143424",
+    "gpu-vulkan client=4 submission=21 words=268 final=1 status=0",
+    "gpu-wine cookie=4 pid=448 operation=4 status=0 live_bytes=22773760 local_bytes=7143424",
+    "gpu-display flip=14 shown=14 source=640x360 status=0",
+    "gpu-wine cookie=4 pid=448 frame=7 extent=640x360 flip=14 status=0",
+    "gpu-wine cookie=4 pid=448 operation=10 status=0 live_bytes=22773760 local_bytes=7143424",
+    "gpu-vulkan client=3 submission=24 words=268 final=1 status=0",
+    "gpu-wine cookie=3 pid=445 operation=4 status=0 live_bytes=22773760 local_bytes=7143424",
+    "gpu-vulkan client=4 submission=22 words=839 final=1 status=0",
+    "gpu-wine cookie=4 pid=448 operation=4 status=0 live_bytes=22773760 local_bytes=7143424",
+    "gpu-display flip=15 shown=15 source=640x360 status=0",
+    "gpu-wine cookie=3 pid=445 frame=8 extent=640x360 flip=15 status=0",
+    "gpu-wine cookie=3 pid=445 operation=10 status=0 live_bytes=22773760 local_bytes=7143424",
+    "gpu-vulkan client=4 submission=23 words=580 final=1 status=0",
+    "gpu-wine cookie=4 pid=448 operation=4 status=0 live_bytes=22773760 local_bytes=7143424",
+    "gpu-vulkan client=4 submission=24 words=268 final=1 status=0",
+    "gpu-wine cookie=4 pid=448 operation=4 status=0 live_bytes=22773760 local_bytes=7143424",
+    "gpu-display flip=16 shown=16 source=640x360 status=0",
+    "gpu-wine cookie=4 pid=448 frame=8 extent=640x360 flip=16 status=0",
+    "gpu-wine cookie=4 pid=448 operation=10 status=0 live_bytes=22773760 local_bytes=7143424",
+    "gpu-wine cookie=5 pid=451 local_offer=8589934592 host_limit=134217728",
+    "gpu-wine cookie=5 pid=451 operation=1 status=0 live_bytes=0 local_bytes=0",
+    "gpu-wine cookie=5 pid=451 operation=2 status=0 live_bytes=2097152 local_bytes=0",
+    "gpu-wine cookie=5 pid=451 operation=2 status=0 live_bytes=2113536 local_bytes=0",
+    "gpu-wine cookie=5 pid=451 operation=2 status=0 live_bytes=2179072 local_bytes=0",
+    "gpu-wine cookie=5 pid=451 operation=2 status=0 live_bytes=2441216 local_bytes=0",
+    "gpu-wine cookie=5 pid=451 operation=2 status=0 live_bytes=2965504 local_bytes=0",
+    "gpu-wine cookie=5 pid=451 operation=2 status=0 live_bytes=7159808 local_bytes=0",
+    "gpu-wine cookie=5 pid=451 operation=2 status=0 live_bytes=7176192 local_bytes=0",
+    "gpu-wine cookie=6 pid=454 local_offer=8589934592 host_limit=134217728",
+    "gpu-wine cookie=6 pid=454 operation=1 status=0 live_bytes=0 local_bytes=0",
+    "gpu-wine cookie=5 pid=451 operation=2 status=0 live_bytes=15564800 local_bytes=0",
+    "gpu-wine cookie=6 pid=454 operation=2 status=0 live_bytes=2097152 local_bytes=0",
+    "gpu-wine cookie=5 pid=451 operation=2 status=0 live_bytes=15564800 local_bytes=4194304",
+    "gpu-wine cookie=6 pid=454 operation=2 status=0 live_bytes=2113536 local_bytes=0",
+    "gpu-wine cookie=5 pid=451 operation=2 status=0 live_bytes=15581184 local_bytes=4194304",
+    "gpu-wine cookie=5 pid=451 operation=2 status=0 live_bytes=16515072 local_bytes=4194304",
+    "gpu-wine cookie=5 pid=451 operation=2 status=0 live_bytes=16531456 local_bytes=4194304",
+    "gpu-wine cookie=5 pid=451 operation=2 status=0 live_bytes=16531456 local_bytes=5177344",
+    "gpu-wine cookie=5 pid=451 operation=2 status=0 live_bytes=16547840 local_bytes=5177344",
+    "gpu-wine cookie=6 pid=454 operation=2 status=0 live_bytes=2179072 local_bytes=0",
+    "gpu-vulkan client=5 submission=1 words=1165 final=1 status=0",
+    "gpu-wine cookie=5 pid=451 operation=4 status=0 live_bytes=16547840 local_bytes=5177344",
+    "gpu-wine cookie=6 pid=454 operation=2 status=0 live_bytes=2441216 local_bytes=0",
+    "gpu-wine cookie=5 pid=451 operation=2 status=0 live_bytes=16564224 local_bytes=5177344",
+    "gpu-wine cookie=6 pid=454 operation=2 status=0 live_bytes=2965504 local_bytes=0",
+    "gpu-wine cookie=5 pid=451 operation=2 status=0 live_bytes=16580608 local_bytes=5177344",
+    "gpu-wine cookie=6 pid=454 operation=2 status=0 live_bytes=7159808 local_bytes=0",
+    "gpu-wine cookie=5 pid=451 operation=2 status=0 live_bytes=17514496 local_bytes=5177344",
+    "gpu-wine cookie=6 pid=454 operation=2 status=0 live_bytes=7176192 local_bytes=0",
+    "gpu-wine cookie=5 pid=451 operation=2 status=0 live_bytes=17514496 local_bytes=6160384",
+    "gpu-wine cookie=6 pid=454 operation=2 status=0 live_bytes=15564800 local_bytes=0",
+    "gpu-wine cookie=5 pid=451 operation=2 status=0 live_bytes=17530880 local_bytes=6160384",
+    "gpu-wine cookie=6 pid=454 operation=2 status=0 live_bytes=15564800 local_bytes=4194304",
+    "gpu-wine cookie=5 pid=451 operation=2 status=0 live_bytes=17547264 local_bytes=6160384",
+    "gpu-wine cookie=6 pid=454 operation=2 status=0 live_bytes=15581184 local_bytes=4194304",
+    "gpu-wine cookie=5 pid=451 operation=2 status=0 live_bytes=18481152 local_bytes=6160384",
+    "gpu-wine cookie=6 pid=454 operation=2 status=0 live_bytes=16515072 local_bytes=4194304",
+    "gpu-wine cookie=5 pid=451 operation=2 status=0 live_bytes=18481152 local_bytes=7143424",
+    "gpu-wine cookie=6 pid=454 operation=2 status=0 live_bytes=16531456 local_bytes=4194304",
+    "gpu-wine cookie=5 pid=451 operation=2 status=0 live_bytes=18497536 local_bytes=7143424",
+    "gpu-wine cookie=6 pid=454 operation=2 status=0 live_bytes=16531456 local_bytes=5177344",
+    "gpu-wine cookie=5 pid=451 operation=2 status=0 live_bytes=18513920 local_bytes=7143424",
+    "gpu-wine cookie=6 pid=454 operation=2 status=0 live_bytes=16547840 local_bytes=5177344",
+    "gpu-vulkan client=5 submission=2 words=580 final=1 status=0",
+    "gpu-wine cookie=5 pid=451 operation=4 status=0 live_bytes=18513920 local_bytes=7143424",
+    "gpu-vulkan client=6 submission=1 words=1165 final=1 status=0",
+    "gpu-wine cookie=6 pid=454 operation=4 status=0 live_bytes=16547840 local_bytes=5177344",
+    "gpu-wine cookie=5 pid=451 operation=2 status=0 live_bytes=18530304 local_bytes=7143424",
+    "gpu-wine cookie=6 pid=454 operation=2 status=0 live_bytes=16564224 local_bytes=5177344",
+    "gpu-vulkan client=5 submission=3 words=268 final=1 status=0",
+    "gpu-wine cookie=5 pid=451 operation=4 status=0 live_bytes=18530304 local_bytes=7143424",
+    "gpu-wine cookie=6 pid=454 operation=2 status=0 live_bytes=16580608 local_bytes=5177344",
+    "gpu-display flip=17 shown=17 source=640x360 status=0",
+    "gpu-wine cookie=5 pid=451 frame=1 extent=640x360 flip=17 status=0",
+    "gpu-wine cookie=5 pid=451 operation=10 status=0 live_bytes=18530304 local_bytes=7143424",
+    "gpu-wine cookie=6 pid=454 operation=2 status=0 live_bytes=17514496 local_bytes=5177344",
+    "gpu-vulkan client=5 submission=4 words=767 final=1 status=0",
+    "gpu-wine cookie=5 pid=451 operation=4 status=0 live_bytes=18530304 local_bytes=7143424",
+    "gpu-wine cookie=6 pid=454 operation=2 status=0 live_bytes=17514496 local_bytes=6160384",
+    "gpu-wine cookie=5 pid=451 operation=2 status=0 live_bytes=18546688 local_bytes=7143424",
+    "gpu-wine cookie=6 pid=454 operation=2 status=0 live_bytes=17530880 local_bytes=6160384",
+    "gpu-vulkan client=5 submission=5 words=580 final=1 status=0",
+    "gpu-wine cookie=5 pid=451 operation=4 status=0 live_bytes=18546688 local_bytes=7143424",
+    "gpu-wine cookie=6 pid=454 operation=2 status=0 live_bytes=17547264 local_bytes=6160384",
+    "gpu-vulkan client=5 submission=6 words=268 final=1 status=0",
+    "gpu-wine cookie=5 pid=451 operation=4 status=0 live_bytes=18546688 local_bytes=7143424",
+    "gpu-wine cookie=6 pid=454 operation=2 status=0 live_bytes=18481152 local_bytes=6160384",
+    "gpu-display flip=18 shown=18 source=640x360 status=0",
+    "gpu-wine cookie=5 pid=451 frame=2 extent=640x360 flip=18 status=0",
+    "gpu-wine cookie=5 pid=451 operation=10 status=0 live_bytes=18546688 local_bytes=7143424",
+    "gpu-wine cookie=6 pid=454 operation=2 status=0 live_bytes=18481152 local_bytes=7143424",
+    "gpu-vulkan client=5 submission=7 words=767 final=1 status=0",
+    "gpu-wine cookie=5 pid=451 operation=4 status=0 live_bytes=18546688 local_bytes=7143424",
+    "gpu-wine cookie=6 pid=454 operation=2 status=0 live_bytes=18497536 local_bytes=7143424",
+    "gpu-wine cookie=5 pid=451 operation=2 status=0 live_bytes=18563072 local_bytes=7143424",
+    "gpu-wine cookie=6 pid=454 operation=2 status=0 live_bytes=18513920 local_bytes=7143424",
+    "gpu-vulkan client=5 submission=8 words=580 final=1 status=0",
+    "gpu-wine cookie=5 pid=451 operation=4 status=0 live_bytes=18563072 local_bytes=7143424",
+    "gpu-vulkan client=6 submission=2 words=580 final=1 status=0",
+    "gpu-wine cookie=6 pid=454 operation=4 status=0 live_bytes=18513920 local_bytes=7143424",
+    "gpu-vulkan client=5 submission=9 words=268 final=1 status=0",
+    "gpu-wine cookie=5 pid=451 operation=4 status=0 live_bytes=18563072 local_bytes=7143424",
+    "gpu-wine cookie=6 pid=454 operation=2 status=0 live_bytes=18530304 local_bytes=7143424",
+    "gpu-display flip=19 shown=19 source=640x360 status=0",
+    "gpu-wine cookie=5 pid=451 frame=3 extent=640x360 flip=19 status=0",
+    "gpu-wine cookie=5 pid=451 operation=10 status=0 live_bytes=18563072 local_bytes=7143424",
+    "gpu-vulkan client=6 submission=3 words=268 final=1 status=0",
+    "gpu-wine cookie=6 pid=454 operation=4 status=0 live_bytes=18530304 local_bytes=7143424",
+    "gpu-vulkan client=5 submission=10 words=767 final=1 status=0",
+    "gpu-wine cookie=5 pid=451 operation=4 status=0 live_bytes=18563072 local_bytes=7143424",
+    "gpu-display flip=20 shown=20 source=640x360 status=0",
+    "gpu-wine cookie=6 pid=454 frame=1 extent=640x360 flip=20 status=0",
+    "gpu-wine cookie=6 pid=454 operation=10 status=0 live_bytes=18530304 local_bytes=7143424",
+    "gpu-wine cookie=5 pid=451 operation=2 status=0 live_bytes=18579456 local_bytes=7143424",
+    "gpu-vulkan client=6 submission=4 words=767 final=1 status=0",
+    "gpu-wine cookie=6 pid=454 operation=4 status=0 live_bytes=18530304 local_bytes=7143424",
+    "gpu-vulkan client=5 submission=11 words=580 final=1 status=0",
+    "gpu-wine cookie=5 pid=451 operation=4 status=0 live_bytes=18579456 local_bytes=7143424",
+    "gpu-wine cookie=6 pid=454 operation=2 status=0 live_bytes=18546688 local_bytes=7143424",
+    "gpu-vulkan client=5 submission=12 words=268 final=1 status=0",
+    "gpu-wine cookie=5 pid=451 operation=4 status=0 live_bytes=18579456 local_bytes=7143424",
+    "gpu-vulkan client=6 submission=5 words=580 final=1 status=0",
+    "gpu-wine cookie=6 pid=454 operation=4 status=0 live_bytes=18546688 local_bytes=7143424",
+    "gpu-display flip=21 shown=21 source=640x360 status=0",
+    "gpu-wine cookie=5 pid=451 frame=4 extent=640x360 flip=21 status=0",
+    "gpu-wine cookie=5 pid=451 operation=10 status=0 live_bytes=18579456 local_bytes=7143424",
+    "gpu-vulkan client=6 submission=6 words=268 final=1 status=0",
+    "gpu-wine cookie=6 pid=454 operation=4 status=0 live_bytes=18546688 local_bytes=7143424",
+    "gpu-vulkan client=5 submission=13 words=767 final=1 status=0",
+    "gpu-wine cookie=5 pid=451 operation=4 status=0 live_bytes=18579456 local_bytes=7143424",
+    "gpu-display flip=22 shown=22 source=640x360 status=0",
+    "gpu-wine cookie=6 pid=454 frame=2 extent=640x360 flip=22 status=0",
+    "gpu-wine cookie=6 pid=454 operation=10 status=0 live_bytes=18546688 local_bytes=7143424",
+    "gpu-vulkan client=5 submission=14 words=580 final=1 status=0",
+    "gpu-wine cookie=5 pid=451 operation=4 status=0 live_bytes=18579456 local_bytes=7143424",
+    "gpu-vulkan client=6 submission=7 words=767 final=1 status=0",
+    "gpu-wine cookie=6 pid=454 operation=4 status=0 live_bytes=18546688 local_bytes=7143424",
+    "gpu-vulkan client=5 submission=15 words=268 final=1 status=0",
+    "gpu-wine cookie=5 pid=451 operation=4 status=0 live_bytes=18579456 local_bytes=7143424",
+    "gpu-wine cookie=6 pid=454 operation=2 status=0 live_bytes=18563072 local_bytes=7143424",
+    "gpu-display flip=23 shown=23 source=640x360 status=0",
+    "gpu-wine cookie=5 pid=451 frame=5 extent=640x360 flip=23 status=0",
+    "gpu-wine cookie=5 pid=451 operation=10 status=0 live_bytes=18579456 local_bytes=7143424",
+    "gpu-vulkan client=6 submission=8 words=580 final=1 status=0",
+    "gpu-wine cookie=6 pid=454 operation=4 status=0 live_bytes=18563072 local_bytes=7143424",
+    "gpu-vulkan client=5 submission=16 words=767 final=1 status=0",
+    "gpu-wine cookie=5 pid=451 operation=4 status=0 live_bytes=18579456 local_bytes=7143424",
+    "gpu-vulkan client=6 submission=9 words=268 final=1 status=0",
+    "gpu-wine cookie=6 pid=454 operation=4 status=0 live_bytes=18563072 local_bytes=7143424",
+    "gpu-vulkan client=5 submission=17 words=580 final=1 status=0",
+    "gpu-wine cookie=5 pid=451 operation=4 status=0 live_bytes=18579456 local_bytes=7143424",
+    "gpu-display flip=24 shown=24 source=640x360 status=0",
+    "gpu-wine cookie=6 pid=454 frame=3 extent=640x360 flip=24 status=0",
+    "gpu-wine cookie=6 pid=454 operation=10 status=0 live_bytes=18563072 local_bytes=7143424",
+    "gpu-vulkan client=5 submission=18 words=268 final=1 status=0",
+    "gpu-wine cookie=5 pid=451 operation=4 status=0 live_bytes=18579456 local_bytes=7143424",
+    "gpu-vulkan client=6 submission=10 words=767 final=1 status=0",
+    "gpu-wine cookie=6 pid=454 operation=4 status=0 live_bytes=18563072 local_bytes=7143424",
+    "gpu-display flip=25 shown=25 source=640x360 status=0",
+    "gpu-wine cookie=5 pid=451 frame=6 extent=640x360 flip=25 status=0",
+    "gpu-wine cookie=5 pid=451 operation=10 status=0 live_bytes=18579456 local_bytes=7143424",
+    "gpu-wine cookie=6 pid=454 operation=2 status=0 live_bytes=18579456 local_bytes=7143424",
+    "gpu-vulkan client=5 submission=19 words=767 final=1 status=0",
+    "gpu-wine cookie=5 pid=451 operation=4 status=0 live_bytes=18579456 local_bytes=7143424",
+    "gpu-vulkan client=6 submission=11 words=580 final=1 status=0",
+    "gpu-wine cookie=6 pid=454 operation=4 status=0 live_bytes=18579456 local_bytes=7143424",
+    "gpu-wine cookie=5 pid=451 operation=2 status=0 live_bytes=22773760 local_bytes=7143424",
+    "gpu-vulkan client=6 submission=12 words=268 final=1 status=0",
+    "gpu-wine cookie=6 pid=454 operation=4 status=0 live_bytes=18579456 local_bytes=7143424",
+    "gpu-vulkan client=5 submission=20 words=580 final=1 status=0",
+    "gpu-wine cookie=5 pid=451 operation=4 status=0 live_bytes=22773760 local_bytes=7143424",
+    "gpu-display flip=26 shown=26 source=640x360 status=0",
+    "gpu-wine cookie=6 pid=454 frame=4 extent=640x360 flip=26 status=0",
+    "gpu-wine cookie=6 pid=454 operation=10 status=0 live_bytes=18579456 local_bytes=7143424",
+    "gpu-vulkan client=5 submission=21 words=268 final=1 status=0",
+    "gpu-wine cookie=5 pid=451 operation=4 status=0 live_bytes=22773760 local_bytes=7143424",
+    "gpu-vulkan client=6 submission=13 words=767 final=1 status=0",
+    "gpu-wine cookie=6 pid=454 operation=4 status=0 live_bytes=18579456 local_bytes=7143424",
+    "gpu-display flip=27 shown=27 source=640x360 status=0",
+    "gpu-wine cookie=5 pid=451 frame=7 extent=640x360 flip=27 status=0",
+    "gpu-wine cookie=5 pid=451 operation=10 status=0 live_bytes=22773760 local_bytes=7143424",
+    "gpu-vulkan client=6 submission=14 words=580 final=1 status=0",
+    "gpu-wine cookie=6 pid=454 operation=4 status=0 live_bytes=18579456 local_bytes=7143424",
+    "gpu-vulkan client=5 submission=22 words=839 final=1 status=0",
+    "gpu-wine cookie=5 pid=451 operation=4 status=0 live_bytes=22773760 local_bytes=7143424",
+    "gpu-vulkan client=6 submission=15 words=268 final=1 status=0",
+    "gpu-wine cookie=6 pid=454 operation=4 status=0 live_bytes=18579456 local_bytes=7143424",
+    "gpu-vulkan client=5 submission=23 words=580 final=1 status=0",
+    "gpu-wine cookie=5 pid=451 operation=4 status=0 live_bytes=22773760 local_bytes=7143424",
+    "gpu-display flip=28 shown=28 source=640x360 status=0",
+    "gpu-wine cookie=6 pid=454 frame=5 extent=640x360 flip=28 status=0",
+    "gpu-wine cookie=6 pid=454 operation=10 status=0 live_bytes=18579456 local_bytes=7143424",
+    "gpu-vulkan client=5 submission=24 words=268 final=1 status=0",
+    "gpu-wine cookie=5 pid=451 operation=4 status=0 live_bytes=22773760 local_bytes=7143424",
+    "gpu-vulkan client=6 submission=16 words=767 final=1 status=0",
+    "gpu-wine cookie=6 pid=454 operation=4 status=0 live_bytes=18579456 local_bytes=7143424",
+    "gpu-display flip=29 shown=29 source=640x360 status=0",
+    "gpu-wine cookie=5 pid=451 frame=8 extent=640x360 flip=29 status=0",
+    "gpu-wine cookie=5 pid=451 operation=10 status=0 live_bytes=22773760 local_bytes=7143424",
+    "gpu-vulkan client=6 submission=17 words=580 final=1 status=0",
+    "gpu-wine cookie=6 pid=454 operation=4 status=0 live_bytes=18579456 local_bytes=7143424",
+    "gpu-wine cookie=5 pid=451 operation=3 status=0 live_bytes=22773760 local_bytes=6160384",
+    "gpu-vulkan client=6 submission=18 words=268 final=1 status=0",
+    "gpu-wine cookie=6 pid=454 operation=4 status=0 live_bytes=18579456 local_bytes=7143424",
+    "gpu-wine cookie=5 pid=451 operation=3 status=0 live_bytes=21839872 local_bytes=6160384",
+    "gpu-display flip=30 shown=30 source=640x360 status=0",
+    "gpu-wine cookie=6 pid=454 frame=6 extent=640x360 flip=30 status=0",
+    "gpu-wine cookie=6 pid=454 operation=10 status=0 live_bytes=18579456 local_bytes=7143424",
+    "gpu-wine cookie=5 pid=451 operation=3 status=0 live_bytes=21839872 local_bytes=5177344",
+    "gpu-vulkan client=6 submission=19 words=767 final=1 status=0",
+    "gpu-wine cookie=6 pid=454 operation=4 status=0 live_bytes=18579456 local_bytes=7143424",
+    "gpu-wine cookie=5 pid=451 operation=3 status=0 live_bytes=20905984 local_bytes=5177344",
+    "gpu-wine cookie=6 pid=454 operation=2 status=0 live_bytes=22773760 local_bytes=7143424",
+    "gpu-wine cookie=5 pid=451 operation=3 status=0 live_bytes=20905984 local_bytes=4194304",
+    "gpu-vulkan client=6 submission=20 words=580 final=1 status=0",
+    "gpu-wine cookie=6 pid=454 operation=4 status=0 live_bytes=22773760 local_bytes=7143424",
+    "gpu-wine cookie=5 pid=451 operation=3 status=0 live_bytes=19972096 local_bytes=4194304",
+    "gpu-vulkan client=6 submission=21 words=268 final=1 status=0",
+    "gpu-wine cookie=6 pid=454 operation=4 status=0 live_bytes=22773760 local_bytes=7143424",
+    "gpu-wine cookie=5 pid=451 operation=3 status=0 live_bytes=19955712 local_bytes=4194304",
+    "gpu-display flip=31 shown=31 source=640x360 status=0",
+    "gpu-wine cookie=6 pid=454 frame=7 extent=640x360 flip=31 status=0",
+    "gpu-wine cookie=6 pid=454 operation=10 status=0 live_bytes=22773760 local_bytes=7143424",
+    "gpu-wine cookie=5 pid=451 operation=3 status=0 live_bytes=19939328 local_bytes=4194304",
+    "gpu-vulkan client=6 submission=22 words=839 final=1 status=0",
+    "gpu-wine cookie=6 pid=454 operation=4 status=0 live_bytes=22773760 local_bytes=7143424",
+    "gpu-wine cookie=5 pid=451 operation=3 status=0 live_bytes=19922944 local_bytes=4194304",
+    "gpu-vulkan client=6 submission=23 words=580 final=1 status=0",
+    "gpu-wine cookie=6 pid=454 operation=4 status=0 live_bytes=22773760 local_bytes=7143424",
+    "gpu-wine cookie=5 pid=451 operation=3 status=0 live_bytes=19906560 local_bytes=4194304",
+    "gpu-vulkan client=6 submission=24 words=268 final=1 status=0",
+    "gpu-wine cookie=6 pid=454 operation=4 status=0 live_bytes=22773760 local_bytes=7143424",
+    "gpu-wine cookie=5 pid=451 operation=3 status=0 live_bytes=19890176 local_bytes=4194304",
+    "gpu-display flip=32 shown=32 source=640x360 status=0",
+    "gpu-wine cookie=6 pid=454 frame=8 extent=640x360 flip=32 status=0",
+    "gpu-wine cookie=6 pid=454 operation=10 status=0 live_bytes=22773760 local_bytes=7143424",
+    "gpu-wine cookie=5 pid=451 operation=3 status=0 live_bytes=19873792 local_bytes=4194304",
+    "gpu-wine cookie=6 pid=454 operation=3 status=0 live_bytes=22773760 local_bytes=6160384",
+    "gpu-wine cookie=5 pid=451 operation=3 status=0 live_bytes=19857408 local_bytes=4194304",
+    "gpu-wine cookie=6 pid=454 operation=3 status=0 live_bytes=21839872 local_bytes=6160384",
+    "gpu-wine cookie=5 pid=451 operation=3 status=0 live_bytes=19841024 local_bytes=4194304",
+    "gpu-wine cookie=6 pid=454 operation=3 status=0 live_bytes=21839872 local_bytes=5177344",
+    "gpu-wine cookie=5 pid=451 operation=3 status=0 live_bytes=19824640 local_bytes=4194304",
+    "gpu-wine cookie=6 pid=454 operation=3 status=0 live_bytes=20905984 local_bytes=5177344",
+    "gpu-wine cookie=5 pid=451 operation=3 status=0 live_bytes=19808256 local_bytes=4194304",
+    "gpu-wine cookie=6 pid=454 operation=3 status=0 live_bytes=20905984 local_bytes=4194304",
+    "gpu-wine cookie=5 pid=451 operation=3 status=0 live_bytes=19791872 local_bytes=4194304",
+    "gpu-wine cookie=6 pid=454 operation=3 status=0 live_bytes=19972096 local_bytes=4194304",
+    "gpu-wine cookie=5 pid=451 operation=3 status=0 live_bytes=19775488 local_bytes=4194304",
+    "gpu-wine cookie=6 pid=454 operation=3 status=0 live_bytes=19955712 local_bytes=4194304",
+    "gpu-wine cookie=5 pid=451 operation=3 status=0 live_bytes=19759104 local_bytes=4194304",
+    "gpu-wine cookie=6 pid=454 operation=3 status=0 live_bytes=19939328 local_bytes=4194304",
+    "gpu-wine cookie=5 pid=451 operation=3 status=0 live_bytes=19742720 local_bytes=4194304",
+    "gpu-wine cookie=6 pid=454 operation=3 status=0 live_bytes=19922944 local_bytes=4194304",
+    "gpu-wine cookie=5 pid=451 operation=3 status=0 live_bytes=15548416 local_bytes=4194304",
+    "gpu-wine cookie=6 pid=454 operation=3 status=0 live_bytes=19906560 local_bytes=4194304",
+    "gpu-wine cookie=5 pid=451 operation=3 status=0 live_bytes=15548416 local_bytes=0",
+    "gpu-wine cookie=6 pid=454 operation=3 status=0 live_bytes=19890176 local_bytes=4194304",
+    "gpu-wine cookie=5 pid=451 operation=3 status=0 live_bytes=11354112 local_bytes=0",
+    "gpu-wine cookie=6 pid=454 operation=3 status=0 live_bytes=19873792 local_bytes=4194304",
+    "gpu-wine cookie=5 pid=451 operation=3 status=0 live_bytes=2965504 local_bytes=0",
+    "gpu-wine cookie=6 pid=454 operation=3 status=0 live_bytes=19857408 local_bytes=4194304",
+    "gpu-wine cookie=5 pid=451 operation=3 status=0 live_bytes=2703360 local_bytes=0",
+    "gpu-wine cookie=6 pid=454 operation=3 status=0 live_bytes=19841024 local_bytes=4194304",
+    "gpu-wine cookie=5 pid=451 operation=3 status=0 live_bytes=2637824 local_bytes=0",
+    "gpu-wine cookie=6 pid=454 operation=3 status=0 live_bytes=19824640 local_bytes=4194304",
+    "gpu-wine cookie=5 pid=451 operation=3 status=0 live_bytes=2113536 local_bytes=0",
+    "gpu-wine cookie=6 pid=454 operation=3 status=0 live_bytes=19808256 local_bytes=4194304",
+    "gpu-wine cookie=3 pid=445 operation=3 status=0 live_bytes=22773760 local_bytes=6160384",
+    "gpu-wine cookie=6 pid=454 operation=3 status=0 live_bytes=19791872 local_bytes=4194304",
+    "gpu-wine cookie=3 pid=445 operation=3 status=0 live_bytes=21839872 local_bytes=6160384",
+    "gpu-wine cookie=6 pid=454 operation=3 status=0 live_bytes=19775488 local_bytes=4194304",
+    "gpu-wine cookie=3 pid=445 operation=3 status=0 live_bytes=21839872 local_bytes=5177344",
+    "gpu-wine cookie=6 pid=454 operation=3 status=0 live_bytes=19759104 local_bytes=4194304",
+    "gpu-wine cookie=5 pid=451 closed=1 absent=1 frames=8 submissions=24 backing_released=2113536 local_released=0 local_peak=7143424",
+    "gpu-wine cookie=3 pid=445 operation=3 status=0 live_bytes=20905984 local_bytes=5177344",
+    "gpu-wine cookie=6 pid=454 operation=3 status=0 live_bytes=19742720 local_bytes=4194304",
+    "gpu-wine cookie=3 pid=445 operation=3 status=0 live_bytes=20905984 local_bytes=4194304",
+    "gpu-wine cookie=6 pid=454 operation=3 status=0 live_bytes=15548416 local_bytes=4194304",
+    "gpu-wine cookie=3 pid=445 operation=3 status=0 live_bytes=19972096 local_bytes=4194304",
+    "gpu-wine cookie=6 pid=454 operation=3 status=0 live_bytes=15548416 local_bytes=0",
+    "gpu-wine cookie=3 pid=445 operation=3 status=0 live_bytes=19955712 local_bytes=4194304",
+    "gpu-wine cookie=6 pid=454 operation=3 status=0 live_bytes=11354112 local_bytes=0",
+    "gpu-wine cookie=3 pid=445 operation=3 status=0 live_bytes=19939328 local_bytes=4194304",
+    "gpu-wine cookie=6 pid=454 operation=3 status=0 live_bytes=2965504 local_bytes=0",
+    "gpu-wine cookie=3 pid=445 operation=3 status=0 live_bytes=19922944 local_bytes=4194304",
+    "gpu-wine cookie=6 pid=454 operation=3 status=0 live_bytes=2703360 local_bytes=0",
+    "gpu-wine cookie=3 pid=445 operation=3 status=0 live_bytes=19906560 local_bytes=4194304",
+    "gpu-wine cookie=6 pid=454 operation=3 status=0 live_bytes=2637824 local_bytes=0",
+    "gpu-wine cookie=3 pid=445 operation=3 status=0 live_bytes=19890176 local_bytes=4194304",
+    "gpu-wine cookie=6 pid=454 operation=3 status=0 live_bytes=2113536 local_bytes=0",
+    "gpu-wine cookie=3 pid=445 operation=3 status=0 live_bytes=19873792 local_bytes=4194304",
+    "gpu-wine cookie=4 pid=448 operation=3 status=0 live_bytes=22773760 local_bytes=6160384",
+    "gpu-wine cookie=3 pid=445 operation=3 status=0 live_bytes=19857408 local_bytes=4194304",
+    "gpu-wine cookie=4 pid=448 operation=3 status=0 live_bytes=21839872 local_bytes=6160384",
+    "gpu-wine cookie=3 pid=445 operation=3 status=0 live_bytes=19841024 local_bytes=4194304",
+    "gpu-wine cookie=4 pid=448 operation=3 status=0 live_bytes=21839872 local_bytes=5177344",
+    "gpu-wine cookie=3 pid=445 operation=3 status=0 live_bytes=19824640 local_bytes=4194304",
+    "gpu-wine cookie=6 pid=454 closed=1 absent=1 frames=8 submissions=24 backing_released=2113536 local_released=0 local_peak=7143424",
+    "gpu-wine cookie=4 pid=448 operation=3 status=0 live_bytes=20905984 local_bytes=5177344",
+    "gpu-wine cookie=3 pid=445 operation=3 status=0 live_bytes=19808256 local_bytes=4194304",
+    "gpu-wine cookie=4 pid=448 operation=3 status=0 live_bytes=20905984 local_bytes=4194304",
+    "gpu-wine cookie=3 pid=445 operation=3 status=0 live_bytes=19791872 local_bytes=4194304",
+    "gpu-wine cookie=4 pid=448 operation=3 status=0 live_bytes=19972096 local_bytes=4194304",
+    "gpu-wine cookie=3 pid=445 operation=3 status=0 live_bytes=19775488 local_bytes=4194304",
+    "gpu-wine cookie=4 pid=448 operation=3 status=0 live_bytes=19955712 local_bytes=4194304",
+    "gpu-wine cookie=3 pid=445 operation=3 status=0 live_bytes=19759104 local_bytes=4194304",
+    "gpu-wine cookie=4 pid=448 operation=3 status=0 live_bytes=19939328 local_bytes=4194304",
+    "gpu-wine cookie=3 pid=445 operation=3 status=0 live_bytes=19742720 local_bytes=4194304",
+    "gpu-wine cookie=4 pid=448 operation=3 status=0 live_bytes=19922944 local_bytes=4194304",
+    "gpu-wine cookie=3 pid=445 operation=3 status=0 live_bytes=15548416 local_bytes=4194304",
+    "gpu-wine cookie=4 pid=448 operation=3 status=0 live_bytes=19906560 local_bytes=4194304",
+    "gpu-wine cookie=3 pid=445 operation=3 status=0 live_bytes=15548416 local_bytes=0",
+    "gpu-wine cookie=4 pid=448 operation=3 status=0 live_bytes=19890176 local_bytes=4194304",
+    "gpu-wine cookie=3 pid=445 operation=3 status=0 live_bytes=11354112 local_bytes=0",
+    "gpu-wine cookie=4 pid=448 operation=3 status=0 live_bytes=19873792 local_bytes=4194304",
+    "gpu-wine cookie=3 pid=445 operation=3 status=0 live_bytes=2965504 local_bytes=0",
+    "gpu-wine cookie=4 pid=448 operation=3 status=0 live_bytes=19857408 local_bytes=4194304",
+    "gpu-wine cookie=3 pid=445 operation=3 status=0 live_bytes=2703360 local_bytes=0",
+    "gpu-wine cookie=4 pid=448 operation=3 status=0 live_bytes=19841024 local_bytes=4194304",
+    "gpu-wine cookie=3 pid=445 operation=3 status=0 live_bytes=2637824 local_bytes=0",
+    "gpu-wine cookie=4 pid=448 operation=3 status=0 live_bytes=19824640 local_bytes=4194304",
+    "gpu-wine cookie=3 pid=445 operation=3 status=0 live_bytes=2113536 local_bytes=0",
+    "gpu-wine cookie=4 pid=448 operation=3 status=0 live_bytes=19808256 local_bytes=4194304",
+    "gpu-wine cookie=4 pid=448 operation=3 status=0 live_bytes=19791872 local_bytes=4194304",
+    "gpu-wine cookie=4 pid=448 operation=3 status=0 live_bytes=19775488 local_bytes=4194304",
+    "gpu-wine cookie=4 pid=448 operation=3 status=0 live_bytes=19759104 local_bytes=4194304",
+    "gpu-wine cookie=4 pid=448 operation=3 status=0 live_bytes=19742720 local_bytes=4194304",
+    "gpu-wine cookie=4 pid=448 operation=3 status=0 live_bytes=15548416 local_bytes=4194304",
+    "gpu-wine cookie=3 pid=445 closed=1 absent=1 frames=8 submissions=24 backing_released=2113536 local_released=0 local_peak=7143424",
+    "gpu-wine cookie=4 pid=448 operation=3 status=0 live_bytes=15548416 local_bytes=0",
+    "gpu-wine cookie=4 pid=448 operation=3 status=0 live_bytes=11354112 local_bytes=0",
+    "gpu-wine cookie=4 pid=448 operation=3 status=0 live_bytes=2965504 local_bytes=0",
+    "gpu-wine cookie=4 pid=448 operation=3 status=0 live_bytes=2703360 local_bytes=0",
+    "gpu-wine cookie=4 pid=448 operation=3 status=0 live_bytes=2637824 local_bytes=0",
+    "gpu-wine cookie=4 pid=448 operation=3 status=0 live_bytes=2113536 local_bytes=0",
+    "gpu-wine cookie=4 pid=448 closed=1 absent=1 frames=8 submissions=24 backing_released=2113536 local_released=0 local_peak=7143424",
+    "gpu-wine cookie=1 pid=-1 closed=1 absent=1 frames=0 submissions=0 backing_released=0 local_released=0 local_peak=0",
+    "gpu-display closed=1 flips=32 blank=0 unregister=0 close=0 release=0",
+    "gpu-wine stopped=1 clients_closed=6 flips=32 flexible_min=28311552 direct_min=12019040256"
+  ],
+  "gpu_clients_closed": [
+    {
+      "cookie": 2,
+      "pid": -1,
+      "frames": 0,
+      "submissions": 0,
+      "backing_released": 0
+    },
+    {
+      "cookie": 5,
+      "pid": 451,
+      "frames": 8,
+      "submissions": 24,
+      "backing_released": 2113536
+    },
+    {
+      "cookie": 6,
+      "pid": 454,
+      "frames": 8,
+      "submissions": 24,
+      "backing_released": 2113536
+    },
+    {
+      "cookie": 3,
+      "pid": 445,
+      "frames": 8,
+      "submissions": 24,
+      "backing_released": 2113536
+    },
+    {
+      "cookie": 4,
+      "pid": 448,
+      "frames": 8,
+      "submissions": 24,
+      "backing_released": 2113536
+    },
+    {
+      "cookie": 1,
+      "pid": -1,
+      "frames": 0,
+      "submissions": 0,
+      "backing_released": 0
+    }
+  ],
+  "gpu_transport_errors": 0,
+  "gpu_allocation_failures": [],
+  "gpu_shared_peak_bytes": 89227264,
+  "gpu_local": true,
+  "gpu_local_offers": [
+    8589934592,
+    8589934592,
+    8589934592,
+    8589934592
+  ],
+  "gpu_local_peaks": [
+    {
+      "cookie": 2,
+      "pid": -1,
+      "local_peak": 0
+    },
+    {
+      "cookie": 5,
+      "pid": 451,
+      "local_peak": 7143424
+    },
+    {
+      "cookie": 6,
+      "pid": 454,
+      "local_peak": 7143424
+    },
+    {
+      "cookie": 3,
+      "pid": 445,
+      "local_peak": 7143424
+    },
+    {
+      "cookie": 4,
+      "pid": 448,
+      "local_peak": 7143424
+    },
+    {
+      "cookie": 1,
+      "pid": -1,
+      "local_peak": 0
+    }
+  ],
+  "gpu_local_total_peak_bytes": 28573696,
+  "gpu_flexible_min": 28311552,
+  "gpu_direct_min": 12019040256,
+  "bootstrap_threads": [
+    {
+      "log": "wine-child-439.log",
+      "stack_bytes": 4194304,
+      "status": 0
+    },
+    {
+      "log": "wine-child-442.log",
+      "stack_bytes": 4194304,
+      "status": 0
+    },
+    {
+      "log": "wine-child-445.log",
+      "stack_bytes": 4194304,
+      "status": 0
+    },
+    {
+      "log": "wine-child-448.log",
+      "stack_bytes": 4194304,
+      "status": 0
+    },
+    {
+      "log": "wine-child-451.log",
+      "stack_bytes": 4194304,
+      "status": 0
+    },
+    {
+      "log": "wine-child-454.log",
+      "stack_bytes": 4194304,
+      "status": 0
+    }
+  ],
+  "gpu_display_captures": [
+    {
+      "name": "gpu-child-3-0.ppm",
+      "sha256": "a4b7e385d56ae52fc0fc7a59b56c0e4a3edfa07d5f68fc48ed4ae3adf9bec94a",
+      "format_passed": true,
+      "samples": [
+        {
+          "rgb": [
+            6,
+            13,
+            25
+          ],
+          "expected": [
+            6,
+            13,
+            26
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            127,
+            64,
+            64
+          ],
+          "expected": [
+            127,
+            64,
+            64
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            242,
+            7,
+            6
+          ],
+          "expected": [
+            242,
+            6,
+            6
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            8,
+            19,
+            228
+          ],
+          "expected": [
+            8,
+            19,
+            228
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            8,
+            228,
+            19
+          ],
+          "expected": [
+            8,
+            228,
+            19
+          ],
+          "passed": true
+        }
+      ],
+      "pixels_passed": true
+    },
+    {
+      "name": "gpu-child-4-0.ppm",
+      "sha256": "a4b7e385d56ae52fc0fc7a59b56c0e4a3edfa07d5f68fc48ed4ae3adf9bec94a",
+      "format_passed": true,
+      "samples": [
+        {
+          "rgb": [
+            6,
+            13,
+            25
+          ],
+          "expected": [
+            6,
+            13,
+            26
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            127,
+            64,
+            64
+          ],
+          "expected": [
+            127,
+            64,
+            64
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            242,
+            7,
+            6
+          ],
+          "expected": [
+            242,
+            6,
+            6
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            8,
+            19,
+            228
+          ],
+          "expected": [
+            8,
+            19,
+            228
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            8,
+            228,
+            19
+          ],
+          "expected": [
+            8,
+            228,
+            19
+          ],
+          "passed": true
+        }
+      ],
+      "pixels_passed": true
+    },
+    {
+      "name": "gpu-child-3-1.ppm",
+      "sha256": "a4b7e385d56ae52fc0fc7a59b56c0e4a3edfa07d5f68fc48ed4ae3adf9bec94a",
+      "format_passed": true,
+      "samples": [
+        {
+          "rgb": [
+            6,
+            13,
+            25
+          ],
+          "expected": [
+            6,
+            13,
+            26
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            127,
+            64,
+            64
+          ],
+          "expected": [
+            127,
+            64,
+            64
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            242,
+            7,
+            6
+          ],
+          "expected": [
+            242,
+            6,
+            6
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            8,
+            19,
+            228
+          ],
+          "expected": [
+            8,
+            19,
+            228
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            8,
+            228,
+            19
+          ],
+          "expected": [
+            8,
+            228,
+            19
+          ],
+          "passed": true
+        }
+      ],
+      "pixels_passed": true
+    },
+    {
+      "name": "gpu-child-4-1.ppm",
+      "sha256": "a4b7e385d56ae52fc0fc7a59b56c0e4a3edfa07d5f68fc48ed4ae3adf9bec94a",
+      "format_passed": true,
+      "samples": [
+        {
+          "rgb": [
+            6,
+            13,
+            25
+          ],
+          "expected": [
+            6,
+            13,
+            26
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            127,
+            64,
+            64
+          ],
+          "expected": [
+            127,
+            64,
+            64
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            242,
+            7,
+            6
+          ],
+          "expected": [
+            242,
+            6,
+            6
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            8,
+            19,
+            228
+          ],
+          "expected": [
+            8,
+            19,
+            228
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            8,
+            228,
+            19
+          ],
+          "expected": [
+            8,
+            228,
+            19
+          ],
+          "passed": true
+        }
+      ],
+      "pixels_passed": true
+    },
+    {
+      "name": "gpu-child-3-2.ppm",
+      "sha256": "a4b7e385d56ae52fc0fc7a59b56c0e4a3edfa07d5f68fc48ed4ae3adf9bec94a",
+      "format_passed": true,
+      "samples": [
+        {
+          "rgb": [
+            6,
+            13,
+            25
+          ],
+          "expected": [
+            6,
+            13,
+            26
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            127,
+            64,
+            64
+          ],
+          "expected": [
+            127,
+            64,
+            64
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            242,
+            7,
+            6
+          ],
+          "expected": [
+            242,
+            6,
+            6
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            8,
+            19,
+            228
+          ],
+          "expected": [
+            8,
+            19,
+            228
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            8,
+            228,
+            19
+          ],
+          "expected": [
+            8,
+            228,
+            19
+          ],
+          "passed": true
+        }
+      ],
+      "pixels_passed": true
+    },
+    {
+      "name": "gpu-child-4-2.ppm",
+      "sha256": "a4b7e385d56ae52fc0fc7a59b56c0e4a3edfa07d5f68fc48ed4ae3adf9bec94a",
+      "format_passed": true,
+      "samples": [
+        {
+          "rgb": [
+            6,
+            13,
+            25
+          ],
+          "expected": [
+            6,
+            13,
+            26
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            127,
+            64,
+            64
+          ],
+          "expected": [
+            127,
+            64,
+            64
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            242,
+            7,
+            6
+          ],
+          "expected": [
+            242,
+            6,
+            6
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            8,
+            19,
+            228
+          ],
+          "expected": [
+            8,
+            19,
+            228
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            8,
+            228,
+            19
+          ],
+          "expected": [
+            8,
+            228,
+            19
+          ],
+          "passed": true
+        }
+      ],
+      "pixels_passed": true
+    },
+    {
+      "name": "gpu-child-3-3.ppm",
+      "sha256": "a4b7e385d56ae52fc0fc7a59b56c0e4a3edfa07d5f68fc48ed4ae3adf9bec94a",
+      "format_passed": true,
+      "samples": [
+        {
+          "rgb": [
+            6,
+            13,
+            25
+          ],
+          "expected": [
+            6,
+            13,
+            26
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            127,
+            64,
+            64
+          ],
+          "expected": [
+            127,
+            64,
+            64
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            242,
+            7,
+            6
+          ],
+          "expected": [
+            242,
+            6,
+            6
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            8,
+            19,
+            228
+          ],
+          "expected": [
+            8,
+            19,
+            228
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            8,
+            228,
+            19
+          ],
+          "expected": [
+            8,
+            228,
+            19
+          ],
+          "passed": true
+        }
+      ],
+      "pixels_passed": true
+    },
+    {
+      "name": "gpu-child-4-3.ppm",
+      "sha256": "a4b7e385d56ae52fc0fc7a59b56c0e4a3edfa07d5f68fc48ed4ae3adf9bec94a",
+      "format_passed": true,
+      "samples": [
+        {
+          "rgb": [
+            6,
+            13,
+            25
+          ],
+          "expected": [
+            6,
+            13,
+            26
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            127,
+            64,
+            64
+          ],
+          "expected": [
+            127,
+            64,
+            64
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            242,
+            7,
+            6
+          ],
+          "expected": [
+            242,
+            6,
+            6
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            8,
+            19,
+            228
+          ],
+          "expected": [
+            8,
+            19,
+            228
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            8,
+            228,
+            19
+          ],
+          "expected": [
+            8,
+            228,
+            19
+          ],
+          "passed": true
+        }
+      ],
+      "pixels_passed": true
+    },
+    {
+      "name": "gpu-child-5-0.ppm",
+      "sha256": "a4b7e385d56ae52fc0fc7a59b56c0e4a3edfa07d5f68fc48ed4ae3adf9bec94a",
+      "format_passed": true,
+      "samples": [
+        {
+          "rgb": [
+            6,
+            13,
+            25
+          ],
+          "expected": [
+            6,
+            13,
+            26
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            127,
+            64,
+            64
+          ],
+          "expected": [
+            127,
+            64,
+            64
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            242,
+            7,
+            6
+          ],
+          "expected": [
+            242,
+            6,
+            6
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            8,
+            19,
+            228
+          ],
+          "expected": [
+            8,
+            19,
+            228
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            8,
+            228,
+            19
+          ],
+          "expected": [
+            8,
+            228,
+            19
+          ],
+          "passed": true
+        }
+      ],
+      "pixels_passed": true
+    },
+    {
+      "name": "gpu-child-5-1.ppm",
+      "sha256": "a4b7e385d56ae52fc0fc7a59b56c0e4a3edfa07d5f68fc48ed4ae3adf9bec94a",
+      "format_passed": true,
+      "samples": [
+        {
+          "rgb": [
+            6,
+            13,
+            25
+          ],
+          "expected": [
+            6,
+            13,
+            26
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            127,
+            64,
+            64
+          ],
+          "expected": [
+            127,
+            64,
+            64
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            242,
+            7,
+            6
+          ],
+          "expected": [
+            242,
+            6,
+            6
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            8,
+            19,
+            228
+          ],
+          "expected": [
+            8,
+            19,
+            228
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            8,
+            228,
+            19
+          ],
+          "expected": [
+            8,
+            228,
+            19
+          ],
+          "passed": true
+        }
+      ],
+      "pixels_passed": true
+    },
+    {
+      "name": "gpu-child-5-2.ppm",
+      "sha256": "a4b7e385d56ae52fc0fc7a59b56c0e4a3edfa07d5f68fc48ed4ae3adf9bec94a",
+      "format_passed": true,
+      "samples": [
+        {
+          "rgb": [
+            6,
+            13,
+            25
+          ],
+          "expected": [
+            6,
+            13,
+            26
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            127,
+            64,
+            64
+          ],
+          "expected": [
+            127,
+            64,
+            64
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            242,
+            7,
+            6
+          ],
+          "expected": [
+            242,
+            6,
+            6
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            8,
+            19,
+            228
+          ],
+          "expected": [
+            8,
+            19,
+            228
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            8,
+            228,
+            19
+          ],
+          "expected": [
+            8,
+            228,
+            19
+          ],
+          "passed": true
+        }
+      ],
+      "pixels_passed": true
+    },
+    {
+      "name": "gpu-child-6-0.ppm",
+      "sha256": "a4b7e385d56ae52fc0fc7a59b56c0e4a3edfa07d5f68fc48ed4ae3adf9bec94a",
+      "format_passed": true,
+      "samples": [
+        {
+          "rgb": [
+            6,
+            13,
+            25
+          ],
+          "expected": [
+            6,
+            13,
+            26
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            127,
+            64,
+            64
+          ],
+          "expected": [
+            127,
+            64,
+            64
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            242,
+            7,
+            6
+          ],
+          "expected": [
+            242,
+            6,
+            6
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            8,
+            19,
+            228
+          ],
+          "expected": [
+            8,
+            19,
+            228
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            8,
+            228,
+            19
+          ],
+          "expected": [
+            8,
+            228,
+            19
+          ],
+          "passed": true
+        }
+      ],
+      "pixels_passed": true
+    },
+    {
+      "name": "gpu-child-5-3.ppm",
+      "sha256": "a4b7e385d56ae52fc0fc7a59b56c0e4a3edfa07d5f68fc48ed4ae3adf9bec94a",
+      "format_passed": true,
+      "samples": [
+        {
+          "rgb": [
+            6,
+            13,
+            25
+          ],
+          "expected": [
+            6,
+            13,
+            26
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            127,
+            64,
+            64
+          ],
+          "expected": [
+            127,
+            64,
+            64
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            242,
+            7,
+            6
+          ],
+          "expected": [
+            242,
+            6,
+            6
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            8,
+            19,
+            228
+          ],
+          "expected": [
+            8,
+            19,
+            228
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            8,
+            228,
+            19
+          ],
+          "expected": [
+            8,
+            228,
+            19
+          ],
+          "passed": true
+        }
+      ],
+      "pixels_passed": true
+    },
+    {
+      "name": "gpu-child-6-1.ppm",
+      "sha256": "a4b7e385d56ae52fc0fc7a59b56c0e4a3edfa07d5f68fc48ed4ae3adf9bec94a",
+      "format_passed": true,
+      "samples": [
+        {
+          "rgb": [
+            6,
+            13,
+            25
+          ],
+          "expected": [
+            6,
+            13,
+            26
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            127,
+            64,
+            64
+          ],
+          "expected": [
+            127,
+            64,
+            64
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            242,
+            7,
+            6
+          ],
+          "expected": [
+            242,
+            6,
+            6
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            8,
+            19,
+            228
+          ],
+          "expected": [
+            8,
+            19,
+            228
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            8,
+            228,
+            19
+          ],
+          "expected": [
+            8,
+            228,
+            19
+          ],
+          "passed": true
+        }
+      ],
+      "pixels_passed": true
+    },
+    {
+      "name": "gpu-child-6-2.ppm",
+      "sha256": "a4b7e385d56ae52fc0fc7a59b56c0e4a3edfa07d5f68fc48ed4ae3adf9bec94a",
+      "format_passed": true,
+      "samples": [
+        {
+          "rgb": [
+            6,
+            13,
+            25
+          ],
+          "expected": [
+            6,
+            13,
+            26
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            127,
+            64,
+            64
+          ],
+          "expected": [
+            127,
+            64,
+            64
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            242,
+            7,
+            6
+          ],
+          "expected": [
+            242,
+            6,
+            6
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            8,
+            19,
+            228
+          ],
+          "expected": [
+            8,
+            19,
+            228
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            8,
+            228,
+            19
+          ],
+          "expected": [
+            8,
+            228,
+            19
+          ],
+          "passed": true
+        }
+      ],
+      "pixels_passed": true
+    },
+    {
+      "name": "gpu-child-6-3.ppm",
+      "sha256": "a4b7e385d56ae52fc0fc7a59b56c0e4a3edfa07d5f68fc48ed4ae3adf9bec94a",
+      "format_passed": true,
+      "samples": [
+        {
+          "rgb": [
+            6,
+            13,
+            25
+          ],
+          "expected": [
+            6,
+            13,
+            26
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            127,
+            64,
+            64
+          ],
+          "expected": [
+            127,
+            64,
+            64
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            242,
+            7,
+            6
+          ],
+          "expected": [
+            242,
+            6,
+            6
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            8,
+            19,
+            228
+          ],
+          "expected": [
+            8,
+            19,
+            228
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            8,
+            228,
+            19
+          ],
+          "expected": [
+            8,
+            228,
+            19
+          ],
+          "passed": true
+        }
+      ],
+      "pixels_passed": true
+    }
+  ],
+  "gpu_readbacks": [
+    {
+      "name": "graphics-broker-48.ppm",
+      "sha256": "f660ef25209bd6772c0b8d3024bf6e2327bf82dd9d693dcf9c52de03ff0fd8e2",
+      "format_passed": true,
+      "samples": [
+        {
+          "rgb": [
+            6,
+            13,
+            25
+          ],
+          "expected": [
+            6,
+            13,
+            26
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            127,
+            64,
+            64
+          ],
+          "expected": [
+            127,
+            64,
+            64
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            242,
+            7,
+            6
+          ],
+          "expected": [
+            242,
+            6,
+            6
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            8,
+            19,
+            228
+          ],
+          "expected": [
+            8,
+            19,
+            228
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            8,
+            228,
+            19
+          ],
+          "expected": [
+            8,
+            228,
+            19
+          ],
+          "passed": true
+        }
+      ],
+      "pixels_passed": true
+    },
+    {
+      "name": "graphics-broker-56.ppm",
+      "sha256": "f660ef25209bd6772c0b8d3024bf6e2327bf82dd9d693dcf9c52de03ff0fd8e2",
+      "format_passed": true,
+      "samples": [
+        {
+          "rgb": [
+            6,
+            13,
+            25
+          ],
+          "expected": [
+            6,
+            13,
+            26
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            127,
+            64,
+            64
+          ],
+          "expected": [
+            127,
+            64,
+            64
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            242,
+            7,
+            6
+          ],
+          "expected": [
+            242,
+            6,
+            6
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            8,
+            19,
+            228
+          ],
+          "expected": [
+            8,
+            19,
+            228
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            8,
+            228,
+            19
+          ],
+          "expected": [
+            8,
+            228,
+            19
+          ],
+          "passed": true
+        }
+      ],
+      "pixels_passed": true
+    },
+    {
+      "name": "graphics-broker-236.ppm",
+      "sha256": "f660ef25209bd6772c0b8d3024bf6e2327bf82dd9d693dcf9c52de03ff0fd8e2",
+      "format_passed": true,
+      "samples": [
+        {
+          "rgb": [
+            6,
+            13,
+            25
+          ],
+          "expected": [
+            6,
+            13,
+            26
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            127,
+            64,
+            64
+          ],
+          "expected": [
+            127,
+            64,
+            64
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            242,
+            7,
+            6
+          ],
+          "expected": [
+            242,
+            6,
+            6
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            8,
+            19,
+            228
+          ],
+          "expected": [
+            8,
+            19,
+            228
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            8,
+            228,
+            19
+          ],
+          "expected": [
+            8,
+            228,
+            19
+          ],
+          "passed": true
+        }
+      ],
+      "pixels_passed": true
+    },
+    {
+      "name": "graphics-broker-244.ppm",
+      "sha256": "f660ef25209bd6772c0b8d3024bf6e2327bf82dd9d693dcf9c52de03ff0fd8e2",
+      "format_passed": true,
+      "samples": [
+        {
+          "rgb": [
+            6,
+            13,
+            25
+          ],
+          "expected": [
+            6,
+            13,
+            26
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            127,
+            64,
+            64
+          ],
+          "expected": [
+            127,
+            64,
+            64
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            242,
+            7,
+            6
+          ],
+          "expected": [
+            242,
+            6,
+            6
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            8,
+            19,
+            228
+          ],
+          "expected": [
+            8,
+            19,
+            228
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            8,
+            228,
+            19
+          ],
+          "expected": [
+            8,
+            228,
+            19
+          ],
+          "passed": true
+        }
+      ],
+      "pixels_passed": true
+    }
+  ],
+  "graphics_metadata_passes": 4,
+  "graphics_teardown_passes": 4,
+  "graphics_descendant_passes": 2,
+  "probe_removed": true,
+  "graphics_removed": true,
+  "graphics_capture_removed": true
+}

@@ -1,0 +1,83 @@
+{
+  "battery": "devname-gate-2026-10-06",
+  "revision": "f6f8de743ad007d3dd66d5199e489f565ca3e720",
+  "dirty": true,
+  "cases": [
+    {
+      "case": "pe64",
+      "run": "devname-gate-2026-10-06-pe64",
+      "runner_status": 0,
+      "seconds": 7.6,
+      "result": "finished",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 2,
+      "protocol_errors": 0
+    },
+    {
+      "case": "payload-eight",
+      "run": "devname-gate-2026-10-06-payload-eight",
+      "runner_status": 0,
+      "seconds": 68.5,
+      "result": "finished",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 10,
+      "protocol_errors": 0
+    },
+    {
+      "case": "descendants",
+      "run": "devname-gate-2026-10-06-descendants",
+      "runner_status": 0,
+      "seconds": 52.2,
+      "result": "finished",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 5,
+      "protocol_errors": 0
+    },
+    {
+      "case": "launcher-render",
+      "run": "devname-gate-2026-10-06-launcher-render",
+      "runner_status": 0,
+      "seconds": 63.0,
+      "result": "finished",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 6,
+      "protocol_errors": 0
+    },
+    {
+      "case": "launcher-tls",
+      "run": "devname-gate-2026-10-06-launcher-tls",
+      "runner_status": 0,
+      "seconds": 58.5,
+      "result": "finished",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 2,
+      "protocol_errors": 0
+    }
+  ],
+  "passed": true
+}

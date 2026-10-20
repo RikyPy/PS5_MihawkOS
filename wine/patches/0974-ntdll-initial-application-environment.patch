@@ -1,0 +1,54 @@
+From: PS5_Proton
+Subject: [PATCH] ntdll: overlay explicit initial application environment after provisioning
+
+The payload bootstrap intentionally forwards selected Unix runtime settings,
+not the owner's entire environment. Carry explicit application overrides in a
+separate bounded block and apply them to the initial Windows environment after
+wineboot/registry provisioning. Reuse Wine's Unicode, case-insensitive variable
+replacement. Ordinary Windows children retain their existing startup contract.
+No executable-name conditions or host-environment scans are introduced.
+
+--- a/dlls/ntdll/unix/env.c
++++ b/dlls/ntdll/unix/env.c
+@@ -2024,6 +2024,41 @@
+     is_prefix_bootstrap = !!bootstrap;
+     free( bootstrap );
+     add_registry_environment( &env, &env_pos, &env_size );
++#ifdef __PROSPERO__
++    /* Explicit catalog overrides belong to this initial Windows application,
++     * after normal registry provisioning. Descendants use their ordinary
++     * startup environment, so none of this is reapplied to CreateProcess. */
++    {
++        extern const char *pw_ps5_initial_environment(void);
++        const char *application = pw_ps5_initial_environment();
++        for (const char *item = application; item && *item; item += strlen(item) + 1)
++        {
++            ULONG written;
++            size_t length = strlen(item);
++            WCHAR *entry = malloc((length + 1) * sizeof(*entry)), *equals;
++            if (!entry) exit_initial_process(STATUS_NO_MEMORY);
++            status = RtlUTF8ToUnicodeN(entry, length * sizeof(*entry), &written, item, length);
++            if (status != STATUS_SUCCESS)
++            {
++                free(entry);
++                exit_initial_process(status);
++            }
++            entry[written / sizeof(*entry)] = 0;
++            equals = wcschr(entry, '=');
++            if (!equals || equals == entry)
++            {
++                free(entry);
++                exit_initial_process(STATUS_INVALID_PARAMETER);
++            }
++            /* Unix may hold case variants. Remove all selected-name matches
++             * before installing exactly one Windows value, including empty. */
++            while (find_env_var(env, env_pos, entry, equals - entry))
++                set_env_var(&env, &env_pos, &env_size, entry, equals - entry, NULL);
++            set_env_var(&env, &env_pos, &env_size, entry, equals - entry, equals + 1);
++            free(entry);
++        }
++    }
++#endif
+     env[env_pos++] = 0;
+ 
+     get_full_path( main_argv[1], curdir, &nt_name );

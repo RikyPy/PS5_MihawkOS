@@ -1,0 +1,37 @@
+{
+  "battery": "v1-jit-2026-10-14-02",
+  "expected_cases": [
+    "payload-vm"
+  ],
+  "revision": "f129706985bced268cf942fe319ba5db88242f66",
+  "dirty": true,
+  "cases": [
+    {
+      "case": "payload-vm",
+      "run": "v1-jit-2026-10-14-02-payload-vm",
+      "runner_status": 0,
+      "seconds": 68.2,
+      "result": "finished",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "run_seconds": 13.8,
+      "launch_readiness": {
+        "ready": true,
+        "seconds": 0.144,
+        "settle_seconds": 0.0,
+        "census_seconds": 0.133,
+        "previous_cleanup_verified": true
+      },
+      "runner_overhead_seconds": 54.4,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 8,
+      "protocol_errors": 0
+    }
+  ],
+  "complete": true,
+  "seconds": 68.2,
+  "passed": true
+}

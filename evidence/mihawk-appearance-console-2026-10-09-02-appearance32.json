@@ -1,0 +1,253 @@
+{
+ "launch_readiness": {
+  "ready": true,
+  "seconds": 0.162,
+  "settle_seconds": 0.0,
+  "census_seconds": 0.143,
+  "previous_cleanup_verified": false
+ },
+ "run": "mihawk-appearance-console-2026-10-09-02-appearance32",
+ "what": "appearance32-probe.exe",
+ "env": [],
+ "result": "finished",
+ "seconds": 31.9,
+ "probe_verdict": "FAIL",
+ "clean_owner_restart": false,
+ "launcher_end_status": 0,
+ "initial_status": 1,
+ "closed_on_request": false,
+ "child_logs": [
+  "klog/mihawk-appearance-console-2026-10-09-02-appearance32-wine-child-1124.log",
+  "klog/mihawk-appearance-console-2026-10-09-02-appearance32-wine-child-1125.log",
+  "klog/mihawk-appearance-console-2026-10-09-02-appearance32-wine-child-1126.log",
+  "klog/mihawk-appearance-console-2026-10-09-02-appearance32-wine-child-1127.log",
+  "klog/mihawk-appearance-console-2026-10-09-02-appearance32-wine-child-1128.log",
+  "klog/mihawk-appearance-console-2026-10-09-02-appearance32-wine-child-1129.log",
+  "klog/mihawk-appearance-console-2026-10-09-02-appearance32-wine-child-1130.log",
+  "klog/mihawk-appearance-console-2026-10-09-02-appearance32-wine-child-1131.log",
+  "klog/mihawk-appearance-console-2026-10-09-02-appearance32-wine-child-1132.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": false,
+ "bench": {},
+ "steady": {
+  "server": {
+   "calls": 0.0,
+   "per_s": 0.0,
+   "avg_us": 0.0,
+   "selects": 0.0,
+   "blocked": 0.0,
+   "block_avg_us": 0.0,
+   "waits": 0.0,
+   "handles_avg": 0.0,
+   "wait_all": 0.0,
+   "polled": 0.0,
+   "delays": 0.0,
+   "yields": 0.0,
+   "intervals": 3
+  }
+ },
+ "intervals": {
+  "frames": [],
+  "server": [
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   }
+  ],
+  "top": []
+ },
+ "shown": {
+  "frames": 41,
+  "per_10s": [
+   41
+  ],
+  "longest_gap_ms": 3455
+ },
+ "broker": {
+  "local_offer": 8589934592,
+  "host_limit": 1073741824,
+  "refused": [],
+  "refused_count": 0,
+  "clients": [
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": 1125,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   }
+  ],
+  "wedged": false,
+  "failure_reasons": [],
+  "host_peak": 2113536,
+  "local_peak": 0
+ },
+ "pad_script": [
+  "anchor frame",
+  "3 capture",
+  "3.2 touch 0 0 0.2",
+  "3.4 touch 400 200 0.2",
+  "10 capture",
+  "10.2 touch 400 200 0.2",
+  "10.4 touch 800 400 0.2"
+ ],
+ "captures": [
+  "klog/mihawk-appearance-console-2026-10-09-02-appearance32-capture-01.png",
+  "klog/mihawk-appearance-console-2026-10-09-02-appearance32-capture-02.png"
+ ],
+ "cleanup_verified": false,
+ "hooks_removed": true,
+ "api_passed": false,
+ "appearance_pixels": [
+  {
+   "variant": "light",
+   "passed": true,
+   "capture": "klog/mihawk-appearance-console-2026-10-09-02-appearance32-capture-01.png",
+   "pane": [
+    255,
+    255,
+    255
+   ],
+   "expected_pane": [
+    255,
+    255,
+    255
+   ],
+   "icon_regions": [
+    {
+     "icon": "folder",
+     "size": 48,
+     "mean_rgb_error": 0.0,
+     "tolerance": 2.0,
+     "passed": true
+    },
+    {
+     "icon": "search",
+     "size": 24,
+     "mean_rgb_error": 0.0,
+     "tolerance": 2.0,
+     "passed": true
+    }
+   ]
+  },
+  {
+   "variant": "dark",
+   "passed": true,
+   "capture": "klog/mihawk-appearance-console-2026-10-09-02-appearance32-capture-02.png",
+   "pane": [
+    32,
+    32,
+    32
+   ],
+   "expected_pane": [
+    32,
+    32,
+    32
+   ],
+   "icon_regions": [
+    {
+     "icon": "folder",
+     "size": 48,
+     "mean_rgb_error": 0.026,
+     "tolerance": 2.0,
+     "passed": true
+    },
+    {
+     "icon": "search",
+     "size": 24,
+     "mean_rgb_error": 0.03,
+     "tolerance": 2.0,
+     "passed": true
+    }
+   ]
+  }
+ ]
+}

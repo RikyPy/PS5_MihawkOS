@@ -1,0 +1,52 @@
+{
+  "launch_readiness": {
+    "ready": true,
+    "seconds": 7.796,
+    "settle_seconds": 7.536,
+    "census_seconds": 0.214,
+    "previous_cleanup_verified": false
+  },
+  "session_marker_left": false,
+  "title": "PPSA99170",
+  "identity": "525b10a652fa4e8db4d1b87ab204b70c",
+  "frames_requested": 120,
+  "eboot_sha256": "d35032c45f1e91a7a364294bbeaf00d1a17db57b6907138d7323b75c250c8b08",
+  "fresh_identity_seen": true,
+  "shell_idle_after_run": true,
+  "title_finished_successfully": true,
+  "picture_and_log_check_passed": true,
+  "post_launch_fault_records": 0,
+  "post_launch_driver_errors": 0,
+  "elevation": [
+    "ok (filesystem access)",
+    "ok (filesystem access)"
+  ],
+  "sample": [
+    "starts",
+    "ok, 120 frames in 2.26 s, 59.9 fps after the first half"
+  ],
+  "library": [
+    "5 game(s); searched: /data/ps5proton/games (4 entries); /data/homebrew/PPSA99170/games (not there)",
+    "library shows 1 of 5 (Mihawk OS and entries with a prefix of their own; /data/ps5proton/library-show-all shows them all)",
+    "Last session ended: Wine: fixed-base32-probe.exe is a 32-bit program fixed at 0x400000 (its relocations stripped), where every helper's own executable sits; it cannot run yet",
+    "During the last session: fixed-base32-probe.exe is an old 32-bit program that cannot run yet: it can load only at 0x400000."
+  ],
+  "notices": [
+    "fixed-base32-probe.exe is an old 32-bit program that cannot run yet: it can load only at 0x400000. (posted 0)"
+  ],
+  "startup_seconds": {
+    "exec": 0.0,
+    "starts": 0.51,
+    "elevation": 0.51,
+    "library": 2.11,
+    "ui": 2.17
+  },
+  "probe": null,
+  "probe_passed": null,
+  "probe_records": [],
+  "controls_preview": null,
+  "passed": true,
+  "capture": "klog/loud-failures-2026-10-18-02-notice-fixed-base32-launch",
+  "forced_close": false,
+  "storage_errors": 0
+}

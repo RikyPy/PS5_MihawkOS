@@ -1,0 +1,284 @@
+From f990bca74057ff462073dc4e8927bfc4caccc464 Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Tue, 6 Oct 2026 21:05:00 -0400
+Subject: [PATCH] ps5: a program's DualSense is its own, there from its start
+ to its end
+
+Every Windows program on the PS5 runs its own HID stack (patch 0870), all
+on the title's one wineserver. In a 2026-10-06 run (record removed from the tree; in git history) the
+game's hidclass got every report (4096, 616 with a press), and for the
+first 3072 of them no file was open on the device: no program in the game
+found the controller. The start-up wait had said "ready after 34 ms".
+A file opened only after the system menu had taken the pad and the bus had
+made the device again, too late for SDL.
+
+From the code, which fits those counts: a device interface's symbolic
+link is a permanent object, so it outlives the process that made it.
+wineboot's bus had made a DualSense and left its link. When the game's
+DualSense was enabled, IoCreateSymbolicLink opened the existing link and
+returned STATUS_OBJECT_NAME_EXISTS. IoSetDeviceInterfaceState then gave
+up and deleted the interface's Linked value. The wait looked in the
+registry, where wineboot's interface was still listed. Nothing looked
+again later: device notifications need the plug-and-play service, which
+the PS5 does not run. Whether wineboot made its DualSense before it ended
+decided whether a game had a controller, which is why the failure came
+and went from run to run.
+
+- ntoskrnl: enabling an interface whose link is already there replaces
+  the link, and says so. IoCreateSymbolicLink closes the handle of a link
+  it opened rather than made, which kept it alive.
+- ntoskrnl: wine_ps5_hid_start waits until this process has enabled the
+  DualSense's HID interface (a flag set in IoSetDeviceInterfaceState), not
+  until the registry lists one.
+- winebus: the PS5 bus makes the DualSense at its start, connected or
+  not, and keeps it until it stops. A pad the title loses (the system menu
+  takes it, or it is off) reads as released until it is back, where it
+  used to be removed and made again, which no program heard about.
+- ntdll: Wine's own programs (system32: wineboot and the rest) start no
+  HID bus. They read no controller, and wineboot's held every launch a
+  second while it waited for one.
+
+A 2026-10-06 run (record removed from the tree; in git history), the first launch after a boot:
+- wineboot started no bus.
+- The game's interface was enabled 26 ms after its bus started.
+- 1.2 s after the game started, programs looking for controllers opened
+  the device: four files opened and closed again, and one stayed open.
+- DirectInput acquired it and read every report: 1793 reads, 1792 reports
+  delivered, none left unread. It parsed 2048 reports, 78 with a button
+  down and 316 that changed the state.
+- The person at the console said everything works. Closing the title
+  from the system menu left no leak warning.
+- Not exercised: no link was left behind this time, and the menu-and-back
+  round trip was not tried.
+---
+ dlls/ntdll/loader.c                  |  8 +++++-
+ dlls/ntoskrnl.exe/ntoskrnl.c         | 31 ++++++++++-------------
+ dlls/ntoskrnl.exe/ntoskrnl_private.h |  2 ++
+ dlls/ntoskrnl.exe/pnp.c              | 28 +++++++++++++++++++++
+ dlls/winebus.sys/bus_ps5.c           | 37 +++++++++++++++++++---------
+ 5 files changed, 76 insertions(+), 30 deletions(-)
+
+diff --git a/dlls/ntdll/loader.c b/dlls/ntdll/loader.c
+index fbb120b..a8672e9 100644
+--- a/dlls/ntdll/loader.c
++++ b/dlls/ntdll/loader.c
+@@ -4812,7 +4812,13 @@ void loader_init( CONTEXT *context, void **entry )
+     if (ps5_hid_init)
+     {
+         WCHAR enabled[4];
+-        if (get_env(L"WINE_PS5_HID", enabled, sizeof(enabled)) && enabled[0] == L'1')
++        const UNICODE_STRING *image = &NtCurrentTeb()->Peb->ProcessParameters->ImagePathName;
++        /* Not in Wine's own programs (wineboot, explorer and the rest, all in system32): they read no controller,
++         * and a DualSense one of them makes is one more the game's must take over (pnp.c). wineboot's also held
++         * every launch a second, waiting for a controller it never used. */
++        if (image->Length >= wcslen(system_dir) * sizeof(WCHAR) && !wcsnicmp(image->Buffer, system_dir, wcslen(system_dir)))
++            WARN("[PS5 Proton] in-process HID not started for %s\n", debugstr_us(image));
++        else if (get_env(L"WINE_PS5_HID", enabled, sizeof(enabled)) && enabled[0] == L'1')
+         {
+             UNICODE_STRING name = RTL_CONSTANT_STRING(L"ntoskrnl.exe");
+             ANSI_STRING proc = RTL_CONSTANT_STRING("wine_ps5_hid_start");
+diff --git a/dlls/ntoskrnl.exe/ntoskrnl.c b/dlls/ntoskrnl.exe/ntoskrnl.c
+index 057448b..2b554dd 100644
+--- a/dlls/ntoskrnl.exe/ntoskrnl.c
++++ b/dlls/ntoskrnl.exe/ntoskrnl.c
+@@ -1752,7 +1752,9 @@ NTSTATUS WINAPI IoCreateSymbolicLink( UNICODE_STRING *name, UNICODE_STRING *targ
+     attr.SecurityQualityOfService = NULL;
+ 
+     TRACE( "%s -> %s\n", debugstr_us(name), debugstr_us(target) );
+-    if (!(ret = NtCreateSymbolicLinkObject( &handle, SYMBOLIC_LINK_ALL_ACCESS, &attr, target )))
++    /* OBJ_OPENIF opens a link that is already there (STATUS_OBJECT_NAME_EXISTS, a success): close that handle
++     * too, or nothing can delete the link while this process lives. */
++    if (NT_SUCCESS(ret = NtCreateSymbolicLinkObject( &handle, SYMBOLIC_LINK_ALL_ACCESS, &attr, target )))
+         NtClose( handle );
+     return ret;
+ }
+@@ -4730,27 +4732,19 @@ static DWORD WINAPI ps5_device_thread(void *stop)
+     return wine_ntoskrnl_main_loop(stop);
+ }
+ 
+-/* Milliseconds until the DualSense's HID interface is present (registered and enabled, as raw input and DirectInput
+- * find it), or -1 once limit_ms has passed without it. */
++/* Milliseconds until this process's DualSense HID interface is enabled (pnp.c), as raw input, DirectInput and SDL
++ * find it, or -1 once limit_ms has passed without it. Not the registry's list of interfaces: an interface another
++ * program's bus enabled is there too, and a game started on that found no controller it could open
++ * (2026-10-06: "ready after 34 ms", then no program opened the DualSense). */
+ static LONG ps5_wait_dualsense(DWORD limit_ms)
+ {
+-    static const GUID hid = {0x4d1e55b2, 0xf16f, 0x11cf, {0x88, 0xcb, 0x00, 0x11, 0x11, 0x00, 0x00, 0x30}};
+     DWORD start = GetTickCount();
+-    for (;;)
++    while (!InterlockedCompareExchange( &ps5_dualsense_enabled, 0, 0 ))
+     {
+-        HDEVINFO set = SetupDiGetClassDevsW(&hid, NULL, NULL, DIGCF_PRESENT | DIGCF_DEVICEINTERFACE);
+-        SP_DEVINFO_DATA device = {sizeof(device)};
+-        WCHAR id[200]; /* MAX_DEVICE_ID_LEN */
+-        BOOL found = FALSE;
+-        DWORD i;
+-        for (i = 0; set != INVALID_HANDLE_VALUE && !found && SetupDiEnumDeviceInfo(set, i, &device); i++)
+-            found = SetupDiGetDeviceInstanceIdW(set, &device, id, ARRAY_SIZE(id), NULL) &&
+-                    !wcsnicmp(id, L"HID\\VID_054C&PID_0CE6", 21);
+-        if (set != INVALID_HANDLE_VALUE) SetupDiDestroyDeviceInfoList(set);
+-        if (found) return GetTickCount() - start;
+         if (GetTickCount() - start >= limit_ms) return -1;
+-        Sleep(10);
++        Sleep(5);
+     }
++    return GetTickCount() - start;
+ }
+ 
+ NTSTATUS CDECL wine_ps5_hid_start(void)
+@@ -4786,8 +4780,9 @@ NTSTATUS CDECL wine_ps5_hid_start(void)
+     SetupDiDestroyDeviceInfoList(set);
+     status = ZwLoadDriver(&service);
+     /* The program starts once the controller is there, not beside it: Wine keeps its raw-input device list for 2 s,
+-     * and a game may look for controllers only once, at its start. The PS5 bus creates the DualSense as soon as the
+-     * title's page says the pad is connected; with no pad the wait ends after a second. */
++     * and a game may look for controllers only once, at its start; nothing tells it of one that comes later, since
++     * device notifications need the plug-and-play service, which the PS5 does not run. The PS5 bus makes the
++     * DualSense at its start, connected or not, and keeps it while the program runs. */
+     if (!status) waited = ps5_wait_dualsense(1000);
+     MESSAGE("[PS5 Proton] HID bus start status %#lx; DualSense %s %ld ms\n", status,
+          waited >= 0 ? "ready after" : "not seen in", waited >= 0 ? waited : 1000L);
+diff --git a/dlls/ntoskrnl.exe/ntoskrnl_private.h b/dlls/ntoskrnl.exe/ntoskrnl_private.h
+index d9db6f6..621451a 100644
+--- a/dlls/ntoskrnl.exe/ntoskrnl_private.h
++++ b/dlls/ntoskrnl.exe/ntoskrnl_private.h
+@@ -76,6 +76,8 @@ void *alloc_kernel_object( POBJECT_TYPE type, HANDLE handle, SIZE_T size, LONG r
+ NTSTATUS kernel_object_from_handle( HANDLE handle, POBJECT_TYPE type, void **ret );
+ 
+ extern POBJECT_TYPE ExEventObjectType;
++/* PS5: whether this process's DualSense HID interface is enabled (pnp.c); wine_ps5_hid_start waits for it. */
++extern LONG ps5_dualsense_enabled;
+ extern POBJECT_TYPE ExSemaphoreObjectType;
+ extern POBJECT_TYPE IoDeviceObjectType;
+ extern POBJECT_TYPE IoDriverObjectType;
+diff --git a/dlls/ntoskrnl.exe/pnp.c b/dlls/ntoskrnl.exe/pnp.c
+index f944f5a..b130045 100644
+--- a/dlls/ntoskrnl.exe/pnp.c
++++ b/dlls/ntoskrnl.exe/pnp.c
+@@ -884,10 +884,35 @@ static NTSTATUS create_device_symlink( DEVICE_OBJECT *device, UNICODE_STRING *sy
+ 
+     RtlInitUnicodeString( &device_nameU, device_name );
+     ret = IoCreateSymbolicLink( symlink_name, &device_nameU );
++    if (ret == STATUS_OBJECT_NAME_EXISTS)
++    {
++        /* A link of this name is already there, made by a driver stack that ended without removing it: a link is
++         * permanent, so it outlives the process that made it. On the PS5 every program runs its own HID stack on
++         * the title's one server (patch 0870); wineboot's DualSense left its link, the game's DualSense found the
++         * name taken, its interface stayed disabled, and no program in the game could find the controller
++         * (2026-10-06). The name belongs to this device now. */
++        MESSAGE( "[PS5 Proton] %s: replacing a link left behind\n", debugstr_us( symlink_name ) );
++        if (!(ret = IoDeleteSymbolicLink( symlink_name ))) ret = IoCreateSymbolicLink( symlink_name, &device_nameU );
++    }
+     free( device_name );
+     return ret;
+ }
+ 
++/* PS5: the DualSense's HID interface, which the in-process bus makes (patch 0870). */
++LONG ps5_dualsense_enabled;
++
++static BOOL ps5_dualsense_interface( const struct device_interface *iface, const UNICODE_STRING *name )
++{
++    static const GUID hid = {0x4d1e55b2, 0xf16f, 0x11cf, {0x88, 0xcb, 0x00, 0x11, 0x11, 0x00, 0x00, 0x30}};
++    static const WCHAR id[] = L"VID_054C&PID_0CE6";
++    size_t i, length = name->Length / sizeof(WCHAR), id_length = ARRAY_SIZE(id) - 1;
++
++    if (!IsEqualGUID( &iface->interface_class, &hid )) return FALSE;
++    for (i = 0; i + id_length <= length; i++)
++        if (!wcsnicmp( name->Buffer + i, id, id_length )) return TRUE;
++    return FALSE;
++}
++
+ void  __RPC_FAR * __RPC_USER MIDL_user_allocate( SIZE_T len )
+ {
+     return HeapAlloc( GetProcessHeap(), 0, len );
+@@ -1133,12 +1158,15 @@ NTSTATUS WINAPI IoSetDeviceInterfaceState( UNICODE_STRING *name, BOOLEAN enable
+         ret = IoDeleteSymbolicLink( name );
+     if (ret)
+     {
++        if (ps5_dualsense_interface( iface, name ))
++            MESSAGE( "[PS5 Proton] DualSense HID interface: %s failed, status %#lx\n", enable ? "enabling" : "disabling", ret );
+         NtDeleteValueKey( control_key, &linked );
+         NtClose( control_key );
+         return ret;
+     }
+ 
+     iface->enabled = enable;
++    if (ps5_dualsense_interface( iface, name )) InterlockedExchange( &ps5_dualsense_enabled, enable );
+ 
+     len = offsetof(DEV_BROADCAST_DEVICEINTERFACE_W, dbcc_name[namelen + 1]);
+ 
+diff --git a/dlls/winebus.sys/bus_ps5.c b/dlls/winebus.sys/bus_ps5.c
+index 000968d..54e05a0 100644
+--- a/dlls/winebus.sys/bus_ps5.c
++++ b/dlls/winebus.sys/bus_ps5.c
+@@ -41,6 +41,17 @@ static const BYTE descriptor[] = {
+     0x85,0x09, 0x09,0x23, 0x95,0x13, 0xb1,0x02,
+     0xc0
+ };
++/* What the DualSense reports while the title has no pad (the system menu took it, or it is off): sticks centred, the
++ * hat and every button released, no finger on the touchpad. */
++static void neutral_report(BYTE report[64])
++{
++    memset(report, 0, 64);
++    report[0] = 1;
++    report[1] = report[2] = report[3] = report[4] = 0x80;
++    report[8] = 8;
++    report[33] = report[37] = 0x80;
++    report[54] = 0x08; /* USB transport */
++}
+ static void destroy(struct unix_device *iface) { }
+ static NTSTATUS start(struct unix_device *iface)
+ {
+@@ -91,6 +102,7 @@ NTSTATUS ps5_bus_init(void *args)
+ NTSTATUS ps5_bus_wait(void *args)
+ {
+     struct bus_event *event = args;
++    static int was_connected;
+     BYTE report[64];
+     int connected;
+     bus_event_cleanup(event);
+@@ -102,7 +114,11 @@ NTSTATUS ps5_bus_wait(void *args)
+         usleep(8000);
+         connected = read_pad(report);
+         pthread_mutex_lock(&device_lock);
+-        if (connected && !device)
++        /* The DualSense is there from the bus's start, connected or not, and stays until the bus stops: a program
++         * looks for controllers at its start, and nothing would tell it of one that came or went later (device
++         * notifications need the plug-and-play service). A pad the title loses (the system menu takes it while
++         * open, or it is turned off) reads as released until it is back. */
++        if (!device)
+         {
+             struct device_desc desc = {.vid=0x054c, .pid=0x0ce6, .version=0x0100, .input=-1,
+                 .is_gamepad=TRUE, .is_hidraw=TRUE, .bus_type=BUS_TYPE_USB,
+@@ -114,18 +130,17 @@ NTSTATUS ps5_bus_wait(void *args)
+             bus_event_queue_device_created(&events, &device->base, &desc);
+             if (note) note(2);
+         }
+-        else if (!connected && device)
+-        {
+-            bus_event_queue_device_removed(&events, &device->base);
+-            device = NULL; /* device_remove releases the bus ownership reference */
+-            if (note) note(3);
+-        }
+-        else if (device && __atomic_load_n(&device->started, __ATOMIC_ACQUIRE))
++        else if (__atomic_load_n(&device->started, __ATOMIC_ACQUIRE))
+         {
+-            bus_event_queue_input_report(&events, &device->base, report, sizeof(report));
+-            if (note) note(0);
++            if (connected || was_connected)
++            {
++                if (!connected) neutral_report(report);
++                bus_event_queue_input_report(&events, &device->base, report, sizeof(report));
++                if (note) note(0);
++            }
++            was_connected = connected;
+         }
+-        else if (device && note) note(1);
++        else if (note) note(1);
+         pthread_mutex_unlock(&device_lock);
+         if (bus_event_queue_pop(&events, event)) return STATUS_PENDING;
+     }
+-- 
+2.56.0
+

@@ -1,0 +1,53 @@
+{
+  "battery": "native-mapping-console-2026-10-08-02",
+  "revision": "cbaf88e43814652833f6028f6978801b0f58832e",
+  "dirty": true,
+  "cases": [
+    {
+      "case": "virtual-query32",
+      "run": "native-mapping-console-2026-10-08-02-virtual-query32",
+      "runner_status": 0,
+      "seconds": 10.8,
+      "result": "finished",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 2,
+      "protocol_errors": 0
+    },
+    {
+      "case": "virtual-query64",
+      "run": "native-mapping-console-2026-10-08-02-virtual-query64",
+      "runner_status": 0,
+      "seconds": 56.9,
+      "result": "finished",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 2,
+      "protocol_errors": 0
+    },
+    {
+      "case": "guest-address-space",
+      "run": "native-mapping-console-2026-10-08-02-guest-address-space",
+      "runner_status": 1,
+      "seconds": 59.8,
+      "result": "finished",
+      "probe_verdict": "FAIL",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": false,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 2,
+      "protocol_errors": 0
+    }
+  ],
+  "passed": false
+}

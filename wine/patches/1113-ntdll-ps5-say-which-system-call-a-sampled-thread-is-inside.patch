@@ -1,0 +1,36 @@
+From: PS5_Proton
+Subject: [PATCH] ntdll: ps5: say which system call a sampled thread is inside
+
+The thread profile (WINE_PS5_SAMPLE=1) found 98 % of a HashLink game's threads parked in
+native call stubs and could not say what they waited for. pw_wine_describe_thread
+reads a thread's syscall frame, the way is_inside_syscall does, and returns the
+number of the Windows system call it is in, or zero when it runs Windows code.
+---
+diff --git a/dlls/ntdll/unix/signal_x86_64.c b/dlls/ntdll/unix/signal_x86_64.c
+--- a/dlls/ntdll/unix/signal_x86_64.c
++++ b/dlls/ntdll/unix/signal_x86_64.c
+@@ -4296,4 +4296,22 @@ __ASM_GLOBAL_POINTER( __ASM_NAME("__wine_unix_call_dispatcher_gs_load_ptr"),
+ __ASM_GLOBAL_POINTER( __ASM_NAME("__wine_unix_call_dispatcher_end_ptr"),
+                       __ASM_LOCAL_LABEL("__wine_unix_call_dispatcher_end") )
+ 
++#ifdef __PROSPERO__
++/* What a thread is doing, for the profile that wine/ps5/pw_wine_threads.c and the helper's telemetry take (WINE_PS5_SAMPLE=1):
++ * 0 when the thread whose stack pointer is rsp runs Windows code, else 0x10000 plus the system call it is inside (the
++ * number in dlls/ntdll/ntsyscalls.h, the table in bits 12 and up). Read from another thread, on a TEB that stays valid while the
++ * thread is registered. A HashLink game in an emulator waited for minutes with every thread parked in a call stub (2026-10-13). */
++DECLSPEC_EXPORT unsigned int pw_wine_describe_thread( TEB *teb, ULONG_PTR rsp )
++{
++    struct ntdll_thread_data *data;
++    struct syscall_frame *frame;
++
++    if (!teb) return 0;
++    data = (struct ntdll_thread_data *)&teb->GdiTebBatch;
++    frame = data->syscall_frame;
++    if (!frame || (char *)rsp < (char *)data->kernel_stack || (char *)rsp > (char *)frame) return 0;
++    return 0x10000 | frame->syscall_id;
++}
++#endif
++
+ #endif  /* __x86_64__ */
+-- 
+2.56.0

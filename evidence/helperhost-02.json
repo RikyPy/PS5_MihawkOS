@@ -1,0 +1,15 @@
+{
+  "run": "helperhost-02",
+  "step": "memory",
+  "elf_sha256": "382927c4f340fe31ed082c2dd373eb1b094769809a95f4ba912e24035615e1a8",
+  "started": "2026-10-05T22:57:50",
+  "lines": [
+    "helperhostprobe pid=4424 uid=1 euid=0 gid=1",
+    "memory: direct 0 MiB in all; flexible available 8159 MiB (status 0)",
+    "runtime: stat ntdll.prx -> 0 errno=0 size=899519",
+    "runtime: open -> 12 errno=0, first bytes 54 14 f5 ee (4 read)",
+    "helperhostprobe done"
+  ],
+  "finished": true,
+  "console_after": "answers"
+}

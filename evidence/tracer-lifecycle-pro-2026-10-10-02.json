@@ -1,0 +1,46 @@
+{
+  "run": "tracer-lifecycle-pro-2026-10-10-02",
+  "question": "Do 4096 native calls preserve results and does the production tracer detach at native exit so the loader reaps both owned payloads?",
+  "build": {
+    "sdk_revision": "611893fc25ef3e138f5bc2c90d829d8b58174cd2",
+    "elf_sha256": "fd3bfac9d18b6fe21df4cfe973a76a1586351530c3c01ce9a5d71f16bb0c1b4d",
+    "sources": {
+      "tests/tracer-lifecycle-probe.c": "a738a2d083200982d76bf0aa6e1c45e92752b0d79a54154c516acd1a1157ca0c",
+      "native/pw_syscall_trace_ps5.c": "1510420cb86fc8decd3d4fcbf9fb5a805d2b910489f406a08896724b7f0d1487",
+      "native/pw_syscall_trace_ps5.h": "64c9ce6b1929d5a34a7c93670cf08f719bd8eaede21c94fbc6afc29086221854",
+      "native/pw_ptrace_ps5.h": "0fbe8fb997be42088ff87082cd0072042f9eba7302064cb0a210edf156bcd22e",
+      "native/pw_signal_trampoline_ps5.h": "f57299922d1158fdc3823f44363b6aad9508ed6e733255eaee8c0a6fb2cc15be",
+      "src/pw_syscall_trace.c": "366740fcdf518f559b3775ef5d8a1b37253d8344271fb9c033ebdf2b95a94002",
+      "src/pw_syscall_trace.h": "858c36f98c6c7aedfc86792a9561103ea7e3bdbdaefda2bc04a5fc5f22b15e33",
+      "src/pw_shared_page.h": "6a5c34b2ea0141b896fdb6d821e8a4d01d7712d470cf4c27b14885723e3284d0",
+      "src/pw_elfldr.c": "b1795c065eba484af643f8e859cae9eac2c8ec39b2c6fe97bab80d56770fc2f7",
+      "src/pw_elfldr.h": "5e74171bef409b234b548be5f3dafee58197d34b5b585bb3a620a2d419e5362a",
+      "wine/ps5/pw_wine_prx.c": "67b8393fca62a72a7aaf53a409c9a34684dd7704037bf194066e5173808c16a2",
+      "wine/ps5/pw_wine_prx.h": "82e4cf6b56377bb3ca9e007bd78a3302633fa8675e77d5b507823829959f9bb0",
+      "wine/ps5/pw_wine_process_io.c": "3d7f260826d507bf276943415a3531bfeb18c3e040ea64b401cb95ab7030aeb7",
+      "wine/ps5/pw_wine_process_io.h": "c375a67872391d47ef20cb7bc0001b66655aa29c44c446af31102c0fe5f937a7",
+      "tools/run-tracer-lifecycle.py": "43c8cc8407ca264eb5263cdf67e867c7beff15d7454e0164e19f54be9e943dc6"
+    }
+  },
+  "wine_integrated": false,
+  "title_launched": false,
+  "passed": true,
+  "readiness": {
+    "ready": true,
+    "seconds": 0.144,
+    "settle_seconds": 0.0,
+    "census_seconds": 0.128,
+    "previous_cleanup_verified": true
+  },
+  "log": "klog/tracer-lifecycle-pro-2026-10-10-02.log",
+  "native_pid": 122,
+  "baseline_ns": 3652446,
+  "traced_ns": 697191626,
+  "trace_log": "klog/tracer-lifecycle-pro-2026-10-10-02-trace.log",
+  "native_exit_detach": true,
+  "native_entries": 4281,
+  "post_control": "ok procs app=4294967295 title= count=0 pids=",
+  "leftover_helpers": [],
+  "clean": true,
+  "seconds": 1.256
+}

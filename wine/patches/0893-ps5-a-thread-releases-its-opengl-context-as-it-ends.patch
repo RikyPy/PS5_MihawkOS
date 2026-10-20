@@ -1,0 +1,181 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Sat, 3 Oct 2026 13:10:00 -0400
+Subject: [PATCH] ps5: a thread releases its OpenGL context as it ends, and the
+ presenter waits for them
+
+A Java game rendered, then ended through ExitProcess called by the
+launcher thread while the game thread, which had the OpenGL context current,
+was killed inside a GL call. The exit hook of patch 0892 then could not close
+the presenter (eglDestroyContext: EGL_BAD_ACCESS, one surface and one context
+left, terminate failed), the title replaced the process with the presenter
+live, and the kernel closed a GPU queue that was in a frame ("gc_gfx_queue_
+force_close: close in_frame queue"): the console powered off. Runs that ended
+on the thread that rendered (a crash in the render thread, a .NET game's own exit)
+closed the presenter fully (surfaces 1/1, contexts 2/2, terminate 1).
+
+Every thread now runs the graphics drivers' thread-exit hooks as it ends, on
+the thread itself (pw_wine_run_thread_exit_hooks, from pthread_exit_wrapper,
+which both exit_thread and abort_thread reach, and so a thread killed inside
+the Unix side ends there once it is back at the user-mode boundary). OpenGL
+registers a hook that makes no context current, which is what the SDK's
+presenter shutdown requires of every thread. The exit hook (0892) runs as soon
+as the other threads are signalled, before they have ended, so the presenter's
+shutdown now waits, for as long as it takes, for the threads that still have a
+context current (tracked at eglMakeCurrent) to release it (a thread in a long GL
+call does so when the call returns), and never returns with the presenter still
+live: a three-second wait that gave up and let the title replace the process
+ended the same way as before, with the console powered off. If the presenter
+cannot be closed the process stays up.
+---
+  dlls/ntdll/unix/thread.c |  8 +++++
+  dlls/win32u/opengl.c     | 85 +++++++++++++++++++++++++++++++++++++++++++++++-
+  2 files changed, 92 insertions(+), 1 deletion(-)
+
+diff --git a/dlls/ntdll/unix/thread.c b/dlls/ntdll/unix/thread.c
+index 9cc633f..b0d0a6b 100644
+--- a/dlls/ntdll/unix/thread.c
++++ b/dlls/ntdll/unix/thread.c
+@@ -1129,6 +1129,14 @@ static DECLSPEC_NORETURN void pthread_exit_wrapper( int status )
+     }
+ #else
+     close( ntdll_get_thread_data()->alert_fd );
++#endif
++#ifdef __PROSPERO__
++    {
++        /* what the graphics drivers must undo on the thread itself, such as
++         * its current OpenGL context (wine/ps5/pw_wine_sink.h) */
++        extern void pw_wine_run_thread_exit_hooks(void);
++        pw_wine_run_thread_exit_hooks();
++    }
+ #endif
+     close( ntdll_get_thread_data()->wait_fd[0] );
+     close( ntdll_get_thread_data()->wait_fd[1] );
+diff --git a/dlls/win32u/opengl.c b/dlls/win32u/opengl.c
+index b7c6174..af44e8e 100644
+--- a/dlls/win32u/opengl.c
++++ b/dlls/win32u/opengl.c
+@@ -886,6 +886,77 @@ static unsigned int ps5_egl_destroy_all( struct ps5_egl_objects *objects, BOOL c
+ 
+ static EGLSurface ps5_screen_surface;
+ 
++/* The threads that have an OpenGL context current, for the end of the process.
++ * The SDK will not destroy a context another thread has current
++ * (eglDestroyContext fails with EGL_BAD_ACCESS), so eglTerminate does not shut
++ * the presenter down, and the title replaces the process with the presenter
++ * live and a frame open on the GPU. A game whose render thread is not the
++ * thread that exits (Java's launcher thread calls ExitProcess while the game
++ * thread renders) ended that way, and the console powered off. Every thread
++ * releases its own context as it ends (pw_wine_run_thread_exit_hooks, from
++ * pthread_exit_wrapper), the only thread that can, and the presenter's
++ * shutdown waits for the ones that were killed to get there. */
++static unsigned int ps5_gl_threads[64], ps5_gl_thread_count;
++
++static unsigned int ps5_gl_thread_id(void)
++{
++    return HandleToULong( NtCurrentTeb()->ClientId.UniqueThread );
++}
++
++static void ps5_gl_thread_note( BOOL current )
++{
++    unsigned int id = ps5_gl_thread_id(), i;
++
++    pthread_mutex_lock( &ps5_egl_lock );
++    for (i = 0; i < ps5_gl_thread_count; i++) if (ps5_gl_threads[i] == id) break;
++    if (current && i == ps5_gl_thread_count && i < ARRAY_SIZE(ps5_gl_threads)) ps5_gl_threads[ps5_gl_thread_count++] = id;
++    else if (!current && i < ps5_gl_thread_count) ps5_gl_threads[i] = ps5_gl_threads[--ps5_gl_thread_count];
++    pthread_mutex_unlock( &ps5_egl_lock );
++}
++
++static EGLBoolean ps5_eglMakeCurrent( EGLDisplay display, EGLSurface draw, EGLSurface read, EGLContext context )
++{
++    EGLBoolean ret = eglMakeCurrent( display, draw, read, context );
++    if (ret) ps5_gl_thread_note( context != EGL_NO_CONTEXT );
++    return ret;
++}
++
++static void ps5_release_thread_context(void)
++{
++    unsigned int id = ps5_gl_thread_id(), i;
++    BOOL current = FALSE;
++
++    if (!ps5_screen_surface) return;
++    pthread_mutex_lock( &ps5_egl_lock );
++    for (i = 0; i < ps5_gl_thread_count; i++) if (ps5_gl_threads[i] == id) current = TRUE;
++    pthread_mutex_unlock( &ps5_egl_lock );
++    if (!current) return;
++    display_funcs.p_eglMakeCurrent( display_egl.display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT );
++    NtCurrentTeb()->glContext = NULL;
++}
++
++/* The other threads that still have a context current, which were told to end
++ * and will release it as they do. A thread inside a long GL call (a shader
++ * compile can take seconds) releases it when the call returns; the process must
++ * not be replaced before, so this waits for as long as it takes. */
++static void ps5_wait_for_context_threads(void)
++{
++    unsigned int id = ps5_gl_thread_id(), others, i, milliseconds = 0;
++
++    for (;;)
++    {
++        pthread_mutex_lock( &ps5_egl_lock );
++        for (others = 0, i = 0; i < ps5_gl_thread_count; i++) if (ps5_gl_threads[i] != id) others++;
++        pthread_mutex_unlock( &ps5_egl_lock );
++        if (!others) return;
++        if (!(milliseconds % 5000))
++            fprintf( stderr, "wine-ps5: waiting for %u other thread(s) to release their OpenGL context (%u s)\n",
++                     others, milliseconds / 1000 );
++        usleep( 1000 );
++        milliseconds++;
++    }
++}
++
+ static void ps5_screen_destroy( struct opengl_drawable *drawable )
+ {
+     drawable->surface = NULL; /* shared by every window, kept for the process */
+@@ -905,6 +976,7 @@ static void ps5_screen_shutdown(void)
+     EGLint terminate_error;
+ 
+     if (!ps5_screen_surface) return;
++    ps5_wait_for_context_threads();
+     released = funcs->p_eglMakeCurrent( display_egl.display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT );
+     surfaces_destroyed = ps5_egl_destroy_all( &ps5_egl_surfaces, FALSE, &surfaces );
+     contexts_destroyed = ps5_egl_destroy_all( &ps5_egl_contexts, TRUE, &contexts );
+@@ -914,6 +986,14 @@ static void ps5_screen_shutdown(void)
+     fprintf( stderr, "wine-ps5: OpenGL presenter closed: release %d, surfaces %u/%u, contexts %u/%u, "
+              "terminate %d (%#x)\n", released, surfaces_destroyed, surfaces, contexts_destroyed, contexts,
+              terminated, terminate_error );
++    if (!terminated || surfaces_destroyed != surfaces || contexts_destroyed != contexts)
++    {
++        /* replacing the process now would leave a frame open on the GPU, which
++         * powered the console off: the process stays up until it is closed
++         * from the home screen */
++        fprintf( stderr, "wine-ps5: the presenter did not close; the process stays up, close it from the home screen\n" );
++        for (;;) sleep( 3600 );
++    }
+ }
+ 
+ static void ps5_screen_flush( struct opengl_drawable *drawable, UINT flags )
+@@ -1029,8 +1109,11 @@ static EGLSurface ps5_get_screen_surface( int format )
+         else
+         {
+             int (*add_exit_hook)( void (*)(void) ) = dlsym( RTLD_DEFAULT, "pw_wine_add_exit_hook" );
++            int (*add_thread_exit_hook)( void (*)(void) ) = dlsym( RTLD_DEFAULT, "pw_wine_add_thread_exit_hook" );
+             if (!add_exit_hook || add_exit_hook( ps5_screen_shutdown ))
+                 ERR( "the PS5 presenter cannot be closed at exit\n" );
++            if (!add_thread_exit_hook || add_thread_exit_hook( ps5_release_thread_context ))
++                ERR( "a thread's OpenGL context cannot be released as it ends\n" );
+             TRACE( "created the PS5 screen surface %p\n", ps5_screen_surface );
+         }
+     }
+@@ -1812,7 +1895,7 @@ static BOOL egl_init( const struct opengl_driver_funcs **driver_funcs )
+     funcs->p_eglGetDisplay = eglGetDisplay;
+     funcs->p_eglGetError = eglGetError;
+     funcs->p_eglInitialize = eglInitialize;
+-    funcs->p_eglMakeCurrent = eglMakeCurrent;
++    funcs->p_eglMakeCurrent = ps5_eglMakeCurrent;
+     funcs->p_eglQuerySurface = eglQuerySurface;
+     funcs->p_eglSwapBuffers = eglSwapBuffers;
+     funcs->p_eglTerminate = eglTerminate;
+-- 
+2.43.0

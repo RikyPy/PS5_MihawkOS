@@ -1,0 +1,46 @@
+{
+  "launch_readiness": {
+    "ready": true,
+    "seconds": 0.142,
+    "settle_seconds": 0.0,
+    "census_seconds": 0.133,
+    "previous_cleanup_verified": true
+  },
+  "title": "PPSA99170",
+  "identity": "58e8908a03d54729902616a52596707f",
+  "frames_requested": 300,
+  "eboot_sha256": "cfc01569033880f0375db83926bd4f4ae92144862fbaaacdff886a29358d5820",
+  "fresh_identity_seen": true,
+  "shell_idle_after_run": true,
+  "title_finished_successfully": true,
+  "picture_and_log_check_passed": true,
+  "post_launch_fault_records": 0,
+  "post_launch_driver_errors": 0,
+  "elevation": [
+    "ok (filesystem access)"
+  ],
+  "sample": [
+    "starts",
+    "ok, 300 frames in 5.36 s, 59.9 fps after the first half"
+  ],
+  "library": [
+    "5 game(s); searched: /data/ps5proton/games (4 entries); /data/homebrew/PPSA99170/games (not there)",
+    "library shows 1 of 5 (Mihawk OS only; /data/ps5proton/library-show-all shows them all)"
+  ],
+  "startup_seconds": {
+    "exec": 0.0,
+    "starts": 0.44,
+    "elevation": 0.44,
+    "library": 0.5,
+    "ui": 0.56
+  },
+  "probe": null,
+  "probe_passed": null,
+  "probe_records": [],
+  "controls_preview": "remapped",
+  "passed": true,
+  "capture": "klog/gate-2026-10-16-browser-01-controls-menu",
+  "forced_close": false,
+  "storage_errors": 0,
+  "controls_selection_verified": true
+}

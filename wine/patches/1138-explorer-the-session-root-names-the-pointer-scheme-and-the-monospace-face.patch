@@ -1,0 +1,37 @@
+From: PS5_Proton <local>
+Subject: [PATCH] explorer: the session root names the pointer scheme and the monospace face once per prefix
+
+The Mihawk pointer scheme's files are staged in C:\windows\Cursors and Cascadia Mono in C:\windows\Fonts (PS5_Proton
+tools/stage-wine.py); user32 loads system cursors from the scheme the registry names (patch 1134). The session root
+(MIHAWK_SESSION=1, patch 0996) now names both once per prefix, as it initializes the wallpaper:
+pw_shell_prepare_cursors (PS5_Proton wine/ps5/pw_shell_cursors.h, copied at build time with its generated table)
+fills HKCU\Control Panel\Cursors, and pw_shell_prepare_monospace (wine/ps5/pw_shell_monospace.h) makes Cascadia Mono
+the console's face and the substitute for Consolas, which no prefix has. It runs before the desktop creates a
+window, so the session's own class cursors already come from the scheme. Choices already made are kept.
+---
+diff --git a/programs/explorer/desktop.c b/programs/explorer/desktop.c
+index 1276894..41edca1 100644
+--- a/programs/explorer/desktop.c
++++ b/programs/explorer/desktop.c
+@@ -1246,6 +1246,8 @@ static BOOL mihawk_session(void)
+ }
+ 
+ #include "pw_shell_wallpaper.h"  /* the session's background, once per prefix (PS5_Proton wine/ps5) */
++#include "pw_shell_cursors.h"  /* the session's pointer scheme, once per prefix (PS5_Proton wine/ps5) */
++#include "pw_shell_monospace.h"  /* the session's monospace face, once per prefix (PS5_Proton wine/ps5) */
+ 
+ static BOOL get_default_enable_launchers(void)
+ {
+@@ -1649,6 +1651,12 @@ void manage_desktop( WCHAR *arg )
+     enable_shell = name ? get_default_enable_shell( name ) : FALSE;
+     session = name && !wcsicmp( name, L"Default" ) && mihawk_session();
+     if (session) enable_shell = TRUE;
++    if (session)  /* before any window loads a class cursor, so this process points with the scheme too */
++    {
++        DWORD cursors = pw_shell_prepare_cursors(), monospace = pw_shell_prepare_monospace();
++        if (cursors) WARN( "Mihawk pointer scheme initialization failed: %lu\n", cursors );
++        if (monospace) WARN( "Mihawk monospace face initialization failed: %lu\n", monospace );
++    }
+     enable_launchers = get_default_enable_launchers();
+     show_systray = get_default_show_systray( name );
+     no_tray_items = get_no_tray_items_display();

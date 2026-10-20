@@ -1,0 +1,873 @@
+{
+ "clipboard": {
+  "exit_code": 3,
+  "failure_count": 3,
+  "failures": [
+   {
+    "file": "clipboard.c",
+    "line": 1112,
+    "text": "CreateWindow failed: 1400"
+   },
+   {
+    "file": "clipboard.c",
+    "line": 1116,
+    "text": "0 WM_DRAWCLIPBOARD received"
+   },
+   {
+    "file": "clipboard.c",
+    "line": 1134,
+    "text": "0 WM_DRAWCLIPBOARD received"
+   }
+  ],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 0.2,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 3,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 567,
+   "todo": 5
+  },
+  "todo_lines": 5
+ },
+ "compobj": {
+  "exit_code": 10,
+  "failure_count": 10,
+  "failures": [
+   {
+    "file": "compobj.c",
+    "line": 2919,
+    "text": "CreateWindowExA failed 1400"
+   },
+   {
+    "file": "compobj.c",
+    "line": 3100,
+    "text": "expected message 992, received none"
+   },
+   {
+    "file": "compobj.c",
+    "line": 3101,
+    "text": "expected message 993, received none"
+   },
+   {
+    "file": "compobj.c",
+    "line": 3102,
+    "text": "expected message 1024, received none"
+   },
+   {
+    "file": "compobj.c",
+    "line": 3104,
+    "text": "PeekMessageA failed: 1400"
+   },
+   {
+    "file": "compobj.c",
+    "line": 3135,
+    "text": "expected message 992, received none"
+   },
+   {
+    "file": "compobj.c",
+    "line": 3136,
+    "text": "expected message 993, received none"
+   },
+   {
+    "file": "compobj.c",
+    "line": 3137,
+    "text": "expected message 1024, received none"
+   },
+   {
+    "file": "compobj.c",
+    "line": 3139,
+    "text": "PeekMessageA failed: 1400"
+   },
+   {
+    "file": "compobj.c",
+    "line": 2820,
+    "text": "CreateWindowExA failed 1400"
+   }
+  ],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 2.3,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 10,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 1111,
+   "todo": 25
+  },
+  "todo_lines": 25
+ },
+ "defaulthandler": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 0.1,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 38,
+   "todo": 8
+  },
+  "todo_lines": 8
+ },
+ "dragdrop": {
+  "exit_code": 108,
+  "failure_count": 108,
+  "failures": [
+   {
+    "file": "dragdrop.c",
+    "line": 642,
+    "text": "RegisterDragDrop failed with error 0x80040102"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 643,
+    "text": "DropTarget refs should be at least one"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 646,
+    "text": "expected IDropTarget pointer 00000001401110F8, got 0000000000000000"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 649,
+    "text": "RegisterDragDrop with already registered hwnd should return DRAGDROP_E_ALREADYREGISTERED instead of 0x80040102"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 651,
+    "text": "DropTarget refs should be at least one"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 677,
+    "text": "got 0x80040102"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 698,
+    "text": "failed to create window"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 704,
+    "text": "got 0x80040102"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DS_QueryContinueDrag"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DT_DragEnter"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DS_GiveFeedback"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DT_Drop"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "DoDragDrop_ret: unexpected param 80004005 expected beefbeef"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 747,
+    "text": "DoDragDrop_effect_out: unexpected param 00000000 expected 00000001"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DS_QueryContinueDrag"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DT_DragEnter"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DS_GiveFeedback"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DT_DragLeave"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "DoDragDrop_ret: unexpected param 80004005 expected 00040100"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DS_QueryContinueDrag"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DT_DragEnter"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DS_GiveFeedback"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DT_Drop"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "DoDragDrop_ret: unexpected param 80004005 expected 00040100"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DS_QueryContinueDrag"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DT_DragEnter"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DS_GiveFeedback"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DT_DragOver"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DS_GiveFeedback"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DS_QueryContinueDrag"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DT_DragOver"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DS_GiveFeedback"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DS_QueryContinueDrag"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DT_Drop"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "DoDragDrop_ret: unexpected param 80004005 expected 00040100"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DS_QueryContinueDrag"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "DoDragDrop_ret: unexpected param 80004005 expected 00040101"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DS_QueryContinueDrag"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DT_DragEnter"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DS_GiveFeedback"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DT_DragOver"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DS_GiveFeedback"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DS_QueryContinueDrag"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DT_DragOver"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DS_GiveFeedback"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DS_QueryContinueDrag"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DT_DragLeave"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "DoDragDrop_ret: unexpected param 80004005 expected 00040101"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DS_QueryContinueDrag"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DT_DragEnter"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DS_GiveFeedback"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DT_DragOver"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DS_GiveFeedback"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DS_QueryContinueDrag"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DT_DragOver"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DS_GiveFeedback"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DS_QueryContinueDrag"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DT_DragLeave"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DS_QueryContinueDrag"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DT_DragEnter"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DS_GiveFeedback"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DT_Drop"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "DoDragDrop_ret: unexpected param 80004005 expected beefbeef"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 747,
+    "text": "DoDragDrop_effect_out: unexpected param 00000000 expected 00000001"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DS_QueryContinueDrag"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DT_DragEnter"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DS_GiveFeedback"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DT_DragLeave"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "DoDragDrop_ret: unexpected param 80004005 expected 00040100"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DS_QueryContinueDrag"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DT_DragEnter"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DS_GiveFeedback"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DT_Drop"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "DoDragDrop_ret: unexpected param 80004005 expected 00040100"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DS_QueryContinueDrag"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DT_DragEnter"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DS_GiveFeedback"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DT_DragOver"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DS_GiveFeedback"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DS_QueryContinueDrag"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DT_DragOver"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DS_GiveFeedback"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DS_QueryContinueDrag"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DT_Drop"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "DoDragDrop_ret: unexpected param 80004005 expected 00040100"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DS_QueryContinueDrag"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "DoDragDrop_ret: unexpected param 80004005 expected 00040101"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DS_QueryContinueDrag"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DT_DragEnter"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DS_GiveFeedback"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DT_DragOver"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DS_GiveFeedback"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DS_QueryContinueDrag"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DT_DragOver"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DS_GiveFeedback"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DS_QueryContinueDrag"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DT_DragLeave"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "DoDragDrop_ret: unexpected param 80004005 expected 00040101"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DS_QueryContinueDrag"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DT_DragEnter"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DS_GiveFeedback"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DT_DragOver"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DS_GiveFeedback"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DS_QueryContinueDrag"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DT_DragOver"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DS_GiveFeedback"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DS_QueryContinueDrag"
+   },
+   {
+    "file": "dragdrop.c",
+    "line": 746,
+    "text": "unexpected call DoDragDrop_ret instead of DT_DragLeave"
+   }
+  ],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 0.1,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 108,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 222,
+   "todo": 42
+  },
+  "todo_lines": 42
+ },
+ "errorinfo": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 0.1,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 19,
+   "todo": 0
+  },
+  "todo_lines": 0
+ },
+ "hglobalstream": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 0.1,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 277,
+   "todo": 0
+  },
+  "todo_lines": 0
+ },
+ "marshal": {
+  "exit_code": 124,
+  "failure_count": 1,
+  "failures": [
+   {
+    "file": "marshal.c",
+    "line": 3372,
+    "text": "Window creation failed"
+   }
+  ],
+  "guarded": null,
+  "last_line": "winetest-batch: timeout marshal 80",
+  "seconds": 80.1,
+  "skipped_lines": [],
+  "status": "timeout",
+  "summary": null,
+  "todo_lines": 22
+ },
+ "moniker": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 0.3,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 5385,
+   "todo": 84
+  },
+  "todo_lines": 84
+ },
+ "ole2": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 0.2,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 3003,
+   "todo": 39
+  },
+  "todo_lines": 39
+ },
+ "ole_server": {
+  "exit_code": 2,
+  "failure_count": 2,
+  "failures": [
+   {
+    "file": "ole_server.c",
+    "line": 365,
+    "text": "CreateProcess(\"Z:\\<workspace>\\PS5_Proton\\.deps\\wine-tests\\exe\\ole32_test.exe\" ole_server -server) error 8"
+   },
+   {
+    "file": "ole_server.c",
+    "line": 335,
+    "text": "RegDeleteKey error 2"
+   }
+  ],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 0.1,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 2,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 8,
+   "todo": 0
+  },
+  "todo_lines": 0
+ },
+ "propvariant": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 0.1,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 1584,
+   "todo": 43
+  },
+  "todo_lines": 43
+ },
+ "stg_prop": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 0.1,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 248,
+   "todo": 8
+  },
+  "todo_lines": 8
+ },
+ "storage32": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 4.7,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 18996,
+   "todo": 6
+  },
+  "todo_lines": 6
+ },
+ "usrmarshal": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 0.1,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 750,
+   "todo": 26
+  },
+  "todo_lines": 26
+ }
+}

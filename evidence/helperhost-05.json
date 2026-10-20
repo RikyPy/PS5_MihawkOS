@@ -1,0 +1,22 @@
+{
+  "run": "helperhost-05",
+  "step": "ranges",
+  "elf_sha256": "9f10c2d7a89c110d94f869c0cdfb97ce51265fac2d14639a275f5cff33e2a9b4",
+  "started": "2026-10-05T22:58:53",
+  "lines": [
+    "helperhostprobe pid=4427 uid=1 euid=0 gid=1 argc=1",
+    "  argv[0]=ranges",
+    "memory: direct 0 MiB in all; flexible available 8159 MiB (status 0)",
+    "runtime: stat ntdll.prx -> 0 errno=0 size=899519",
+    "runtime: open -> 12 errno=0, first bytes 54 14 f5 ee (4 read)",
+    "ranges: about to reserve 512 MiB at 0x240000000",
+    "ranges: reserve -> 0 at 240000000",
+    "ranges: release -> 0",
+    "ranges: about to reserve 16384 MiB at 0x3000000000",
+    "ranges: reserve -> 0 at 3000000000",
+    "ranges: release -> 0",
+    "helperhostprobe done"
+  ],
+  "finished": true,
+  "console_after": "answers"
+}

@@ -1,0 +1,23 @@
+{
+  "wine_revision": "7e893751d256bfe062fd1d159375f024dedfa696",
+  "cases": [
+    {
+      "case": "memory",
+      "status": 0,
+      "seconds": 157.72,
+      "passed": true,
+      "error": null,
+      "probe_sha256": "c43c6149ff494f9141667053162952fdec8f114c53422377f37610c2ab7d0344"
+    },
+    {
+      "case": "graphics",
+      "status": 1,
+      "seconds": 25.35,
+      "passed": false,
+      "error": null,
+      "probe_sha256": "2a18d6e677370278a1999a3061f680a21a8ed904c25becf21ba379c1a112ea33",
+      "rendered_ready_count": 0
+    }
+  ],
+  "passed": false
+}

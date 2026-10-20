@@ -1,0 +1,216 @@
+{
+ "dispatch": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 0.1,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 58,
+   "todo": 0
+  },
+  "todo_lines": 0
+ },
+ "olefont": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 0.2,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 2430,
+   "todo": 2
+  },
+  "todo_lines": 2
+ },
+ "olepicture": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 0.2,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 3907,
+   "todo": 178
+  },
+  "todo_lines": 178
+ },
+ "safearray": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 0.3,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 11563,
+   "todo": 2
+  },
+  "todo_lines": 2
+ },
+ "tmarshal": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 0.3,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 754,
+   "todo": 19
+  },
+  "todo_lines": 19
+ },
+ "typelib": {
+  "exit_code": 4,
+  "failure_count": 4,
+  "failures": [
+   {
+    "file": "typelib.c",
+    "line": 8438,
+    "text": "got wrong return code: 2, side: 0200"
+   },
+   {
+    "file": "typelib.c",
+    "line": 8442,
+    "text": "Registry reflection is enabled on this platform."
+   },
+   {
+    "file": "typelib.c",
+    "line": 8438,
+    "text": "got wrong return code: 2, side: 0100"
+   },
+   {
+    "file": "typelib.c",
+    "line": 8442,
+    "text": "Registry reflection is enabled on this platform."
+   }
+  ],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 0.2,
+  "skipped_lines": [
+   "typelib.c:6560: Tests skipped: ignoring VARDESC::oInst, (libattr->syskind expected 1 got 3)"
+  ],
+  "status": "complete",
+  "summary": {
+   "failures": 4,
+   "flaky": 0,
+   "skipped": 1,
+   "tests": 7684,
+   "todo": 43
+  },
+  "todo_lines": 43
+ },
+ "usrmarshal": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 0.1,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 711,
+   "todo": 12
+  },
+  "todo_lines": 12
+ },
+ "varformat": {
+  "exit_code": 2,
+  "failure_count": 2,
+  "failures": [
+   {
+    "file": "varformat.c",
+    "line": 285,
+    "text": "VT 7|0x0000 Format medium time: expected 0x00000000, '12:36 PM', got 0x00000000, '12:36 p.m.'"
+   },
+   {
+    "file": "varformat.c",
+    "line": 285,
+    "text": "VT 7|0x0000 Format long time: expected 0x00000000, '12:36:00 PM', got 0x00000000, '12:36:00 p.m.'"
+   }
+  ],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 0.1,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 2,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 880,
+   "todo": 0
+  },
+  "todo_lines": 0
+ },
+ "vartest": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 0.3,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 1039460,
+   "todo": 0
+  },
+  "todo_lines": 0
+ },
+ "vartype": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 0.4,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 2517705,
+   "todo": 0
+  },
+  "todo_lines": 0
+ }
+}

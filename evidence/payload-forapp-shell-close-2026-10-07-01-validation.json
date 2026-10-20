@@ -1,0 +1,25 @@
+{
+ "run": "payload-forapp-shell-close-2026-10-07-01",
+ "action": "shell kill with a graphics helper holding 2048 MiB",
+ "readiness_source": "native helper log",
+ "ready_pids": [
+  806
+ ],
+ "native_pids": [
+  805,
+  806,
+  807
+ ],
+ "alive_before": [
+  805,
+  806
+ ],
+ "direct_memory": [
+  "direct memory current=2101 MiB peak=2101 MiB runs=69 failures=0 unix_heap=24 MiB"
+ ],
+ "shell_close": "ok killed PPSA99170: PPSA99170 is gone (app id 49176, 1 processes killed, result 0x00000000)",
+ "remaining_native_pids": [],
+ "control_after": "ok procs app=4294967295 title= count=0 pids=",
+ "fault_records": 0,
+ "passed": true
+}

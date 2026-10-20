@@ -1,0 +1,15 @@
+{
+ "run": "mihawk-pro-only-gate-2026-10-09-02-wallpaper32",
+ "what": "wallpaper32-probe.exe",
+ "env": [
+  "PROTON_LAYOUT=launcher"
+ ],
+ "passed": false,
+ "result": "runner_error",
+ "error": "ps5vkctl: <console>:9111 did not answer ([Errno 111] Connection refused); load build/ps5vkctl/ps5vkctl.elf on the console first",
+ "loaded": false,
+ "probe_verdict": null,
+ "stop_requested": null,
+ "cleanup_verified": false,
+ "hooks_removed": false
+}

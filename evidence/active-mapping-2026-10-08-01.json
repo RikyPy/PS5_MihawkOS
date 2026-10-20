@@ -1,0 +1,25 @@
+{
+ "run": "active-mapping-2026-10-08-01",
+ "context": "our own native title active",
+ "kernel_reads": false,
+ "kernel_writes": false,
+ "no_overwrite": true,
+ "temporary_direct_backing_bytes": 16384,
+ "passed": false,
+ "lines": [
+  "mapping-class identity role=payload abi=0x1 status=0 guard=1 app=0 header4=0 header8=0 header12=0",
+  "mapping-class identity role=owner abi=0x1 status=0 guard=1 app=24 header4=0x1 header8=0 header12=0",
+  "mapping-class memconf status=0 size=8 version=1 flags=0x1",
+  "mapping-class allocation=0",
+  "mapping-class route=direct band=ordinary status=0 exact=1",
+  "mapping-class route=direct unmap=0",
+  "mapping-class route=direct band=extended status=0x80020016 exact=0",
+  "mapping-class route=modern band=ordinary status=0x8002002d exact=0",
+  "mapping-class release=0",
+  "mapping-class route=pool band=ordinary status=0x80020016 exact=0"
+ ],
+ "elf_sha256": "c57a298c1bff910013efb4f2709d785fa56c4ab43d971625d0c2b7a06ab98f57",
+ "source_sha256": "6fc6ff118e471b38a62f28c7029500bbb774e571f4b74d0d41054cb17aa450cf",
+ "extended_mapping_worked": false,
+ "owner_runner_status": 0
+}

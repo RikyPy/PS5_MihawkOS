@@ -1,0 +1,30 @@
+{
+ "run": "m4-alias-2026-10-07-01-pe32",
+ "what": "pe32-probe.exe",
+ "env": [
+  "PROTON_LAYOUT=launcher"
+ ],
+ "result": "finished",
+ "seconds": 7.1,
+ "probe_verdict": null,
+ "clean_owner_restart": false,
+ "launcher_end_status": 0,
+ "initial_status": 1,
+ "closed_on_request": false,
+ "child_logs": [
+  "klog/m4-alias-2026-10-07-01-pe32-wine-child-1976.log",
+  "klog/m4-alias-2026-10-07-01-pe32-wine-child-1977.log",
+  "klog/m4-alias-2026-10-07-01-pe32-wine-child-1978.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": false,
+ "bench": {},
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [],
+  "top": []
+ }
+}

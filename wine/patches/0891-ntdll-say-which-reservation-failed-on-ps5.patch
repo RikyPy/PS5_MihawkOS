@@ -1,0 +1,78 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Sat, 3 Oct 2026 14:30:00 -0400
+Subject: [PATCH] ntdll: say which reservation failed, and do not abort on a view
+ that is not on a host page (PS5)
+
+A Java process ran out of memory (the JVM's malloc failed on a 1 MB request while
+the title had 3.5 GiB of 12 in use) and, in another run, create_view's
+assertion that a view starts on a host page (16 KiB) killed the process. Each
+NtAllocateVirtualMemory that reserves memory and fails now says what it asked
+for and why it was refused, and a view that is not on a host page is refused
+with STATUS_CONFLICTING_ADDRESSES and a line naming the base, instead of
+aborting.
+---
+  dlls/ntdll/unix/virtual.c | 20 ++++++++++++++++++++
+  1 file changed, 20 insertions(+)
+
+diff --git a/dlls/ntdll/unix/virtual.c b/dlls/ntdll/unix/virtual.c
+index 34f7fdd..399099a 100644
+--- a/dlls/ntdll/unix/virtual.c
++++ b/dlls/ntdll/unix/virtual.c
+@@ -2201,7 +2201,18 @@ static NTSTATUS create_view( struct file_view **view_ret, void *base, size_t siz
+ {
+     struct file_view *view;
+ 
++#ifdef __PROSPERO__
++    /* A view must start on a host page (16 KiB on the console). Say which
++     * request asked for another, rather than abort the whole process. */
++    if ((UINT_PTR)base & host_page_mask)
++    {
++        fprintf( stderr, "wine-ps5: create_view: base %p is not on a host page (mask %#lx), size %#lx vprot %#x\n",
++                 base, (unsigned long)host_page_mask, (unsigned long)size, vprot );
++        return STATUS_CONFLICTING_ADDRESSES;
++    }
++#else
+     assert( !((UINT_PTR)base & host_page_mask) );
++#endif
+     assert( !(size & page_mask) );
+ 
+     /* Check for overlapping views. This can happen if the previous view
+@@ -2211,6 +2222,19 @@ static NTSTATUS create_view( struct file_view **view_ret, void *base, size_t siz
+     {
+         TRACE( "overlapping view %p-%p for %p-%p\n",
+                view->base, (char *)view->base + view->size, base, (char *)base + size );
++#ifdef __PROSPERO__
++        /* Which view a new one landed on, and what the free list said was there. */
++        if (!(view->protect & VPROT_SYSTEM))
++            fprintf( stderr, "wine-ps5: create_view: %p-%p (vprot %#x) overlaps view %p-%p (protect %#x); free range %p-%p\n",
++                     base, (char *)base + size, vprot, view->base, (char *)view->base + view->size, view->protect,
++                     free_ranges_lower_bound( base )->base, free_ranges_lower_bound( base )->end );
++        if (!(view->protect & VPROT_SYSTEM))
++        {
++            struct range_entry *r = free_ranges_lower_bound( (char *)base - ((size_t)64 << 20) );
++            for (; r != free_ranges_end && (char *)r->base < (char *)base + size + ((size_t)64 << 20); r++)
++                fprintf( stderr, "wine-ps5: create_view: free range %p-%p\n", r->base, r->end );
++        }
++#endif
+         assert( view->protect & VPROT_SYSTEM );
+         delete_view( view );
+     }
+@@ -5841,6 +5852,15 @@ static NTSTATUS allocate_virtual_memory( void **ret, SIZE_T *size_ptr, ULONG typ
+             else if (is_dos_memory) status = allocate_dos_memory( &view, vprot );
+             else status = map_view( &view, base, size, type, vprot, limit_low, limit_high,
+                                     align ? align - 1 : granularity_mask );
++#ifdef __PROSPERO__
++            if (status && status != STATUS_CONFLICTING_ADDRESSES)
++                fprintf( stderr, "wine-ps5: reserving %#lx bytes at %p failed: %#x (type %#x, protect %#x, limits %#lx-%#lx, align %#lx)\n",
++                         (unsigned long)size, base, status, type, protect, (unsigned long)limit_low,
++                         (unsigned long)limit_high, (unsigned long)align );
++            else if (status)
++                fprintf( stderr, "wine-ps5: reserving %#lx bytes at %p refused: %#x (type %#x, protect %#x, align %#lx)\n",
++                         (unsigned long)size, base, status, type, protect, (unsigned long)align );
++#endif
+ 
+             if (status == STATUS_SUCCESS)
+             {
+-- 
+2.43.0

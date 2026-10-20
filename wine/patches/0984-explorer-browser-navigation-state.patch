@@ -1,0 +1,29 @@
+Subject: [PATCH] shell32: expose native browser navigation availability
+
+A read-only registered window message exposes the control's own travel cursor
+without cloning its history in the Explorer host. Bit zero reports support,
+then back, forward and parent availability. No application-name condition.
+
+--- a/dlls/shell32/ebrowser.c
++++ b/dlls/shell32/ebrowser.c
+@@ -741,6 +741,20 @@
+ static LRESULT CALLBACK main_wndproc(HWND hWnd, UINT uMessage, WPARAM wParam, LPARAM lParam)
+ {
+     ExplorerBrowserImpl *This = (ExplorerBrowserImpl*)GetWindowLongPtrW(hWnd, GWLP_USERDATA);
++
++    /* Private, read-only Wine shell query. No pointers cross the window boundary.
++     * A supported browser sets bit 0; bits 1/2/3 mean back/forward/up. */
++    if (This && uMessage == RegisterWindowMessageW(L"Wine.ExplorerBrowser.NavigationState"))
++    {
++        LRESULT state = 1;
++        if (This->travellog_cursor)
++        {
++            if (list_prev(&This->travellog, &This->travellog_cursor->entry)) state |= 2;
++            if (list_next(&This->travellog, &This->travellog_cursor->entry)) state |= 4;
++        }
++        if (This->current_pidl && !ILIsEmpty(This->current_pidl)) state |= 8;
++        return state;
++    }
+ 
+     switch(uMessage)
+     {

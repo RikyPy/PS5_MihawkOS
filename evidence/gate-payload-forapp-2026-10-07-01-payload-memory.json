@@ -1,0 +1,32 @@
+{
+ "run": "gate-payload-forapp-2026-10-07-01-payload-memory",
+ "what": "process-probe.exe",
+ "env": [
+  "PROTON_LAYOUT=launcher"
+ ],
+ "result": "finished",
+ "seconds": 8.0,
+ "probe_verdict": "PASS",
+ "clean_owner_restart": true,
+ "launcher_end_status": 0,
+ "initial_status": 0,
+ "closed_on_request": false,
+ "child_logs": [
+  "klog/gate-payload-forapp-2026-10-07-01-payload-memory-wine-child-591.log",
+  "klog/gate-payload-forapp-2026-10-07-01-payload-memory-wine-child-592.log",
+  "klog/gate-payload-forapp-2026-10-07-01-payload-memory-wine-child-593.log",
+  "klog/gate-payload-forapp-2026-10-07-01-payload-memory-wine-child-594.log",
+  "klog/gate-payload-forapp-2026-10-07-01-payload-memory-wine-child-595.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": true,
+ "bench": {},
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [],
+  "top": []
+ }
+}

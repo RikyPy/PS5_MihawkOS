@@ -1,0 +1,55 @@
+# Where LLVM's disassembler and the CPU disagree about an IA-32 encoding, the CPU decides
+# (docs/IA32_DESIGN.md). One line per disagreement that tools/ia32-decode-oracle.sh reports and we
+# keep on purpose:
+#
+#   <KIND> <MAP>:<opcode hex>[-<opcode hex>][/<ModRM.reg>] [p=<prefix set>,...] <reason>
+#
+# KIND is the oracle's: OURS_ONLY (we decode it, LLVM rejects it), LLVM_ONLY, LENGTH, TEXT. A p=
+# list limits the line to those prefix sets, written as the groups file writes them (66f3; "-" for
+# none). Each reason says what the CPU does. tools/ia32-cpu-decode-check.sh checks length and validity on this PC's
+# CPU (Intel); "confirmed" means that sweep agrees with us; AMD-only behaviour waits for the console (M0).
+
+# Encodings the CPU executes and LLVM does not decode (confirmed: the CPU sweep runs them).
+OURS_ONLY PRI:F1 F1 is INT1 (ICEBP) on the CPU, a one-byte debug trap.
+OURS_ONLY PRI:C0-C1/6 /6 of group 2 is SAL, the same operation as SHL /4 (AMD documents it).
+OURS_ONLY PRI:D0-D3/6 /6 of group 2 is SAL, the same operation as SHL /4 (AMD documents it).
+OURS_ONLY PRI:F6-F7/1 /1 of group 3 is TEST again on the CPU, with its immediate.
+OURS_ONLY PRI:90 p=66f3 66 F3 90 is PAUSE on the CPU (66 changes nothing in it).
+OURS_ONLY PRI:A0-A3 p=f2,f266 F2 before a moffs MOV selects nothing on the CPU; LLVM rejects the pair.
+
+# AMD's SSE4a, which the console's Zen 2 has and LLVM decodes as Intel's VMREAD.
+LENGTH 0F:78 p=66,6667,66f3,f266,f2 With 66 or F2, 0F 78 is EXTRQ/INSERTQ on AMD, and two imm8 follow.
+
+# LLVM lets F2/F3 cancel a 66 before them; on the CPU F2/F3 select nothing in these forms and 66
+# still sets the operand size (confirmed: the CPU's lengths are ours).
+LENGTH 0F:80-8F p=66f3,f266 Jcc rel: 66 makes the displacement 16-bit.
+LENGTH PRI:C7 p=66f3 MOV Ev, Iz: 66 makes the immediate 16-bit.
+TEXT PRI:86-89 p=66f3 XRELEASE XCHG/MOV: 66 makes it a 16-bit operation.
+TEXT PRI:91-97 p=66f3 XRELEASE XCHG: 66 makes it a 16-bit operation.
+TEXT PRI:C6-C7 p=66f3 XRELEASE MOV: 66 makes it a 16-bit operation.
+TEXT 0F:1F p=66f3,f266 In the 0F map LLVM prints a 16-bit register beside a 32-bit memory operand; 66 makes both 16-bit.
+TEXT 0F:40-4F p=66f3,f266 As 0F:1F.
+TEXT 0F:A3-A5 p=66f3,f266 As 0F:1F.
+TEXT 0F:AB-AD p=66f3,f266 As 0F:1F.
+TEXT 0F:AF p=66f3,f266 As 0F:1F.
+TEXT 0F:B1 p=66f3,f266 As 0F:1F.
+TEXT 0F:B3 p=66f3,f266 As 0F:1F.
+TEXT 0F:BA-BD p=66f3,f266 As 0F:1F.
+TEXT 0F:C1 p=66f3,f266 As 0F:1F.
+TEXT 0F38:F0-F1 p=66f3 MOVBE: as 0F:1F, LLVM prints a 32-bit memory operand beside the 16-bit register.
+
+# Encodings the CPU runs and LLVM rejects or names otherwise (confirmed by the CPU sweep).
+OURS_ONLY 0F:0D The 0F 0D group is a prefetch or a reserved NOP for every ModRM on the CPU.
+OURS_ONLY 0F:18-1F 0F 18-1F are the reserved hint NOPs: the CPU runs every encoding of them.
+TEXT 0F:0D The 0F 0D/0F 18 hints LLVM names as prefetches it knows (prefetchwt1, prefetchrst2); we print NOP.
+TEXT 0F:18-1F As 0F:0D.
+OURS_ONLY PRI:D9/3 FSTP1 (D9 D8+i), an alias of FSTP ST(i).
+OURS_ONLY PRI:DB/4 FENI, FDISI, FSETPM (DB E0/E1/E4) run as FNOP on the CPU.
+OURS_ONLY PRI:DC/2 FCOM2 (DC D0+i), an alias of FCOM ST(i).
+OURS_ONLY PRI:DC/3 FCOMP3 (DC D8+i), an alias of FCOMP ST(i).
+OURS_ONLY PRI:DD/1 FXCH4 (DD C8+i), an alias of FXCH ST(i).
+OURS_ONLY PRI:DE/2 FCOMP5 (DE D0+i), an alias of FCOMP ST(i).
+OURS_ONLY PRI:DF/1 FXCH7 (DF C8+i), an alias of FXCH ST(i).
+OURS_ONLY PRI:DF/2 FSTP8 (DF D0+i), an alias of FSTP ST(i).
+OURS_ONLY PRI:DF/3 FSTP9 (DF D8+i), an alias of FSTP ST(i).
+LLVM_ONLY PRI:8E/1 MOV CS, r/m is #UD on the CPU; LLVM decodes it.

@@ -1,0 +1,579 @@
+From: PS5_Proton
+Subject: [PATCH] ntdll: merge a program's sequential file writes for up to 15 ms on the PS5
+
+A Unity game's download in a launcher ran at 2.5 MB/s on a 1 Gbps line. The
+network gives 19 to 35 MB/s on this console; the disk (bfs under a nullfs)
+takes 2.3 ms per write() plus 0.3 ms per 64 KiB, and the Agent wrote its 1 GiB
+in 17,588 calls of 64 KiB or less, 5 to 10 MiB/s. Writing through a mapping
+was tried and rejected (it skips block allocation: other readers get stale
+bytes). A 256 KiB write costs 3.5 ms (74 MB/s), so fewer calls is the lever.
+
+NtWriteFile on a regular file keeps sequential writes of up to 256 KiB in a
+per-process buffer (4 files, 512 KiB each) and writes them as one at 256 KiB,
+after 15 ms (a thread with every signal blocked), or when the process does
+anything that could show the file: a read, query, set-information, flush or
+control on a handle on it, any open, delete or attribute or directory query, a
+section made of it (and no merging for that file after), a handle on it closed
+or duplicated, a process created or ended. Not merged: write-through handles,
+appends, writes over 256 KiB, writes not next to the buffered bytes (the
+buffer goes first, so the order holds). The only difference from Windows that
+remains: another process that opens or reads the file within 15 ms of a write
+sees the bytes late, a process killed from outside loses at most those 15 ms,
+and a write that fails at flush time (disk full) is logged, not reported, as
+with Windows' lazy writer. The helper census counts merged calls and bytes,
+flushes and the time in them.
+---
+diff --git a/dlls/ntdll/unix/file.c b/dlls/ntdll/unix/file.c
+--- a/dlls/ntdll/unix/file.c
++++ b/dlls/ntdll/unix/file.c
+@@ -118,6 +118,40 @@
+ #include "ddk/wdm.h"
+ #define WINE_MOUNTMGR_EXTENSIONS
+ #include "ddk/mountmgr.h"
++
++#ifdef __PROSPERO__
++/* the calls that show a file, or end a process, first write what is merged (see wb_write below) */
++#define NtReadFile real_NtReadFile
++#define NtReadFileScatter real_NtReadFileScatter
++#define NtWriteFileGather real_NtWriteFileGather
++#define NtFlushBuffersFile real_NtFlushBuffersFile
++#define NtFlushBuffersFileEx real_NtFlushBuffersFileEx
++#define NtQueryInformationFile real_NtQueryInformationFile
++#define NtSetInformationFile real_NtSetInformationFile
++#define NtFsControlFile real_NtFsControlFile
++#define NtDeviceIoControlFile real_NtDeviceIoControlFile
++#define NtQueryDirectoryFile real_NtQueryDirectoryFile
++#define NtCreateFile real_NtCreateFile
++#define NtOpenFile real_NtOpenFile
++#define NtDeleteFile real_NtDeleteFile
++#define NtQueryAttributesFile real_NtQueryAttributesFile
++#define NtQueryFullAttributesFile real_NtQueryFullAttributesFile
++NTSTATUS WINAPI real_NtReadFile( HANDLE handle, HANDLE event, PIO_APC_ROUTINE apc, void *apc_user, IO_STATUS_BLOCK *io, void *buffer, ULONG length, LARGE_INTEGER *offset, ULONG *key );
++NTSTATUS WINAPI real_NtReadFileScatter( HANDLE file, HANDLE event, PIO_APC_ROUTINE apc, void *apc_user, IO_STATUS_BLOCK *io, FILE_SEGMENT_ELEMENT *segments, ULONG length, LARGE_INTEGER *offset, ULONG *key );
++NTSTATUS WINAPI real_NtWriteFileGather( HANDLE file, HANDLE event, PIO_APC_ROUTINE apc, void *apc_user, IO_STATUS_BLOCK *io, FILE_SEGMENT_ELEMENT *segments, ULONG length, LARGE_INTEGER *offset, ULONG *key );
++NTSTATUS WINAPI real_NtFlushBuffersFile( HANDLE handle, IO_STATUS_BLOCK *io );
++NTSTATUS WINAPI real_NtFlushBuffersFileEx( HANDLE handle, ULONG flags, void *params, ULONG size, IO_STATUS_BLOCK *io );
++NTSTATUS WINAPI real_NtQueryInformationFile( HANDLE handle, IO_STATUS_BLOCK *io, void *ptr, ULONG len, FILE_INFORMATION_CLASS class );
++NTSTATUS WINAPI real_NtSetInformationFile( HANDLE handle, IO_STATUS_BLOCK *io, void *ptr, ULONG len, FILE_INFORMATION_CLASS class );
++NTSTATUS WINAPI real_NtFsControlFile( HANDLE handle, HANDLE event, PIO_APC_ROUTINE apc, void *apc_context, IO_STATUS_BLOCK *io, ULONG code, void *in_buffer, ULONG in_size, void *out_buffer, ULONG out_size );
++NTSTATUS WINAPI real_NtDeviceIoControlFile( HANDLE handle, HANDLE event, PIO_APC_ROUTINE apc, void *apc_context, IO_STATUS_BLOCK *io, ULONG code, void *in_buffer, ULONG in_size, void *out_buffer, ULONG out_size );
++NTSTATUS WINAPI real_NtQueryDirectoryFile( HANDLE handle, HANDLE event, PIO_APC_ROUTINE apc_routine, void *apc_context, IO_STATUS_BLOCK *io, void *buffer, ULONG length, FILE_INFORMATION_CLASS info_class, BOOLEAN single_entry, UNICODE_STRING *mask, BOOLEAN restart_scan );
++NTSTATUS WINAPI real_NtCreateFile( HANDLE *handle, ACCESS_MASK access, OBJECT_ATTRIBUTES *attr, IO_STATUS_BLOCK *io, LARGE_INTEGER *alloc_size, ULONG attributes, ULONG sharing, ULONG disposition, ULONG options, void *ea_buffer, ULONG ea_length );
++NTSTATUS WINAPI real_NtOpenFile( HANDLE *handle, ACCESS_MASK access, OBJECT_ATTRIBUTES *attr, IO_STATUS_BLOCK *io, ULONG sharing, ULONG options );
++NTSTATUS WINAPI real_NtDeleteFile( OBJECT_ATTRIBUTES *attr );
++NTSTATUS WINAPI real_NtQueryAttributesFile( const OBJECT_ATTRIBUTES *attr, FILE_BASIC_INFORMATION *info );
++NTSTATUS WINAPI real_NtQueryFullAttributesFile( const OBJECT_ATTRIBUTES *attr, FILE_NETWORK_OPEN_INFORMATION *info );
++#endif
+ #include "wine/server.h"
+ #include "wine/list.h"
+ #include "wine/debug.h"
+@@ -6861,7 +6895,8 @@
+  * 2.5 MB/s on a 1 Gbps line (2026-10-11). Counters: calls, bytes, nanoseconds in the write, and the calls of up to
+  * 4 KiB, 16 KiB, 64 KiB, 256 KiB and more, and the slowest call. */
+ enum { FILE_WRITE_CALLS, FILE_WRITE_BYTES, FILE_WRITE_NS, FILE_WRITE_4K, FILE_WRITE_16K, FILE_WRITE_64K, FILE_WRITE_256K,
+-       FILE_WRITE_BIG, FILE_WRITE_SLOWEST_NS, FILE_WRITE_COUNT };
++       FILE_WRITE_BIG, FILE_WRITE_SLOWEST_NS, FILE_WRITE_MERGED_CALLS, FILE_WRITE_MERGED_BYTES,
++       FILE_WRITE_FLUSHES, FILE_WRITE_FLUSH_NS, FILE_WRITE_COUNT };
+ static ULONG64 file_write_stats[FILE_WRITE_COUNT];
+ 
+ static void file_write_account( ULONG bytes, const struct timespec *begin )
+@@ -6891,6 +6926,268 @@
+ #endif
+ 
+ 
++/* Writes to regular files merged before they reach the disk. On the console a write() costs about 2.3 ms plus 0.3 ms per
++ * 64 KiB, on bfs under a nullfs, however it is opened; a 256 KiB write costs 3.5 ms (74 MB/s), a 64 KiB one 2.8 ms
++ * (23 MB/s), and a launcher's agent wrote a Unity game's download as 1 GiB in 17,588 calls of 64 KiB or less, 5 to 10 MiB/s,
++ * on a line that gives 19 to 35 MB/s (2026-10-11). Writing through a mapping was tried and rejected: it skips block
++ * allocation, so other readers get stale bytes (docs/PLAN.md). So sequential writes of up to 256 KiB to a regular file are
++ * kept in a small per-process buffer and written as one when it holds 256 KiB, when 15 ms have passed (a thread with all
++ * signals blocked does it), or when anything this process does could show the file to someone: a read, a query, a
++ * size change or flush of a handle on the file, a new open, a directory or attribute query, a section made of it
++ * (and from then on no merging for that file), a handle on it closed or duplicated, a process created, the process
++ * ending. Not merged: a handle opened write-through, an append, a write of more than 256 KiB, one that is not next to the
++ * buffered bytes (the buffer is written first, so the order is kept). What stays different from Windows: another
++ * PROCESS that opens or reads the file within 15 ms of a write sees the bytes late, and a process killed from outside
++ * loses at most those 15 ms; a write that fails at flush time (disk full) cannot be reported to the program, as with
++ * Windows' lazy writer, and is logged. */
++enum { WB_ENTRIES = 4, WB_CAPACITY = 512 << 10, WB_FLUSH_AT = 256 << 10, WB_MAX_WRITE = 256 << 10, WB_HANDLES = 4,
++       WB_DENIED = 16 };
++#define WB_DEADLINE_NS 15000000ull
++struct wb_entry
++{
++    int fd;                 /* a dup of the descriptor written through: the entry outlives the handle's */
++    dev_t dev;
++    ino_t ino;
++    off_t start;
++    size_t length;
++    ULONG64 since_ns;
++    char *buffer;
++    HANDLE handles[WB_HANDLES];
++    unsigned int handle_count;
++};
++static struct wb_entry wb_entries[WB_ENTRIES];
++static struct { dev_t dev; ino_t ino; } wb_denied[WB_DENIED];
++static unsigned int wb_denied_count;
++static pthread_mutex_t wb_mutex = PTHREAD_MUTEX_INITIALIZER;
++static pthread_cond_t wb_cond = PTHREAD_COND_INITIALIZER;
++static int wb_pending;                 /* entries holding bytes: read without the mutex as a hint */
++static int wb_thread_state;            /* 0 not started, 1 running, -1 could not start */
++
++static ULONG64 wb_now_ns( void )
++{
++    struct timespec ts;
++
++    clock_gettime( CLOCK_MONOTONIC, &ts );
++    return (ULONG64)ts.tv_sec * 1000000000ull + ts.tv_nsec;
++}
++
++/* Write the entry's bytes with the mutex held; the entry is empty after, whatever happened. */
++static void wb_flush_entry( struct wb_entry *e )
++{
++    size_t done = 0;
++    ULONG64 begin;
++    int failed = 0;
++
++    if (!e->length) return;
++    begin = wb_now_ns();
++    while (done < e->length)
++    {
++        ssize_t n = pwrite( e->fd, e->buffer + done, e->length - done, e->start + done );
++
++        if (n < 0 && errno == EINTR) continue;
++        if (n <= 0) { failed = errno ? errno : EIO; break; }
++        done += n;
++    }
++    if (failed) ERR( "a merged write of %u bytes at %lld could not be written: %s\n", (unsigned int)(e->length - done),
++                     (long long)(e->start + done), strerror( failed ));
++    __atomic_add_fetch( &file_write_stats[FILE_WRITE_FLUSHES], 1, __ATOMIC_RELAXED );
++    __atomic_add_fetch( &file_write_stats[FILE_WRITE_FLUSH_NS], wb_now_ns() - begin, __ATOMIC_RELAXED );
++    close( e->fd );
++    e->fd = -1;
++    e->length = 0;
++    e->handle_count = 0;
++    __atomic_sub_fetch( &wb_pending, 1, __ATOMIC_RELAXED );
++}
++
++static void *wb_thread( void *arg )
++{
++    sigset_t all;
++
++    /* a signal for the process must never run on this thread: Wine's handlers need a TEB */
++    sigfillset( &all );
++    pthread_sigmask( SIG_BLOCK, &all, NULL );
++    pthread_mutex_lock( &wb_mutex );
++    for (;;)
++    {
++        ULONG64 now = wb_now_ns(), next = 0;
++        unsigned int i;
++
++        for (i = 0; i < WB_ENTRIES; i++)
++        {
++            struct wb_entry *e = &wb_entries[i];
++            ULONG64 due;
++
++            if (!e->length) continue;
++            due = e->since_ns + WB_DEADLINE_NS;
++            if (due <= now) wb_flush_entry( e );
++            else if (!next || due < next) next = due;
++        }
++        if (!next) pthread_cond_wait( &wb_cond, &wb_mutex );
++        else
++        {
++            struct timespec ts;
++            ULONG64 wait = next - now;
++
++            clock_gettime( CLOCK_REALTIME, &ts );
++            ts.tv_sec += wait / 1000000000ull;
++            ts.tv_nsec += wait % 1000000000ull;
++            if (ts.tv_nsec >= 1000000000) { ts.tv_sec++; ts.tv_nsec -= 1000000000; }
++            pthread_cond_timedwait( &wb_cond, &wb_mutex, &ts );
++        }
++    }
++    return NULL;
++}
++
++static BOOL wb_start_thread( void )
++{
++    pthread_t id;
++    pthread_attr_t attr;
++
++    if (wb_thread_state) return wb_thread_state > 0;
++    pthread_attr_init( &attr );
++    pthread_attr_setdetachstate( &attr, PTHREAD_CREATE_DETACHED );
++    wb_thread_state = pthread_create( &id, &attr, wb_thread, NULL ) ? -1 : 1;
++    pthread_attr_destroy( &attr );
++    return wb_thread_state > 0;
++}
++
++static void wb_flush_file_locked( dev_t dev, ino_t ino )
++{
++    unsigned int i;
++
++    for (i = 0; i < WB_ENTRIES; i++)
++        if (wb_entries[i].length && wb_entries[i].dev == dev && wb_entries[i].ino == ino) wb_flush_entry( &wb_entries[i] );
++}
++
++void wb_flush_all( void )
++{
++    unsigned int i;
++
++    if (!__atomic_load_n( &wb_pending, __ATOMIC_RELAXED )) return;
++    pthread_mutex_lock( &wb_mutex );
++    for (i = 0; i < WB_ENTRIES; i++) wb_flush_entry( &wb_entries[i] );
++    pthread_mutex_unlock( &wb_mutex );
++}
++
++static void wb_flush_fd( int fd )
++{
++    struct stat st;
++
++    if (!__atomic_load_n( &wb_pending, __ATOMIC_RELAXED ) || fstat( fd, &st )) return;
++    pthread_mutex_lock( &wb_mutex );
++    wb_flush_file_locked( st.st_dev, st.st_ino );
++    pthread_mutex_unlock( &wb_mutex );
++}
++
++/* A handle was closed or duplicated: the entries it wrote through go. */
++void wb_flush_closed_handle( HANDLE handle )
++{
++    unsigned int i, j;
++
++    if (!__atomic_load_n( &wb_pending, __ATOMIC_RELAXED )) return;
++    pthread_mutex_lock( &wb_mutex );
++    for (i = 0; i < WB_ENTRIES; i++)
++        for (j = 0; j < wb_entries[i].handle_count && wb_entries[i].length; j++)
++            if (wb_entries[i].handles[j] == handle) { wb_flush_entry( &wb_entries[i] ); break; }
++    pthread_mutex_unlock( &wb_mutex );
++}
++
++/* A handle on a file is used for something that shows the file: the file's bytes go first, whichever handle wrote them. */
++void wb_flush_handle( HANDLE handle )
++{
++    int fd, needs_close;
++    enum server_fd_type type;
++
++    if (!__atomic_load_n( &wb_pending, __ATOMIC_RELAXED )) return;
++    wb_flush_closed_handle( handle );
++    if (!__atomic_load_n( &wb_pending, __ATOMIC_RELAXED )) return;
++    if (server_get_unix_fd( handle, 0, &fd, &needs_close, &type, NULL )) return;
++    if (type == FD_TYPE_FILE) wb_flush_fd( fd );
++    if (needs_close) close( fd );
++}
++
++/* A section is made of the file: its bytes go and it is not merged again (a view would show the old ones). */
++void wb_note_section( HANDLE file )
++{
++    struct stat st;
++    int fd, needs_close;
++    enum server_fd_type type;
++
++    if (!file || server_get_unix_fd( file, 0, &fd, &needs_close, &type, NULL )) return;
++    if (type == FD_TYPE_FILE && !fstat( fd, &st ))
++    {
++        pthread_mutex_lock( &wb_mutex );
++        wb_flush_file_locked( st.st_dev, st.st_ino );
++        if (wb_denied_count < WB_DENIED) { wb_denied[wb_denied_count].dev = st.st_dev; wb_denied[wb_denied_count++].ino = st.st_ino; }
++        pthread_mutex_unlock( &wb_mutex );
++    }
++    if (needs_close) close( fd );
++}
++
++/* TRUE when the bytes were taken into the buffer (the program is told they were written); FALSE when nothing was and the
++ * caller writes them itself (after any buffered bytes of the file, which are written first to keep the order). */
++static BOOL wb_write( HANDLE handle, int fd, const void *buffer, ULONG length, off_t offset, unsigned int options )
++{
++    struct wb_entry *match = NULL, *free_entry = NULL, *oldest = NULL, *e;
++    struct stat st;
++    BOOL absorbed = FALSE, denied = FALSE;
++    unsigned int i;
++
++    if (offset < 0 || fstat( fd, &st ) || !S_ISREG( st.st_mode )) return FALSE;
++    pthread_mutex_lock( &wb_mutex );
++    for (i = 0; i < wb_denied_count; i++)
++        if (wb_denied[i].dev == st.st_dev && wb_denied[i].ino == st.st_ino) denied = TRUE;
++    for (i = 0; i < WB_ENTRIES; i++)
++    {
++        e = &wb_entries[i];
++        if (e->length && e->dev == st.st_dev && e->ino == st.st_ino) match = e;
++        else if (!e->length) { if (!free_entry) free_entry = e; }
++        else if (!oldest || e->since_ns < oldest->since_ns) oldest = e;
++    }
++    if (denied || !length || length > WB_MAX_WRITE || (options & FILE_WRITE_THROUGH) || !wb_start_thread())
++    {
++        if (match) wb_flush_entry( match );
++        pthread_mutex_unlock( &wb_mutex );
++        return FALSE;
++    }
++    if (match && match->start + (off_t)match->length == offset && match->length + length <= WB_CAPACITY)
++    {
++        memcpy( match->buffer + match->length, buffer, length );
++        match->length += length;
++        for (i = 0; i < match->handle_count && match->handles[i] != handle; i++) {}
++        if (i == match->handle_count && i < WB_HANDLES) match->handles[match->handle_count++] = handle;
++        if (match->length >= WB_FLUSH_AT) wb_flush_entry( match );
++        absorbed = TRUE;
++    }
++    else
++    {
++        if (match) { wb_flush_entry( match ); e = match; }
++        else if (free_entry) e = free_entry;
++        else { wb_flush_entry( oldest ); e = oldest; }
++        if (!e->buffer) e->buffer = malloc( WB_CAPACITY );
++        if (e->buffer && (e->fd = dup( fd )) != -1)
++        {
++            memcpy( e->buffer, buffer, length );
++            e->dev = st.st_dev;
++            e->ino = st.st_ino;
++            e->start = offset;
++            e->length = length;
++            e->since_ns = wb_now_ns();
++            e->handles[0] = handle;
++            e->handle_count = 1;
++            if (!__atomic_add_fetch( &wb_pending, 1, __ATOMIC_RELAXED ) || TRUE) pthread_cond_signal( &wb_cond );
++            absorbed = TRUE;
++        }
++    }
++    if (absorbed)
++    {
++        __atomic_add_fetch( &file_write_stats[FILE_WRITE_MERGED_CALLS], 1, __ATOMIC_RELAXED );
++        __atomic_add_fetch( &file_write_stats[FILE_WRITE_MERGED_BYTES], length, __ATOMIC_RELAXED );
++    }
++    pthread_mutex_unlock( &wb_mutex );
++    return absorbed;
++}
++
+ /******************************************************************************
+  *              NtWriteFile   (NTDLL.@)
+  */
+@@ -6963,6 +7260,9 @@
+             {
+                 struct stat st;
+ 
++#ifdef __PROSPERO__
++                wb_flush_fd( unix_handle );  /* the end of the file is where the merged bytes end */
++#endif
+                 if (fstat( unix_handle, &st ) == -1)
+                 {
+                     status = errno_to_status( errno );
+@@ -6977,6 +7277,10 @@
+             }
+ 
+             /* async I/O doesn't make sense on regular files */
++#ifdef __PROSPERO__
++            if (wb_write( handle, unix_handle, buffer, length, off, options )) result = length;
++            else
++#endif
+             while ((result = pwrite( unix_handle, buffer, length, off )) == -1)
+             {
+                 if (errno != EINTR)
+@@ -7011,6 +7315,21 @@
+         return status;
+     }
+ 
++#ifdef __PROSPERO__
++    if (type == FD_TYPE_FILE && !append_write)
++    {
++        off_t position = lseek( unix_handle, 0, SEEK_CUR );
++
++        if (position != -1 && wb_write( handle, unix_handle, buffer, length, position, options ))
++        {
++            lseek( unix_handle, position + length, SEEK_SET );    /* the pointer moves as if the bytes were written */
++            total = length;
++            status = STATUS_SUCCESS;
++            goto done;
++        }
++    }
++#endif
++
+     for (;;)
+     {
+         result = write( unix_handle, (const char *)buffer + total, length - total );
+@@ -8567,3 +8886,112 @@
+     free( nt_name.Buffer );
+     return status;
+ }
++
++#ifdef __PROSPERO__
++#undef NtReadFile
++#undef NtReadFileScatter
++#undef NtWriteFileGather
++#undef NtFlushBuffersFile
++#undef NtFlushBuffersFileEx
++#undef NtQueryInformationFile
++#undef NtSetInformationFile
++#undef NtFsControlFile
++#undef NtDeviceIoControlFile
++#undef NtQueryDirectoryFile
++#undef NtCreateFile
++#undef NtOpenFile
++#undef NtDeleteFile
++#undef NtQueryAttributesFile
++#undef NtQueryFullAttributesFile
++
++NTSTATUS WINAPI NtReadFile( HANDLE handle, HANDLE event, PIO_APC_ROUTINE apc, void *apc_user, IO_STATUS_BLOCK *io, void *buffer, ULONG length, LARGE_INTEGER *offset, ULONG *key )
++{
++    wb_flush_handle( handle );
++    return real_NtReadFile( handle, event, apc, apc_user, io, buffer, length, offset, key );
++}
++
++NTSTATUS WINAPI NtReadFileScatter( HANDLE file, HANDLE event, PIO_APC_ROUTINE apc, void *apc_user, IO_STATUS_BLOCK *io, FILE_SEGMENT_ELEMENT *segments, ULONG length, LARGE_INTEGER *offset, ULONG *key )
++{
++    wb_flush_handle( file );
++    return real_NtReadFileScatter( file, event, apc, apc_user, io, segments, length, offset, key );
++}
++
++NTSTATUS WINAPI NtWriteFileGather( HANDLE file, HANDLE event, PIO_APC_ROUTINE apc, void *apc_user, IO_STATUS_BLOCK *io, FILE_SEGMENT_ELEMENT *segments, ULONG length, LARGE_INTEGER *offset, ULONG *key )
++{
++    wb_flush_handle( file );
++    return real_NtWriteFileGather( file, event, apc, apc_user, io, segments, length, offset, key );
++}
++
++NTSTATUS WINAPI NtFlushBuffersFile( HANDLE handle, IO_STATUS_BLOCK *io )
++{
++    wb_flush_handle( handle );
++    return real_NtFlushBuffersFile( handle, io );
++}
++
++NTSTATUS WINAPI NtFlushBuffersFileEx( HANDLE handle, ULONG flags, void *params, ULONG size, IO_STATUS_BLOCK *io )
++{
++    wb_flush_handle( handle );
++    return real_NtFlushBuffersFileEx( handle, flags, params, size, io );
++}
++
++NTSTATUS WINAPI NtQueryInformationFile( HANDLE handle, IO_STATUS_BLOCK *io, void *ptr, ULONG len, FILE_INFORMATION_CLASS class )
++{
++    wb_flush_handle( handle );
++    return real_NtQueryInformationFile( handle, io, ptr, len, class );
++}
++
++NTSTATUS WINAPI NtSetInformationFile( HANDLE handle, IO_STATUS_BLOCK *io, void *ptr, ULONG len, FILE_INFORMATION_CLASS class )
++{
++    wb_flush_handle( handle );
++    return real_NtSetInformationFile( handle, io, ptr, len, class );
++}
++
++NTSTATUS WINAPI NtFsControlFile( HANDLE handle, HANDLE event, PIO_APC_ROUTINE apc, void *apc_context, IO_STATUS_BLOCK *io, ULONG code, void *in_buffer, ULONG in_size, void *out_buffer, ULONG out_size )
++{
++    wb_flush_handle( handle );
++    return real_NtFsControlFile( handle, event, apc, apc_context, io, code, in_buffer, in_size, out_buffer, out_size );
++}
++
++NTSTATUS WINAPI NtDeviceIoControlFile( HANDLE handle, HANDLE event, PIO_APC_ROUTINE apc, void *apc_context, IO_STATUS_BLOCK *io, ULONG code, void *in_buffer, ULONG in_size, void *out_buffer, ULONG out_size )
++{
++    wb_flush_handle( handle );
++    return real_NtDeviceIoControlFile( handle, event, apc, apc_context, io, code, in_buffer, in_size, out_buffer, out_size );
++}
++
++NTSTATUS WINAPI NtQueryDirectoryFile( HANDLE handle, HANDLE event, PIO_APC_ROUTINE apc_routine, void *apc_context, IO_STATUS_BLOCK *io, void *buffer, ULONG length, FILE_INFORMATION_CLASS info_class, BOOLEAN single_entry, UNICODE_STRING *mask, BOOLEAN restart_scan )
++{
++    wb_flush_all();
++    return real_NtQueryDirectoryFile( handle, event, apc_routine, apc_context, io, buffer, length, info_class, single_entry, mask, restart_scan );
++}
++
++NTSTATUS WINAPI NtCreateFile( HANDLE *handle, ACCESS_MASK access, OBJECT_ATTRIBUTES *attr, IO_STATUS_BLOCK *io, LARGE_INTEGER *alloc_size, ULONG attributes, ULONG sharing, ULONG disposition, ULONG options, void *ea_buffer, ULONG ea_length )
++{
++    wb_flush_all();
++    return real_NtCreateFile( handle, access, attr, io, alloc_size, attributes, sharing, disposition, options, ea_buffer, ea_length );
++}
++
++NTSTATUS WINAPI NtOpenFile( HANDLE *handle, ACCESS_MASK access, OBJECT_ATTRIBUTES *attr, IO_STATUS_BLOCK *io, ULONG sharing, ULONG options )
++{
++    wb_flush_all();
++    return real_NtOpenFile( handle, access, attr, io, sharing, options );
++}
++
++NTSTATUS WINAPI NtDeleteFile( OBJECT_ATTRIBUTES *attr )
++{
++    wb_flush_all();
++    return real_NtDeleteFile( attr );
++}
++
++NTSTATUS WINAPI NtQueryAttributesFile( const OBJECT_ATTRIBUTES *attr, FILE_BASIC_INFORMATION *info )
++{
++    wb_flush_all();
++    return real_NtQueryAttributesFile( attr, info );
++}
++
++NTSTATUS WINAPI NtQueryFullAttributesFile( const OBJECT_ATTRIBUTES *attr, FILE_NETWORK_OPEN_INFORMATION *info )
++{
++    wb_flush_all();
++    return real_NtQueryFullAttributesFile( attr, info );
++}
++
++#endif
+diff --git a/dlls/ntdll/unix/unix_private.h b/dlls/ntdll/unix/unix_private.h
+--- a/dlls/ntdll/unix/unix_private.h
++++ b/dlls/ntdll/unix/unix_private.h
+@@ -258,6 +258,12 @@
+ extern unsigned int server_wait_for_object( HANDLE handle, BOOL alertable, const LARGE_INTEGER *timeout );
+ extern unsigned int server_queue_process_apc( HANDLE process, const union apc_call *call,
+                                               union apc_result *result );
++#ifdef __PROSPERO__
++extern void wb_flush_all( void );                    /* file.c: merged writes */
++extern void wb_flush_handle( HANDLE handle );
++extern void wb_flush_closed_handle( HANDLE handle );
++extern void wb_note_section( HANDLE file );
++#endif
+ extern int server_get_unix_fd( HANDLE handle, unsigned int wanted_access, int *unix_fd,
+                                int *needs_close, enum server_fd_type *type, unsigned int *options );
+ extern int wine_server_receive_fd( obj_handle_t *handle );
+diff --git a/dlls/ntdll/unix/server.c b/dlls/ntdll/unix/server.c
+--- a/dlls/ntdll/unix/server.c
++++ b/dlls/ntdll/unix/server.c
+@@ -2220,6 +2220,9 @@
+     int fd = -1;
+ 
+     if (dest) *dest = 0;
++#ifdef __PROSPERO__
++    if (source_process == NtCurrentProcess()) wb_flush_closed_handle( source );
++#endif
+ 
+     if ((options & DUPLICATE_CLOSE_SOURCE) && source_process != NtCurrentProcess())
+     {
+@@ -2318,6 +2321,9 @@
+     if (HandleToLong( handle ) >= ~5 && HandleToLong( handle ) <= ~0)
+         return STATUS_SUCCESS;
+ 
++#ifdef __PROSPERO__
++    wb_flush_closed_handle( handle );
++#endif
+     /* hold fd_cache_mutex to prevent the fd from being added again between the
+      * call to remove_fd_from_cache and close_handle */
+     server_enter_uninterrupted_section( &fd_cache_mutex, &sigset );
+diff --git a/dlls/ntdll/unix/sync.c b/dlls/ntdll/unix/sync.c
+--- a/dlls/ntdll/unix/sync.c
++++ b/dlls/ntdll/unix/sync.c
+@@ -3062,6 +3062,9 @@
+                                  const LARGE_INTEGER *size, ULONG protect,
+                                  ULONG sec_flags, HANDLE file )
+ {
++#ifdef __PROSPERO__
++    if (file) wb_note_section( file );
++#endif
+     unsigned int ret;
+     unsigned int file_access;
+     data_size_t len;
+diff --git a/dlls/ntdll/unix/process.c b/dlls/ntdll/unix/process.c
+--- a/dlls/ntdll/unix/process.c
++++ b/dlls/ntdll/unix/process.c
+@@ -778,6 +778,9 @@
+                                      RTL_USER_PROCESS_PARAMETERS *params, PS_CREATE_INFO *info,
+                                      PS_ATTRIBUTE_LIST *ps_attr )
+ {
++#ifdef __PROSPERO__
++    wb_flush_all();
++#endif
+     unsigned int status;
+     BOOL success = FALSE;
+     HANDLE file_handle, process_info = 0, process_handle = 0, thread_handle = 0;
+@@ -1071,6 +1074,9 @@
+  */
+ NTSTATUS WINAPI NtTerminateProcess( HANDLE handle, LONG exit_code )
+ {
++#ifdef __PROSPERO__
++    wb_flush_all();
++#endif
+     unsigned int ret;
+     BOOL self;
+ 

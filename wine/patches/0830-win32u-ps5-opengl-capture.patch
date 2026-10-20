@@ -1,0 +1,93 @@
+From 6d0580c52553eb1cfb2fb82a16f7b4537790491e Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Fri, 2 Oct 2026 20:51:32 -0400
+Subject: [PATCH] win32u: capture PS5 OpenGL presentation on request
+
+Preserve read framebuffer and pixel packing state around the opt-in PPM readback. Count successful swaps so console runs distinguish startup from presentation.
+---
+ dlls/win32u/opengl.c | 67 +++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 66 insertions(+), 1 deletion(-)
+
+diff --git a/dlls/win32u/opengl.c b/dlls/win32u/opengl.c
+index 3aafd2c..3fc0893 100644
+--- a/dlls/win32u/opengl.c
++++ b/dlls/win32u/opengl.c
+@@ -802,9 +802,74 @@ static void ps5_screen_flush( struct opengl_drawable *drawable, UINT flags )
+ {
+ }
+ 
++static void ps5_capture_frame( struct opengl_drawable *drawable )
++{
++    const struct opengl_funcs *f = &display_funcs;
++    const char *path = getenv( "WINE_PS5_CAPTURE" );
++    char request[1024];
++    GLint framebuffer, buffer, pack_buffer, alignment, row_length, skip_rows, skip_pixels;
++    EGLint width, height;
++    unsigned char *pixels;
++    FILE *file;
++    int ok = 1;
++
++    if (!path || snprintf( request, sizeof(request), "%s.request", path ) >= sizeof(request) ||
++        access( request, F_OK )) return;
++    unlink( request );
++    if (!f->p_eglQuerySurface( display_egl.display, drawable->surface, EGL_WIDTH, &width ) ||
++        !f->p_eglQuerySurface( display_egl.display, drawable->surface, EGL_HEIGHT, &height ) ||
++        width <= 0 || height <= 0 || width > 4096 || height > 2160) return;
++    if (!(pixels = malloc( (size_t)width * height * 3 ))) return;
++    f->p_glGetIntegerv( GL_READ_FRAMEBUFFER_BINDING, &framebuffer );
++    f->p_glGetIntegerv( GL_PIXEL_PACK_BUFFER_BINDING, &pack_buffer );
++    f->p_glGetIntegerv( GL_PACK_ALIGNMENT, &alignment );
++    f->p_glGetIntegerv( GL_PACK_ROW_LENGTH, &row_length );
++    f->p_glGetIntegerv( GL_PACK_SKIP_ROWS, &skip_rows );
++    f->p_glGetIntegerv( GL_PACK_SKIP_PIXELS, &skip_pixels );
++    f->p_glBindFramebuffer( GL_READ_FRAMEBUFFER, 0 );
++    f->p_glGetIntegerv( GL_READ_BUFFER, &buffer );
++    f->p_glReadBuffer( GL_BACK );
++    f->p_glBindBuffer( GL_PIXEL_PACK_BUFFER, 0 );
++    f->p_glPixelStorei( GL_PACK_ALIGNMENT, 1 );
++    f->p_glPixelStorei( GL_PACK_ROW_LENGTH, 0 );
++    f->p_glPixelStorei( GL_PACK_SKIP_ROWS, 0 );
++    f->p_glPixelStorei( GL_PACK_SKIP_PIXELS, 0 );
++    f->p_glReadPixels( 0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, pixels );
++    f->p_glReadBuffer( buffer );
++    f->p_glBindFramebuffer( GL_READ_FRAMEBUFFER, framebuffer );
++    f->p_glBindBuffer( GL_PIXEL_PACK_BUFFER, pack_buffer );
++    f->p_glPixelStorei( GL_PACK_ALIGNMENT, alignment );
++    f->p_glPixelStorei( GL_PACK_ROW_LENGTH, row_length );
++    f->p_glPixelStorei( GL_PACK_SKIP_ROWS, skip_rows );
++    f->p_glPixelStorei( GL_PACK_SKIP_PIXELS, skip_pixels );
++    if ((file = fopen( path, "wb" )))
++    {
++        ok = fprintf( file, "P6\n%d %d\n255\n", width, height ) > 0;
++        for (int y = height - 1; y >= 0 && ok; y--)
++            ok = fwrite( pixels + (size_t)y * width * 3, 3, width, file ) == width;
++        if (fclose( file )) ok = 0;
++        fprintf( stderr, "wine-ps5: OpenGL capture %s %dx%d\n", ok ? "saved" : "failed", width, height );
++    }
++    free( pixels );
++}
++
+ static BOOL ps5_screen_swap( struct opengl_drawable *drawable )
+ {
+-    return display_funcs.p_eglSwapBuffers( display_egl.display, drawable->surface );
++    static unsigned int frames, start;
++    unsigned int now = NtGetTickCount();
++    BOOL result;
++
++    if (!start) start = now;
++    ps5_capture_frame( drawable );
++    result = display_funcs.p_eglSwapBuffers( display_egl.display, drawable->surface );
++    if (result) frames++;
++    if (now - start >= 5000)
++    {
++        fprintf( stderr, "wine-ps5: OpenGL presented %u frames in %u ms\n", frames, now - start );
++        frames = 0;
++        start = now;
++    }
++    return result;
+ }
+ 
+ static const struct opengl_drawable_funcs ps5_screen_funcs =
+-- 
+2.55.0
+

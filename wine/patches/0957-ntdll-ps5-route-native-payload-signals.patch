@@ -1,0 +1,68 @@
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Subject: [PATCH] ntdll: PS5: keep native payload signals out of WoW64 handlers
+
+SDK service threads have no Wine TEB. Preserve their prior signal action instead
+of dereferencing GS:0x30 and masking a native fault with a second SIGSEGV.
+Wine threads retain the raw entry that restores their host FS before TLS use.
+---
+--- a/dlls/ntdll/unix/signal_x86_64.c
++++ b/dlls/ntdll/unix/signal_x86_64.c
+@@ -3466,10 +3466,56 @@
+     return 0;
+ }
+ 
++/* A payload also has SDK service threads with no Wine TEB (GS base zero).
++ * Process-wide Wine handlers must preserve their native handlers. In particular,
++ * init_handler's GS:0x30 read used to replace their original fault with a second
++ * SIGSEGV at address 0x30, hiding the useful kernel crash context. */
++static struct sigaction pw_wine_actions[NSIG], pw_native_actions[NSIG];
++
++static void pw_signal_dispatch( int sig, siginfo_t *info, void *context )
++{
++    void *gs_base = NULL;
++    const struct sigaction *native = &pw_native_actions[sig];
++
++    if (!sysarch( AMD64_GET_GSBASE, &gs_base ) && gs_base)
++    {
++        /* Do not read FS or use host TLS here: WoW64's init_handler restores it. */
++        pw_wine_actions[sig].sa_sigaction( sig, info, context );
++        return;
++    }
++    if (native->sa_handler == SIG_IGN) return;
++    if (native->sa_handler == SIG_DFL)
++    {
++        pw_raw_sigaction( sig, native, NULL );
++        /* A synchronous fault repeats at its original instruction after return,
++         * so the kernel records that context instead of a fault in our handler. */
++        if (info && info->si_code < SI_USER &&
++            (sig == SIGSEGV || sig == SIGBUS || sig == SIGILL || sig == SIGFPE || sig == SIGTRAP)) return;
++        raise( sig );
++        return;
++    }
++    if (native->sa_flags & SA_RESETHAND)
++    {
++        struct sigaction reset = *native;
++        reset.sa_handler = SIG_DFL;
++        pw_raw_sigaction( sig, &reset, NULL );
++    }
++    if (native->sa_flags & SA_SIGINFO) native->sa_sigaction( sig, info, context );
++    else native->sa_handler( sig );
++}
++
+ static int pw_sigaction( int sig, const struct sigaction *act, struct sigaction *old )
+ {
+-    if (pw_raw_sigaction && get_wow_teb( NtCurrentTeb() )) return pw_raw_sigaction( sig, act, old );
+-    return sigaction( sig, act, old );
++    struct sigaction routed;
++    int status;
++
++    if (!pw_raw_sigaction) return sigaction( sig, act, old );
++    pw_wine_actions[sig] = *act;
++    routed = *act;
++    routed.sa_sigaction = pw_signal_dispatch;
++    status = pw_raw_sigaction( sig, &routed, &pw_native_actions[sig] );
++    if (!status && old) *old = pw_native_actions[sig];
++    return status;
+ }
+ #else
+ # define pw_sigaction sigaction

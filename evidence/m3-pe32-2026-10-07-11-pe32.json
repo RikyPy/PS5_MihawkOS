@@ -1,0 +1,30 @@
+{
+ "run": "m3-pe32-2026-10-07-11-pe32",
+ "what": "pe32-probe.exe",
+ "env": [
+  "PROTON_LAYOUT=launcher"
+ ],
+ "result": "finished",
+ "seconds": 7.3,
+ "probe_verdict": null,
+ "clean_owner_restart": true,
+ "launcher_end_status": 0,
+ "initial_status": 0,
+ "closed_on_request": false,
+ "child_logs": [
+  "klog/m3-pe32-2026-10-07-11-pe32-wine-child-1801.log",
+  "klog/m3-pe32-2026-10-07-11-pe32-wine-child-1802.log",
+  "klog/m3-pe32-2026-10-07-11-pe32-wine-child-1803.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": false,
+ "bench": {},
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [],
+  "top": []
+ }
+}

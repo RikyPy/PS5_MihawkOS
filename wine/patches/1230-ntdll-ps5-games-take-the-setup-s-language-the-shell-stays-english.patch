@@ -1,0 +1,37 @@
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Subject: [PATCH] ntdll: PS5: games take the language MihawkOS's setup chose; the shell stays English
+
+The guided setup's language sets the mihawk prefix's Windows locale (docs/GUIDED_SETUP.md): the title pins it in the
+prefix when the prefix is made and passes it to every session as WINE_PS5_LOCALE, which helpers inherit
+(wine/ps5/pw_wine_inherit.h). Wine reads a process's locale from LC_CTYPE and LC_MESSAGES, which the title cannot give
+Explorer and its games apart: a helper's Unix environment is its spawner's. So the language is applied here, in every
+process but the session's Explorer, the one the title started with MIHAWK_SESSION=1 in its application environment
+(patch 0996), which no program it starts inherits (patch 0998). Games then see the language as their system locale,
+user locale and UI language, and Wine's default keyboard layout follows the user locale; the Mihawk OS shell keeps
+English. Typed characters still follow the PS5 driver's US key map.
+---
+diff --git a/dlls/ntdll/unix/env.c b/dlls/ntdll/unix/env.c
+--- a/dlls/ntdll/unix/env.c
++++ b/dlls/ntdll/unix/env.c
+@@ -741,6 +741,21 @@
+         FIXME_(nls)( "Failed to set LC_CTYPE to %s, is the locale supported?\n", debugstr_a(ctype) );
+     if (!(messages = setlocale( LC_MESSAGES, "" )) && (messages = getenv( "LC_MESSAGES" )))
+         FIXME_(nls)( "Failed to set LC_MESSAGES to %s, is the locale supported?\n", debugstr_a(messages) );
++#ifdef __PROSPERO__
++    /* The language MihawkOS's setup chose for this prefix (the title's WINE_PS5_LOCALE, which every helper inherits):
++     * Windows programs take it as their system and user locale, and so their UI language and keyboard layout. The
++     * Mihawk OS shell stays English: its Explorer is the process the title started with MIHAWK_SESSION=1 in its
++     * application environment (patches 0996, 0998), which the programs it starts do not inherit. */
++    {
++        extern const char *pw_ps5_initial_environment(void);
++        const char *language = getenv( "WINE_PS5_LOCALE" ), *item;
++        BOOL shell = FALSE;
++
++        for (item = pw_ps5_initial_environment(); item && *item; item += strlen( item ) + 1)
++            if (!strcmp( item, "MIHAWK_SESSION=1" )) shell = TRUE;
++        if (language && *language && !shell) ctype = messages = language;
++    }
++#endif
+ 
+     if (!unix_to_win_locale( ctype, system_locale )) system_locale[0] = 0;
+     TRACE_(nls)( "Unix LC_CTYPE is %s, setting system locale to %s\n", debugstr_a(ctype), debugstr_a(user_locale) );

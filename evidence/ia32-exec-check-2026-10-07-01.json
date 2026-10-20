@@ -1,0 +1,96 @@
+{
+ "run": "ia32-exec-check-2026-10-07-01",
+ "where": "host PC (no console run)",
+ "what": "src/pw_ia32_interp.c against this PC's CPU in 32-bit mode (tools/ia32-exec-check.sh): every form, 400 random encodings each, from random registers, flags and window bytes, run natively single-stepped and through the interpreter, compared on event, EIP, registers, EFLAGS (outside the table's undefined bits) and the whole 64 KiB window",
+ "exec_oracle": {
+  "forms": 943,
+  "forms_compared": 374,
+  "forms_with_mismatches": 0,
+  "cases": 375962,
+  "compared": 148144,
+  "unsupported": 227607,
+  "skipped": 211,
+  "EVENT": 0,
+  "EIP": 0,
+  "REGS": 0,
+  "FLAGS": 0,
+  "MEMORY": 0
+ },
+ "decoder_cpu_oracle": {
+  "encodings": 2576220,
+  "lost_to_dead_workers": 0,
+  "LENGTH": {
+   "encodings": 0,
+   "groups": 0
+  },
+  "CPU_EXECUTES": {
+   "encodings": 0,
+   "groups": 0
+  },
+  "CPU_UD": {
+   "encodings": 0,
+   "groups": 0
+  },
+  "LOCK_UD": {
+   "encodings": 0,
+   "groups": 0
+  },
+  "LOCK_RUNS": {
+   "encodings": 0,
+   "groups": 0
+  },
+  "NOFORM_RUNS": {
+   "encodings": 1586,
+   "groups": 107
+  },
+  "HANG": {
+   "encodings": 0,
+   "groups": 0
+  }
+ },
+ "decoder_llvm_oracle": {
+  "verdict": "PASS",
+  "encodings": 12486072,
+  "agree_text": 2497796,
+  "agree_invalid": 8372826,
+  "vex_evex_xop_length_agree": 976132,
+  "groups": 11196,
+  "unexplained_groups": 0,
+  "LENGTH": {
+   "encodings": 3016,
+   "unexplained_groups": 0
+  },
+  "TEXT": {
+   "encodings": 53430,
+   "unexplained_groups": 0
+  },
+  "OURS_ONLY": {
+   "encodings": 85726,
+   "unexplained_groups": 0
+  },
+  "LLVM_ONLY": {
+   "encodings": 1308,
+   "unexplained_groups": 0
+  },
+  "NOFORM": {
+   "encodings": 495838,
+   "unexplained_groups": 0
+  },
+  "forms": 943,
+  "llvm": "23.1.1"
+ },
+ "host_tests": "26 passed (tests/test_pw_ia32_interp.c new: whole programs, precise faults, REP progress at a fault, #DE, LOCK #UD, unsupported leaves the state untouched)",
+ "interpreter_slice": "the general-purpose integer instructions: ALU, moves, shifts and rotates, multiply/divide, bit operations, BCD, flags, stack, near control transfer, strings with REP, INT3/INT1/INTO/INT n, privileged instructions as #GP",
+ "not_yet": [
+  "x87, MMX, SSE (the 'unsupported' count: forms the interpreter returns PW_ERR_UNSUPPORTED for)",
+  "segment register loads, far transfers, CPUID/RDTSC/XGETBV (environment-dependent)",
+  "LOCKed instructions are not yet atomic across threads",
+  "AMD-specific behaviour: this PC's CPU is Intel"
+ ],
+ "harness_lessons": [
+  "the trampoline once pushed EFLAGS onto the guest stack: every CPU run wrote 4 bytes the interpreter did not",
+  "a PUSHF under single-step pushes TF",
+  "a SIGALRM landing inside the SIGTRAP handler corrupted it: now blocked there",
+  "random register values could point into this process's own memory: they now come from a reserved PROT_NONE range"
+ ]
+}

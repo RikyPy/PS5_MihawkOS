@@ -1,0 +1,46 @@
+{
+  "launch_readiness": {
+    "ready": true,
+    "seconds": 0.577,
+    "settle_seconds": 0.0,
+    "census_seconds": 0.563,
+    "previous_cleanup_verified": false
+  },
+  "title": "PPSA99170",
+  "identity": "f434a57bd61d48a6973a2f56d6a80400",
+  "frames_requested": 1500,
+  "eboot_sha256": "406153221f024044ed2263a4a246e25847c11ec2dbaa3c966db351b47a20e2f1",
+  "fresh_identity_seen": true,
+  "shell_idle_after_run": true,
+  "title_finished_successfully": true,
+  "picture_and_log_check_passed": true,
+  "post_launch_fault_records": 0,
+  "post_launch_driver_errors": 0,
+  "elevation": [
+    "ok (filesystem access)"
+  ],
+  "sample": [
+    "starts",
+    "ok, 1500 frames in 25.59 s, 59.9 fps after the first half"
+  ],
+  "library": [
+    "5 game(s); searched: /data/ps5proton/games (4 entries); /data/homebrew/PPSA99170/games (not there)",
+    "library shows 1 of 5 (Mihawk OS only; /data/ps5proton/library-show-all shows them all)"
+  ],
+  "startup_seconds": {
+    "exec": 0.0,
+    "starts": 0.58,
+    "elevation": 0.58,
+    "library": 0.64,
+    "ui": 0.84
+  },
+  "probe": null,
+  "probe_passed": null,
+  "probe_records": [],
+  "controls_preview": null,
+  "passed": true,
+  "capture": "klog/setup-tour-2026-10-18-01",
+  "forced_close": false,
+  "storage_errors": 0,
+  "setup_note": "This run's tools/run-launcher.py put its --setup verdict block in the script-building code, so 'passed' here did not check the tour. Read from its klog afterwards: steps [0, 1, 2, 3, 4, 5], ja-JP chosen, the fake install done; the sky cost 1.752, 1.756, 1.753 ms a frame at 3840x2160 (the per-pixel hashing that run 02's shader removed). Run 02 is the verdict."
+}

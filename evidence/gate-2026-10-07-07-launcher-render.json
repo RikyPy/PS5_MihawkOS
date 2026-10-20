@@ -1,0 +1,40 @@
+{
+ "run": "gate-2026-10-07-07-launcher-render",
+ "what": "process-probe.exe",
+ "env": [
+  "PROTON_LAYOUT=launcher"
+ ],
+ "result": "finished",
+ "seconds": 10.2,
+ "probe_verdict": "FAIL",
+ "clean_owner_restart": false,
+ "launcher_end_status": 0,
+ "initial_status": 1,
+ "closed_on_request": false,
+ "child_logs": [
+  "klog/gate-2026-10-07-07-launcher-render-wine-child-237.log",
+  "klog/gate-2026-10-07-07-launcher-render-wine-child-238.log",
+  "klog/gate-2026-10-07-07-launcher-render-wine-child-239.log",
+  "klog/gate-2026-10-07-07-launcher-render-wine-child-240.log",
+  "klog/gate-2026-10-07-07-launcher-render-wine-child-241.log",
+  "klog/gate-2026-10-07-07-launcher-render-wine-child-242.log",
+  "klog/gate-2026-10-07-07-launcher-render-wine-child-243.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": false,
+ "bench": {
+  "frames": 8.0,
+  "draws": 1.0,
+  "vsync": 1.0,
+  "total_ms": 132.0,
+  "frame_us": 16523.0
+ },
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [],
+  "top": []
+ }
+}

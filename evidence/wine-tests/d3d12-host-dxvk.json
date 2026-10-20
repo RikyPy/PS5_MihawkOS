@@ -1,0 +1,86 @@
+{
+ "d3d12": {
+  "exit_code": 0,
+  "failure_count": 13,
+  "failures": [
+   {
+    "file": "d3d12-d3d12.c",
+    "line": 912,
+    "text": "Got unexpected hr 0x887a0002."
+   },
+   {
+    "file": "crash.c",
+    "line": 1576,
+    "text": "test_create_device() crashed with 0xc0000005 at offset 0x681e"
+   },
+   {
+    "file": "d3d12-d3d12.c",
+    "line": 1009,
+    "text": "ID3D12Device has 2 references left."
+   },
+   {
+    "file": "d3d12-d3d12.c",
+    "line": 1127,
+    "text": "ID3D12Device has 2 references left."
+   },
+   {
+    "file": "d3d12-d3d12.c",
+    "line": 1197,
+    "text": "ID3D12Device has 2 references left."
+   },
+   {
+    "file": "d3d12-d3d12.c",
+    "line": 1318,
+    "text": "ID3D12Device has 2 references left."
+   },
+   {
+    "file": "d3d12-d3d12.c",
+    "line": 1412,
+    "text": "ID3D12Device has 2 references left."
+   },
+   {
+    "file": "d3d12-d3d12.c",
+    "line": 1454,
+    "text": "Got unexpected hr 0."
+   },
+   {
+    "file": "d3d12-d3d12.c",
+    "line": 1459,
+    "text": "Got unexpected hr 0x8007000e."
+   },
+   {
+    "file": "d3d12-d3d12.c",
+    "line": 1463,
+    "text": "ID3D12Device has 3 references left."
+   },
+   {
+    "file": "d3d12-d3d12.c",
+    "line": 1525,
+    "text": "Got unexpected hr 0."
+   },
+   {
+    "file": "d3d12-d3d12.c",
+    "line": 1525,
+    "text": "Got unexpected hr 0."
+   },
+   {
+    "file": "d3d12-d3d12.c",
+    "line": 1545,
+    "text": "Device has 3 references left."
+   }
+  ],
+  "guarded": 10,
+  "last_line": "winetest-batch: done",
+  "seconds": 36.3,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 13,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 664,
+   "todo": 9
+  },
+  "todo_lines": 9
+ }
+}

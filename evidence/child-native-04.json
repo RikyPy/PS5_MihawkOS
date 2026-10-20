@@ -1,0 +1,51 @@
+{
+  "title": "PPSA99170",
+  "identity": "70a799f2aeca43bd997a2d46ff5a766e",
+  "build": {
+    "revision": "31a46b89b6a8db4eb16fe8b0fada56afad0c4dc6",
+    "sdk_revision": "611893fc25ef3e138f5bc2c90d829d8b58174cd2",
+    "source_sha256": {
+      "native/proton_child_probe.h": "a3a0c1324b7fa4c2482ea22e7a206df63a385d2467bc5abe1ba041166faf668e",
+      "native/proton_child_probe.cpp": "a58ce33bfaf2337f52613f93538279f6963618fdd4bdc2ecf3e0e228b3083b90",
+      "ps5/src/main.cpp": "0dcea5cd6aed4575c7609fa658e44d2d729dc1bc9f6d9cb3ca161658e257375e",
+      "ps5/CMakeLists.txt": "c6e22feae5b334d2a8396bc06bc635a49306393b5d3a3e5a09a9482b3a982597"
+    },
+    "radv_recipe_sha256": "bcb92ff14ae32fbee7991399a7b79c065c78bda3162c76d41c49d170a46b4022",
+    "identity": "4a1b530a861b569c07e27fb583d0a282a128e6002ab073e1f4bf57c38ab8f416",
+    "eboot_sha256": "c8310dee50456e7601b7caf1cdea4c2e9547ee3e0af20c9720f2d962fc0c9fc3"
+  },
+  "capture": "klog/child-native-04",
+  "passed": false,
+  "status": "terminated_during_probe",
+  "production_sha256": "8f63bbc57bd9203520653d9e3eb765798a434b737ac6c1f79b106437542761c3",
+  "production_restored": true,
+  "root_reference_balance_verified": false,
+  "forced_title_close": false,
+  "error": "ps5vkctl: <address>:9111 did not answer (timed out); load build/ps5vkctl/ps5vkctl.elf on the console first",
+  "console_kernel_panic_reported_by_user": true,
+  "probe_result": "kernel panic at or after the native spawn boundary; no return recorded",
+  "native_spawn_call_reached_confirmed": false,
+  "child_creation_proved": false,
+  "restoration_pending": false,
+  "diagnosis": "Recovered identity-bound trace confirms elevation, a nonzero rfork_thread import matching libkernel handle 0x2001, successful mappings/socketpair, and a durable pre-spawn marker. No spawn return, child acknowledgement or panic backtrace was captured. The exact kernel failure remains unknown.",
+  "recovered_fresh_identity_seen": true,
+  "observations": [
+    "child-probe identity=70a799f2aeca43bd997a2d46ff5a766e revision=1 parent=932 elevated=1 uid=0 euid=0",
+    "firmware status=0 version=12090001",
+    "binding source=title_import name=rfork_thread present=1",
+    "lookup module=0x1 name=rfork_thread status=-2147352573 present=0 same_import=0",
+    "lookup module=0x2001 name=rfork_thread status=0 present=1 same_import=1",
+    "setup stack=1 memory=1 socketpair=0 errno=9",
+    "spawn flags=0x14 sigsys_ignore=0"
+  ],
+  "recovery_time_unix": 1791145972.3088658,
+  "recovery_capture": "klog/child-native-04/recovery",
+  "recovery_launched_title": false,
+  "last_durable_probe_stage": "before_rfork_thread",
+  "native_import_present": true,
+  "native_import_lookup_handle": "0x2001",
+  "stack_memory_socket_setup_succeeded": true,
+  "spawn_flags": "RFPROC | RFFDG (0x14)",
+  "spawn_return_recorded": false,
+  "restored_launcher_validation": "evidence/child-recovery-library-01.json"
+}

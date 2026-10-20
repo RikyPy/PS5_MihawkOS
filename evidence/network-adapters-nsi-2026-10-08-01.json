@@ -1,0 +1,93 @@
+{
+ "run": "network-adapters-nsi-2026-10-08-01",
+ "what": "Z:\\data\\ps5proton\\network-adapters-review.exe",
+ "env": [
+  "PROTON_LAYOUT=launcher",
+  "WINE_PS5_SERVICES=1",
+  "WINEDEBUG=+debugstr,+service,+nsi"
+ ],
+ "result": "finished",
+ "seconds": 8.6,
+ "probe_verdict": "FAIL",
+ "clean_owner_restart": false,
+ "launcher_end_status": 0,
+ "initial_status": 1,
+ "closed_on_request": false,
+ "child_logs": [
+  "klog/network-adapters-nsi-2026-10-08-01-wine-child-1366.log",
+  "klog/network-adapters-nsi-2026-10-08-01-wine-child-1367.log",
+  "klog/network-adapters-nsi-2026-10-08-01-wine-child-1368.log",
+  "klog/network-adapters-nsi-2026-10-08-01-wine-child-1369.log",
+  "klog/network-adapters-nsi-2026-10-08-01-wine-child-1370.log",
+  "klog/network-adapters-nsi-2026-10-08-01-wine-child-1371.log",
+  "klog/network-adapters-nsi-2026-10-08-01-wine-child-1372.log",
+  "klog/network-adapters-nsi-2026-10-08-01-wine-child-1373.log",
+  "klog/network-adapters-nsi-2026-10-08-01-wine-child-1374.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": false,
+ "bench": {},
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [],
+  "top": []
+ },
+ "shown": {
+  "frames": 0,
+  "per_10s": [],
+  "longest_gap_ms": 0
+ },
+ "broker": {
+  "local_offer": 8589934592,
+  "host_limit": 1073741824,
+  "refused": [],
+  "refused_count": 0,
+  "clients": [
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   }
+  ],
+  "host_peak": 0,
+  "local_peak": 0
+ }
+}

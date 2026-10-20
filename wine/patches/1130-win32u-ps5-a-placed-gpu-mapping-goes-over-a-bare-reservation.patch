@@ -1,0 +1,93 @@
+From: PS5_Proton <local>
+Subject: [PATCH] win32u: PS5: a placed GPU mapping goes over a bare reservation, not over Wine's memory
+
+A 32-bit program's GPU memory is mapped again where win32u places it (VK_EXT_map_memory_placed, patch 0951): win32u
+commits a range with NtAllocateVirtualMemory, and the GPU client maps its wired memory over it with a fixed mapping.
+That mapping replaced a run of the direct-memory engine: the run's direct memory stayed allocated with no mapping, and the
+engine went on taking the range for its own, so a VirtualProtect, a release out of order or a lay would have torn down
+wired GPU memory, which hung the console ("unwire timeout at 0xc80000000").
+
+Before the placed map the range goes back to a bare reservation and its direct memory is released
+(__wine_ps5_dmem_file_region, refused when a mapping that is not Wine's is there already), and the engine forgets it
+(__wine_ps5_dmem_file_released). The client's mapping then lies over a reservation, and the engine reads it as foreign: a
+commit or protection change there is refused, a release goes around it. The GPU client maps only over a bare
+reservation (graphics patch 0013). The range is also lent (__wine_ps5_dmem_lend) until Wine releases it, and a lent
+range is foreign by record: the owner's shared memory reads as the reservation under it, so the kernel alone does not
+show it (graphics patch 0014 had refused to place shared memory, and host-dmem-fallback64 failed,
+v2-backend-gate-2026-10-15).
+
+ntdll makes both calls (__wine_ps5_placed_range_bare) under the virtual mutex with its signals blocked, as every other
+engine call is made: win32u's unix call holds neither, and a thread suspended (NtSuspendThread, SIGUSR1; a Mono
+stop-the-world) while it held the engine's spinlock would leave every other thread that reaches the engine spinning
+with the mutex held.
+
+Host: tests/test_placed_unmap_order.py holds the order in this tree; tests/test_crash_replays.c runs the sequence with the
+real engine, the real GPU client and this export (Wine's signals blocked while the engine releases the range) against
+tests/fake_ps5_kernel.c. Console: not run.
+---
+diff --git a/dlls/ntdll/unix/virtual.c b/dlls/ntdll/unix/virtual.c
+index 5aa9474..f954403 100644
+--- a/dlls/ntdll/unix/virtual.c
++++ b/dlls/ntdll/unix/virtual.c
+@@ -6122,6 +6122,30 @@ BOOL virtual_ps5_step_done(void)
+     mutex_unlock( &virtual_mutex );
+     return TRUE;
+ }
++
++/***********************************************************************
++ *           __wine_ps5_placed_range_bare
++ *
++ * win32u's placed GPU range (patch 1130) back to a bare reservation the engine forgets, lent to the GPU client's
++ * mapping until Wine releases it (foreign by record: the owner's shared memory reads as the reservation). Under the
++ * virtual mutex with Wine's signals blocked, as every other engine call: a thread suspended (SIGUSR1) while it holds
++ * the engine's spinlock would leave every thread that reaches the engine under the mutex spinning for good. 0, or -1.
++ */
++DECLSPEC_EXPORT int __wine_ps5_placed_range_bare( void *address, size_t bytes )
++{
++    extern int __wine_ps5_dmem_file_region( void *address, size_t bytes );
++    extern int __wine_ps5_dmem_file_released( void *address, size_t bytes );
++    extern int __wine_ps5_dmem_lend( void *address, size_t bytes );
++    sigset_t sigset;
++    int status;
++
++    server_enter_uninterrupted_section( &virtual_mutex, &sigset );
++    if (!(status = __wine_ps5_dmem_file_region( address, bytes )) &&
++        !(status = __wine_ps5_dmem_file_released( address, bytes )))
++        status = __wine_ps5_dmem_lend( address, bytes );
++    server_leave_uninterrupted_section( &virtual_mutex, &sigset );
++    return status;
++}
+ #endif
+ 
+ 
+diff --git a/dlls/win32u/vulkan.c b/dlls/win32u/vulkan.c
+index 2984b45..6d2521b 100644
+--- a/dlls/win32u/vulkan.c
++++ b/dlls/win32u/vulkan.c
+@@ -1879,6 +1879,26 @@ static VkResult win32u_vkMapMemory2KHR( VkDevice client_device, const VkMemoryMa
+             ERR( "NtAllocateVirtualMemory failed\n" );
+             return VK_ERROR_OUT_OF_HOST_MEMORY;
+         }
++#ifdef __PROSPERO__
++        {
++            /* The GPU client maps its wired memory here with a fixed mapping. The range goes back to a bare
++             * reservation first, its direct memory released (the engine adopts and forgets it), so that mapping lies
++             * over a reservation, never over a run of the engine's, and the engine reads it as a mapping that is not
++             * Wine's: never mapped over, protected or unmapped, whatever order the program frees it in (a teardown of
++             * wired GPU memory hung the console, "unwire timeout"). Refused when such a mapping is there already. The
++             * range stays lent to it until Wine releases it: shared memory reads as the reservation. ntdll does it
++             * under the virtual mutex: this unix call holds none and could be suspended inside the engine. */
++            extern int __wine_ps5_placed_range_bare( void *address, size_t bytes );
++
++            if (__wine_ps5_placed_range_bare( placed_info.pPlacedAddress, alloc_size ))
++            {
++                ERR( "placed range %p not made bare\n", placed_info.pPlacedAddress );
++                alloc_size = 0;
++                NtFreeVirtualMemory( GetCurrentProcess(), &placed_info.pPlacedAddress, &alloc_size, MEM_RELEASE );
++                return VK_ERROR_OUT_OF_HOST_MEMORY;
++            }
++        }
++#endif
+     }
+ 
+     if (device->p_vkMapMemory2KHR)

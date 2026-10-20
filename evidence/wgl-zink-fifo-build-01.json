@@ -1,0 +1,33 @@
+{
+  "run": "wgl-zink-fifo-build-01",
+  "passed": true,
+  "scope": "build-only; revised FIFO driver not console-validated",
+  "mesa": {
+    "mesa_version": "26.2.0",
+    "mesa_sha256": "efd4bb08cdb7c365a812cd4e6c9202ab55b2f22cdcd13c7d6c4f9647b799a4ef",
+    "llvm_mingw": "20260922-ucrt",
+    "build_script": "d373c4f25816aca16a8e370da85ef685744073890f8e46a34ebe9855947aaaf4",
+    "architecture": "x86_64",
+    "driver": "zink",
+    "files": {
+      "libgallium_wgl.dll": "8bc479e2539e6305c24782c7b1a5938b4503701249a46904d7612365014f5fcb",
+      "opengl32.dll": "1fda34a76526efdfb34500d14ba2de9a7465e9b9ec1e76aa4878a5aceb54b479"
+    },
+    "console_validated": false,
+    "patches": {
+      "mesa-zink-windows-present-mode.patch": "65b3df0ff4696b8737fcdaec07c165e69346abf81fe049a4fbb75c13352f24ca"
+    }
+  },
+  "idempotent_rebuild_passed": true,
+  "broker_wsi_diagnostic": {
+    "patch_sha256": "6dae52dcaca3e10f6b923122a21e41ba3094b7afdc392eda5353e40242892007",
+    "build_passed": true,
+    "console_deployed": false
+  },
+  "memory_adapter": {
+    "source_sha256": "71439e7313e157a974be68e35e2f2b07758e43e0431a94ece0753bead315c75e",
+    "production_build_passed": true,
+    "console_offscreen_vertex_passed": true,
+    "console_general_memory_probe_run": false
+  }
+}

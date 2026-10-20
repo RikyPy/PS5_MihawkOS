@@ -1,0 +1,136 @@
+{
+ "telemetry_hold": null,
+ "launch_readiness": {
+  "ready": true,
+  "seconds": 0.147,
+  "settle_seconds": 0.0,
+  "census_seconds": 0.133,
+  "previous_cleanup_verified": false
+ },
+ "native_close_failures": [],
+ "run": "hs-perms-2026-10-12-13",
+ "what": "profile mihawk-os program Z:\\data\\ps5proton\\prefixes\\probe\\drive_c\\agent-permissions64-probe.exe",
+ "env": [],
+ "result": "finished",
+ "seconds": 16.9,
+ "probe_verdict": null,
+ "clean_owner_restart": true,
+ "launcher_end_status": 0,
+ "initial_status": 0,
+ "closed_on_request": false,
+ "child_logs": [
+  "klog/hs-perms-2026-10-12-13-wine-child-8712.log",
+  "klog/hs-perms-2026-10-12-13-wine-child-8713.log",
+  "klog/hs-perms-2026-10-12-13-wine-child-8714.log",
+  "klog/hs-perms-2026-10-12-13-wine-child-8715.log",
+  "klog/hs-perms-2026-10-12-13-wine-child-8716.log",
+  "klog/hs-perms-2026-10-12-13-wine-child-8717.log",
+  "klog/hs-perms-2026-10-12-13-wine-child-8718.log",
+  "klog/hs-perms-2026-10-12-13-wine-child-8719.log",
+  "klog/hs-perms-2026-10-12-13-wine-child-8720.log",
+  "klog/hs-perms-2026-10-12-13-wine-child-8721.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": false,
+ "bench": {},
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   }
+  ],
+  "top": []
+ },
+ "shown": {
+  "frames": 1,
+  "per_10s": [
+   1
+  ],
+  "longest_gap_ms": 0
+ },
+ "broker": {
+  "local_offer": 8589934592,
+  "host_limit": 1073741824,
+  "windows": {
+   "presents": 13,
+   "effect_bytes": 0,
+   "mica_builds": 0,
+   "thumbnail_builds": 0,
+   "compositions": 13,
+   "compose_avg_us": 188,
+   "compose_max_us": 271
+  },
+  "refused": [],
+  "refused_count": 0,
+  "clients": [
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   }
+  ],
+  "wedged": false,
+  "failure_reasons": [],
+  "host_peak": 0,
+  "local_peak": 0
+ },
+ "pacing": null,
+ "captures": [],
+ "cleanup_verified": false,
+ "hooks_removed": true
+}

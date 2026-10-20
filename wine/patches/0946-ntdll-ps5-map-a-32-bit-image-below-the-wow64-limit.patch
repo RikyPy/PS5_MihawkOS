@@ -1,0 +1,45 @@
+From 0974ae15f5c8e3f8d920984730a0c4afe2854057 Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Wed, 7 Oct 2026 17:05:45 -0400
+Subject: [PATCH] ntdll: PS5: map a 32-bit image below the WoW64 limit.
+
+The main image is mapped before init_peb sets user_space_wow_limit, so
+map_image_view tries no range below it and maps "any suitable address".
+Upstream's free-area search starts low and finds one below 2 GiB; the
+console's map_view prefers its reserved area above 4 GiB, and a 32-bit
+program was mapped at 0x1000000000: its 32-bit PEB then said
+ImageBaseAddress 0 (the low half), and 32-bit ntdll faulted in
+set_wow64_environment, reading the image's NT header at address 4
+(PS5_Proton m3-pe32-2026-10-07-06 and -08).
+
+A 32-bit image is now held below the WoW64 limit, the image's own
+large-address-aware flag deciding it before init_peb has.
+---
+ dlls/ntdll/unix/virtual.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/dlls/ntdll/unix/virtual.c b/dlls/ntdll/unix/virtual.c
+index 1b495ef..b768b45 100644
+--- a/dlls/ntdll/unix/virtual.c
++++ b/dlls/ntdll/unix/virtual.c
+@@ -4029,6 +4029,17 @@ static NTSTATUS map_image_view( struct file_view **view_ret, struct pe_image_inf
+ 
+     limit_low = max( limit_low, (ULONG_PTR)address_space_start );  /* make sure the DOS area remains free */
+     if (!limit_high) limit_high = (ULONG_PTR)user_space_limit;
++#if defined(__PROSPERO__) && defined(_WIN64)
++    /* A 32-bit image runs as 32-bit code: it stays below the WoW64 limit, also
++     * for the main image, which is mapped before init_peb sets that limit from
++     * the image's own flag. Upstream finds a low address then because the
++     * search starts low; the console's map_view prefers its reserved area
++     * above 4 GiB, and the program was mapped at 0x1000000000, so the 32-bit
++     * PEB's ImageBaseAddress was 0 (docs/IA32_DESIGN.md, M3). */
++    if (!is_machine_64bit( image_info->machine ))
++        limit_high = min( limit_high, user_space_wow_limit ? user_space_wow_limit :
++                          ((image_info->image_charact & IMAGE_FILE_LARGE_ADDRESS_AWARE) ? limit_4g : limit_2g) - 1 );
++#endif
+ 
+     /* first try the specified base */
+ 
+-- 
+2.56.0
+

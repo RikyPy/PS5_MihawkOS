@@ -1,0 +1,15 @@
+{
+ "run": "v3-jit-gatecases-2026-10-14-late-library",
+ "what": "late-library-probe.exe",
+ "env": [
+  "PROTON_LAYOUT=launcher",
+  "PROTON_STOP_TERMINATE=0"
+ ],
+ "passed": false,
+ "result": "runner_error",
+ "error": "ps5vkctl: <console>:9111 did not answer (timed out); load build/ps5vkctl/ps5vkctl.elf on the console first",
+ "loaded": true,
+ "probe_verdict": null,
+ "stop_requested": "no return before the watchdog",
+ "cleanup_verified": false
+}

@@ -1,0 +1,80 @@
+From: PS5_Proton <local>
+Subject: [PATCH] user32: system cursors come from the user's pointer scheme
+
+Windows loads each system cursor (IDC_ARROW, IDC_IBEAM, IDC_WAIT, ...) from the file the user's scheme names in
+HKCU\Control Panel\Cursors; Wine always loads its own resources and ignores the scheme, so a program, DefWindowProc's
+sizing arrows and every class cursor point with Wine's cursors whatever the prefix sets. CURSORICON_Load now reads
+the role's value first (REG_SZ or REG_EXPAND_SZ, expanded), loads that .cur or .ani, and falls back to the resource
+when there is no value or the file does not load. A shared request (LoadCursor, LoadImage with LR_SHARED) gets one
+cursor per process, so the file is read once and the system's own references never load it again.
+
+An animated cursor loaded with LR_SHARED is now shared like a static one: before, DestroyCursor freed it under the
+other references, which a scheme's busy cursor (one handle for the whole process) cannot allow.
+
+Changing the scheme while a process runs (SPI_SETCURSORS) does not reload it yet; a process started afterwards uses it.
+---
+diff --git a/dlls/user32/cursoricon.c b/dlls/user32/cursoricon.c
+index c9a5ef8..9a8cd02 100644
+--- a/dlls/user32/cursoricon.c
++++ b/dlls/user32/cursoricon.c
+@@ -1173,6 +1173,7 @@ static HCURSOR CURSORICON_CreateIconFromANI( const BYTE *bits, DWORD bits_size,
+ 
+     /* The .ANI stores the display rate in jiffies (1/60s) */
+     desc.delay      = header.display_rate;
++    desc.flags      = loadflags & LR_SHARED;  /* a shared animated cursor outlives DestroyCursor, as a static one does */
+     desc.num_frames = header.num_frames;
+     desc.num_steps  = header.num_steps;
+     if (!(desc.frames = HeapAlloc( GetProcessHeap(), 0, sizeof(*desc.frames) * desc.num_frames )))
+@@ -1353,6 +1354,42 @@ end:
+     return hIcon;
+ }
+ 
++/* A system cursor from the user's pointer scheme, HKCU\Control Panel\Cursors, where each value names the file of
++ * one role as Windows stores it (REG_EXPAND_SZ "%SystemRoot%\Cursors\..."). A shared request gets one cursor per
++ * process, so the system's own references (class cursors, WM_SETCURSOR) never load the file again. No value, or a
++ * file that does not load, leaves user32's own cursor. */
++static HICON load_scheme_cursor( WORD id, INT width, INT height, INT depth, UINT loadflags )
++{
++    static const struct { WORD id; const WCHAR *name; } roles[] =
++    {
++        { 32512, L"Arrow" }, { 32513, L"IBeam" }, { 32514, L"Wait" }, { 32515, L"Crosshair" }, { 32516, L"UpArrow" },
++        { 32642, L"SizeNWSE" }, { 32643, L"SizeNESW" }, { 32644, L"SizeWE" }, { 32645, L"SizeNS" },
++        { 32646, L"SizeAll" }, { 32648, L"No" }, { 32649, L"Hand" }, { 32650, L"AppStarting" }, { 32651, L"Help" },
++    };
++    static HICON shared[ARRAY_SIZE(roles)];
++    WCHAR value[MAX_PATH], path[MAX_PATH];
++    DWORD size = sizeof(value) - sizeof(WCHAR), type;
++    HICON cursor, previous;
++    HKEY key;
++    UINT i;
++
++    for (i = 0; i < ARRAY_SIZE(roles) && roles[i].id != id; i++);
++    if (i == ARRAY_SIZE(roles)) return 0;
++    if ((loadflags & LR_SHARED) && shared[i]) return shared[i];
++    if (RegOpenKeyExW( HKEY_CURRENT_USER, L"Control Panel\\Cursors", 0, KEY_QUERY_VALUE, &key )) return 0;
++    if (RegQueryValueExW( key, roles[i].name, NULL, &type, (BYTE *)value, &size ) ||
++        (type != REG_SZ && type != REG_EXPAND_SZ)) size = 0;
++    RegCloseKey( key );
++    value[size / sizeof(WCHAR)] = 0;
++    if (!value[0] || !ExpandEnvironmentStringsW( value, path, ARRAY_SIZE(path) ) ||
++        !(cursor = CURSORICON_LoadFromFile( path, width, height, depth, TRUE, loadflags )))
++        return 0;
++    if (!(loadflags & LR_SHARED)) return cursor;
++    /* A thread that lost the race keeps the winner's; its own copy is shared, so it is only a small leak. */
++    previous = InterlockedCompareExchangePointer( (void **)&shared[i], cursor, NULL );
++    return previous ? previous : cursor;
++}
++
+ /**********************************************************************
+  *          CURSORICON_Load
+  *
+@@ -1378,6 +1415,9 @@ static HICON CURSORICON_Load(HINSTANCE hInstance, LPCWSTR name,
+     if ((loadflags & LR_LOADFROMFILE) && get_app_version() >= 0x4000)    /* Load from file */
+         return CURSORICON_LoadFromFile( name, width, height, depth, fCursor, loadflags );
+ 
++    if (!hInstance && fCursor && IS_INTRESOURCE( name ) &&
++        (hIcon = load_scheme_cursor( LOWORD( name ), width, height, depth, loadflags )))
++        return hIcon;
+     if (!hInstance) hInstance = user32_module;  /* Load OEM cursor/icon */
+ 
+     /* don't cache 16-bit instances (FIXME: should never get 16-bit instances in the first place) */

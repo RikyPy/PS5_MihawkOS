@@ -1,0 +1,69 @@
+{
+  "kind": "native_multi_client_gpu_broker_validation",
+  "graphics_runtime_integrated": false,
+  "child_vulkan_devices_proven": false,
+  "child_rendered_frames_proven": false,
+  "independent_child_gpu_vms_proven": false,
+  "method": "Descriptor-backed shared CPU mappings; original title GPU protection and AGC submission.",
+  "runs": [
+    {
+      "evidence": "evidence/graphics-child-gpu-broker-native-01.json",
+      "sha256": "3a633b37201ad229c40a46140e5eedf99ccc2e48ed35dc236dac1b9e2de56622",
+      "passed": false
+    },
+    {
+      "evidence": "evidence/graphics-child-gpu-broker-native-02.json",
+      "sha256": "af2c76abc0614f459d6c1c09b124919ad05fb06c817472ece10f1bceb145252c",
+      "passed": false
+    },
+    {
+      "evidence": "evidence/graphics-child-gpu-broker-shm-01.json",
+      "sha256": "71b2456e34ec3e85f060e8fc0253e8f96d3e89f48af7858d34e6df52ad67beee",
+      "passed": false
+    },
+    {
+      "evidence": "evidence/graphics-child-gpu-broker-shm-02.json",
+      "sha256": "bf185b620546442559c22592974eda4961f416f3ef16c9b054028295a09e0ff5",
+      "passed": true
+    },
+    {
+      "evidence": "evidence/graphics-child-gpu-broker-shm-window-01.json",
+      "sha256": "8c63c4ec8f763664cd6ea22217e5a24510989286816ee8c45ce2a8a8909dc708",
+      "passed": true
+    }
+  ],
+  "host_checks": {
+    "fd_census": "pass",
+    "wine_process_io": "pass",
+    "strict_native_helper_compile_elevated": "pass",
+    "strict_native_helper_compile_kernel_only": "pass",
+    "tested_vs_current_helper_text_identical": true,
+    "python_syntax": "pass",
+    "static_firmware_metadata_checks": 24
+  },
+  "proven": {
+    "live_separate_native_clients": 2,
+    "valid_interleaved_gpu_submissions_per_passing_run": 6,
+    "malformed_packets_rejected_per_passing_run": 1,
+    "largest_shared_bytes_per_client": 33554432,
+    "shader_address_window_tested": true,
+    "last_page_gpu_completion_checks": 2,
+    "descriptor_counts": [
+      12,
+      12
+    ],
+    "direct_memory_balanced_after_warmup": true,
+    "production_restored": true,
+    "helpers_removed": true,
+    "post_launch_fault_records": 0
+  },
+  "pending": [
+    "RADV platform broker client and Vulkan device initialization",
+    "Two children rendering distinct images and presenting",
+    "Process termination and resource retirement",
+    "Game-sized shared-memory budget and complete feature accounting",
+    "OpenGL backend adaptation",
+    "Normal native lifecycle follow-up and restored production launcher run after user power-on"
+  ],
+  "console_unavailable_reason": "User confirmed intentional shutdown after last passing probe."
+}

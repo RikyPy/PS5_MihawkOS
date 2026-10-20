@@ -1,0 +1,43 @@
+{
+ "battery": "mihawk-caption-negative-2026-10-09-11",
+ "expected_cases": [
+  "appearance64"
+ ],
+ "revision": "364ec945e865e646d9e11a42f5600c300a257f47",
+ "dirty": true,
+ "cases": [
+  {
+   "case": "appearance64",
+   "run": "mihawk-caption-negative-2026-10-09-11-appearance64",
+   "runner_status": 1,
+   "seconds": 26.1,
+   "result": "finished",
+   "probe_verdict": "FAIL",
+   "returned_to_launcher": true,
+   "exit_stall": false,
+   "passed": false,
+   "run_seconds": 24.2,
+   "launch_readiness": {
+    "ready": true,
+    "seconds": 0.185,
+    "settle_seconds": 0.0,
+    "census_seconds": 0.167,
+    "previous_cleanup_verified": true
+   },
+   "runner_overhead_seconds": 1.9,
+   "layout": "launcher",
+   "fault_records": 0,
+   "helpers": 8,
+   "protocol_errors": 0
+  }
+ ],
+ "complete": true,
+ "seconds": 26.1,
+ "passed": false,
+ "runtime_build_fingerprint": "17c233ab2fd5ea7b1e7074e254455725c823b73927dea4a5a005415c4dcf84b9",
+ "diagnostic_only_upload": true,
+ "diagnostic_sha256": "b7d2d6da71ebf84c6803a70d94106f737e084d25c72c8b6aa8550a72101a3adb",
+ "checks": 1025,
+ "failures": 6,
+ "interpretation": "The new diagnostic rejects all six classic caption buttons (three parts in each variant) on build10. No full gate was attempted. Exact themed-caption qualification still requires corrected build11 and the complete gate."
+}

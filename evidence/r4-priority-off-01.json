@@ -1,0 +1,69 @@
+{
+ "run": "r4-priority-off-01",
+ "what": "priority-probe.exe",
+ "env": [],
+ "result": "finished",
+ "seconds": 9.3,
+ "probe_verdict": "FAIL",
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": false,
+ "passed": false,
+ "bench": {
+  "cpus": 16.0,
+  "equal_periods": 0.0,
+  "equal_p50_us": 0.0,
+  "equal_p99_us": 0.0,
+  "time_critical_periods": 0.0,
+  "time_critical_p50_us": 0.0,
+  "time_critical_p99_us": 0.0,
+  "below_normal_permille_of_normal": 0.0,
+  "idle_permille_of_normal": 0.0,
+  "inversion_holder_started": 0.0,
+  "inversion_wait_us": 1.0
+ },
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [
+   {
+    "calls": 3402.0,
+    "per_s": 672.0,
+    "avg_us": 2474.4,
+    "selects": 373.0,
+    "blocked": 53.0,
+    "block_avg_us": 57342.9,
+    "waits": 153.0,
+    "handles_avg": 1.9,
+    "wait_all": 4.0,
+    "polled": 101.0,
+    "delays": 0.0,
+    "yields": 0.0
+   }
+  ],
+  "top": [
+   {
+    "select": {
+     "count": 374,
+     "avg_us": 8673.8
+    },
+    "init_thread": {
+     "count": 117,
+     "avg_us": 13099.8
+    },
+    "event_op": {
+     "count": 44,
+     "avg_us": 30805.0
+    },
+    "new_thread": {
+     "count": 118,
+     "avg_us": 7264.9
+    },
+    "close_handle": {
+     "count": 715,
+     "avg_us": 978.7
+    }
+   }
+  ]
+ }
+}

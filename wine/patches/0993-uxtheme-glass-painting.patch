@@ -1,0 +1,290 @@
+From: PS5_Proton
+Subject: [PATCH] uxtheme: buffered-paint alpha and composited theme text
+
+The documented Win32 recipe for content over DWM glass did not work:
+BeginBufferedPaint ignored its parameters, BufferedPaintClear and
+BufferedPaintSetAlpha returned E_NOTIMPL, and DrawThemeTextEx ignored
+DTT_COMPOSITED. Honour BPPF_ERASE, the excluded rectangle and the blend
+function; clear and set alpha in 32-bit buffers of either orientation; and
+draw composited text as grayscale coverage premultiplied into the selected
+top-down DIB. Any other DC keeps ordinary DrawText.
+diff --git a/dlls/uxtheme/buffer.c b/dlls/uxtheme/buffer.c
+index 7003d3da..2ef92dfd 100644
+--- a/dlls/uxtheme/buffer.c
++++ b/dlls/uxtheme/buffer.c
+@@ -40,6 +40,12 @@ struct paintbuffer
+     HBITMAP bitmap;
+     RECT rect;
+     void *bits;
++    BOOL argb;             /* 32-bit DIB: alpha can be cleared and set */
++    BOOL top_down;
++    BOOL exclude;          /* params->prcExclude is not updated on the target */
++    RECT excluded;
++    BOOL blend;            /* params->pBlendFunction is applied by EndBufferedPaint */
++    BLENDFUNCTION function;
+ };
+ 
+ static void free_paintbuffer(struct paintbuffer *buffer)
+@@ -91,13 +97,25 @@ HPAINTBUFFER WINAPI BeginBufferedPaint(HDC targetdc, const RECT *rect,
+     if (!targetdc || IsRectEmpty(rect))
+         return NULL;
+ 
+-    if (params)
+-        FIXME("painting parameters are ignored\n");
++    if (params && (params->dwFlags & ~(BPPF_ERASE | BPPF_NOCLIP | BPPF_NONCLIENT)))
++        FIXME("unsupported painting flags %#lx\n", params->dwFlags);
+ 
+-    buffer = malloc(sizeof(*buffer));
++    buffer = calloc(1, sizeof(*buffer));
+     buffer->targetdc = targetdc;
+     buffer->rect = *rect;
+     buffer->memorydc = CreateCompatibleDC(targetdc);
++    buffer->top_down = format == BPBF_TOPDOWNDIB || format == BPBF_TOPDOWNMONODIB;
++    buffer->argb = format == BPBF_DIB || format == BPBF_TOPDOWNDIB;
++    if (params && params->prcExclude)
++    {
++        buffer->exclude = TRUE;
++        buffer->excluded = *params->prcExclude;
++    }
++    if (params && params->pBlendFunction)
++    {
++        buffer->blend = TRUE;
++        buffer->function = *params->pBlendFunction;
++    }
+ 
+     switch (format)
+     {
+@@ -136,6 +154,9 @@ HPAINTBUFFER WINAPI BeginBufferedPaint(HDC targetdc, const RECT *rect,
+     SetWindowOrgEx(buffer->memorydc, rect->left, rect->top, NULL);
+     IntersectClipRect(buffer->memorydc, rect->left, rect->top, rect->right, rect->bottom);
+     DeleteObject(SelectObject(buffer->memorydc, buffer->bitmap));
++    /* BPPF_ERASE: ARGB {0,0,0,0}. A new DIB section is already zeroed. */
++    if (params && (params->dwFlags & BPPF_ERASE) && !buffer->bits)
++        PatBlt(buffer->memorydc, rect->left, rect->top, rect->right - rect->left, rect->bottom - rect->top, BLACKNESS);
+ 
+     *retdc = buffer->memorydc;
+ 
+@@ -156,12 +177,21 @@ HRESULT WINAPI EndBufferedPaint(HPAINTBUFFER bufferhandle, BOOL update)
+ 
+     if (update)
+     {
+-        if (!BitBlt(buffer->targetdc, buffer->rect.left, buffer->rect.top,
+-                buffer->rect.right - buffer->rect.left, buffer->rect.bottom - buffer->rect.top,
+-                buffer->memorydc, buffer->rect.left, buffer->rect.top, SRCCOPY))
+-        {
+-            WARN("BitBlt() failed\n");
+-        }
++        int saved = buffer->exclude ? SaveDC(buffer->targetdc) : 0;
++        int width = buffer->rect.right - buffer->rect.left, height = buffer->rect.bottom - buffer->rect.top;
++        BOOL ret;
++
++        if (saved)
++            ExcludeClipRect(buffer->targetdc, buffer->excluded.left, buffer->excluded.top,
++                            buffer->excluded.right, buffer->excluded.bottom);
++        if (buffer->blend)
++            ret = GdiAlphaBlend(buffer->targetdc, buffer->rect.left, buffer->rect.top, width, height,
++                                buffer->memorydc, buffer->rect.left, buffer->rect.top, width, height, buffer->function);
++        else
++            ret = BitBlt(buffer->targetdc, buffer->rect.left, buffer->rect.top, width, height,
++                         buffer->memorydc, buffer->rect.left, buffer->rect.top, SRCCOPY);
++        if (!ret) WARN("buffer update failed\n");
++        if (saved) RestoreDC(buffer->targetdc, saved);
+     }
+ 
+     free_paintbuffer(buffer);
+@@ -171,19 +201,61 @@ HRESULT WINAPI EndBufferedPaint(HPAINTBUFFER bufferhandle, BOOL update)
+ /***********************************************************************
+  *      BufferedPaintClear                                 (UXTHEME.@)
+  */
++/* Visit the 32-bit buffer pixels inside prc (buffer coordinates; NULL means
++ * the whole buffer) with a byte mask/value. Returns FALSE without bits. */
++static BOOL update_pixels(struct paintbuffer *buffer, const RECT *prc, DWORD keep, DWORD set)
++{
++    RECT area;
++    int width = buffer->rect.right - buffer->rect.left, height = buffer->rect.bottom - buffer->rect.top;
++
++    if (!buffer->bits || !buffer->argb) return FALSE;
++    if (!prc) area = buffer->rect;
++    else if (!IntersectRect(&area, prc, &buffer->rect)) return TRUE;
++    for (int y = area.top; y < area.bottom; y++)
++    {
++        int row = y - buffer->rect.top;
++        DWORD *line = (DWORD *)buffer->bits + (size_t)(buffer->top_down ? row : height - 1 - row) * width;
++        for (int x = area.left; x < area.right; x++)
++        {
++            DWORD *pixel = &line[x - buffer->rect.left];
++            *pixel = (*pixel & keep) | set;
++        }
++    }
++    return TRUE;
++}
++
+ HRESULT WINAPI BufferedPaintClear(HPAINTBUFFER hBufferedPaint, const RECT *prc)
+ {
+-    FIXME("Stub (%p %p)\n", hBufferedPaint, prc);
+-    return E_NOTIMPL;
++    struct paintbuffer *buffer = get_buffer_obj(hBufferedPaint);
++    RECT area;
++
++    TRACE("(%p %s)\n", buffer, wine_dbgstr_rect(prc));
++
++    if (!buffer)
++        return E_INVALIDARG;
++    if (update_pixels(buffer, prc, 0, 0))
++        return S_OK;
++    if (!prc) area = buffer->rect;
++    else if (!IntersectRect(&area, prc, &buffer->rect)) return S_OK;
++    PatBlt(buffer->memorydc, area.left, area.top, area.right - area.left, area.bottom - area.top, BLACKNESS);
++    return S_OK;
+ }
+ 
+ /***********************************************************************
+  *      BufferedPaintSetAlpha                              (UXTHEME.@)
+  */
++/* The usual way to make alpha-unaware GDI content opaque over DWM glass. */
+ HRESULT WINAPI BufferedPaintSetAlpha(HPAINTBUFFER hBufferedPaint, const RECT *prc, BYTE alpha)
+ {
+-    FIXME("Stub (%p %p %u)\n", hBufferedPaint, prc, alpha);
+-    return E_NOTIMPL;
++    struct paintbuffer *buffer = get_buffer_obj(hBufferedPaint);
++
++    TRACE("(%p %s %u)\n", buffer, wine_dbgstr_rect(prc), alpha);
++
++    if (!buffer)
++        return E_INVALIDARG;
++    if (!update_pixels(buffer, prc, 0x00ffffff, (DWORD)alpha << 24))
++        return E_FAIL;
++    return S_OK;
+ }
+ 
+ /***********************************************************************
+diff --git a/dlls/uxtheme/draw.c b/dlls/uxtheme/draw.c
+index 91406407..472fd0e3 100644
+--- a/dlls/uxtheme/draw.c
++++ b/dlls/uxtheme/draw.c
+@@ -1769,6 +1769,90 @@ HRESULT WINAPI DrawThemeText(HTHEME hTheme, HDC hdc, int iPartId, int iStateId,
+     return DrawThemeTextEx(hTheme, hdc, iPartId, iStateId, pszText, iCharCount, flags, &rt, &opts);
+ }
+ 
++/* DTT_COMPOSITED: anti-aliased text with alpha in the top-down 32-bit DIB
++ * selected into hdc, as DWM glass requires; the flag is documented to need a
++ * top-down DIB, and GetObject reports DIB heights as positive, so rows are
++ * addressed top-down. Coverage comes from drawing the same text white-on-black
++ * with grayscale anti-aliasing; the colour is premultiplied by it and composited
++ * source-over. FALSE: not applicable. */
++static BOOL draw_composited_text(HDC hdc, LPCWSTR text, int count, DWORD flags, RECT *rect, COLORREF colour)
++{
++    BITMAPINFO info = {{sizeof(info.bmiHeader)}};
++    HBITMAP target = GetCurrentObject(hdc, OBJ_BITMAP), coverage, old_bitmap;
++    HFONT font = GetCurrentObject(hdc, OBJ_FONT), gray, old_font;
++    RECT device, box, local;
++    POINT points[4];
++    LOGFONTW logfont;
++    DIBSECTION dib;
++    DWORD *mask;
++    HDC memory;
++    int width, height;
++
++    if ((flags & DT_CALCRECT) || GetObjectW(target, sizeof(dib), &dib) != sizeof(dib) ||
++        dib.dsBm.bmBitsPixel != 32 || !dib.dsBm.bmBits ||
++        GetObjectW(font, sizeof(logfont), &logfont) != sizeof(logfont))
++        return FALSE;
++    points[0].x = rect->left; points[0].y = rect->top;
++    points[1].x = rect->right; points[1].y = rect->bottom;
++    GetClipBox(hdc, &box);
++    points[2].x = box.left; points[2].y = box.top;
++    points[3].x = box.right; points[3].y = box.bottom;
++    LPtoDP(hdc, points, 4);
++    width = points[1].x - points[0].x;
++    height = points[1].y - points[0].y;
++    if (width <= 0 || height <= 0) return TRUE;
++    if (width > 8192 || height > 8192) return FALSE;
++    SetRect(&device, max(points[0].x, max(points[2].x, 0)), max(points[0].y, max(points[2].y, 0)),
++            min(points[1].x, min(points[3].x, dib.dsBm.bmWidth)), min(points[1].y, min(points[3].y, dib.dsBm.bmHeight)));
++    if (IsRectEmpty(&device)) return TRUE;
++
++    info.bmiHeader.biWidth = width;
++    info.bmiHeader.biHeight = -height;
++    info.bmiHeader.biPlanes = 1;
++    info.bmiHeader.biBitCount = 32;
++    info.bmiHeader.biCompression = BI_RGB;
++    memory = CreateCompatibleDC(hdc);
++    coverage = CreateDIBSection(memory, &info, DIB_RGB_COLORS, (void **)&mask, NULL, 0);
++    logfont.lfQuality = ANTIALIASED_QUALITY;
++    gray = CreateFontIndirectW(&logfont);
++    if (!memory || !coverage || !gray)
++    {
++        if (gray) DeleteObject(gray);
++        if (coverage) DeleteObject(coverage);
++        if (memory) DeleteDC(memory);
++        return FALSE;
++    }
++    old_bitmap = SelectObject(memory, coverage);
++    old_font = SelectObject(memory, gray);
++    SetTextColor(memory, RGB(255, 255, 255));
++    SetBkMode(memory, TRANSPARENT);
++    SetRect(&local, 0, 0, width, height);
++    DrawTextW(memory, text, count, &local, flags);
++    GdiFlush();
++    for (int y = device.top; y < device.bottom; y++)
++    {
++        const DWORD *source = mask + (size_t)(y - points[0].y) * width;
++        DWORD *dest = (DWORD *)((BYTE *)dib.dsBm.bmBits + (size_t)y * dib.dsBm.bmWidthBytes);
++        for (int x = device.left; x < device.right; x++)
++        {
++            DWORD value = source[x - points[0].x], pixel = dest[x], out;
++            unsigned int alpha = max(max(value & 0xff, (value >> 8) & 0xff), (value >> 16) & 0xff);
++            if (!alpha) continue;
++            out = (alpha + ((pixel >> 24) * (255 - alpha) + 127) / 255) << 24;
++            out |= ((GetBValue(colour) * alpha + 127) / 255 + ((pixel & 0xff) * (255 - alpha) + 127) / 255);
++            out |= ((GetGValue(colour) * alpha + 127) / 255 + (((pixel >> 8) & 0xff) * (255 - alpha) + 127) / 255) << 8;
++            out |= ((GetRValue(colour) * alpha + 127) / 255 + (((pixel >> 16) & 0xff) * (255 - alpha) + 127) / 255) << 16;
++            dest[x] = out;
++        }
++    }
++    SelectObject(memory, old_font);
++    SelectObject(memory, old_bitmap);
++    DeleteObject(gray);
++    DeleteObject(coverage);
++    DeleteDC(memory);
++    return TRUE;
++}
++
+ /***********************************************************************
+  *      DrawThemeTextEx                                     (UXTHEME.@)
+  */
+@@ -1791,7 +1875,7 @@ HRESULT WINAPI DrawThemeTextEx(HTHEME hTheme, HDC hdc, int iPartId, int iStateId
+         return E_HANDLE;
+ 
+     if(options) {
+-        if(options->dwFlags & ~(DTT_TEXTCOLOR | DTT_FONTPROP))
++        if(options->dwFlags & ~(DTT_TEXTCOLOR | DTT_FONTPROP | DTT_COMPOSITED))
+             FIXME("unsupported flags 0x%08lx\n", options->dwFlags);
+         if(options->dwFlags & DTT_FONTPROP)
+             fontProp = options->iFontPropId;
+@@ -1816,7 +1900,9 @@ HRESULT WINAPI DrawThemeTextEx(HTHEME hTheme, HDC hdc, int iPartId, int iStateId
+ 
+     oldTextColor = SetTextColor(hdc, textColor);
+     oldBkMode = SetBkMode(hdc, TRANSPARENT);
+-    DrawTextW(hdc, pszText, iCharCount, rect, flags);
++    if(!options || !(options->dwFlags & DTT_COMPOSITED) ||
++       !draw_composited_text(hdc, pszText, iCharCount, flags, rect, textColor))
++        DrawTextW(hdc, pszText, iCharCount, rect, flags);
+     SetBkMode(hdc, oldBkMode);
+     SetTextColor(hdc, oldTextColor);
+ 
+diff --git a/include/uxtheme.h b/include/uxtheme.h
+index b7fa3f93..3ee3b395 100644
+--- a/include/uxtheme.h
++++ b/include/uxtheme.h
+@@ -241,6 +241,10 @@ typedef enum _BP_BUFFERFORMAT
+ 	BPBF_TOPDOWNMONODIB
+ } BP_BUFFERFORMAT;
+ 
++#define BPPF_ERASE     0x0001
++#define BPPF_NOCLIP    0x0002
++#define BPPF_NONCLIENT 0x0004
++
+ typedef struct _BP_PAINTPARAMS
+ {
+ 	DWORD cbSize;

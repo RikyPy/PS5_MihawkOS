@@ -1,0 +1,195 @@
+{
+  "date": "2026-10-05",
+  "scope": "Two separate Sony-managed native Vulkan/RADV clients using the original title GPU context; offscreen image clear and graphics-pipeline triangle draws, device recreation and balanced closure.",
+  "runs": [
+    {
+      "run": "graphics-child-gpu-broker-native-regression-02",
+      "passed": true,
+      "fault_records": 0,
+      "production_restored": true,
+      "helper_removed": true,
+      "gpu_client_removed": null,
+      "devices": null,
+      "pixel_checks": null
+    },
+    {
+      "run": "graphics-child-broker-restored-production-03",
+      "passed": true,
+      "fault_records": 0,
+      "production_restored": null,
+      "helper_removed": null,
+      "gpu_client_removed": null,
+      "devices": null,
+      "pixel_checks": null
+    },
+    {
+      "run": "graphics-child-gpu-broker-vulkan-01",
+      "passed": false,
+      "fault_records": 0,
+      "production_restored": true,
+      "helper_removed": true,
+      "gpu_client_removed": true,
+      "devices": 0,
+      "pixel_checks": []
+    },
+    {
+      "run": "graphics-child-gpu-broker-vulkan-02",
+      "passed": false,
+      "fault_records": 2,
+      "production_restored": true,
+      "helper_removed": true,
+      "gpu_client_removed": true,
+      "devices": 0,
+      "pixel_checks": []
+    },
+    {
+      "run": "graphics-child-gpu-broker-vulkan-03",
+      "passed": true,
+      "fault_records": 0,
+      "production_restored": true,
+      "helper_removed": true,
+      "gpu_client_removed": true,
+      "devices": 4,
+      "pixel_checks": [
+        {
+          "client": 0,
+          "cycle": 0,
+          "pixels": 4096,
+          "verdict": 1
+        },
+        {
+          "client": 1,
+          "cycle": 0,
+          "pixels": 4096,
+          "verdict": 1
+        },
+        {
+          "client": 0,
+          "cycle": 1,
+          "pixels": 4096,
+          "verdict": 1
+        },
+        {
+          "client": 1,
+          "cycle": 1,
+          "pixels": 4096,
+          "verdict": 1
+        }
+      ]
+    },
+    {
+      "run": "graphics-child-gpu-broker-draw-01",
+      "passed": true,
+      "fault_records": 0,
+      "production_restored": true,
+      "helper_removed": true,
+      "gpu_client_removed": true,
+      "devices": 4,
+      "pixel_checks": [
+        {
+          "client": 0,
+          "cycle": 0,
+          "pixels": 4096,
+          "draw": 1,
+          "verdict": 1
+        },
+        {
+          "client": 1,
+          "cycle": 0,
+          "pixels": 4096,
+          "draw": 1,
+          "verdict": 1
+        },
+        {
+          "client": 0,
+          "cycle": 1,
+          "pixels": 4096,
+          "draw": 1,
+          "verdict": 1
+        },
+        {
+          "client": 1,
+          "cycle": 1,
+          "pixels": 4096,
+          "draw": 1,
+          "verdict": 1
+        }
+      ]
+    },
+    {
+      "run": "graphics-child-broker-restored-production-04",
+      "passed": true,
+      "fault_records": 0,
+      "production_restored": null,
+      "helper_removed": null,
+      "gpu_client_removed": null,
+      "devices": null,
+      "pixel_checks": null
+    },
+    {
+      "run": "graphics-child-gpu-broker-draw-02",
+      "passed": true,
+      "fault_records": 0,
+      "production_restored": true,
+      "helper_removed": true,
+      "gpu_client_removed": true,
+      "devices": 4,
+      "pixel_checks": [
+        {
+          "client": 0,
+          "cycle": 0,
+          "pixels": 4096,
+          "draw": 1,
+          "verdict": 1
+        },
+        {
+          "client": 1,
+          "cycle": 0,
+          "pixels": 4096,
+          "draw": 1,
+          "verdict": 1
+        },
+        {
+          "client": 0,
+          "cycle": 1,
+          "pixels": 4096,
+          "draw": 1,
+          "verdict": 1
+        },
+        {
+          "client": 1,
+          "cycle": 1,
+          "pixels": 4096,
+          "draw": 1,
+          "verdict": 1
+        }
+      ]
+    }
+  ],
+  "host_tests": {
+    "count": 3,
+    "tests": [
+      "pw_gpu_broker",
+      "pw_wine_process_io",
+      "pw_wine_prx"
+    ],
+    "sanitizers": "ASan/UBSan; LeakSanitizer disabled because sandbox ptrace prevents it; socket transport test run outside socket-denying sandbox"
+  },
+  "remaining": [
+    "Owner-only presentation and display arbitration",
+    "Replacement graphics client in same title session",
+    "Wine and descendant integration",
+    "Larger allocations, textures, depth, compute, synchronization and timestamp support"
+  ],
+  "installed_state": "Signed production launcher restored after every probe, synthetic helper/client module removed; restored production passed 120 frames.",
+  "limits": {
+    "shared_bytes_per_client": 134217728,
+    "allocation_slots": 128,
+    "clients_tested": 2,
+    "native_owner_concurrent_rendering": false,
+    "full_pm4_validator": false,
+    "runtime_driver_installed": false
+  },
+  "failure_policy_tested": false,
+  "shader_regeneration": "Pinned compiler regenerated the exact checked-in SPIR-V header byte-for-byte."
+}

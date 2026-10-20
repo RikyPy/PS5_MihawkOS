@@ -1,0 +1,37 @@
+{
+  "battery": "mihawk-effects-pe64-2026-10-10-03",
+  "expected_cases": [
+    "pe64"
+  ],
+  "revision": "24c8923dfd15a5fc93cef4c4310be91511f551b8",
+  "dirty": true,
+  "cases": [
+    {
+      "case": "pe64",
+      "run": "mihawk-effects-pe64-2026-10-10-03-pe64",
+      "runner_status": 0,
+      "seconds": 10.3,
+      "result": "finished",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "run_seconds": 9.7,
+      "launch_readiness": {
+        "ready": true,
+        "seconds": 0.196,
+        "settle_seconds": 0.0,
+        "census_seconds": 0.18,
+        "previous_cleanup_verified": true
+      },
+      "runner_overhead_seconds": 0.6,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 8,
+      "protocol_errors": 0
+    }
+  ],
+  "complete": true,
+  "seconds": 10.3,
+  "passed": true
+}

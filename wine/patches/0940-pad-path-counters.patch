@@ -1,0 +1,305 @@
+From b845370c40f9c960380dcef9ce7fa8c8bdadb823 Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Tue, 6 Oct 2026 19:46:39 -0400
+Subject: [PATCH] winebus, hidclass, dinput, xinput: count the PS5 controller's
+ input along its way
+
+A Windows program in a helper ignores the DualSense in some runs without a
++hid trace and obeys it in others, although the PS5 bus hands every report
+that carries a press to winebus (the helper's pad counters), and hidclass
+had a read waiting for 5117 of 5120 of them
+(2026-10-06; record removed from the tree; in git history). To find where presses stop without
+the trace's timing, each stage counts what it does and logs as err, so it
+shows by default:
+
+- winebus, every 1024 reports: reports, those with a press, those a
+  waiting hidclass read took at once, and the longest unread queue.
+- hidclass, every 1024 reports: reports, those with a press, the readers
+  (open files) they reached, the reads already waiting, and for each open
+  file the reads it sent, the reports they took and its unread reports;
+  each WM_INPUT send's average and longest time, a server round trip into
+  the title in a helper; and every file opened or closed on the device.
+- dinput: every acquire of a HID device; every 1024 reports parsed, those
+  with a button down and those that changed the state a program reads;
+  every 1024 GetDeviceState calls.
+- xinput: that controller 0 is the title's; the first four times a program
+  asks what it is (a wired Xbox 360 controller, 045e:028e); every 1024
+  polls of it, those that found it connected and those with a button down.
+
+Diagnostic, on the controller-input branch.
+---
+ dlls/dinput/device.c       |  5 +++
+ dlls/dinput/joystick_hid.c | 13 ++++++++
+ dlls/hidclass.sys/device.c | 68 +++++++++++++++++++++++++++++++++++++-
+ dlls/hidclass.sys/hid.h    |  5 +++
+ dlls/winebus.sys/main.c    | 12 +++++++
+ dlls/xinput1_3/main.c      | 20 ++++++++++-
+ 6 files changed, 121 insertions(+), 2 deletions(-)
+
+diff --git a/dlls/dinput/device.c b/dlls/dinput/device.c
+index 0d8589b..6fdaac6 100644
+--- a/dlls/dinput/device.c
++++ b/dlls/dinput/device.c
+@@ -1438,6 +1438,11 @@ static HRESULT WINAPI dinput_device_GetObjectInfo( IDirectInputDevice8W *iface,
+ 
+ static HRESULT WINAPI dinput_device_GetDeviceState( IDirectInputDevice8W *iface, DWORD size, void *data )
+ {
++    {
++        /* PS5 controller-path counters (branch controller-input): how often the program reads a device's state. */
++        static LONG reads;
++        if (InterlockedIncrement( &reads ) % 1024 == 0) ERR( "pad-path dinput: GetDeviceState calls %ld\n", reads );
++    }
+     struct dinput_device *impl = impl_from_IDirectInputDevice8W( iface );
+     DIDATAFORMAT *device_format = &impl->device_format, *user_format = &impl->user_format;
+     DIOBJECTDATAFORMAT *device_obj, *user_obj;
+diff --git a/dlls/dinput/joystick_hid.c b/dlls/dinput/joystick_hid.c
+index 78ccf10..13fcebf 100644
+--- a/dlls/dinput/joystick_hid.c
++++ b/dlls/dinput/joystick_hid.c
+@@ -1207,6 +1207,8 @@ static HRESULT hid_joystick_acquire( IDirectInputDevice8W *iface )
+     }
+ 
+     IDirectInputDevice8_SendForceFeedbackCommand( iface, DISFFC_RESET );
++    /* PS5 controller-path counters (branch controller-input): a program takes the device. */
++    ERR( "pad-path dinput: acquired %04x:%04x\n", impl->attrs.VendorID, impl->attrs.ProductID );
+     return DI_OK;
+ }
+ 
+@@ -1623,6 +1625,17 @@ static HRESULT hid_joystick_read( IDirectInputDevice8W *iface )
+ 
+             enum_objects( impl, &filter, DIDFT_AXIS | DIDFT_POV, read_device_state_value, &params );
+             enum_objects( impl, &filter, DIDFT_BUTTON, check_device_state_button, &params );
++            {
++                /* PS5 controller-path counters (branch controller-input): reports parsed, those with a button
++                 * down, and those that changed the state the game reads. */
++                static LONG reports, buttons, changes;
++                ULONG down = 0;
++                for (i = 0; i < ARRAY_SIZE(params.buttons); ++i) down += params.buttons[i] != 0;
++                if (down) InterlockedIncrement( &buttons );
++                if (memcmp( &params.old_state, impl->base.device_state, format->dwDataSize )) InterlockedIncrement( &changes );
++                if (InterlockedIncrement( &reports ) % 1024 == 0)
++                    ERR( "pad-path dinput: reports %ld with-a-button-down %ld state-changes %ld\n", reports, buttons, changes );
++            }
+             if (impl->base.hEvent && memcmp( &params.old_state, impl->base.device_state, format->dwDataSize ))
+                 SetEvent( impl->base.hEvent );
+         }
+diff --git a/dlls/hidclass.sys/device.c b/dlls/hidclass.sys/device.c
+index c3e0f85..bf14e90 100644
+--- a/dlls/hidclass.sys/device.c
++++ b/dlls/hidclass.sys/device.c
+@@ -253,7 +253,24 @@ static void hid_device_queue_input( struct phys_device *pdo, HID_XFER_PACKET *pa
+             hid->head.length = report_len;
+             memcpy( hid->data, packet->reportBuffer, packet->reportBufferLen );
+             memset( hid->data + packet->reportBufferLen, 0, report_len - packet->reportBufferLen );
+-            NtUserSendHardwareInput( 0, 0, &input, (LPARAM)hid );
++            {
++                /* PS5 controller-path counters (branch controller-input): how long the WM_INPUT send takes. */
++                static LONGLONG total_us, longest_us;
++                static LONG sends;
++                LARGE_INTEGER start, end, frequency;
++                NtQueryPerformanceCounter( &start, &frequency );
++                NtUserSendHardwareInput( 0, 0, &input, (LPARAM)hid );
++                NtQueryPerformanceCounter( &end, NULL );
++                if (frequency.QuadPart)
++                {
++                    LONGLONG us = (end.QuadPart - start.QuadPart) * 1000000 / frequency.QuadPart;
++                    total_us += us;
++                    if (us > longest_us) longest_us = us;
++                }
++                if (InterlockedIncrement( &sends ) % 1024 == 0)
++                    ERR( "pad-path hidclass: WM_INPUT sends %ld average %lld us longest %lld us\n",
++                         sends, total_us / sends, longest_us );
++            }
+ 
+             free( hid );
+         }
+@@ -268,6 +285,36 @@ static void hid_device_queue_input( struct phys_device *pdo, HID_XFER_PACKET *pa
+     InitializeListHead( &completed );
+ 
+     KeAcquireSpinLock( &pdo->lock, &irql );
++    /* PS5 controller-path counters (branch controller-input): reports, those with a press, the readers (open
++     * files) they reached, the reads they completed at once, and every 1024 reports what each file took. They
++     * are logged once the lock is released. */
++    static LONG reports, pressed, readers, completed_reads;
++    struct { ULONG id, unread; LONG reads, delivered; } files[4];
++    ULONG file_count = 0, logged = 0;
++    {
++        const BYTE *b = packet->reportBuffer;
++        struct hid_queue *each;
++        LIST_FOR_EACH_ENTRY( each, &pdo->queues, struct hid_queue, entry )
++        {
++            readers++;
++            if (!IsListEmpty( &each->irp_queue )) completed_reads++;
++        }
++        if (packet->reportBufferLen > 10 && b[0] == 1 && ((b[8] & 0x0f) != 8 || (b[8] & 0xf0) || b[9] || (b[10] & 3)))
++            pressed++;
++        if (++reports % 1024 == 0)
++        {
++            logged = reports;
++            LIST_FOR_EACH_ENTRY( each, &pdo->queues, struct hid_queue, entry )
++            {
++                if (file_count == ARRAY_SIZE(files)) break;
++                files[file_count].id = each->pad_path_id;
++                files[file_count].unread = (each->write_idx + each->length - each->read_idx) % each->length;
++                files[file_count].reads = each->pad_path_reads;
++                files[file_count].delivered = each->pad_path_delivered;
++                file_count++;
++            }
++        }
++    }
+     if (pdo->removed) WARN( "Device has been removed, dropping report\n" );
+     else LIST_FOR_EACH_ENTRY( queue, &pdo->queues, struct hid_queue, entry )
+     {
+@@ -282,12 +329,22 @@ static void hid_device_queue_input( struct phys_device *pdo, HID_XFER_PACKET *pa
+             irp->IoStatus.Information = report->length;
+             irp->IoStatus.Status = STATUS_SUCCESS;
+             hid_report_decref( report );
++            queue->pad_path_delivered++;
+ 
+             InsertTailList( &completed, &irp->Tail.Overlay.ListEntry );
+         }
+         while (polled);
+     }
+     KeReleaseSpinLock( &pdo->lock, irql );
++    if (logged)
++    {
++        ULONG i;
++        ERR( "pad-path hidclass: reports %ld pressed %ld readers-reached %ld reads-waiting %ld removed %d\n",
++             reports, pressed, readers, completed_reads, pdo->removed );
++        for (i = 0; i < file_count; i++)
++            ERR( "pad-path hidclass: file %lu reads %ld delivered %ld unread %lu\n", files[i].id, files[i].reads,
++                 files[i].delivered, files[i].unread );
++    }
+ 
+     while ((entry = RemoveHeadList( &completed )) != &completed)
+     {
+@@ -723,12 +780,14 @@ NTSTATUS WINAPI pdo_read( DEVICE_OBJECT *device, IRP *irp )
+     }
+ 
+     irp->IoStatus.Information = 0;
++    InterlockedIncrement( &queue->pad_path_reads );
+     if ((report = hid_queue_pop_report( queue )))
+     {
+         memcpy( irp->AssociatedIrp.SystemBuffer, report->buffer, report->length );
+         irp->IoStatus.Information = report->length;
+         irp->IoStatus.Status = STATUS_SUCCESS;
+         hid_report_decref( report );
++        InterlockedIncrement( &queue->pad_path_delivered );
+ 
+         IoCompleteRequest( irp, IO_NO_INCREMENT );
+         return STATUS_SUCCESS;
+@@ -773,12 +832,17 @@ NTSTATUS WINAPI pdo_create( DEVICE_OBJECT *device, IRP *irp )
+     if (!(queue = hid_queue_create())) irp->IoStatus.Status = STATUS_NO_MEMORY;
+     else
+     {
++        /* PS5 controller-path counters (branch controller-input): which files are opened on the device. */
++        static LONG files;
++        queue->pad_path_id = InterlockedIncrement( &files );
++
+         KeAcquireSpinLock( &pdo->lock, &irql );
+         list_add_tail( &pdo->queues, &queue->entry );
+         KeReleaseSpinLock( &pdo->lock, irql );
+ 
+         irp->Tail.Overlay.OriginalFileObject->FsContext = queue;
+         irp->IoStatus.Status = STATUS_SUCCESS;
++        ERR( "pad-path hidclass: file %lu opened on %s\n", queue->pad_path_id, debugstr_w( pdo->base.device_id ) );
+     }
+ 
+     IoCompleteRequest( irp, IO_NO_INCREMENT );
+@@ -810,6 +874,8 @@ NTSTATUS WINAPI pdo_close( DEVICE_OBJECT *device, IRP *irp )
+         KeAcquireSpinLock( &pdo->lock, &irql );
+         list_remove( &queue->entry );
+         KeReleaseSpinLock( &pdo->lock, irql );
++        ERR( "pad-path hidclass: file %lu closed after reads %ld delivered %ld\n", queue->pad_path_id,
++             queue->pad_path_reads, queue->pad_path_delivered );
+         hid_queue_destroy( queue );
+     }
+ 
+diff --git a/dlls/hidclass.sys/hid.h b/dlls/hidclass.sys/hid.h
+index 21de221..5b914d1 100644
+--- a/dlls/hidclass.sys/hid.h
++++ b/dlls/hidclass.sys/hid.h
+@@ -123,6 +123,11 @@ struct hid_queue
+     ULONG              write_idx;
+     struct hid_report *reports[512];
+     LIST_ENTRY         irp_queue;
++    /* PS5 controller-path counters (branch controller-input): the file's number, the reads it sent, and the
++     * reports those reads took. */
++    ULONG              pad_path_id;
++    LONG               pad_path_reads;
++    LONG               pad_path_delivered;
+ };
+ 
+ typedef struct _minidriver
+diff --git a/dlls/winebus.sys/main.c b/dlls/winebus.sys/main.c
+index 5dc27dc..c0c155a 100644
+--- a/dlls/winebus.sys/main.c
++++ b/dlls/winebus.sys/main.c
+@@ -793,6 +793,18 @@ static void process_hid_report(DEVICE_OBJECT *device, BYTE *report_buf, DWORD re
+     }
+ 
+     list_add_tail(&ext->reports, &report->entry);
++    {
++        /* PS5 controller-path counters (branch controller-input): every 1024th report, what winebus did with them. */
++        static LONG reports, pressed, waiting, longest;
++        LONG queued_now = list_count(&ext->reports);
++        if (report_len > 10 && report_buf[0] == 1 && ((report_buf[8] & 0x0f) != 8 || (report_buf[8] & 0xf0) ||
++            report_buf[9] || (report_buf[10] & 3))) InterlockedIncrement(&pressed);
++        if (ext->pending_read) InterlockedIncrement(&waiting);
++        if (queued_now > longest) longest = queued_now;
++        if (InterlockedIncrement(&reports) % 1024 == 0)
++            ERR("pad-path winebus: reports %ld pressed %ld met-a-waiting-read %ld longest-queue %ld\n",
++                reports, pressed, waiting, longest);
++    }
+     /* Keep only the newest unread reports. The list is a FIFO that hidclass empties one read at a time, and a
+      * device that reports faster than hidclass reads (the PS5 DualSense, at 122 reports a second, read through a
+      * server round trip each in a helper process) left every press further behind, until none arrived while the
+diff --git a/dlls/xinput1_3/main.c b/dlls/xinput1_3/main.c
+index c69d6e6..1c5eac6 100644
+--- a/dlls/xinput1_3/main.c
++++ b/dlls/xinput1_3/main.c
+@@ -132,6 +132,7 @@ static BOOL WINAPI find_title_pad(INIT_ONCE *once, void *param, void **context)
+         return TRUE;
+     }
+     TRACE("controller 0 is the title's\n");
++    ERR("pad-path xinput: controller 0 is the title's\n");
+     title_pad = handle;
+     return TRUE;
+ }
+@@ -949,8 +950,20 @@ static DWORD xinput_get_state(DWORD index, XINPUT_STATE *state)
+     if (!state) return ERROR_BAD_ARGUMENTS;
+     if (has_title_pad())
+     {
++        /* PS5 controller-path counters (branch controller-input): polls of controller 0, those that found it
++         * connected, and those with a button down. */
++        static LONG polls, connected, pressed;
+         if (index >= XUSER_MAX_COUNT) return ERROR_BAD_ARGUMENTS;
+-        return title_pad_state(index, state) ? ERROR_SUCCESS : ERROR_DEVICE_NOT_CONNECTED;
++        ret = title_pad_state(index, state) ? ERROR_SUCCESS : ERROR_DEVICE_NOT_CONNECTED;
++        if (!index)
++        {
++            if (ret == ERROR_SUCCESS) InterlockedIncrement( &connected );
++            if (ret == ERROR_SUCCESS && state->Gamepad.wButtons) InterlockedIncrement( &pressed );
++            if (InterlockedIncrement( &polls ) % 1024 == 0)
++                ERR( "pad-path xinput: polls of controller 0 %ld connected %ld with-a-button-down %ld\n",
++                     polls, connected, pressed );
++        }
++        return ret;
+     }
+ 
+     start_update_thread();
+@@ -1298,6 +1311,11 @@ DWORD WINAPI DECLSPEC_HOTPATCH XInputGetCapabilitiesEx(DWORD unk, DWORD index, D
+         caps->VendorId = 0x045e;
+         caps->ProductId = 0x028e;
+         caps->VersionNumber = 0x0114;
++        {
++            /* PS5 controller-path counters (branch controller-input): a program asks what controller 0 is. */
++            static LONG asked;
++            if (InterlockedIncrement( &asked ) <= 4) ERR( "pad-path xinput: controller 0 described as 045e:028e\n" );
++        }
+         return ERROR_SUCCESS;
+     }
+ 
+-- 
+2.56.0
+

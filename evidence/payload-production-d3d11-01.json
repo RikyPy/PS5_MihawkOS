@@ -1,0 +1,98 @@
+{
+ "run": "payload-production-d3d11-01",
+ "what": "d3d11-probe.exe",
+ "env": [
+  "PROTON_LOADING_SCREEN=0",
+  "PROTON_GPU_CAPTURE=1"
+ ],
+ "result": "finished",
+ "seconds": 12.3,
+ "probe_verdict": "PASS",
+ "clean_owner_restart": true,
+ "child_logs": [
+  "klog/payload-production-d3d11-01-wine-child-4839.log",
+  "klog/payload-production-d3d11-01-wine-child-4840.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": true,
+ "bench": {
+  "frames": 180.0,
+  "draws": 1.0,
+  "vsync": 1.0,
+  "total_ms": 5687.0,
+  "frame_us": 31599.0
+ },
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   }
+  ],
+  "top": []
+ },
+ "native_payloads_absent": [
+  {
+   "pid": 4839,
+   "status": -1,
+   "errno": 3,
+   "absent": 1
+  },
+  {
+   "pid": 4840,
+   "status": -1,
+   "errno": 3,
+   "absent": 1
+  }
+ ],
+ "readback": {
+  "size": [
+   1280,
+   720
+  ],
+  "samples": {
+   "center": [
+    127,
+    64,
+    64
+   ],
+   "background": [
+    6,
+    13,
+    26
+   ]
+  }
+ },
+ "display": {
+  "size": [
+   1920,
+   1080
+  ],
+  "samples": {
+   "center": [
+    127,
+    64,
+    64
+   ],
+   "background": [
+    6,
+    13,
+    26
+   ]
+  }
+ }
+}

@@ -1,0 +1,61 @@
+{
+  "daemon_revision": "5b8397b9f2b5f12a7bc2f9c8745a00d1c2dd01ad",
+  "daemon_elf_sha256": "9438bcf8fdf527a0d6f254578b072ceaa2102be5d76410f21992437b0d9d5fd4",
+  "daemon_build_id": "dede84c759da62c662c2728a48ed0842d1f2b44d3343d64250b4a8b1f6639e3b",
+  "mode": "one-shot",
+  "patches": [
+    "platform/lapy/stdout-mirror.patch",
+    "platform/lapy/donor-wait.patch",
+    "platform/lapy/donor-release.patch"
+  ],
+  "title_launched": true,
+  "complete_balanced_lifecycle": true,
+  "lifecycle_validation": {
+    "passed": true,
+    "errors": [],
+    "records": 27,
+    "requests": 1,
+    "donors_reaped": 3,
+    "baseline": [
+      {
+        "build": "dede84c759da62c662c2728a48ed0842d1f2b44d3343d64250b4a8b1f6639e3b",
+        "phase": "baseline",
+        "hold": "74",
+        "use": "73"
+      }
+    ],
+    "final": [
+      {
+        "build": "dede84c759da62c662c2728a48ed0842d1f2b44d3343d64250b4a8b1f6639e3b",
+        "phase": "title_exited",
+        "hold": "74",
+        "use": "73"
+      }
+    ]
+  },
+  "kernel_fault_records": 0,
+  "kernel_fault_signatures": 0,
+  "capture_errors": [],
+  "lifecycle_records": [
+    "1\t2803031125587\tMARK\tdaemon_start build=dede84c759da62c662c2728a48ed0842d1f2b44d3343d64250b4a8b1f6639e3b firmware=10010000 title=PPSA99170 service=0 require_client_result=1 max_requests=0",
+    "7\t2803032070171\tMARK\troot_sample build=dede84c759da62c662c2728a48ed0842d1f2b44d3343d64250b4a8b1f6639e3b phase=layout_before hold=74 use=73",
+    "8\t2803032469174\tMARK\troot_sample build=dede84c759da62c662c2728a48ed0842d1f2b44d3343d64250b4a8b1f6639e3b phase=layout_donor hold=76 use=75",
+    "9\t2803082635258\tMARK\tdonor_reaped build=dede84c759da62c662c2728a48ed0842d1f2b44d3343d64250b4a8b1f6639e3b pid=181 status=9 expected_signal=9",
+    "10\t2803082668775\tMARK\troot_sample build=dede84c759da62c662c2728a48ed0842d1f2b44d3343d64250b4a8b1f6639e3b phase=layout_released hold=74 use=73",
+    "12\t2803082675912\tMARK\troot_layout build=dede84c759da62c662c2728a48ed0842d1f2b44d3343d64250b4a8b1f6639e3b valid=1 error=0 attempts=1",
+    "13\t2803082693152\tMARK\troot_sample build=dede84c759da62c662c2728a48ed0842d1f2b44d3343d64250b4a8b1f6639e3b phase=baseline hold=74 use=73",
+    "18\t2805894079000\tMARK\troot_sample build=dede84c759da62c662c2728a48ed0842d1f2b44d3343d64250b4a8b1f6639e3b phase=donors_ready hold=78 use=77",
+    "20\t2805944688590\tMARK\tdonor_reaped build=dede84c759da62c662c2728a48ed0842d1f2b44d3343d64250b4a8b1f6639e3b pid=183 status=9 expected_signal=9",
+    "21\t2805994867103\tMARK\tdonor_reaped build=dede84c759da62c662c2728a48ed0842d1f2b44d3343d64250b4a8b1f6639e3b pid=184 status=9 expected_signal=9",
+    "22\t2805994893644\tMARK\troot_sample build=dede84c759da62c662c2728a48ed0842d1f2b44d3343d64250b4a8b1f6639e3b phase=donors_reaped hold=76 use=75",
+    "23\t2805994896932\tMARK\tdonor_balance build=dede84c759da62c662c2728a48ed0842d1f2b44d3343d64250b4a8b1f6639e3b expected_two=1",
+    "24\t2805994946326\tMARK\trequest_result build=dede84c759da62c662c2728a48ed0842d1f2b44d3343d64250b4a8b1f6639e3b stage=complete error=0 pid=182 roots_moved=1 cred_changed=1 detached=1 donors_reaped=1",
+    "25\t2806095374717\tMARK\tclient_result build=dede84c759da62c662c2728a48ed0842d1f2b44d3343d64250b4a8b1f6639e3b data_rw=1 open_errno=0",
+    "26\t2811801577099\tMARK\troot_sample build=dede84c759da62c662c2728a48ed0842d1f2b44d3343d64250b4a8b1f6639e3b phase=title_exited hold=74 use=73",
+    "27\t2811801584476\tMARK\tdaemon_result build=dede84c759da62c662c2728a48ed0842d1f2b44d3343d64250b4a8b1f6639e3b stage=complete error=0 pid=182 acknowledged=1 root_balanced=1"
+  ],
+  "title_passed": true,
+  "console_idle": true,
+  "capture": "klog/library-games-only-01",
+  "passed": true
+}

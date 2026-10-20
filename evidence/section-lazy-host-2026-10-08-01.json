@@ -1,0 +1,27 @@
+{
+ "run": "section-lazy-host-2026-10-08-01",
+ "host_only": true,
+ "source_sha256": "b825b4f079323d0f2a92e1925db0b08a01f2c28a633976aff101f89b2e1aa06f",
+ "host_source_sha256": "ca50806e374f8e0b901881e74904543afa316dc6113117ae60ed7480298de7ba",
+ "host_support_sha256": "e9049b107fc94942408bc4fb9555aa1edcc518b2fa5e649f45bef8b95ee4576f",
+ "binary_sha256": "4d9f7e1369871d939d21fa897315ea9932467e7c2ba3495341c21cb2bc8f1822",
+ "oracle": "Linux public mmap and signals; only pathname adapted, native reserve/unmap wrapped by mmap/munmap",
+ "census_measured": false,
+ "proof_limit": "single-thread signal smoke test, not Windows/Wine integration or physical capacity",
+ "virtual_alias_bytes_each": 14495514624,
+ "aliases": 2,
+ "faults": 4,
+ "passed": true,
+ "lines": [
+  "section-lazy reserve=0 exact=1 bytes=68719476736",
+  "section-lazy open=1 truncate=0 errno=0",
+  "section-lazy handlers=0/0 virtual_view_bytes=14495514624 aliases=2",
+  "section-lazy phase=before-touch census_status=0xffffffff resident_bytes=0 mapped_bytes=0",
+  "section-lazy phase=after-touch census_status=0xffffffff resident_bytes=0 mapped_bytes=0",
+  "section-lazy zero=1 coherent=1 flush=0 remove=0 reserve_page=0 persisted=1 faults=4",
+  "section-lazy full_unmap=0 alias_survived=1",
+  "section-lazy phase=before-cleanup census_status=0xffffffff resident_bytes=0 mapped_bytes=0",
+  "section-lazy restore_handlers=0/0",
+  "section-lazy arena_unmap=0 close=0 unlink=0 result=PASS"
+ ]
+}

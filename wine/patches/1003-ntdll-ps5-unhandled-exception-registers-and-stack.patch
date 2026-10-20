@@ -1,0 +1,70 @@
+From: PS5_Proton
+Subject: [PATCH] ntdll: an unhandled exception's registers and stack in the log
+
+A program that ends on an unhandled exception left one line: its code and
+address. A Direct3D 12 game, started from a launcher, ended twice in 4 s on a
+fail-fast (0xc0000409, int 0x29 with code 2: a stack cookie check) at the
+same address in the launcher's overlay DLL, and the function whose
+check failed, the return address at the stack pointer, was not in any
+record.
+
+On the PS5, x86-64 only: after that line, the exception's registers, up
+to four parameters and the top 64 stack entries, bounded by the thread's
+stack limits. The module of each address is found from the loaddll lines
+of the same log.
+---
+diff --git a/dlls/ntdll/unix/thread.c b/dlls/ntdll/unix/thread.c
+--- a/dlls/ntdll/unix/thread.c
++++ b/dlls/ntdll/unix/thread.c
+@@ -1697,6 +1697,37 @@
+ }
+ 
+ 
++#if defined(__PROSPERO__) && defined(__x86_64__)
++/* An unhandled exception's registers and the top of its stack, for the log: a game that ends on a fail-fast
++ * (__fastfail, int 0x29) showed only its address (a Direct3D 12 game, 2026-10-10: a stack cookie check in a launcher's
++ * overlay DLL), and the function that failed is the return address at the stack pointer. The module
++ * of each address is found offline from the loaddll lines. Reads stay inside the thread's stack. */
++static void ps5_report_unhandled( const EXCEPTION_RECORD *rec, const CONTEXT *context )
++{
++    const NT_TIB *tib = &NtCurrentTeb()->Tib;
++    const ULONG64 *sp = (const ULONG64 *)context->Rsp;
++    unsigned int i;
++
++    ERR_(seh)( "  rip=%016llx rsp=%016llx rbp=%016llx rax=%016llx rbx=%016llx rcx=%016llx rdx=%016llx\n",
++               (unsigned long long)context->Rip, (unsigned long long)context->Rsp, (unsigned long long)context->Rbp,
++               (unsigned long long)context->Rax, (unsigned long long)context->Rbx, (unsigned long long)context->Rcx,
++               (unsigned long long)context->Rdx );
++    ERR_(seh)( "  rsi=%016llx rdi=%016llx r8=%016llx r9=%016llx r12=%016llx r13=%016llx r14=%016llx\n",
++               (unsigned long long)context->Rsi, (unsigned long long)context->Rdi, (unsigned long long)context->R8,
++               (unsigned long long)context->R9, (unsigned long long)context->R12, (unsigned long long)context->R13,
++               (unsigned long long)context->R14 );
++    for (i = 0; i < rec->NumberParameters && i < 4; i++)
++        ERR_(seh)( "  parameter %u=%llx\n", i, (unsigned long long)rec->ExceptionInformation[i] );
++    for (i = 0; i < 64; i += 4)
++    {
++        if ((ULONG_PTR)(sp + i) < (ULONG_PTR)tib->StackLimit ||
++            (ULONG_PTR)(sp + i + 4) > (ULONG_PTR)tib->StackBase) break;
++        ERR_(seh)( "  stack %p: %016llx %016llx %016llx %016llx\n", sp + i, (unsigned long long)sp[i],
++                   (unsigned long long)sp[i + 1], (unsigned long long)sp[i + 2], (unsigned long long)sp[i + 3] );
++    }
++}
++#endif
++
+ /*******************************************************************
+  *		NtRaiseException (NTDLL.@)
+  */
+@@ -1714,8 +1745,13 @@
+     else if (rec->ExceptionCode == STATUS_NONCONTINUABLE_EXCEPTION)
+         ERR_(seh)("Process attempted to continue execution after noncontinuable exception.\n");
+     else
++    {
+         ERR_(seh)("Unhandled exception code %x flags %x addr %p\n",
+                   rec->ExceptionCode, rec->ExceptionFlags, rec->ExceptionAddress );
++#if defined(__PROSPERO__) && defined(__x86_64__)
++        ps5_report_unhandled( rec, context );
++#endif
++    }
+ 
+     NtTerminateProcess( NtCurrentProcess(), rec->ExceptionCode );
+     return STATUS_SUCCESS;

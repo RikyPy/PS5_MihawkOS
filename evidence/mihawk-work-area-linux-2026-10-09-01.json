@@ -1,0 +1,22 @@
+{
+ "reference": "GUI-capable Linux Wine 11.18, existing owned diagnostic prefix",
+ "purpose": "SPI shared work area, monitor info and normal maximization across opposite architectures",
+ "results": [
+  {
+   "bits": 32,
+   "exit_code": 1,
+   "log": "work-area PASS: original area saved error=0\nwork-area PASS: actual monitor available error=0\nwork-area PASS: parent reserves taskbar height error=0\nwork-area PASS: SPI shared area error=0\nwork-area FAIL: monitor shared area error=0\nwork-area PASS: real window created error=1400\nwork-area PASS: normal maximize command error=0\nwork-area PASS: maximized client stays inside shared work area error=0\nwork-area PASS: normal restore command error=1400\nwork-area PASS: opposite-architecture child starts error=0\nwork-area FAIL: SPI shared area error=0\nwork-area FAIL: monitor shared area error=0\nwork-area PASS: real window created error=1400\nwork-area PASS: normal maximize command error=0\nwork-area PASS: maximized client stays inside shared work area error=0\nwork-area PASS: normal restore command error=1400\nwork-area PASS: child updates shared area error=0\nwork-area PASS: SPI shared area error=0\nwork-area FAIL: monitor shared area error=0\nPS5_PROTON_WORK_AREA FAIL mode=child bits=64 checks=9 failures=3\nwork-area PASS: child finishes within deadline error=0\nwork-area FAIL: child shared-area verdict error=0\nwork-area FAIL: SPI shared area error=0\nwork-area FAIL: monitor shared area error=0\nwork-area PASS: real window created error=1400\nwork-area PASS: normal maximize command error=1400\nwork-area FAIL: maximized client stays inside shared work area error=1400\nwork-area PASS: normal restore command error=1400\nwork-area PASS: original area restored error=0\nwork-area PASS: SPI shared area error=0\nwork-area PASS: monitor shared area error=0\nPS5_PROTON_WORK_AREA FAIL mode=root bits=32 checks=21 failures=5\n"
+  },
+  {
+   "bits": 64,
+   "exit_code": 1,
+   "log": "work-area PASS: original area saved error=0\nwork-area PASS: actual monitor available error=0\nwork-area PASS: parent reserves taskbar height error=0\nwork-area PASS: SPI shared area error=0\nwork-area FAIL: monitor shared area error=0\nwork-area PASS: real window created error=1400\nwork-area PASS: normal maximize command error=0\nwork-area PASS: maximized client stays inside shared work area error=0\nwork-area PASS: normal restore command error=1400\nwork-area PASS: opposite-architecture child starts error=0\nwork-area FAIL: SPI shared area error=0\nwork-area FAIL: monitor shared area error=0\nwork-area PASS: real window created error=1400\nwork-area PASS: normal maximize command error=0\nwork-area PASS: maximized client stays inside shared work area error=0\nwork-area PASS: normal restore command error=1400\nwork-area PASS: child updates shared area error=0\nwork-area PASS: SPI shared area error=0\nwork-area FAIL: monitor shared area error=0\nPS5_PROTON_WORK_AREA FAIL mode=child bits=32 checks=9 failures=3\nwork-area PASS: child finishes within deadline error=0\nwork-area FAIL: child shared-area verdict error=0\nwork-area FAIL: SPI shared area error=0\nwork-area FAIL: monitor shared area error=0\nwork-area PASS: real window created error=1400\nwork-area PASS: normal maximize command error=1400\nwork-area FAIL: maximized client stays inside shared work area error=1400\nwork-area PASS: normal restore command error=1400\nwork-area PASS: original area restored error=0\nwork-area PASS: SPI shared area error=0\nwork-area PASS: monitor shared area error=0\nPS5_PROTON_WORK_AREA FAIL mode=root bits=64 checks=21 failures=5\n"
+  }
+ ],
+ "passed": false,
+ "probe_revision": "initial 21-root / 9-child check diagnostic, before notification checks",
+ "binaries": {
+  "32": "eb97b2a26e4e664821698df48b90e310499bb3de428aaffbe9a1682414565160",
+  "64": "24ebfd190afdedc507d2b5f88fefb636857e303565e9c188beea4382424be6c4"
+ }
+}

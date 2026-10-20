@@ -1,0 +1,40 @@
+From: PS5_Proton
+Subject: [PATCH] server: publish canonical whole-window shape clips
+
+Keep Wine authoritative for shape, movement and input hit-testing. Export its
+whole-window visible region separately from existing GPU-client clips. Empty
+regions stay empty; region capacity failure rejects the incomplete snapshot.
+Layered windows remain unsupported until their pixel contract is qualified.
+
+--- a/server/window.c
++++ b/server/window.c
+@@ -238,7 +238,28 @@
+     }
+     if (is_visible(win) && !(win->style & WS_MINIMIZE))row->flags |= PW_WINDOW_VISIBLE;
+     if (desktop)row->flags |= PW_WINDOW_DESKTOP;
+-    if (win->win_region || (win->ex_style & WS_EX_LAYERED))row->flags |= PW_WINDOW_UNSUPPORTED;
++    if (win->win_region)
++    {
++        struct region *region=get_visible_region((struct window *)win,DCX_WINDOW);
++        struct rectangle *rects;
++        data_size_t bytes=0;
++        row->flags|=PW_WINDOW_SHAPED;
++        if(!region) {snapshot->overflow=1;return;}
++        map_win_region_to_screen((struct window *)win,region);
++        rects=get_region_data_and_free(region,sizeof(snapshot->clips),&bytes);
++        if(!rects || bytes/sizeof(*rects)>PW_WINDOW_CLIP_LIMIT-snapshot->clip_count)
++        {free(rects);snapshot->overflow=1;return;}
++        row->shape_start=snapshot->clip_count;
++        row->shape_count=bytes/sizeof(*rects);
++        for(unsigned int i=0;i<row->shape_count;++i)
++        {
++            struct rectangle *rect=&rects[i];
++            snapshot->clips[snapshot->clip_count++]=(PwWindowClip){rect->left,rect->top,rect->right,rect->bottom};
++        }
++        free(rects);
++    }
++    /* Layered pixels need their own alpha contract; do not silently paint them opaque. */
++    if (win->ex_style & WS_EX_LAYERED)row->flags |= PW_WINDOW_UNSUPPORTED;
+ }
+ 
+ /* GDI children draw into their parent's surface. Publish only child HWNDs

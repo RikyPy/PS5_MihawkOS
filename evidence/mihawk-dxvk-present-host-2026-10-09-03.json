@@ -1,0 +1,43 @@
+{
+ "oracle": "Linux Wine 11.18 with source-built pinned DXVK v3.1-19-g601930949-ps5-1",
+ "runs": [
+  {
+   "bits": 64,
+   "exit_code": 0,
+   "stdout": "MIHAWK_DXVK_PRESENT PASS bits=64 actual=220,50,60 step=display status=0x0\n",
+   "passed": true,
+   "probe_sha256": "ff198edfdc5ed40a61a02f8d8ba7ec834e320dc1e13aa60a85124d967a017c3c"
+  },
+  {
+   "bits": 32,
+   "exit_code": 0,
+   "stdout": "MIHAWK_DXVK_PRESENT PASS bits=32 actual=220,50,60 step=display status=0x0\n",
+   "passed": true,
+   "probe_sha256": "9ff136b65d07371ca6594cfdf5aadb8b9468e640e1409c4dc5214b8f07cbe488"
+  }
+ ],
+ "passed": true,
+ "console_qualified": false,
+ "windows_equivalence_verified": false,
+ "scope": "Same owned-window drawable observation after ordinary unbound ClearRenderTargetView and Present; no D3D readback",
+ "dxvk_manifest": {
+  "revision": "601930949d111edbbcf9dd463948426d9f8f6ddd",
+  "version": "v3.1-19-g601930949-ps5-1",
+  "source_stamp": "a645688274c04f0ce89960e159ba54777c24cdcc5ac52c23a5bd666babc484d9",
+  "toolchain_sha256": "bb7bb7654b33d5aa8712acb837c963b2e0c56352560c76105270a3268c665c21",
+  "files": {
+   "x86_64/d3d11.dll": "bf782c53e8565dcb5494a31e3a45182090bcbd4ac71b66e85ba114b157d2eaa3",
+   "x86_64/dxgi.dll": "50cd6db7c0932bbebe2e2bbf32b209d393eb9ddc912d9fc6e3460d55cabf8b0f",
+   "x86_64/d3d10core.dll": "fc86f42ecccce405140e14db8e7c99b59b4e7f6ffce298d39c81230242481344",
+   "x86_64/d3d9.dll": "64ed7e31ad670a2861a6f4247aa3cfc4d0ffd52c828c1e93865f26706892a42a",
+   "x86_64/d3d8.dll": "9b84b82ff0a3ea97a8ac9278cfdf4a9171845246ed39a6004c6f117fb6645ad9",
+   "i386/d3d11.dll": "fef2a970ebfdee0130f450a5d60fde05959df17b8280a06bee69c158b6aed94f",
+   "i386/dxgi.dll": "77e98cfee296c038a130f9557205820cd164de3f2bbf1e60067980bfe16743a5",
+   "i386/d3d10core.dll": "b7ea3d14cd5f0bf5cacc6a82755514af6df0cc1a8676dbd397366711408b416f",
+   "i386/d3d9.dll": "4a7a440bb06931c0ba921bd91e6857dad17efb95aee6bc4e7eca23d00bc669cc",
+   "i386/d3d8.dll": "26245ab1e155a212a9d7207e3672afe8befca5ecb4544e3f9c1a4c2ec5c81ffa"
+  },
+  "console_validated": false
+ },
+ "source_sha256": "93d656c46ffb17ea7bed7c11dbac048e2926f42fa19dc6c5f3b8810faf119e4b"
+}

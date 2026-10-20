@@ -1,0 +1,68 @@
+From: PS5_Proton <local>
+Subject: [PATCH] explorer: the Mihawk desktop is the shell's folder view
+
+Wine's explorer paints the desktop's launchers itself: no rubber-band selection, no dragging icons, no rename, no sort or arrange,
+no drag and drop with Explorer windows, and a context menu we had to build by hand (patch 1000). Windows' desktop is the Desktop
+folder's shell view (SHELLDLL_DefView and its list view) inside Progman. In the Mihawk session Progman now hosts that view
+(wine/ps5/pw_shell_desktop_view.h, copied into the explorer sources at build time), so the shell's own code provides those behaviours, and
+the launchers stay for every other desktop and for a session whose view could not be made (the view logs why).
+
+Only a few places change here: the include, Progman fitting the view to its size and to the work area, the call that creates the view in place of the
+launchers, and the desktop's message loop translating keys (the view's type-ahead and rename need characters).
+---
+diff --git a/programs/explorer/desktop.c b/programs/explorer/desktop.c
+--- a/programs/explorer/desktop.c
++++ b/programs/explorer/desktop.c
+@@ -61,6 +61,8 @@
+ static struct launcher **launchers;
+ static unsigned int nb_launchers, nb_allocated;
+ 
++#include "pw_shell_desktop_view.h"  /* the Mihawk session's desktop as a shell folder view (PS5_Proton wine/ps5) */
++
+ static REFIID tid_ids[] =
+ {
+     &IID_IShellWindows,
+@@ -1064,6 +1066,9 @@
+         /* Windows keeps the shell's desktop at the bottom of the z-order. */
+         if (!(((WINDOWPOS *)lp)->flags & SWP_NOZORDER)) ((WINDOWPOS *)lp)->hwndInsertAfter = HWND_BOTTOM;
+         break;
++    case WM_SIZE:
++        pw_desktop_view_fit();
++        break;
+     case WM_CONTEXTMENU:
+         show_desktop_menu( hwnd, (short)LOWORD(lp), (short)HIWORD(lp) );
+         return 0;
+@@ -1099,6 +1104,8 @@
+             open_launcher( hwnd, launchers[selected_launcher], "Enter" );
+         break;
+     case WM_SETTINGCHANGE:
++        if (wp == SPI_SETWORKAREA) pw_desktop_view_fit();
++        /* fall through */
+     case WM_SYSCOLORCHANGE:
+         /* The system repaints its own desktop window for a new wallpaper or colour; this one repaints itself. */
+         desktop_wnd_proc( hwnd, message, wp, lp );
+@@ -1715,7 +1722,10 @@
+                 CoUninitialize();
+             }
+         }
+-        if (!using_root && enable_launchers) initialize_launchers( hwnd );
++        /* In the Mihawk session the shell's own folder view shows the desktop (patch 1100); the launchers stay for every other desktop
++         * and for a session whose view could not be made. */
++        if (session && enable_launchers && pw_desktop_view_create( hwnd )) ;
++        else if (!using_root && enable_launchers) initialize_launchers( hwnd );
+ 
+         if ((shell32 = LoadLibraryW( L"shell32.dll" )) &&
+             (pShellDDEInit = (void *)GetProcAddress( shell32, (LPCSTR)188)))
+@@ -1756,7 +1766,11 @@
+         start_xalia_process();
+ 
+         TRACE( "desktop message loop starting on hwnd %p\n", hwnd );
+-        while (GetMessageW( &msg, 0, 0, 0 )) DispatchMessageW( &msg );
++        while (GetMessageW( &msg, 0, 0, 0 ))
++        {
++            TranslateMessage( &msg );  /* the desktop's folder view takes typed characters (type-ahead, rename) */
++            DispatchMessageW( &msg );
++        }
+         TRACE( "desktop message loop exiting for hwnd %p\n", hwnd );
+     }
+ 

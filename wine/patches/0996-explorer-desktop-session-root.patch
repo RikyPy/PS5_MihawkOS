@@ -1,0 +1,259 @@
+From: PS5_Proton
+Subject: [PATCH] explorer: run as the title's desktop session root
+
+The Mihawk OS desktop session no longer runs a Windows mihawk.exe: the PS5
+title starts Explorer itself as the session's root with MIHAWK_SESSION=1
+(src/pw_desktop_session.h), and in game mode ends it while a full-screen
+game runs and starts it again afterwards. With that variable:
+
+- Explorer enables its shell on the Default desktop and initializes the
+  session's wallpaper once per prefix with the same function mihawk.exe
+  ran (pw_shell_wallpaper.h, copied from wine/ps5 at build time).
+- Its desktop is Progman, as on Windows: a bottom-most top-level window
+  that paints the wallpaper and the launchers and is the shell window,
+  while the desktop window itself stays the system's (the PS5 server makes
+  it with no thread). An Explorer that claimed the desktop window could
+  not be replaced: Wine refuses a second desktop window, and a restarted
+  Explorer exited at once (step3-diag-2026-10-10-01).
+- Progman becomes the shell window as soon as it exists, before Explorer
+  starts the session's program or sets up COM, as on Windows: Explorer is
+  now the session's first process, and a program it started looked for
+  the shell before Explorer had registered it
+  (step3-gate-2026-10-10-01-gpu-window32).
+- The Mihawk taskbar learns of window creation and destruction from window
+  events, since parent notifications go to the system's desktop window,
+  and adopts the windows already open when it starts.
+- A taskbar made in the session broadcasts TaskbarCreated, as Windows'
+  Explorer does, so programs add their notification icons again after
+  the session restarts Explorer.
+
+Without the variable nothing changes.
+
+diff --git a/programs/explorer/desktop.c b/programs/explorer/desktop.c
+index 594b825..bb3a0de 100644
+--- a/programs/explorer/desktop.c
++++ b/programs/explorer/desktop.c
+@@ -853,6 +853,45 @@ static LRESULT WINAPI desktop_wnd_proc( HWND hwnd, UINT message, WPARAM wp, LPAR
+     return desktop_orig_wndproc( hwnd, message, wp, lp );
+ }
+ 
++/* The Mihawk session's desktop, as on Windows: the system owns the desktop window (the PS5 server makes it, with no
++ * thread) and the shell's desktop is Progman, a bottom-most top-level window that paints the wallpaper and the
++ * launchers. When this Explorer ends (game mode unloads it, or it fails) Progman goes with it and the desktop window
++ * and every other window stay; the next Explorer makes its own Progman. An Explorer that claimed the desktop window
++ * itself could not be replaced: Wine refuses a second desktop window (step3-diag-2026-10-10-01). */
++static LRESULT WINAPI progman_wnd_proc( HWND hwnd, UINT message, WPARAM wp, LPARAM lp )
++{
++    switch (message)
++    {
++    case WM_WINDOWPOSCHANGING:
++        /* Windows keeps the shell's desktop at the bottom of the z-order. */
++        if (!(((WINDOWPOS *)lp)->flags & SWP_NOZORDER)) ((WINDOWPOS *)lp)->hwndInsertAfter = HWND_BOTTOM;
++        break;
++    case WM_SETTINGCHANGE:
++    case WM_SYSCOLORCHANGE:
++        /* The system repaints its own desktop window for a new wallpaper or colour; this one repaints itself. */
++        desktop_wnd_proc( hwnd, message, wp, lp );
++        InvalidateRect( hwnd, NULL, TRUE );
++        return 0;
++    }
++    return desktop_wnd_proc( hwnd, message, wp, lp );
++}
++
++static HWND create_progman(void)
++{
++    WNDCLASSEXW class = { sizeof(class) };
++
++    GetDesktopWindow();  /* the system's desktop window, made by the server if nobody has asked yet */
++    desktop_orig_wndproc = DefWindowProcW;
++    class.style = CS_DBLCLKS;  /* the launchers open on a double click */
++    class.lpfnWndProc = progman_wnd_proc;
++    class.hInstance = GetModuleHandleW( NULL );
++    class.hCursor = LoadCursorW( 0, (LPCWSTR)IDC_ARROW );
++    class.lpszClassName = L"Progman";
++    if (!RegisterClassExW( &class ) && GetLastError() != ERROR_CLASS_ALREADY_EXISTS) return 0;
++    return CreateWindowExW( WS_EX_TOOLWINDOW, L"Progman", L"Program Manager",
++                            WS_POPUP | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0, 0, 0, 0, 0, 0, class.hInstance, NULL );
++}
++
+ /* parse the desktop size specification */
+ static BOOL parse_size( const WCHAR *size, unsigned int *width, unsigned int *height )
+ {
+@@ -959,6 +998,16 @@ static BOOL get_default_enable_shell( const WCHAR *name )
+     return result;
+ }
+ 
++/* The Mihawk OS desktop session: the title starts this Explorer as the session's root with MIHAWK_SESSION=1
++ * (src/pw_desktop_session.h in PS5_Proton), and may end it while a full-screen game runs and start it again. */
++static BOOL mihawk_session(void)
++{
++    WCHAR value[4];
++    return GetEnvironmentVariableW( L"MIHAWK_SESSION", value, ARRAY_SIZE(value) ) == 1 && value[0] == '1';
++}
++
++#include "pw_shell_wallpaper.h"  /* the session's background, once per prefix (PS5_Proton wine/ps5) */
++
+ static BOOL get_default_enable_launchers(void)
+ {
+     BOOL result;
+@@ -1312,7 +1361,7 @@ void manage_desktop( WCHAR *arg )
+     WCHAR *cmdline = NULL, *driver = NULL;
+     WCHAR *p = arg;
+     const WCHAR *name = NULL;
+-    BOOL enable_shell, enable_launchers, show_systray, no_tray_items;
++    BOOL enable_shell, enable_launchers, show_systray, no_tray_items, session;
+     void (WINAPI *pShellDDEInit)( BOOL ) = NULL;
+     HMODULE shell32;
+     HANDLE thread;
+@@ -1359,6 +1408,8 @@ void manage_desktop( WCHAR *arg )
+     }
+ 
+     enable_shell = name ? get_default_enable_shell( name ) : FALSE;
++    session = name && !wcsicmp( name, L"Default" ) && mihawk_session();
++    if (session) enable_shell = TRUE;
+     enable_launchers = get_default_enable_launchers();
+     show_systray = get_default_show_systray( name );
+     no_tray_items = get_no_tray_items_display();
+@@ -1385,25 +1436,37 @@ void manage_desktop( WCHAR *arg )
+     status = NtSetInformationProcess( GetCurrentProcess(), ProcessWineGrantAdminToken, NULL, 0 );
+     if (status) WARN( "couldn't set admin token for desktop, error %08lx\n", status );
+ 
+-    /* create the desktop window */
+-    hwnd = CreateWindowExW( 0, DESKTOP_CLASS_ATOM, NULL,
+-                            WS_POPUP | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0, 0, 0, 0, 0, 0, 0, &guid );
++    /* create the desktop window (in the Mihawk session, the shell's Progman) */
++    if (session) hwnd = create_progman();
++    else hwnd = CreateWindowExW( 0, DESKTOP_CLASS_ATOM, NULL,
++                                 WS_POPUP | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0, 0, 0, 0, 0, 0, 0, &guid );
+ 
+     if (hwnd)
+     {
+-        /* create the HWND_MESSAGE parent */
+-        CreateWindowExW( 0, L"Message", NULL, WS_POPUP | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
+-                         0, 0, 100, 100, 0, 0, 0, NULL );
++        if (!session)
++        {
++            /* create the HWND_MESSAGE parent */
++            CreateWindowExW( 0, L"Message", NULL, WS_POPUP | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
++                             0, 0, 100, 100, 0, 0, 0, NULL );
+ 
+-        desktop_orig_wndproc = (WNDPROC)SetWindowLongPtrW( hwnd, GWLP_WNDPROC,
+-            (LONG_PTR)desktop_wnd_proc );
++            desktop_orig_wndproc = (WNDPROC)SetWindowLongPtrW( hwnd, GWLP_WNDPROC,
++                (LONG_PTR)desktop_wnd_proc );
++        }
+         SendMessageW( hwnd, WM_SETICON, ICON_BIG, (LPARAM)LoadIconW( 0, MAKEINTRESOURCEW(OIC_WINLOGO)));
+-        if (name) set_desktop_window_title( hwnd, name );
+-        SetWindowPos( hwnd, 0, GetSystemMetrics(SM_XVIRTUALSCREEN), GetSystemMetrics(SM_YVIRTUALSCREEN),
+-                      GetSystemMetrics(SM_CXVIRTUALSCREEN), GetSystemMetrics(SM_CYVIRTUALSCREEN),
+-                      SWP_SHOWWINDOW );
++        if (name && !session) set_desktop_window_title( hwnd, name );
++        SetWindowPos( hwnd, session ? HWND_BOTTOM : 0, GetSystemMetrics(SM_XVIRTUALSCREEN),
++                      GetSystemMetrics(SM_YVIRTUALSCREEN), GetSystemMetrics(SM_CXVIRTUALSCREEN),
++                      GetSystemMetrics(SM_CYVIRTUALSCREEN), SWP_SHOWWINDOW | (session ? SWP_NOACTIVATE : 0) );
++        /* The session's Explorer is its first process: the shell is there before any program starts or COM is
++         * set up, as on Windows, so a program the session starts finds it (step3-gate-2026-10-10-01-gpu-window32). */
++        if (session) set_shell_window( hwnd );
+         thread = CreateThread( NULL, 0, clipboard_thread, NULL, 0, &id );
+         if (thread) CloseHandle( thread );
++        if (session)
++        {
++            DWORD wallpaper = pw_shell_prepare_wallpaper();
++            if (wallpaper) WARN( "Mihawk wallpaper initialization failed: %lu\n", wallpaper );
++        }
+         SystemParametersInfoW( SPI_SETDESKWALLPAPER, 0, NULL, FALSE );
+         ClipCursor( NULL );
+         initialize_display_settings( width, height );
+@@ -1450,7 +1513,7 @@ void manage_desktop( WCHAR *arg )
+ 
+     /* Ideally we would set the window of an IShellView here, but we never
+        actually create one, so the desktop window itself will have to do. */
+-    set_shell_window( hwnd );
++    if (!session) set_shell_window( hwnd );
+ 
+     /* run the desktop message loop */
+     if (hwnd)
+diff --git a/programs/explorer/systray.c b/programs/explorer/systray.c
+index cba173e..12eb6ac 100644
+--- a/programs/explorer/systray.c
++++ b/programs/explorer/systray.c
+@@ -141,7 +141,7 @@ enum { TASKBAR_PREVIEW_SHOW = 4, TASKBAR_PREVIEW_HIDE = 5, TASKBAR_SYNC = 6 };
+  * (foreground, shown or hidden, minimized or restored, retitled; creation and destruction arrive as parent
+  * notifications) instead of a scan of every window each second, which cost about 146 server calls a second
+  * while a full-screen game hid the taskbar (2026-10-10). */
+-static HWINEVENTHOOK taskbar_events[4];
++static HWINEVENTHOOK taskbar_events[5];
+ static BOOL taskbar_sync_pending;
+ static RECT taskbar_overflow_placed, taskbar_clock_placed;
+ static BOOL taskbar_overflow_shown;
+@@ -1157,12 +1157,27 @@ static void taskbar_arm_clock(void)
+     SetTimer(tray_window, 3, (60 - now.wSecond) * 1000 - now.wMilliseconds + 50, NULL);
+ }
+ 
+-/* A window event (out of context, on this thread): one sync shortly after, however many arrive. */
++static struct taskbar_button *find_taskbar_button( HWND hwnd );
++static void add_taskbar_button( HWND hwnd );
++static void remove_taskbar_button( HWND hwnd );
++/* A window event (out of context, on this thread): one sync shortly after, however many arrive. Creation and
++ * destruction come here too: in the Mihawk session the system owns the desktop window, so the parent notifications
++ * Wine posts to it reach no shell (desktop.c, Progman). */
+ static void CALLBACK taskbar_event(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG object, LONG child,
+                                    DWORD thread, DWORD time)
+ {
+     if (!hwnd || object != OBJID_WINDOW || child != CHILDID_SELF) return;
+-    if (event != EVENT_SYSTEM_FOREGROUND && (GetWindowLongW(hwnd, GWL_STYLE) & WS_CHILD)) return;
++    if (event == EVENT_OBJECT_DESTROY)
++    {
++        if (find_taskbar_button(hwnd)) remove_taskbar_button(hwnd);
++        cleanup_systray_window(hwnd);
++    }
++    else if (event == EVENT_OBJECT_CREATE)
++    {
++        if (GetAncestor(hwnd, GA_PARENT) != GetDesktopWindow() || find_taskbar_button(hwnd)) return;
++        add_taskbar_button(hwnd);
++    }
++    else if (event != EVENT_SYSTEM_FOREGROUND && (GetWindowLongW(hwnd, GWL_STYLE) & WS_CHILD)) return;
+     if (taskbar_sync_pending) return;
+     taskbar_sync_pending = TRUE;
+     SetTimer(tray_window, TASKBAR_SYNC, 30, NULL);
+@@ -1170,7 +1185,8 @@ static void CALLBACK taskbar_event(HWINEVENTHOOK hook, DWORD event, HWND hwnd, L
+ 
+ static void taskbar_watch(BOOL on)
+ {
+-    static const DWORD ranges[4][2] = {{EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND},
++    static const DWORD ranges[5][2] = {{EVENT_OBJECT_CREATE, EVENT_OBJECT_DESTROY},
++        {EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND},
+         {EVENT_SYSTEM_MINIMIZESTART, EVENT_SYSTEM_MINIMIZEEND}, {EVENT_OBJECT_SHOW, EVENT_OBJECT_HIDE},
+         {EVENT_OBJECT_NAMECHANGE, EVENT_OBJECT_NAMECHANGE}};
+     for (unsigned i = 0; i < ARRAY_SIZE(taskbar_events); ++i)
+@@ -1358,6 +1374,14 @@ done:
+     return ret;
+ }
+ 
++static struct taskbar_button *find_taskbar_button( HWND hwnd );
++static void add_taskbar_button( HWND hwnd );
++static BOOL CALLBACK taskbar_adopt( HWND hwnd, LPARAM unused )
++{
++    if (!find_taskbar_button( hwnd )) add_taskbar_button( hwnd );
++    return TRUE;
++}
++
+ static void add_taskbar_button( HWND hwnd )
+ {
+     struct taskbar_button *win;
+@@ -1965,9 +1989,15 @@ void initialize_systray( BOOL arg_using_root, BOOL arg_enable_shell, BOOL arg_sh
+         taskbar_surfaces();
+     }
+     add_taskbar_button( 0 );
++    /* A taskbar started again (the title's desktop session restarts Explorer after a full-screen game) learns of the
++     * windows already open; creations after this arrive as window events (taskbar_event). */
++    if (mihawk_taskbar) EnumWindows( taskbar_adopt, 0 );
+     if (mihawk_taskbar && !RegisterHotKey(tray_window, 0x4d54, MOD_WIN, 'T'))
+         WARN("Mihawk taskbar hotkey registration failed: %lu\n", GetLastError());
+ 
+     if (enable_taskbar) do_show_systray();
+     else do_hide_systray();
++    /* As Windows' Explorer does whenever its taskbar is made: programs add their notification icons again, which a
++     * restarted Explorer would otherwise have lost for good (the session restarts it after a full-screen game). */
++    if (mihawk_taskbar) SendNotifyMessageW( HWND_BROADCAST, RegisterWindowMessageW( L"TaskbarCreated" ), 0, 0 );
+ }

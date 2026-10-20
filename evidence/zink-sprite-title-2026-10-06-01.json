@@ -1,0 +1,87 @@
+{
+ "run": "zink-sprite-title-2026-10-06-01",
+ "what": "gl-sprite-probe.exe",
+ "env": [
+  "WINEDLLOVERRIDES=opengl32=n;d3d11,dxgi,d3d10core=n,b;bcrypt=b",
+  "GALLIUM_DRIVER=zink",
+  "WINE_PS5_HID=0",
+  "PROTON_LOADING_SCREEN=0",
+  "PROTON_GPU_CAPTURE=1",
+  "WINEDEBUG=-all,+seh,+debugstr,+loaddll",
+  "PROTON_LAYOUT=title"
+ ],
+ "result": "finished",
+ "seconds": 10.5,
+ "probe_verdict": "PASS",
+ "clean_owner_restart": false,
+ "child_logs": [
+  "klog/zink-sprite-title-2026-10-06-01-wine-child-227.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": true,
+ "bench": {},
+ "steady": {
+  "vulkan_first_frame_ms": 4733.0
+ },
+ "intervals": {
+  "frames": [
+   {
+    "api": "vulkan",
+    "first_frame_ms": 4733.0
+   },
+   {
+    "api": "vulkan",
+    "frames": 19.0,
+    "fps": 3.7,
+    "p50_ms": 16.75,
+    "p95_ms": 49.25,
+    "p99_ms": 49.25,
+    "max_ms": 49.25,
+    "present_avg_ms": 0.011,
+    "present_max_all_ms": 0.113
+   }
+  ],
+  "server": [
+   {
+    "calls": 2495.0,
+    "per_s": 492.0,
+    "avg_us": 21.8,
+    "selects": 14.0,
+    "blocked": 2.0,
+    "block_avg_us": 281216.7,
+    "waits": 7.0,
+    "handles_avg": 1.14,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 6.0,
+    "yields": 0.0
+   }
+  ],
+  "top": [
+   {
+    "create_mapping": {
+     "count": 39,
+     "avg_us": 346.8
+    },
+    "create_file": {
+     "count": 45,
+     "avg_us": 187.5
+    },
+    "get_key_value": {
+     "count": 432,
+     "avg_us": 15.8
+    },
+    "open_key": {
+     "count": 213,
+     "avg_us": 15.8
+    },
+    "enum_key_value": {
+     "count": 162,
+     "avg_us": 16.3
+    }
+   }
+  ]
+ }
+}

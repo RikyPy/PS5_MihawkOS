@@ -1,0 +1,545 @@
+From: PS5_Proton <local>
+Subject: [PATCH] win32u: Windows 11's window frame and caption buttons
+
+The approved Windows 11 prototype (PS5_Proton-design prototypes/windows11-shell) draws a window as Windows 11 does:
+a 1-pixel border round a 32-pixel title bar and the client, the caption buttons 46 x 32 side by side in the bar's
+top right corner with no plate at rest, lit while the pointer is over them. Wine drew the classic frame (a raised
+edge and the sizing border, 4 pixels), buttons inset by 2 pixels with 1-pixel gaps, a line under the caption, and
+never a hot button. With the managed theme's bitmaps (PS5_Proton tools/pw_caption_buttons.py, measured from the
+prototype) this draws the same pixels:
+
+- A framed top-level window's visible rect is its window rect less the invisible part of the frame (all of it but the
+  innermost pixel; all of it when maximized), as DWM shows Windows 11 windows, for a driver that decorates nothing
+  (get_visible_rect). The frame still sizes the window: the server's hit test keeps the window rect for top-level
+  windows. The visible pixel is the caption's colour; the PS5 compositor draws Windows 11's default border over it
+  (the server's default border, #66757575).
+- The caption buttons are SM_CXSIZE wide and SM_CYCAPTION tall from the inside rect's top right, close first; hit
+  testing uses the same rectangles. The caption bar fills SM_CYCAPTION with no line beneath it; the icon and the
+  title each start 16 pixels after what precedes them.
+- DWMWA_EXTENDED_FRAME_BOUNDS answers those visible bounds, as on Windows 11 (it answered GetWindowRect).
+- WM_NCMOUSEMOVE over a button draws it hot (CBS_HOT, passed to the theme hook as down = 2, which the classic
+  fallback draws DFCS_HOT) and tracks the non-client leave; moving off it or WM_NCMOUSELEAVE draws it normal again.
+  A repaint keeps the hot button.
+---
+diff --git a/dlls/dwmapi/dwmapi_main.c b/dlls/dwmapi/dwmapi_main.c
+index 2518fce..ec14bf9 100644
+--- a/dlls/dwmapi/dwmapi_main.c
++++ b/dlls/dwmapi/dwmapi_main.c
+@@ -277,7 +277,35 @@ HRESULT WINAPI DwmGetWindowAttribute(HWND hwnd, DWORD attribute, PVOID pv_attrib
+         /* DWM frame bounds are always in physical coords */
+         context = SetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE);
+         if (GetWindowRect(hwnd, rect))
++        {
++            /* What the window shows: inside the invisible part of its resize border, as win32u's visible rect keeps
++             * it (PS5_Proton patch 1136, get_visible_rect and get_dwm_frame_inset): a 1-pixel border, none maximized. */
++            DWORD style = GetWindowLongW(hwnd, GWL_STYLE), ex_style = GetWindowLongW(hwnd, GWL_EXSTYLE);
++            RECT client;
++            POINT origin = {0, 0};
++            int x = 0, y = 0;
++
++            if ((style & WS_THICKFRAME) && (style & (WS_DLGFRAME | WS_BORDER)) != WS_DLGFRAME)
++            {
++                x = GetSystemMetrics(SM_CXFRAME);
++                y = GetSystemMetrics(SM_CYFRAME);
++            }
++            else if ((ex_style & WS_EX_DLGMODALFRAME) || ((style & WS_DLGFRAME) && !(style & WS_THICKFRAME)))
++            {
++                x = GetSystemMetrics(SM_CXDLGFRAME);
++                y = GetSystemMetrics(SM_CYDLGFRAME);
++            }
++            if (x && !(style & WS_MAXIMIZE))
++            {
++                x -= GetSystemMetrics(SM_CXBORDER);
++                y -= GetSystemMetrics(SM_CYBORDER);
++            }
++            GetClientRect(hwnd, &client);
++            ClientToScreen(hwnd, &origin);
++            OffsetRect(&client, origin.x, origin.y);
++            if (!EqualRect(&client, rect) && GetWindowRgnBox(hwnd, &client) == ERROR) InflateRect(rect, -x, -y);
+             hr = S_OK;
++        }
+         else
+             hr = HRESULT_FROM_WIN32(GetLastError());
+ 
+diff --git a/dlls/user32/nonclient.c b/dlls/user32/nonclient.c
+index c9f1d9d..d5cca8d 100644
+--- a/dlls/user32/nonclient.c
++++ b/dlls/user32/nonclient.c
+@@ -148,7 +148,8 @@ void WINAPI USER_NonClientButtonDraw( HWND hwnd, HDC hdc, enum NONCLIENT_BUTTON_
+     }
+     if (type >= CAPTION_CLOSE_BUTTON && type <= CAPTION_SMALL_CLOSE_BUTTON)
+     {
+-        if (down) flags |= DFCS_PUSHED;
++        if (down == 2) flags |= DFCS_HOT;  /* the pointer is over it */
++        else if (down) flags |= DFCS_PUSHED;
+         if (grayed) flags |= DFCS_INACTIVE;
+         DrawFrameControl( hdc, &rect, DFC_CAPTION, flags );
+         return;
+diff --git a/dlls/uxtheme/window.c b/dlls/uxtheme/window.c
+index e1e95bd..bb8186b 100644
+--- a/dlls/uxtheme/window.c
++++ b/dlls/uxtheme/window.c
+@@ -82,7 +82,8 @@ static void uxtheme_draw_caption_button(HTHEME theme, HWND hwnd, HDC hdc,
+     case CAPTION_RESTORE_BUTTON: part = WP_RESTOREBUTTON; break;
+     default: return;
+     }
+-    state = grayed ? CBS_DISABLED : down ? CBS_PUSHED : CBS_NORMAL;
++    /* down: 1 pressed, 2 hot (the pointer is over it) */
++    state = grayed ? CBS_DISABLED : down == 2 ? CBS_HOT : down ? CBS_PUSHED : CBS_NORMAL;
+     if (GetActiveWindow() != hwnd) state += 4;
+     if (!IsThemePartDefined(theme, part, 0))
+         result = E_NOTIMPL;
+diff --git a/dlls/win32u/defwnd.c b/dlls/win32u/defwnd.c
+index e7bd626..a9c4d2a 100644
+--- a/dlls/win32u/defwnd.c
++++ b/dlls/win32u/defwnd.c
+@@ -67,6 +67,32 @@ static BOOL has_static_outer_frame( UINT ex_style )
+     return (ex_style & (WS_EX_STATICEDGE|WS_EX_DLGMODALFRAME)) == WS_EX_STATICEDGE;
+ }
+ 
++/* Windows 11 shows a framed top-level window inside its resize border, as DWM does: a 1-pixel border and what it
++ * encloses (the whole frame when maximized). The rest of the frame is invisible yet still sizes the window. Returns
++ * the invisible part on each side, or FALSE for a window without such a frame. */
++BOOL get_dwm_frame_inset( UINT style, UINT ex_style, SIZE *inset )
++{
++    if (style & WS_CHILD) return FALSE;
++    if (has_thick_frame( style, ex_style ))
++    {
++        inset->cx = get_system_metrics( SM_CXFRAME );
++        inset->cy = get_system_metrics( SM_CYFRAME );
++    }
++    else if (has_dialog_frame( style, ex_style ))
++    {
++        inset->cx = get_system_metrics( SM_CXDLGFRAME );
++        inset->cy = get_system_metrics( SM_CYDLGFRAME );
++    }
++    else return FALSE;
++    if (!(style & WS_MAXIMIZE))
++    {
++        inset->cx -= get_system_metrics( SM_CXBORDER );
++        inset->cy -= get_system_metrics( SM_CYBORDER );
++    }
++    return TRUE;
++}
++
++
+ static BOOL has_menu( HWND hwnd, UINT style )
+ {
+     return (style & (WS_CHILD | WS_POPUP)) != WS_CHILD && get_menu( hwnd );
+@@ -1098,6 +1124,30 @@ static void get_inside_rect( HWND hwnd, enum coords_relative relative, RECT *rec
+     }
+ }
+ 
++/* Windows 11's caption buttons: the caption's full height, SM_CXSIZE wide, side by side from the inside rectangle's
++ * right edge, close first. A tool window keeps its small close button. */
++static void get_caption_button_rect( HWND hwnd, DWORD style, DWORD ex_style, int index, RECT *rect )
++{
++    get_inside_rect( hwnd, COORDS_WINDOW, rect, style, ex_style );
++    rect->right -= index * get_system_metrics( SM_CXSIZE );
++    rect->left = rect->right - get_system_metrics( SM_CXSIZE );
++    rect->bottom = rect->top + get_system_metrics( SM_CYCAPTION );
++}
++
++/* The caption button the pointer is over (HTCLOSE, HTMAXBUTTON, HTMINBUTTON) or 0, drawn hot. */
++static UINT get_caption_hot( HWND hwnd )
++{
++    WND *win = get_win_ptr( hwnd );
++    UINT hot = 0;
++
++    if (win && win != WND_OTHER_PROCESS && win != WND_DESKTOP)
++    {
++        hot = win->caption_hot;
++        release_win_ptr( win );
++    }
++    return hot;
++}
++
+ void get_sys_popup_pos( HWND hwnd, RECT *rect )
+ {
+     if (is_iconic(hwnd)) get_window_rect( hwnd, rect, get_thread_dpi() );
+@@ -1248,7 +1298,7 @@ BOOL draw_nc_sys_button( HWND hwnd, HDC hdc, BOOL down )
+         DWORD ex_style = get_window_long( hwnd, GWL_EXSTYLE );
+ 
+         get_inside_rect( hwnd, COORDS_WINDOW, &rect, style, ex_style );
+-        pt.x = rect.left + 2;
++        pt.x = rect.left + 16;
+         pt.y = rect.top + (get_system_metrics( SM_CYCAPTION ) - get_system_metrics( SM_CYSMICON )) / 2;
+         NtUserDrawIconEx( hdc, pt.x, pt.y, icon,
+                           get_system_metrics( SM_CXSMICON ),
+@@ -1509,13 +1559,7 @@ static void draw_close_button( HWND hwnd, HDC hdc, BOOL down, BOOL grayed )
+         rect.bottom = rect.top + bmp_height;
+         rect.right = rect.left + bmp_width;
+     }
+-    else
+-    {
+-        rect.left = rect.right - get_system_metrics( SM_CXSIZE );
+-        rect.bottom = rect.top + get_system_metrics( SM_CYSIZE ) - 2;
+-        rect.top += 2;
+-        rect.right -= 2;
+-    }
++    else get_caption_button_rect( hwnd, style, ex_style, 0, &rect );
+ 
+     draw_menu_button( hwnd, hdc, &rect,
+                       (ex_style & WS_EX_TOOLWINDOW) ? CAPTION_SMALL_CLOSE_BUTTON : CAPTION_CLOSE_BUTTON, down, grayed );
+@@ -1530,12 +1574,7 @@ static void draw_max_button( HWND hwnd, HDC hdc, BOOL down, BOOL grayed )
+     /* never draw maximize box when window has WS_EX_TOOLWINDOW style */
+     if (ex_style & WS_EX_TOOLWINDOW) return;
+ 
+-    get_inside_rect( hwnd, COORDS_WINDOW, &rect, style, ex_style );
+-    if (style & WS_SYSMENU) rect.right -= get_system_metrics( SM_CXSIZE );
+-    rect.left = rect.right - get_system_metrics( SM_CXSIZE );
+-    rect.bottom = rect.top + get_system_metrics( SM_CYSIZE ) - 2;
+-    rect.top += 2;
+-    rect.right -= 2;
++    get_caption_button_rect( hwnd, style, ex_style, (style & WS_SYSMENU) ? 1 : 0, &rect );
+     draw_menu_button( hwnd, hdc, &rect,
+                       (style & WS_MAXIMIZE) ? CAPTION_RESTORE_BUTTON : CAPTION_MAX_BUTTON, down, grayed );
+ }
+@@ -1549,15 +1588,7 @@ static void draw_min_button( HWND hwnd, HDC hdc, BOOL down, BOOL grayed )
+     /* never draw minimize box when window has WS_EX_TOOLWINDOW style */
+     if (ex_style & WS_EX_TOOLWINDOW) return;
+ 
+-    get_inside_rect( hwnd, COORDS_WINDOW, &rect, style, ex_style );
+-    if (style & WS_SYSMENU)
+-        rect.right -= get_system_metrics( SM_CXSIZE );
+-    if (style & (WS_MAXIMIZEBOX|WS_MINIMIZEBOX))
+-        rect.right -= get_system_metrics( SM_CXSIZE ) - 2;
+-    rect.left = rect.right - get_system_metrics( SM_CXSIZE );
+-    rect.bottom = rect.top + get_system_metrics( SM_CYSIZE ) - 2;
+-    rect.top += 2;
+-    rect.right -= 2;
++    get_caption_button_rect( hwnd, style, ex_style, !!(style & WS_SYSMENU) + !!(style & (WS_MAXIMIZEBOX|WS_MINIMIZEBOX)), &rect );
+     draw_menu_button( hwnd, hdc, &rect,
+                       (style & WS_MINIMIZE) ? CAPTION_RESTORE_BUTTON : CAPTION_MIN_BUTTON, down, grayed );
+ }
+@@ -1567,28 +1598,23 @@ static void draw_nc_caption( HDC hdc, RECT *rect, HWND hwnd, DWORD  style,
+ {
+     RECT  r = *rect;
+     WCHAR buffer[256];
+-    HPEN prev_pen;
+     HMENU sys_menu;
+     BOOL gradient = FALSE;
+-    UINT pen_color = COLOR_3DFACE;
++    UINT hot = get_caption_hot( hwnd );
+     int len;
+ 
+-    if ((ex_style & (WS_EX_STATICEDGE|WS_EX_CLIENTEDGE|WS_EX_DLGMODALFRAME)) == WS_EX_STATICEDGE)
+-        pen_color = COLOR_WINDOWFRAME;
+-    prev_pen = NtGdiSelectPen( hdc, get_sys_color_pen( pen_color ));
+-    NtGdiMoveTo( hdc, r.left, r.bottom - 1, NULL );
+-    NtGdiLineTo( hdc, r.right, r.bottom - 1 );
+-    NtGdiSelectPen( hdc, prev_pen );
+-    r.bottom--;
+-
++    /* Windows 11: the bar fills the whole caption, with no line beneath it */
+     NtUserSystemParametersInfo( SPI_GETGRADIENTCAPTIONS, 0, &gradient, 0 );
+     draw_caption_bar( hdc, &r, style, active, gradient );
+ 
+     if ((style & WS_SYSMENU) && !(ex_style & WS_EX_TOOLWINDOW))
+     {
++        /* icon and title each 16 pixels after what precedes them */
+         if (draw_nc_sys_button( hwnd, hdc, FALSE ))
+-            r.left += get_system_metrics( SM_CXSMICON ) + 2;
++            r.left += 16 + get_system_metrics( SM_CXSMICON );
++        r.left += 16;
+     }
++    else r.left += 2;
+ 
+     if (style & WS_SYSMENU)
+     {
+@@ -1599,17 +1625,17 @@ static void draw_nc_caption( HDC hdc, RECT *rect, HWND hwnd, DWORD  style,
+         state = get_menu_state( sys_menu, SC_CLOSE, MF_BYCOMMAND );
+ 
+         /* Draw a grayed close button if disabled or if SC_CLOSE is not there */
+-        draw_close_button( hwnd, hdc, FALSE,
++        draw_close_button( hwnd, hdc, hot == HTCLOSE ? 2 : FALSE,
+                            (state & (MF_DISABLED | MF_GRAYED)) || (state == 0xFFFFFFFF) );
+-        r.right -= get_system_metrics( SM_CYCAPTION ) - 1;
++        r.right -= get_system_metrics( SM_CXSIZE );
+ 
+         if ((style & WS_MAXIMIZEBOX) || (style & WS_MINIMIZEBOX))
+         {
+-            draw_max_button( hwnd, hdc, FALSE, !(style & WS_MAXIMIZEBOX) );
+-            r.right -= get_system_metrics( SM_CXSIZE ) + 1;
++            draw_max_button( hwnd, hdc, hot == HTMAXBUTTON ? 2 : FALSE, !(style & WS_MAXIMIZEBOX) );
++            r.right -= get_system_metrics( SM_CXSIZE );
+ 
+-            draw_min_button( hwnd, hdc, FALSE, !(style & WS_MINIMIZEBOX) );
+-            r.right -= get_system_metrics( SM_CXSIZE ) + 1;
++            draw_min_button( hwnd, hdc, hot == HTMINBUTTON ? 2 : FALSE, !(style & WS_MINIMIZEBOX) );
++            r.right -= get_system_metrics( SM_CXSIZE );
+         }
+     }
+ 
+@@ -1630,7 +1656,6 @@ static void draw_nc_caption( HDC hdc, RECT *rect, HWND hwnd, DWORD  style,
+         else
+             NtGdiGetAndSetDCDword( hdc, NtGdiSetTextColor, get_sys_color( COLOR_INACTIVECAPTIONTEXT ), NULL );
+         NtGdiGetAndSetDCDword( hdc, NtGdiSetBkMode, TRANSPARENT, NULL );
+-        r.left += 2;
+         DrawTextW( hdc, buffer, -1, &r,
+                      DT_SINGLELINE | DT_VCENTER | DT_NOPREFIX | DT_LEFT );
+         NtGdiDeleteObjectApp( NtGdiSelectFont( hdc, hOldFont ));
+@@ -1739,6 +1764,7 @@ static void nc_paint( HWND hwnd, HRGN clip )
+     WORD flags;
+     HRGN hrgn;
+     RECT rectClient;
++    SIZE inset;
+ 
+     if (!(win = get_win_ptr( hwnd )) || win == WND_OTHER_PROCESS) return;
+     style = win->dwStyle;
+@@ -1775,12 +1801,33 @@ static void nc_paint( HWND hwnd, HRGN clip )
+ 
+     NtGdiSelectPen( hdc, get_sys_color_pen( COLOR_WINDOWFRAME ));
+ 
+-    if (has_static_outer_frame( ex_style ))
+-        draw_rect_edge( hdc, &rect, BDR_SUNKENOUTER, BF_RECT | BF_ADJUST, 1 );
+-    else if (has_big_frame( style, ex_style ))
+-        draw_rect_edge( hdc, &rect, EDGE_RAISED, BF_RECT | BF_ADJUST, 1 );
++    if (get_dwm_frame_inset( style, ex_style, &inset ))
++    {
++        /* Only the frame's innermost pixel shows (get_visible_rect): the window's own colour, which the
++         * compositor's 1-pixel border is drawn over, as Windows 11 draws a frame over its backdrop. */
++        HBRUSH brush = get_sys_color_brush( active ? COLOR_ACTIVECAPTION : COLOR_INACTIVECAPTION );
++        RECT inside, strip;
+ 
+-    draw_nc_frame( hdc, &rect, active, style, ex_style );
++        get_inside_rect( hwnd, COORDS_WINDOW, &inside, style, ex_style );
++        SetRect( &strip, rect.left, rect.top, rect.right, inside.top );
++        fill_rect( hdc, &strip, brush );
++        SetRect( &strip, rect.left, inside.bottom, rect.right, rect.bottom );
++        fill_rect( hdc, &strip, brush );
++        SetRect( &strip, rect.left, inside.top, inside.left, inside.bottom );
++        fill_rect( hdc, &strip, brush );
++        SetRect( &strip, inside.right, inside.top, rect.right, inside.bottom );
++        fill_rect( hdc, &strip, brush );
++        rect = inside;
++    }
++    else
++    {
++        if (has_static_outer_frame( ex_style ))
++            draw_rect_edge( hdc, &rect, BDR_SUNKENOUTER, BF_RECT | BF_ADJUST, 1 );
++        else if (has_big_frame( style, ex_style ))
++            draw_rect_edge( hdc, &rect, EDGE_RAISED, BF_RECT | BF_ADJUST, 1 );
++
++        draw_nc_frame( hdc, &rect, active, style, ex_style );
++    }
+ 
+     if ((style & WS_CAPTION) == WS_CAPTION)
+     {
+@@ -2018,7 +2065,7 @@ LRESULT handle_nc_hit_test( HWND hwnd, POINT pt )
+         if (ex_style & WS_EX_TOOLWINDOW)
+             rects.window.top += get_system_metrics( SM_CYSMCAPTION ) - 1;
+         else
+-            rects.window.top += get_system_metrics( SM_CYCAPTION ) - 1;
++            rects.window.top += get_system_metrics( SM_CYCAPTION );
+         if (!PtInRect( &rects.window, pt ))
+         {
+             BOOL min_or_max_box = (style & WS_SYSMENU) && (style & (WS_MINIMIZEBOX | WS_MAXIMIZEBOX));
+@@ -2028,14 +2075,15 @@ LRESULT handle_nc_hit_test( HWND hwnd, POINT pt )
+                 if ((style & WS_SYSMENU) && !(ex_style & WS_EX_TOOLWINDOW) &&
+                     get_nc_icon_for_window( hwnd ))
+                 {
+-                    rects.window.right -= get_system_metrics( SM_CYCAPTION ) - 1;
+-                    if (pt.x > rects.window.right) return HTSYSMENU;
++                    rects.window.right -= 32 + get_system_metrics( SM_CXSMICON );
++                    if (pt.x >= rects.window.right) return HTSYSMENU;
+                 }
+ 
+                 /* Check close button */
+                 if (style & WS_SYSMENU)
+                 {
+-                    rects.window.left += get_system_metrics( SM_CYCAPTION );
++                    rects.window.left += (ex_style & WS_EX_TOOLWINDOW) ? get_system_metrics( SM_CYCAPTION ) :
++                                         get_system_metrics( SM_CXSIZE );
+                     if (pt.x < rects.window.left) return HTCLOSE;
+                 }
+ 
+@@ -2056,26 +2104,27 @@ LRESULT handle_nc_hit_test( HWND hwnd, POINT pt )
+                 if ((style & WS_SYSMENU) && !(ex_style & WS_EX_TOOLWINDOW) &&
+                     get_nc_icon_for_window( hwnd ))
+                 {
+-                    rects.window.left += get_system_metrics( SM_CYCAPTION ) - 1;
++                    rects.window.left += 32 + get_system_metrics( SM_CXSMICON );  /* the icon and its margins */
+                     if (pt.x < rects.window.left) return HTSYSMENU;
+                 }
+ 
+                 /* Check close button */
+                 if (style & WS_SYSMENU)
+                 {
+-                    rects.window.right -= get_system_metrics( SM_CYCAPTION );
+-                    if (pt.x > rects.window.right) return HTCLOSE;
++                    rects.window.right -= (ex_style & WS_EX_TOOLWINDOW) ? get_system_metrics( SM_CYCAPTION ) :
++                                          get_system_metrics( SM_CXSIZE );
++                    if (pt.x >= rects.window.right) return HTCLOSE;
+                 }
+ 
+                 if (min_or_max_box && !(ex_style & WS_EX_TOOLWINDOW))
+                 {
+                     /* Check maximize box */
+                     rects.window.right -= get_system_metrics( SM_CXSIZE );
+-                    if (pt.x > rects.window.right) return HTMAXBUTTON;
++                    if (pt.x >= rects.window.right) return HTMAXBUTTON;
+ 
+                     /* Check minimize box */
+                     rects.window.right -= get_system_metrics( SM_CXSIZE );
+-                    if (pt.x > rects.window.right) return HTMINBUTTON;
++                    if (pt.x >= rects.window.right) return HTMINBUTTON;
+                 }
+             }
+             return HTCAPTION;
+@@ -2392,6 +2441,45 @@ static HBRUSH handle_control_color( HDC hdc, UINT type )
+     return get_sys_color_brush( COLOR_WINDOW );
+ }
+ 
++/* Redraw the caption button a hit code names: 0 normal, 1 pressed, 2 hot. */
++static void draw_caption_button( HWND hwnd, HDC hdc, UINT hit, BOOL down )
++{
++    DWORD style = get_window_long( hwnd, GWL_STYLE );
++    UINT state;
++
++    if (!(style & WS_SYSMENU) || (style & WS_CAPTION) != WS_CAPTION) return;
++    switch (hit)
++    {
++    case HTCLOSE:
++        state = get_menu_state( NtUserGetSystemMenu( hwnd, FALSE ), SC_CLOSE, MF_BYCOMMAND );
++        draw_close_button( hwnd, hdc, down, (state & (MF_DISABLED | MF_GRAYED)) || state == 0xFFFFFFFF );
++        break;
++    case HTMAXBUTTON:
++        if (style & (WS_MAXIMIZEBOX | WS_MINIMIZEBOX)) draw_max_button( hwnd, hdc, down, !(style & WS_MAXIMIZEBOX) );
++        break;
++    case HTMINBUTTON:
++        if (style & (WS_MAXIMIZEBOX | WS_MINIMIZEBOX)) draw_min_button( hwnd, hdc, down, !(style & WS_MINIMIZEBOX) );
++        break;
++    }
++}
++
++/* Windows 11 lights the caption button under the pointer until the pointer leaves it. */
++static void set_caption_hot( HWND hwnd, UINT hot )
++{
++    WND *win = get_win_ptr( hwnd );
++    UINT old;
++    HDC hdc;
++
++    if (!win || win == WND_OTHER_PROCESS || win == WND_DESKTOP) return;
++    old = win->caption_hot;
++    win->caption_hot = hot;
++    release_win_ptr( win );
++    if (old == hot || !(hdc = NtUserGetWindowDC( hwnd ))) return;
++    if (old) draw_caption_button( hwnd, hdc, old, FALSE );
++    if (hot) draw_caption_button( hwnd, hdc, hot, 2 );
++    NtUserReleaseDC( hwnd, hdc );
++}
++
+ static LRESULT handle_nc_mouse_move( HWND hwnd, WPARAM wparam, LPARAM lparam )
+ {
+     RECT rect;
+@@ -2399,6 +2487,20 @@ static LRESULT handle_nc_mouse_move( HWND hwnd, WPARAM wparam, LPARAM lparam )
+ 
+     TRACE( "hwnd=%p wparam=%#lx lparam=%#lx\n", hwnd, (long)wparam, lparam );
+ 
++    if (wparam == HTCLOSE || wparam == HTMAXBUTTON || wparam == HTMINBUTTON)
++    {
++        TRACKMOUSEEVENT tme = {.cbSize = sizeof(tme), .dwFlags = TME_QUERY};
++
++        NtUserTrackMouseEvent( &tme );
++        if ((tme.dwFlags & (TME_NONCLIENT | TME_LEAVE)) != (TME_NONCLIENT | TME_LEAVE) || tme.hwndTrack != hwnd)
++        {
++            tme.dwFlags = TME_NONCLIENT | TME_LEAVE;
++            tme.hwndTrack = hwnd;
++            NtUserTrackMouseEvent( &tme );
++        }
++    }
++    set_caption_hot( hwnd, (wparam == HTCLOSE || wparam == HTMAXBUTTON || wparam == HTMINBUTTON) ? wparam : 0 );
++
+     if (wparam != HTHSCROLL && wparam != HTVSCROLL)
+         return 0;
+ 
+@@ -2420,6 +2522,7 @@ static LRESULT handle_nc_mouse_leave( HWND hwnd )
+ 
+     TRACE( "hwnd=%p\n", hwnd );
+ 
++    set_caption_hot( hwnd, 0 );
+     if (style & WS_HSCROLL)
+         handle_scroll_event( hwnd, SB_HORZ, WM_NCMOUSELEAVE, pt );
+     if (style & WS_VSCROLL)
+diff --git a/dlls/win32u/ntuser_private.h b/dlls/win32u/ntuser_private.h
+index 67cbe23..7b5fd61 100644
+--- a/dlls/win32u/ntuser_private.h
++++ b/dlls/win32u/ntuser_private.h
+@@ -74,6 +74,7 @@ typedef struct tagWND
+     int                swap_interval; /* OpenGL surface swap interval */
+     int                pixel_format;  /* Pixel format set by the graphics driver */
+     int                clip_clients;  /* Has client surfaces that needs to be clipped out */
++    UINT               caption_hot;   /* caption button the pointer is over (HTCLOSE, ...), or 0 */
+     int                cbWndExtra;    /* class cbWndExtra at window creation */
+     DWORD_PTR          userdata;      /* User private data */
+     DWORD              wExtra[1];     /* Window extra bytes */
+diff --git a/dlls/win32u/win32u_private.h b/dlls/win32u/win32u_private.h
+index 3a81cc8..d240d4b 100644
+--- a/dlls/win32u/win32u_private.h
++++ b/dlls/win32u/win32u_private.h
+@@ -73,6 +73,7 @@ extern LRESULT default_window_proc( HWND hwnd, UINT msg, WPARAM wparam, LPARAM l
+                                     BOOL ansi );
+ extern LRESULT desktop_window_proc( HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam, BOOL ansi );
+ extern void draw_menu_button( HWND hwnd, HDC dc, RECT *r, enum NONCLIENT_BUTTON_TYPE, BOOL down, BOOL grayed );
++extern BOOL get_dwm_frame_inset( UINT style, UINT ex_style, SIZE *inset );
+ extern BOOL draw_frame_menu( HDC dc, RECT *r, UINT flags );
+ extern BOOL draw_nc_sys_button( HWND hwnd, HDC hdc, BOOL down );
+ extern BOOL draw_rect_edge( HDC hdc, RECT *rc, UINT uType, UINT uFlags, UINT width );
+diff --git a/dlls/win32u/window.c b/dlls/win32u/window.c
+index d042db4..4331633 100644
+--- a/dlls/win32u/window.c
++++ b/dlls/win32u/window.c
+@@ -2032,8 +2032,17 @@ static RECT get_visible_rect( HWND hwnd, BOOL shaped, UINT style, UINT ex_style,
+     RECT visible_rect, rect = {0};
+ 
+     if (get_present_rect( hwnd, &rect, get_thread_dpi() )) return rect;
+-    if (IsRectEmpty( &rects->window ) || EqualRect( &rects->window, &rects->client ) || shaped || !decorated_mode) return rects->window;
+-    if (!user_driver->pGetWindowStyleMasks( hwnd, style, ex_style, &style_mask, &ex_style_mask )) return rects->window;
++    if (IsRectEmpty( &rects->window ) || EqualRect( &rects->window, &rects->client ) || shaped) return rects->window;
++    if (!user_driver->pGetWindowStyleMasks( hwnd, style, ex_style, &style_mask, &ex_style_mask ))
++    {
++        /* A driver that decorates nothing shows a framed window as Windows 11 does: inside its resize border. */
++        SIZE inset;
++
++        visible_rect = rects->window;
++        if (get_dwm_frame_inset( style, ex_style, &inset )) InflateRect( &visible_rect, -inset.cx, -inset.cy );
++        return visible_rect;
++    }
++    if (!decorated_mode) return rects->window;
+     if (!NtUserAdjustWindowRect( &rect, style & style_mask, FALSE, ex_style & ex_style_mask, dpi )) return rects->window;
+ 
+     visible_rect = rects->window;
+diff --git a/server/window.c b/server/window.c
+index 0516fc2..a9931d6 100644
+--- a/server/window.c
++++ b/server/window.c
+@@ -233,6 +233,13 @@ static void ps5_snapshot_dwm(PwWindowRow *row, const struct window *win)
+         row->radius = 4;
+     if (plain && (framed || row->radius == 8)) row->shadow = PW_SHADOW_WINDOW;
+     else if (plain && (row->radius == 4 || dropshadow)) row->shadow = PW_SHADOW_SMALL;
++    if (!win->ps5_border_mode && plain && framed)
++    {
++        /* Windows 11's default frame border: SurfaceStrokeColorDefault (#66757575, WinUI) over the window's own
++         * edge, which win32u leaves inside the visible rect (the frame's innermost pixel). */
++        row->flags |= PW_WINDOW_BORDER;
++        row->border = 0x66757575;
++    }
+     if (win->ps5_border_mode == 1)
+     {
+         row->flags |= PW_WINDOW_BORDER;
+@@ -1328,7 +1335,14 @@ static int is_point_in_window( struct window *win, int *x, int *y, unsigned int
+     if ((win->ex_style & (WS_EX_LAYERED|WS_EX_TRANSPARENT)) == (WS_EX_LAYERED|WS_EX_TRANSPARENT))
+         return 0;  /* transparent */
+     map_dpi_point( win, x, y, dpi, get_window_dpi( win ) );
++#ifdef __PROSPERO__
++    /* Windows 11's invisible resize border: a top-level window shows inside its frame (win32u's visible rect) and
++     * the frame still answers the mouse, so it can be sized from there. */
++    if (!point_in_rect( win->parent && is_desktop_window( win->parent ) && !win->win_region ? &win->window_rect : &win->visible_rect,
++                        *x, *y ))
++#else
+     if (!point_in_rect( &win->visible_rect, *x, *y ))
++#endif
+         return 0;  /* not in window */
+     if (win->win_region &&
+         !point_in_region( win->win_region, *x - win->window_rect.left, *y - win->window_rect.top ))

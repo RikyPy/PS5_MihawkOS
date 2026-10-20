@@ -1,0 +1,145 @@
+From: PS5_Proton <local>
+Subject: [PATCH] shell32: the desktop folder is the Desktop and the Public Desktop, and its items can be renamed
+
+Wine's desktop folder listed only the user's Desktop, found every item's file under that one directory, and answered SetNameOf with
+E_FAIL. Windows' desktop is the user's Desktop and the Public Desktop together (the game shortcuts this session writes live in the
+public one), and an item there can be renamed, deleted, opened and dragged like any other. Now:
+
+- enumeration adds the Public Desktop's items that the user's Desktop does not have (a name in both is the user's);
+- an item's directory is found by looking, the user's first, then the public one, and that directory is what parsing names, binding to
+  the item and renaming use;
+- SetNameOf renames the file or folder in its own directory and tells the shell (SHCNE_RENAMEITEM / RENAMEFOLDER), refusing names with
+  characters a file name cannot hold, and gives back the new item.
+---
+diff --git a/dlls/shell32/shfldr_desktop.c b/dlls/shell32/shfldr_desktop.c
+--- a/dlls/shell32/shfldr_desktop.c
++++ b/dlls/shell32/shfldr_desktop.c
+@@ -303,6 +303,58 @@
+ }
+ 
+ /**************************************************************************
++ * The desktop is two directories, as on Windows: the user's Desktop and the Public Desktop (what every user sees). An item is a simple
++ * pidl carrying only its name, so the directory it lives in is found by looking: the user's first, then the public one. A name in both
++ * is the user's.
++ */
++static BOOL desktop_public_path(WCHAR *path)
++{
++    return SHGetSpecialFolderPathW(0, path, CSIDL_COMMON_DESKTOPDIRECTORY, FALSE) && path[0];
++}
++
++/* The directory holding the file-system item pidl (user's Desktop when it is in neither). */
++static void desktop_item_directory(const IDesktopFolderImpl *This, LPCITEMIDLIST pidl, WCHAR *dir)
++{
++    WCHAR name[MAX_PATH], path[MAX_PATH], common[MAX_PATH];
++
++    lstrcpynW(dir, This->sPathTarget, MAX_PATH);
++    if (!desktop_public_path(common) || !_ILSimpleGetTextW(pidl, name, MAX_PATH)) return;
++    lstrcpynW(path, dir, MAX_PATH);
++    PathAppendW(path, name);
++    if (GetFileAttributesW(path) != INVALID_FILE_ATTRIBUTES) return;
++    lstrcpynW(path, common, MAX_PATH);
++    PathAppendW(path, name);
++    if (GetFileAttributesW(path) != INVALID_FILE_ATTRIBUTES) lstrcpynW(dir, common, MAX_PATH);
++}
++
++/* The Public Desktop's items that the user's Desktop does not already have. */
++static BOOL CreatePublicDesktopEnumList(IEnumIDListImpl *list, LPCWSTR user_dir, DWORD dwFlags)
++{
++    WCHAR common[MAX_PATH], pattern[MAX_PATH], own[MAX_PATH];
++    WIN32_FIND_DATAW data;
++    HANDLE find;
++
++    if (!desktop_public_path(common) || !lstrcmpiW(common, user_dir)) return TRUE;
++    lstrcpynW(pattern, common, MAX_PATH);
++    PathAppendW(pattern, L"*");
++    if ((find = FindFirstFileW(pattern, &data)) == INVALID_HANDLE_VALUE) return TRUE;
++    do
++    {
++        BOOL directory = data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY;
++
++        if ((data.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN) && !(dwFlags & SHCONTF_INCLUDEHIDDEN)) continue;
++        if (directory && (!wcscmp(data.cFileName, L".") || !wcscmp(data.cFileName, L".."))) continue;
++        if (directory ? !(dwFlags & SHCONTF_FOLDERS) : !(dwFlags & SHCONTF_NONFOLDERS)) continue;
++        lstrcpynW(own, user_dir, MAX_PATH);
++        PathAppendW(own, data.cFileName);
++        if (GetFileAttributesW(own) != INVALID_FILE_ATTRIBUTES) continue;
++        AddToEnumList(list, _ILCreateFromFindDataW(&data));
++    } while (FindNextFileW(find, &data));
++    FindClose(find);
++    return TRUE;
++}
++
++/**************************************************************************
+  *  CreateDesktopEnumList()
+  */
+ static BOOL CreateDesktopEnumList(IEnumIDListImpl *list, DWORD dwFlags)
+@@ -323,6 +375,8 @@
+     /* enumerate the elements in %windir%\desktop */
+     ret = ret && SHGetSpecialFolderPathW(0, szPath, CSIDL_DESKTOPDIRECTORY, FALSE);
+     ret = ret && CreateFolderEnumList(list, szPath, dwFlags);
++    /* and in the Public Desktop, as Windows' desktop does */
++    if (ret) CreatePublicDesktopEnumList(list, szPath, dwFlags);
+ 
+     return ret;
+ }
+@@ -360,6 +414,13 @@
+     TRACE ("(%p)->(pidl=%p,%p,%s,%p)\n",
+            This, pidl, pbcReserved, shdebugstr_guid (riid), ppvOut);
+ 
++    if (pidl && _ILIsPidlSimple(pidl) && !_ILGetGUIDPointer(pidl))
++    {
++        WCHAR dir[MAX_PATH];
++
++        desktop_item_directory(This, pidl, dir);
++        return SHELL32_BindToChild( This->pidlRoot, &CLSID_ShellFSFolder, dir, pidl, riid, ppvOut );
++    }
+     return SHELL32_BindToChild( This->pidlRoot, &CLSID_ShellFSFolder, This->sPathTarget, pidl, riid, ppvOut );
+ }
+ 
+@@ -664,7 +725,7 @@
+             if ((GET_SHGDN_FOR(dwFlags) == SHGDN_FORPARSING) &&
+                 (GET_SHGDN_RELATION(dwFlags) != SHGDN_INFOLDER))
+             {
+-                lstrcpynW(pszPath, This->sPathTarget, MAX_PATH - 1);
++                desktop_item_directory(This, pidl, pszPath);
+                 PathAddBackslashW(pszPath);
+                 cLen = lstrlenW(pszPath);
+             }
+@@ -725,11 +786,32 @@
+                 LPCOLESTR lpName, DWORD dwFlags, LPITEMIDLIST * pPidlOut)
+ {
+     IDesktopFolderImpl *This = impl_from_IShellFolder2(iface);
+-
+-    FIXME ("(%p)->(%p,pidl=%p,%s,%lu,%p) stub\n", This, hwndOwner, pidl,
+-           debugstr_w (lpName), dwFlags, pPidlOut);
+-
+-    return E_FAIL;
++    WCHAR dir[MAX_PATH], name[MAX_PATH], old_path[MAX_PATH], new_path[MAX_PATH];
++    WIN32_FIND_DATAW data;
++    HANDLE find;
++
++    TRACE ("(%p)->(%p,pidl=%p,%s,%lu,%p)\n", This, hwndOwner, pidl, debugstr_w (lpName), dwFlags, pPidlOut);
++
++    if (pPidlOut) *pPidlOut = NULL;
++    /* only the files and folders on the desktop can be renamed here, not My Computer and the other namespace items */
++    if (!pidl || !_ILIsPidlSimple(pidl) || _ILGetGUIDPointer(pidl) || !lpName || !lpName[0] ||
++        StrPBrkW(lpName, L"\\/:*?\"<>|") || !_ILSimpleGetTextW(pidl, name, MAX_PATH))
++        return E_INVALIDARG;
++    desktop_item_directory(This, pidl, dir);
++    lstrcpynW(old_path, dir, MAX_PATH);
++    PathAppendW(old_path, name);
++    lstrcpynW(new_path, dir, MAX_PATH);
++    PathAppendW(new_path, lpName);
++    if (!lstrcmpiW(old_path, new_path)) return S_OK;
++    if (!MoveFileW(old_path, new_path)) return HRESULT_FROM_WIN32(GetLastError());
++    SHChangeNotify((GetFileAttributesW(new_path) & FILE_ATTRIBUTE_DIRECTORY) ? SHCNE_RENAMEFOLDER : SHCNE_RENAMEITEM,
++                   SHCNF_PATHW, old_path, new_path);
++    if (pPidlOut && (find = FindFirstFileW(new_path, &data)) != INVALID_HANDLE_VALUE)
++    {
++        *pPidlOut = _ILCreateFromFindDataW(&data);
++        FindClose(find);
++    }
++    return S_OK;
+ }
+ 
+ static HRESULT WINAPI ISF_Desktop_fnGetDefaultSearchGUID(IShellFolder2 *iface, GUID *guid)

@@ -1,0 +1,29 @@
+{
+ "run": "remote-memory-probe-2026-10-06-01",
+ "what": "remote-memory-probe.exe",
+ "env": [],
+ "result": "finished",
+ "seconds": 14.9,
+ "probe_verdict": "FAIL",
+ "clean_owner_restart": false,
+ "launcher_end_status": 0,
+ "initial_status": 1,
+ "closed_on_request": false,
+ "child_logs": [
+  "klog/remote-memory-probe-2026-10-06-01-wine-child-1575.log",
+  "klog/remote-memory-probe-2026-10-06-01-wine-child-1576.log",
+  "klog/remote-memory-probe-2026-10-06-01-wine-child-1577.log",
+  "klog/remote-memory-probe-2026-10-06-01-wine-child-1578.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": false,
+ "bench": {},
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [],
+  "top": []
+ }
+}

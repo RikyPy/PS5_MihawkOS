@@ -1,0 +1,149 @@
+{
+ "telemetry_hold": {
+  "pid": 8017,
+  "native_states": [
+   {
+    "pid": 8016,
+    "status": -1,
+    "errno": 3,
+    "absent": 1
+   },
+   {
+    "pid": 8017,
+    "status": -1,
+    "errno": 3,
+    "absent": 1
+   },
+   {
+    "pid": 8018,
+    "status": -1,
+    "errno": 3,
+    "absent": 1
+   },
+   {
+    "pid": 8019,
+    "status": -1,
+    "errno": 3,
+    "absent": 1
+   },
+   {
+    "pid": 8020,
+    "status": -1,
+    "errno": 3,
+    "absent": 1
+   },
+   {
+    "pid": 8021,
+    "status": -1,
+    "errno": 3,
+    "absent": 1
+   },
+   {
+    "pid": 8022,
+    "status": -1,
+    "errno": 3,
+    "absent": 1
+   },
+   {
+    "pid": 8023,
+    "status": -1,
+    "errno": 3,
+    "absent": 1
+   },
+   {
+    "pid": 8024,
+    "status": -1,
+    "errno": 3,
+    "absent": 1
+   }
+  ],
+  "absence_elapsed_seconds": 11.413,
+  "passed": true
+ },
+ "launch_readiness": {
+  "ready": true,
+  "seconds": 0.183,
+  "settle_seconds": 0.0,
+  "census_seconds": 0.168,
+  "previous_cleanup_verified": true
+ },
+ "native_close_failures": [],
+ "run": "bootstrap-gate-2026-10-10-01-telemetry-teardown",
+ "what": "C:\\window-probe.exe",
+ "env": [
+  "PROTON_LAYOUT=launcher",
+  "WINETEST_TELEMETRY_HOLD=1"
+ ],
+ "result": "finished",
+ "seconds": 11.0,
+ "probe_verdict": null,
+ "clean_owner_restart": true,
+ "launcher_end_status": 0,
+ "initial_status": 0,
+ "closed_on_request": true,
+ "child_logs": [
+  "klog/bootstrap-gate-2026-10-10-01-telemetry-teardown-wine-child-8016.log",
+  "klog/bootstrap-gate-2026-10-10-01-telemetry-teardown-wine-child-8017.log",
+  "klog/bootstrap-gate-2026-10-10-01-telemetry-teardown-wine-child-8018.log",
+  "klog/bootstrap-gate-2026-10-10-01-telemetry-teardown-wine-child-8019.log",
+  "klog/bootstrap-gate-2026-10-10-01-telemetry-teardown-wine-child-8020.log",
+  "klog/bootstrap-gate-2026-10-10-01-telemetry-teardown-wine-child-8021.log",
+  "klog/bootstrap-gate-2026-10-10-01-telemetry-teardown-wine-child-8022.log",
+  "klog/bootstrap-gate-2026-10-10-01-telemetry-teardown-wine-child-8023.log",
+  "klog/bootstrap-gate-2026-10-10-01-telemetry-teardown-wine-child-8024.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": "telemetry worker hold observed",
+ "returned_to_launcher": true,
+ "passed": true,
+ "bench": {},
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   }
+  ],
+  "top": []
+ },
+ "shown": {
+  "frames": 0,
+  "per_10s": [],
+  "longest_gap_ms": 0
+ },
+ "broker": {
+  "local_offer": null,
+  "host_limit": null,
+  "windows": {
+   "presents": 0,
+   "effect_bytes": 0,
+   "mica_builds": 0,
+   "thumbnail_builds": 0,
+   "compositions": 0,
+   "compose_avg_us": 0,
+   "compose_max_us": 0
+  },
+  "refused": [],
+  "refused_count": 0,
+  "clients": [],
+  "wedged": false,
+  "failure_reasons": [],
+  "host_peak": null,
+  "local_peak": null
+ },
+ "captures": [],
+ "cleanup_verified": true,
+ "hooks_removed": true
+}

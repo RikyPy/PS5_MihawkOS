@@ -1,0 +1,21 @@
+{
+ "run": "java-version-01",
+ "what": "profile 7",
+ "env": [
+  "WINEDEBUG=+timestamp,+pid,+tid,+process,+loaddll,+debugstr,err+all"
+ ],
+ "result": "finished",
+ "seconds": 7.6,
+ "probe_verdict": null,
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": true,
+ "bench": {},
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [],
+  "top": []
+ }
+}

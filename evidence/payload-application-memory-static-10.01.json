@@ -1,0 +1,12 @@
+{
+ "firmware": "10.01",
+ "module": "common/lib/libkernel_sys.sprx",
+ "sha256": "a30e1973f86492c911e37fcbba725a271e886a27f66481c9c7f743899b32b6d0",
+ "exports": {
+  "sceKernelAllocateDirectMemoryForApp": "0x18c10",
+  "sceKernelAllocateMainDirectMemory": "0x18b50",
+  "sceKernelGetBudget": "0x44ab0"
+ },
+ "abi": "AllocateDirectMemoryForApp(int64_t search_start, int64_t search_end, size_t bytes, size_t alignment, int memory_type, int64_t *offset)",
+ "scope": "Local static API lookup; runtime claims are in the separate console probe evidence. No firmware bytes included."
+}

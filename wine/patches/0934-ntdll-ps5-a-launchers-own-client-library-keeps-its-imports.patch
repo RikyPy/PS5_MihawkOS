@@ -1,0 +1,39 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Mon, 5 Oct 2026 21:00:00 -0400
+Subject: [PATCH] ntdll: PS5: a launcher's own client library keeps its imports.
+
+Proton runs Windows games against a launcher's Linux client: ntdll loads
+lsteamclient.dll in place of the launcher's client library and points its
+tier0_s64 and vstdlib_s64 imports at ntdll. On the console there is no
+Linux client and no lsteamclient.dll, and the launcher's client itself
+is a Windows program here. Its client library got stubs for its
+tier0 and vstdlib functions, its DllMain returned 0, and the launcher
+loaded it twenty times before "InternalAPI_Init_Internal failed, most
+likely because you are missing a 32-bit dependency" and the "problem
+with your installation" box (2026-10-05, with +module; record removed from the tree; in git history). The
+bridge is off unless PROTON_DISABLE_LSTEAMCLIENT=0.
+---
+ dlls/ntdll/loader.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/dlls/ntdll/loader.c b/dlls/ntdll/loader.c
+--- a/dlls/ntdll/loader.c
++++ b/dlls/ntdll/loader.c
+@@ -1156,9 +1156,14 @@
+ 
+     if (use != -1) return use;
+ 
+-    use = !get_env( L"PROTON_DISABLE_LSTEAMCLIENT", env, sizeof(env) ) || *env == '0';
++    /* PS5: no launcher's Linux client runs beside the console for lsteamclient to bridge to,
++     * and lsteamclient.dll is not built. The launcher's own client library runs instead, and
++     * it needs its own tier0 and vstdlib: pointed at ntdll, their functions were stubs
++     * and its DllMain failed ("missing a 32-bit dependency" of its client library).
++     * PROTON_DISABLE_LSTEAMCLIENT=0 turns the bridge back on. */
++    use = get_env( L"PROTON_DISABLE_LSTEAMCLIENT", env, sizeof(env) ) && *env == '0';
+     if (!use)
+-        ERR("lsteamclient disabled.\n");
++        TRACE("lsteamclient disabled.\n");
+     return use;
+ }
+ 

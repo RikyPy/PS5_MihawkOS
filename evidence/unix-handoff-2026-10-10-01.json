@@ -1,0 +1,70 @@
+{
+  "run": "unix-handoff-2026-10-10-01",
+  "build": {
+    "source_sha256": "df58d88f38f238b669a13ff2509ef7142514236297ddfbb68a8cc12d03d5601a",
+    "sdk_revision": "611893fc25ef3e138f5bc2c90d829d8b58174cd2",
+    "elf_sha256": "59b92bfd24483e6ed13d5a4dd50caf6a3079a9b048be535fa9f68639e72938ad",
+    "host_sha256": "deeaa397e4601600016f6eb852ed675189730c728fb019e5040a4281b56dc8e5"
+  },
+  "which": "both",
+  "question": "Does the console flush a unix socket in SCM_RIGHTS transit once its sender closed its copy, and does holding the copy until the receiver acknowledges prevent it?",
+  "host": {
+    "early": {
+      "handoffs": 160000,
+      "healthy": 160000,
+      "flushed": 0,
+      "flushed_readable_without_hangup": 0,
+      "delivered_after_flush": 0,
+      "anomalies": 0,
+      "errors": 0,
+      "first_error": "first_error=none errno=0",
+      "ms": 771
+    },
+    "held": {
+      "handoffs": 160000,
+      "healthy": 160000,
+      "flushed": 0,
+      "flushed_readable_without_hangup": 0,
+      "delivered_after_flush": 0,
+      "anomalies": 0,
+      "errors": 0,
+      "first_error": "first_error=none errno=0",
+      "ms": 792
+    }
+  },
+  "production_changed": false,
+  "title_launched": false,
+  "native": {
+    "early": {
+      "handoffs": 160000,
+      "healthy": 159933,
+      "flushed": 67,
+      "flushed_readable_without_hangup": 67,
+      "delivered_after_flush": 67,
+      "anomalies": 0,
+      "errors": 0,
+      "first_error": "first_error=none errno=0",
+      "ms": 1529
+    },
+    "held": {
+      "handoffs": 160000,
+      "healthy": 160000,
+      "flushed": 0,
+      "flushed_readable_without_hangup": 0,
+      "delivered_after_flush": 0,
+      "anomalies": 0,
+      "errors": 0,
+      "first_error": "first_error=none errno=0",
+      "ms": 1702
+    }
+  },
+  "native_summary": [
+    "UNIX_HANDOFF early_flushed=67 early_handoffs=160000 early_errors=0 held_flushed=0 held_handoffs=160000 held_errors=0"
+  ],
+  "post_control": "ok procs app=4294967295 title= count=0 pids=",
+  "completed": true,
+  "early_flushes": 67,
+  "held_flushes": 0,
+  "hypothesis_shown": true,
+  "passed": true
+}

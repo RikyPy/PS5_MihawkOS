@@ -1,0 +1,40 @@
+{
+ "run": "carrier-image-2026-10-19-01",
+ "elf_sha256": "7a4231e34819f127b2e56f0910fda1abd64d929b08dfa72e72a48176e7baee2d",
+ "source_sha256": "7f4b52f565cef7236803bdb65b7ea5a822035afda88318cce2d22b9bfdaa131f",
+ "process": "payload through websrv/elfldr in the NPXS40112 carrier, no title running",
+ "passed": false,
+ "stopped_by": null,
+ "modes": {
+  "list": {
+   "passed": false,
+   "ended": false,
+   "carrier_found": true,
+   "after": [
+    "CARRIER thread status=0 value=42",
+    "CARRIER signal status=0 delivered=1"
+   ],
+   "lines": [
+    "CARRIER start mode=list pid=572 text=200008860",
+    "CARRIER map before low start=0x400000 end=0x454000 prot=0x4 type=0 flags=0x1 name=executable",
+    "CARRIER map before low start=0x454000 end=0x470000 prot=0x1 type=0 flags=0x1 name=executable",
+    "CARRIER map before low start=0x470000 end=0x474000 prot=0x1 type=0 flags=0x1 name=executable",
+    "CARRIER map before low start=0x474000 end=0x478000 prot=0x3 type=0 flags=0x1 name=executable",
+    "CARRIER map before low start=0x478000 end=0x584000 prot=0x3 type=0 flags=0x1 name=executable",
+    "CARRIER map before above start=0x200000000 end=0x20000c000 prot=0x3 type=0 flags=0x1 name=(NoName)SceSpZeroConfMain",
+    "CARRIER modules before status=0 count=1",
+    "CARRIER module before handle=0 name=eboot.bin seg=0x400000+0x54000/0x4 seg=0x454000+0x1c000/0x1 seg=0x470000+0x4000/0x1 seg=0x474000+0x110000/0x3",
+    "CARRIER carrier before module=0",
+    "CARRIER thread start",
+    "CARRIER thread status=0 value=42",
+    "CARRIER signal start",
+    "CARRIER signal status=0 delivered=1",
+    "CARRIER load start path=/system/common/lib/libSceSystemService.sprx"
+   ],
+   "klog_fatal": [
+    "mDBG: Sending signal(pid: 572, tid: 101479, signo: 0xa0020101)"
+   ],
+   "klog_error": null
+  }
+ }
+}

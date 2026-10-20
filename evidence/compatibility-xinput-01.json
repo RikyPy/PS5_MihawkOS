@@ -1,0 +1,72 @@
+{
+  "daemon_revision": "5b8397b9f2b5f12a7bc2f9c8745a00d1c2dd01ad",
+  "daemon_elf_sha256": "d4948dfb4fdb40cfe9189be3c4b839c0f835b0fae9c2dcdadb03d6b5a469d790",
+  "daemon_build_id": "f461aef3ef43b374f3d4b38d43fdfd4cc0d42e29316bae0e255cb2c8e9bd6773",
+  "mode": "service",
+  "patches": [
+    "platform/lapy/stdout-mirror.patch",
+    "platform/lapy/donor-wait.patch",
+    "platform/lapy/donor-release.patch",
+    "platform/lapy/service-lifecycle.patch",
+    "platform/lapy/deterministic-build.patch"
+  ],
+  "title_launched": true,
+  "complete_balanced_lifecycle": true,
+  "lifecycle_validation": {
+    "passed": true,
+    "errors": [],
+    "records": 43,
+    "requests": 2,
+    "donors_reaped": 5,
+    "baseline": [
+      {
+        "build": "f461aef3ef43b374f3d4b38d43fdfd4cc0d42e29316bae0e255cb2c8e9bd6773",
+        "phase": "service_baseline",
+        "hold": "55",
+        "use": "54"
+      }
+    ],
+    "final": [
+      {
+        "build": "f461aef3ef43b374f3d4b38d43fdfd4cc0d42e29316bae0e255cb2c8e9bd6773",
+        "phase": "service_exited",
+        "hold": "55",
+        "use": "54"
+      }
+    ]
+  },
+  "kernel_fault_records": 0,
+  "kernel_fault_signatures": 0,
+  "capture_errors": [],
+  "lifecycle_records": [
+    "1\t2116534236742\tMARK\tdaemon_start build=f461aef3ef43b374f3d4b38d43fdfd4cc0d42e29316bae0e255cb2c8e9bd6773 firmware=10010000 title=PPSA99170 service=1 require_client_result=1 max_requests=2",
+    "7\t2116535500464\tMARK\troot_sample build=f461aef3ef43b374f3d4b38d43fdfd4cc0d42e29316bae0e255cb2c8e9bd6773 phase=layout_before hold=55 use=54",
+    "8\t2116586152151\tMARK\troot_sample build=f461aef3ef43b374f3d4b38d43fdfd4cc0d42e29316bae0e255cb2c8e9bd6773 phase=layout_donor hold=57 use=56",
+    "9\t2116636410208\tMARK\tdonor_reaped build=f461aef3ef43b374f3d4b38d43fdfd4cc0d42e29316bae0e255cb2c8e9bd6773 pid=170 status=9 expected_signal=9",
+    "10\t2116636455913\tMARK\troot_sample build=f461aef3ef43b374f3d4b38d43fdfd4cc0d42e29316bae0e255cb2c8e9bd6773 phase=layout_released hold=55 use=54",
+    "12\t2116636526877\tMARK\troot_layout build=f461aef3ef43b374f3d4b38d43fdfd4cc0d42e29316bae0e255cb2c8e9bd6773 valid=1 error=0 attempts=1",
+    "13\t2116636562800\tMARK\troot_sample build=f461aef3ef43b374f3d4b38d43fdfd4cc0d42e29316bae0e255cb2c8e9bd6773 phase=service_baseline hold=55 use=54",
+    "14\t2119047515888\tMARK\troot_sample build=f461aef3ef43b374f3d4b38d43fdfd4cc0d42e29316bae0e255cb2c8e9bd6773 phase=before_request hold=55 use=54",
+    "19\t2119300464326\tMARK\troot_sample build=f461aef3ef43b374f3d4b38d43fdfd4cc0d42e29316bae0e255cb2c8e9bd6773 phase=donors_ready hold=59 use=58",
+    "21\t2119351220896\tMARK\tdonor_reaped build=f461aef3ef43b374f3d4b38d43fdfd4cc0d42e29316bae0e255cb2c8e9bd6773 pid=172 status=9 expected_signal=9",
+    "22\t2119401462034\tMARK\tdonor_reaped build=f461aef3ef43b374f3d4b38d43fdfd4cc0d42e29316bae0e255cb2c8e9bd6773 pid=173 status=9 expected_signal=9",
+    "23\t2119401496513\tMARK\troot_sample build=f461aef3ef43b374f3d4b38d43fdfd4cc0d42e29316bae0e255cb2c8e9bd6773 phase=donors_reaped hold=57 use=56",
+    "24\t2119401501244\tMARK\tdonor_balance build=f461aef3ef43b374f3d4b38d43fdfd4cc0d42e29316bae0e255cb2c8e9bd6773 expected_two=1",
+    "25\t2119401552322\tMARK\trequest_result build=f461aef3ef43b374f3d4b38d43fdfd4cc0d42e29316bae0e255cb2c8e9bd6773 stage=complete error=0 pid=171 roots_moved=1 cred_changed=1 detached=1 donors_reaped=1",
+    "27\t2119501993142\tMARK\tclient_result build=f461aef3ef43b374f3d4b38d43fdfd4cc0d42e29316bae0e255cb2c8e9bd6773 data_rw=1 open_errno=0",
+    "28\t2121107817730\tMARK\troot_sample build=f461aef3ef43b374f3d4b38d43fdfd4cc0d42e29316bae0e255cb2c8e9bd6773 phase=before_request hold=55 use=54",
+    "33\t2121410645590\tMARK\troot_sample build=f461aef3ef43b374f3d4b38d43fdfd4cc0d42e29316bae0e255cb2c8e9bd6773 phase=donors_ready hold=59 use=58",
+    "35\t2121461291824\tMARK\tdonor_reaped build=f461aef3ef43b374f3d4b38d43fdfd4cc0d42e29316bae0e255cb2c8e9bd6773 pid=175 status=9 expected_signal=9",
+    "36\t2121511476591\tMARK\tdonor_reaped build=f461aef3ef43b374f3d4b38d43fdfd4cc0d42e29316bae0e255cb2c8e9bd6773 pid=176 status=9 expected_signal=9",
+    "37\t2121511505618\tMARK\troot_sample build=f461aef3ef43b374f3d4b38d43fdfd4cc0d42e29316bae0e255cb2c8e9bd6773 phase=donors_reaped hold=57 use=56",
+    "38\t2121511508906\tMARK\tdonor_balance build=f461aef3ef43b374f3d4b38d43fdfd4cc0d42e29316bae0e255cb2c8e9bd6773 expected_two=1",
+    "39\t2121511568644\tMARK\trequest_result build=f461aef3ef43b374f3d4b38d43fdfd4cc0d42e29316bae0e255cb2c8e9bd6773 stage=complete error=0 pid=174 roots_moved=1 cred_changed=1 detached=1 donors_reaped=1",
+    "41\t2121612019246\tMARK\tclient_result build=f461aef3ef43b374f3d4b38d43fdfd4cc0d42e29316bae0e255cb2c8e9bd6773 data_rw=1 open_errno=0",
+    "42\t2127118187630\tMARK\troot_sample build=f461aef3ef43b374f3d4b38d43fdfd4cc0d42e29316bae0e255cb2c8e9bd6773 phase=service_exited hold=55 use=54",
+    "43\t2127118194927\tMARK\tdaemon_result build=f461aef3ef43b374f3d4b38d43fdfd4cc0d42e29316bae0e255cb2c8e9bd6773 stage=service_complete error=0 pid=174 acknowledged=1 root_balanced=1"
+  ],
+  "title_passed": true,
+  "console_idle": true,
+  "capture": "klog/compatibility-xinput-01",
+  "passed": true
+}

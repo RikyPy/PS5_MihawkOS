@@ -1,0 +1,29 @@
+{
+  "run": "section-cache-host-2026-10-08-01",
+  "host_only": true,
+  "scratch_only": true,
+  "passed": true,
+  "exit_code": 0,
+  "lines": [
+    "SECTION_HOST PASS aliases=2 virtual_bytes=14495514624 threads=8 fault_cache_pages=4 faults=201 evictions=196 cleanup=1"
+  ],
+  "inputs": {
+    "/tmp/pw_wine_section.h": "429ab9df3e843d01213b4b503b6f0651daccd8f20f20e43fd5c17cfe9c5fad4a",
+    "/tmp/pw_wine_section.c": "549eaea0ab72a3b9bcb021290608d124fbdac670d78287e4eb44498ab78f44cf",
+    "/tmp/test_pw_wine_section.c": "053be62cdee0ca59787cf84e3289a9625b7bc724d958d7610c3a334d116618be",
+    "/tmp/test_pw_wine_section": "68b39eaf88ab871292e080c42a41511d29239073d5a79719b24394225209e293"
+  },
+  "proof_limit": "Portable policy using actual Linux mmap: sparse 13.5 GiB aliases, 8 concurrent threads, four-page cache eviction, descriptor lifetime and cleanup. No Wine integration, console concurrency or Windows metadata qualification.",
+  "sanitized": {
+    "command": "/tmp/test_pw_wine_section_sanitized",
+    "address_sanitizer": true,
+    "undefined_behavior_sanitizer": true,
+    "leak_sanitizer": true,
+    "exit_code": 0,
+    "lines": [
+      "SECTION_HOST PASS aliases=2 virtual_bytes=14495514624 threads=8 fault_cache_pages=4 faults=79 evictions=74 cleanup=1"
+    ],
+    "executable_sha256": "2004e4d55b82526953a47bc471ef457e59af78711b2f02842c55dab8c0505992",
+    "runner_limitation": "Initial sandboxed run reached LeakSanitizer ptrace restriction. Unsandboxed host-only rerun passes without changing sanitizer settings."
+  }
+}

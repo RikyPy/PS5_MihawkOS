@@ -1,0 +1,37 @@
+{
+  "battery": "v11-desktopview-2026-10-15-02",
+  "expected_cases": [
+    "desktop-view"
+  ],
+  "revision": "f129706985bced268cf942fe319ba5db88242f66",
+  "dirty": true,
+  "cases": [
+    {
+      "case": "desktop-view",
+      "run": "v11-desktopview-2026-10-15-02-desktop-view",
+      "runner_status": 1,
+      "seconds": 108.4,
+      "result": "exited",
+      "probe_verdict": "FAIL",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": false,
+      "run_seconds": 43.0,
+      "launch_readiness": {
+        "ready": true,
+        "seconds": 0.247,
+        "settle_seconds": 0.0,
+        "census_seconds": 0.212,
+        "previous_cleanup_verified": false
+      },
+      "runner_overhead_seconds": 65.4,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 12,
+      "protocol_errors": 0
+    }
+  ],
+  "complete": true,
+  "seconds": 108.4,
+  "passed": false
+}

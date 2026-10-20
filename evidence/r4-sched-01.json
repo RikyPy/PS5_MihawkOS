@@ -1,0 +1,20 @@
+{
+ "run": "r4-sched-01",
+ "what": "exit-probe.exe",
+ "env": [
+  "PROTON_SCHED_PROBE=1"
+ ],
+ "result": "timed out",
+ "seconds": 204.3,
+ "probe_verdict": null,
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": false,
+ "passed": false,
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [],
+  "top": []
+ }
+}

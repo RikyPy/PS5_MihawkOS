@@ -1,0 +1,35 @@
+From: PS5_Proton <local>
+Subject: [PATCH] explorer: File Explorer's navigations show the new folder only once it is drawn as the prototype's
+
+shell32's CreateViewWindow shows the new view and updates it (and its WM_SHOWWINDOW updates the list) inside
+ExplorerBrowser's navigation, before the browser reports the view or the navigation as complete, which is when
+PS5_Proton's File Explorer (pw_shell_explorer.h) gives the list its columns, rows and drawing. So every folder to folder
+navigation first painted Wine's classic list, then the prototype's (the owner saw it on the console). The browser's
+events tell pw_shell_explorer.h when a navigation starts, when its view is created and when it fails: from the start
+the browser's window does not draw, so the old folder stays on screen until the new view is styled and drawn.
+---
+--- a/programs/explorer/explorer.c
++++ b/programs/explorer/explorer.c
+@@ -311,16 +311,22 @@
+ 
+ static HRESULT WINAPI IExplorerBrowserEventsImpl_fnOnNavigationFailed(IExplorerBrowserEvents *iface, PCIDLIST_ABSOLUTE pidl)
+ {
++    IExplorerBrowserEventsImpl *This = impl_from_IExplorerBrowserEvents(iface);
++    if (This->info->mihawk) pw_explorer_navigation_failed(This->info);
+     return S_OK;
+ }
+ 
+ static HRESULT WINAPI IExplorerBrowserEventsImpl_fnOnNavigationPending(IExplorerBrowserEvents *iface, PCIDLIST_ABSOLUTE pidl)
+ {
++    IExplorerBrowserEventsImpl *This = impl_from_IExplorerBrowserEvents(iface);
++    if (This->info->mihawk) pw_explorer_navigation_pending(This->info);
+     return S_OK;
+ }
+ 
+ static HRESULT WINAPI IExplorerBrowserEventsImpl_fnOnViewCreated(IExplorerBrowserEvents *iface, IShellView *psv)
+ {
++    IExplorerBrowserEventsImpl *This = impl_from_IExplorerBrowserEvents(iface);
++    if (This->info->mihawk) pw_explorer_view_created(This->info, psv);
+     return S_OK;
+ }
+ 

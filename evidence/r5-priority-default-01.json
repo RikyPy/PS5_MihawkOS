@@ -1,0 +1,71 @@
+{
+ "run": "r5-priority-default-01",
+ "what": "priority-probe.exe",
+ "env": [
+  "PROTON_SHADER_CACHE=0"
+ ],
+ "result": "finished",
+ "seconds": 9.2,
+ "probe_verdict": "PASS",
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": true,
+ "bench": {
+  "cpus": 16.0,
+  "equal_periods": 348.0,
+  "equal_p50_us": 3995.0,
+  "equal_p99_us": 7997.0,
+  "time_critical_periods": 449.0,
+  "time_critical_p50_us": 3.0,
+  "time_critical_p99_us": 6.0,
+  "below_normal_permille_of_normal": 1927.0,
+  "idle_permille_of_normal": 1894.0,
+  "inversion_holder_started": 1.0,
+  "inversion_wait_us": 55431.0
+ },
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [
+   {
+    "calls": 4048.0,
+    "per_s": 800.0,
+    "avg_us": 1392.8,
+    "selects": 635.0,
+    "blocked": 44.0,
+    "block_avg_us": 73263.0,
+    "waits": 394.0,
+    "handles_avg": 1.4,
+    "wait_all": 5.0,
+    "polled": 352.0,
+    "delays": 34435.0,
+    "yields": 34364.0
+   }
+  ],
+  "top": [
+   {
+    "select": {
+     "count": 637,
+     "avg_us": 2718.0
+    },
+    "close_handle": {
+     "count": 819,
+     "avg_us": 1139.7
+    },
+    "create_event": {
+     "count": 243,
+     "avg_us": 2397.8
+    },
+    "send_hardware_message": {
+     "count": 177,
+     "avg_us": 3051.2
+    },
+    "init_thread": {
+     "count": 137,
+     "avg_us": 3149.4
+    }
+   }
+  ]
+ }
+}

@@ -1,0 +1,242 @@
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Subject: [PATCH] ntdll: PS5: demand-map large shared file sections
+
+Large shared mappings exceed the console's native reservation accounting even
+before touching pages. Keep real shared backing and Windows metadata, but map
+bounded file pages on faults. Place unconstrained section views in an internal
+native arena that address-space scanners cannot claim. The payload memory helper
+owns backing creation and file leases; do not fall back to title-owned pages.
+
+SPDX-License-Identifier: LGPL-2.1-or-later
+---
+--- a/dlls/ntdll/unix/unix_private.h
++++ b/dlls/ntdll/unix/unix_private.h
+@@ -119,6 +119,7 @@
+     int                      *fsync_apc_futex;
+ #ifdef __PROSPERO__
+     int                       ps5_terminating; /* 03e0 killed inside the Unix side: end at the boundary */
++    struct { ULONG_PTR address; ULONG64 generation; } ps5_section_retry;
+     unsigned int              ps5_exec_seen;   /* executable protection changes finished at this thread's last retry */
+ #endif
+ };
+--- a/dlls/ntdll/unix/virtual.c
++++ b/dlls/ntdll/unix/virtual.c
+@@ -99,6 +99,9 @@
+ #include "wine/rbtree.h"
+ #include "unix_private.h"
+ #include "wine/debug.h"
++#ifdef __PROSPERO__
++#include "pw_wine_section_ps5.h"
++#endif
+ 
+ WINE_DEFAULT_DEBUG_CHANNEL(virtual);
+ WINE_DECLARE_DEBUG_CHANNEL(module);
+@@ -231,6 +234,16 @@
+ static inline int counted_mprotect( void *addr, size_t len, int prot )
+ {
+     int ret;
++#ifdef __PROSPERO__
++    /* Unfaulted shared pages remain guards; changing Windows protection must
++     * not commit anonymous backing or make those guards accessible. */
++    if ((ret = __wine_ps5_section_protect( (uintptr_t)addr, len, prot )))
++    {
++        vm_stat_add( VM_STAT_MPROTECT, 1 );
++        vm_stat_add( VM_STAT_MPROTECT_BYTES, len );
++        return ret < 0 ? -1 : 0;
++    }
++#endif
+ 
+     if (host_prot_unchanged( addr, len, prot ))
+     {
+@@ -484,6 +497,9 @@
+     void         *base;          /* base address */
+     size_t        size;          /* size in bytes */
+     unsigned int  protect;       /* protection for all pages at allocation time and SEC_* flags */
++#ifdef __PROSPERO__
++    PwWineSectionView ps5_section; /* retained shared backing, or fd == -1 */
++#endif
+ };
+ 
+ /* per-page protection flags */
+@@ -2147,6 +2163,11 @@
+ 
+     assert( !((UINT_PTR)start & host_page_mask) );
+     size = ROUND_SIZE( 0, size, host_page_mask );
++#ifdef __PROSPERO__
++    /* Section removal already restores every cached page's guard. Keep the
++     * internal arena reserved and unavailable to generic Windows scans. */
++    if (__wine_ps5_section_arena_contains( (uintptr_t)start, size )) return;
++#endif
+ 
+     if (!(size = unmap_area_above_user_limit( start, size ))) return;
+ 
+@@ -2187,6 +2208,9 @@
+     {
+         struct file_view *ret = next_free_view;
+         next_free_view = *(struct file_view **)ret;
++#ifdef __PROSPERO__
++        ret->ps5_section.fd = -1;
++#endif
+         return ret;
+     }
+     if (view_block_start == view_block_end)
+@@ -2196,6 +2220,9 @@
+         view_block_start = ptr;
+         view_block_end = view_block_start + view_block_size / sizeof(*view_block_start);
+     }
++#ifdef __PROSPERO__
++    view_block_start->ps5_section.fd = -1;
++#endif
+     return view_block_start++;
+ }
+ 
+@@ -2231,6 +2258,13 @@
+  */
+ static void delete_view( struct file_view *view ) /* [in] View */
+ {
++#ifdef __PROSPERO__
++    if (view->ps5_section.fd >= 0 && __wine_ps5_section_remove( &view->ps5_section ))
++    {
++        ERR( "cannot release shared-section cache at %p; retaining view\n", view->base );
++        return;
++    }
++#endif
+     if (!(view->protect & VPROT_SYSTEM)) unmap_area( view->base, view->size );
+     set_page_vprot( view->base, view->size, 0 );
+     if (view->protect & VPROT_ARM64EC) clear_arm64ec_range( view->base, view->size );
+@@ -2325,6 +2359,10 @@
+     view->base    = base;
+     view->size    = size;
+     view->protect = vprot;
++#ifdef __PROSPERO__
++    memset( &view->ps5_section, 0, sizeof(view->ps5_section) );
++    view->ps5_section.fd = -1;
++#endif
+     if (use_kernel_writewatch) vprot &= ~VPROT_WRITEWATCH;
+     set_page_vprot( base, size, vprot );
+ 
+@@ -3233,6 +3271,10 @@
+         if (status) return status;
+     }
+ 
++#ifdef __PROSPERO__
++    if (view->ps5_section.fd >= 0 && __wine_ps5_section_remove( &view->ps5_section ))
++        return STATUS_NO_MEMORY;
++#endif
+     view->protect = VPROT_PLACEHOLDER | VPROT_FREE_PLACEHOLDER;
+     set_page_vprot( view->base, view->size, 0 );
+     anon_mmap_fixed( view->base, ROUND_SIZE( 0, view->size, host_page_mask ), PROT_NONE, 0 );
+@@ -4281,11 +4323,43 @@
+ 
+     server_enter_uninterrupted_section( &virtual_mutex, &sigset );
+ 
+-    res = map_view( &view, base, size, alloc_type, vprot, limit_low, limit_high, 0 );
+-    if (res) goto done;
++#ifdef __PROSPERO__
++    /* The same policy applies to every large shared section and its aliases.
++     * Leave private/write-copy and unaligned views on their existing path. */
++    if (full_size >= ((ULONG64)256 << 20) && !(vprot & VPROT_WRITECOPY) &&
++        !(size & host_page_mask) && !(offset.QuadPart & host_page_mask))
++    {
++        void *internal = NULL;
++        if (is_win64 && !base && !(alloc_type & (MEM_REPLACE_PLACEHOLDER | MEM_TOP_DOWN)))
++            internal = __wine_ps5_section_address( size, limit_low,
++                limit_high ? min( limit_high, (ULONG_PTR)user_space_limit - 1 ) :
++                (ULONG_PTR)user_space_limit - 1, granularity_mask );
++        if (internal) res = create_view( &view, internal, size, vprot );
++        else res = map_view( &view, base, size, alloc_type, vprot & ~VPROT_COMMITTED,
++                             limit_low, limit_high, 0 );
++        if (res) goto done;
++        /* The pager takes the view before its protection is set, so set_vprot's mprotect reaches
++         * __wine_ps5_section_protect. Set first, it reached the direct-memory engine, which backed the whole view and
++         * released it again when the pager adopted it, leaving the untouched pages unmapped: a mapping made without an
++         * address then landed inside the view (a Unity game in an emulator read Wine's host-protection leaf, 0x80 bytes,
++         * as its own memory; 2026-10-14). */
++        res = __wine_ps5_section_add( &view->ps5_section, (uintptr_t)view->base, size,
++                                     unix_handle, offset.QuadPart ) ? STATUS_NO_MEMORY : STATUS_SUCCESS;
++        if (!res && !internal)
++        {
++            view->protect |= vprot;
++            set_vprot( view, view->base, size, vprot );
++        }
++    }
++    else
++#endif
++    {
++        res = map_view( &view, base, size, alloc_type, vprot, limit_low, limit_high, 0 );
++        if (res) goto done;
++        res = map_file_into_view( view, unix_handle, 0, size, offset.QuadPart, vprot, needs_close );
++    }
+ 
+     TRACE( "handle=%p size=%lx offset=%s\n", handle, size, wine_dbgstr_longlong(offset.QuadPart) );
+-    res = map_file_into_view( view, unix_handle, 0, size, offset.QuadPart, vprot, needs_close );
+     if (res == STATUS_SUCCESS)
+     {
+         /* file mappings must always be accessible */
+@@ -4423,6 +4495,9 @@
+     free_ranges = (void *)((char *)view_block_start + view_block_size);
+     pages_vprot = (void *)((char *)view_block_start + 2 * view_block_size);
+     wine_rb_init( &views_tree, compare_view );
++#ifdef __PROSPERO__
++    __wine_ps5_section_init( (uintptr_t)host_addr_space_limit );
++#endif
+ 
+     free_ranges[0].base = (void *)0;
+     free_ranges[0].end = (void *)~0;
+@@ -5476,6 +5551,23 @@
+                 ret = STATUS_SUCCESS;
+         }
+     }
++#ifdef __PROSPERO__
++    if (ret == STATUS_ACCESS_VIOLATION || ret == STATUS_SUCCESS)
++    {
++        PwWineSectionRetry *retry = (PwWineSectionRetry *)&ntdll_get_thread_data()->ps5_section_retry;
++        unsigned int access = err == EXCEPTION_EXECUTE_FAULT ? PROT_EXEC :
++                              err == EXCEPTION_WRITE_FAULT ? PROT_WRITE : PROT_READ;
++        int resolved = __wine_ps5_section_fault( (uintptr_t)addr,
++                           get_unix_prot( get_host_page_vprot( page ) ), access, retry );
++        if (resolved > 0) ret = STATUS_SUCCESS;
++        else if (resolved < 0)
++        {
++            rec->NumberParameters = 3;
++            rec->ExceptionInformation[2] = STATUS_NO_MEMORY;
++            ret = STATUS_IN_PAGE_ERROR;
++        }
++    }
++#endif
+     fault_top_note( addr, err, get_page_vprot( addr ), vprot, ret, rec->ExceptionAddress );
+     mutex_unlock( &virtual_mutex );
+     rec->ExceptionCode = ret;
+@@ -7522,6 +7614,13 @@
+     SERVER_END_REQ;
+     if (!status)
+     {
++#ifdef __PROSPERO__
++        if (view->ps5_section.fd >= 0 && __wine_ps5_section_remove( &view->ps5_section ))
++        {
++            status = STATUS_NO_MEMORY;
++            goto done;
++        }
++#endif
+         if (view->protect & SEC_IMAGE)
+         {
+             r_debug_remove_module( view->base );
+--- a/server/mapping.c
++++ b/server/mapping.c
+@@ -472,9 +472,13 @@
+         set_error( STATUS_INVALID_PARAMETER );
+         return -1;
+     }
+-    if (ps5_shared_alloc && (fd = ps5_shared_alloc( length )) != -1)
+-    {
+-        if (!logged++) fprintf( stderr, "wine-ps5: anonymous mappings in shared memory from the memory helper\n" );
++    if (ps5_shared_alloc)
++    {
++        fd = ps5_shared_alloc( length );
++        if (fd == -1) file_set_error();
++        else if (!logged++) fprintf( stderr, "wine-ps5: anonymous mappings from the memory helper\n" );
++        /* Refusal must not fall back to title-owned shared pages. The helper
++         * supplies sparse linked file backing when native SHM sizing fails. */
+         return fd;
+     }
+     if ((fd = shm_open( SHM_ANON, O_RDWR, 0600 )) != -1)

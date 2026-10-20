@@ -1,0 +1,294 @@
+{
+ "assoc": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 0.1,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 33,
+   "todo": 0
+  },
+  "todo_lines": 0
+ },
+ "clist": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 0.1,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 236,
+   "todo": 0
+  },
+  "todo_lines": 0
+ },
+ "clsid": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 0.1,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 171,
+   "todo": 0
+  },
+  "todo_lines": 0
+ },
+ "generated": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 0.1,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 0,
+   "todo": 0
+  },
+  "todo_lines": 0
+ },
+ "istream": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 0.2,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 20880,
+   "todo": 1
+  },
+  "todo_lines": 1
+ },
+ "ordinal": {
+  "exit_code": 21,
+  "failure_count": 18,
+  "failures": [
+   {
+    "file": "ordinal.c",
+    "line": 481,
+    "text": "could not create child process error: 8"
+   },
+   {
+    "file": "ordinal.c",
+    "line": 1619,
+    "text": "failed to create window"
+   },
+   {
+    "file": "ordinal.c",
+    "line": 1636,
+    "text": "expected WS_VISIBLE"
+   },
+   {
+    "file": "ordinal.c",
+    "line": 1652,
+    "text": "expected updated style"
+   },
+   {
+    "file": "ordinal.c",
+    "line": 2483,
+    "text": "expected window"
+   },
+   {
+    "file": "ordinal.c",
+    "line": 2486,
+    "text": "expected WorkerA class, got "
+   },
+   {
+    "file": "ordinal.c",
+    "line": 2504,
+    "text": "expected window"
+   },
+   {
+    "file": "ordinal.c",
+    "line": 2507,
+    "text": "expected WorkerA class, got "
+   },
+   {
+    "file": "ordinal.c",
+    "line": 2510,
+    "text": "got 0"
+   },
+   {
+    "file": "ordinal.c",
+    "line": 2514,
+    "text": "0x00000000"
+   },
+   {
+    "file": "ordinal.c",
+    "line": 2521,
+    "text": "0x00000000"
+   },
+   {
+    "file": "ordinal.c",
+    "line": 2952,
+    "text": "got 0000000000000000"
+   },
+   {
+    "file": "ordinal.c",
+    "line": 2955,
+    "text": "got 0000000000000000"
+   },
+   {
+    "file": "ordinal.c",
+    "line": 2975,
+    "text": "got style 0x00000000"
+   },
+   {
+    "file": "ordinal.c",
+    "line": 2979,
+    "text": "got style 0x00000000"
+   },
+   {
+    "file": "ordinal.c",
+    "line": 2993,
+    "text": "got style 0x00000000"
+   },
+   {
+    "file": "ordinal.c",
+    "line": 3004,
+    "text": "got 0x00000000"
+   },
+   {
+    "file": "ordinal.c",
+    "line": 3014,
+    "text": "got 0x00000000"
+   }
+  ],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 0.1,
+  "skipped_lines": [
+   "ordinal.c:200: Tests skipped: RegOpenKey(Software\\Microsoft\\Internet Explorer\\International) failed: 2",
+   "ordinal.c:2062: Tests skipped: No compatibility class data found"
+  ],
+  "status": "complete",
+  "summary": {
+   "failures": 21,
+   "flaky": 0,
+   "skipped": 2,
+   "tests": 453,
+   "todo": 1
+  },
+  "todo_lines": 1
+ },
+ "path": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 0.1,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 66838,
+   "todo": 9
+  },
+  "todo_lines": 9
+ },
+ "shreg": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 0.1,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 59,
+   "todo": 0
+  },
+  "todo_lines": 0
+ },
+ "string": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 0.2,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 34755,
+   "todo": 0
+  },
+  "todo_lines": 0
+ },
+ "thread": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 0.1,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 14,
+   "todo": 0
+  },
+  "todo_lines": 0
+ },
+ "url": {
+  "exit_code": 0,
+  "failure_count": 0,
+  "failures": [],
+  "guarded": null,
+  "last_line": "winetest-batch: done",
+  "seconds": 0.1,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 93343,
+   "todo": 0
+  },
+  "todo_lines": 0
+ }
+}

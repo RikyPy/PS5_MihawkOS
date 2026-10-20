@@ -1,0 +1,29 @@
+{
+  "question": "Can a hangup-only loader observer preserve queued control messages and complete concurrent child shutdown?",
+  "build_fingerprint": "dbd2a4a6ad6aa71c7677c66a064b556fcaa952ee786f24c580cbf4395e7d822d",
+  "host": {
+    "command": "bash tools/host-tests.sh control_watch",
+    "asan_ubsan": true,
+    "passed": true,
+    "checks": [
+      "old POLLIN observer immediately wakes 100 times on the same unread packet",
+      "new observer waits through five 20ms timeouts with data pending",
+      "consumer retains queued packet",
+      "hangup reported with unread data",
+      "invalid descriptor reported"
+    ]
+  },
+  "console": {
+    "run": "mihawk-exit-watch-2026-10-09-11",
+    "passed": true,
+    "seconds": 27.8,
+    "cleanup_verified": true,
+    "native_closes": 16,
+    "maximum_close_ms": 303
+  },
+  "limits": [
+    "Focused evidence only; complete exact-source gate still required.",
+    "Prior isolated test has a payload-readiness timing discrepancy; no second console crash is asserted.",
+    "Busy polling is reproduced on host; no captured console scheduler stack proves the entire prior outage cause."
+  ]
+}

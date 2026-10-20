@@ -1,0 +1,17 @@
+{
+ "run": "registry-flush-2026-10-11-03",
+ "what": "registry value on disk during a session",
+ "before_run": "000a8645",
+ "samples": {
+  "early": {
+   "seconds": 12.0,
+   "stamp": "000a8645"
+  },
+  "late": {
+   "seconds": 45.4,
+   "stamp": "000bbfec"
+  }
+ },
+ "passed": true,
+ "runner_exit": 0
+}

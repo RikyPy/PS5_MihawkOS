@@ -1,0 +1,243 @@
+{
+ "telemetry_hold": null,
+ "launch_readiness": {
+  "ready": true,
+  "seconds": 0.218,
+  "settle_seconds": 0.0,
+  "census_seconds": 0.18,
+  "previous_cleanup_verified": true
+ },
+ "native_close_failures": [],
+ "run": "mihawk-games-gate-2026-10-10-01-desktop-session",
+ "what": "profile mihawk-os",
+ "env": [],
+ "result": "finished",
+ "seconds": 18.4,
+ "probe_verdict": "PASS",
+ "clean_owner_restart": true,
+ "launcher_end_status": 0,
+ "initial_status": 0,
+ "closed_on_request": false,
+ "child_logs": [
+  "klog/mihawk-games-gate-2026-10-10-01-desktop-session-wine-child-1667.log",
+  "klog/mihawk-games-gate-2026-10-10-01-desktop-session-wine-child-1668.log",
+  "klog/mihawk-games-gate-2026-10-10-01-desktop-session-wine-child-1669.log",
+  "klog/mihawk-games-gate-2026-10-10-01-desktop-session-wine-child-1670.log",
+  "klog/mihawk-games-gate-2026-10-10-01-desktop-session-wine-child-1671.log",
+  "klog/mihawk-games-gate-2026-10-10-01-desktop-session-wine-child-1672.log",
+  "klog/mihawk-games-gate-2026-10-10-01-desktop-session-wine-child-1673.log",
+  "klog/mihawk-games-gate-2026-10-10-01-desktop-session-wine-child-1674.log",
+  "klog/mihawk-games-gate-2026-10-10-01-desktop-session-wine-child-1675.log",
+  "klog/mihawk-games-gate-2026-10-10-01-desktop-session-wine-child-1676.log",
+  "klog/mihawk-games-gate-2026-10-10-01-desktop-session-wine-child-1677.log",
+  "klog/mihawk-games-gate-2026-10-10-01-desktop-session-wine-child-1678.log",
+  "klog/mihawk-games-gate-2026-10-10-01-desktop-session-wine-child-1679.log",
+  "klog/mihawk-games-gate-2026-10-10-01-desktop-session-wine-child-1680.log",
+  "klog/mihawk-games-gate-2026-10-10-01-desktop-session-wine-child-1681.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": true,
+ "bench": {},
+ "steady": {
+  "server": {
+   "calls": 0.0,
+   "per_s": 0.0,
+   "avg_us": 0.0,
+   "selects": 0.0,
+   "blocked": 0.0,
+   "block_avg_us": 0.0,
+   "waits": 0.0,
+   "handles_avg": 0.0,
+   "wait_all": 0.0,
+   "polled": 0.0,
+   "delays": 0.0,
+   "yields": 0.0,
+   "intervals": 1
+  }
+ },
+ "intervals": {
+  "frames": [],
+  "server": [
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   },
+   {
+    "calls": 0.0,
+    "per_s": 0.0,
+    "avg_us": 0.0,
+    "selects": 0.0,
+    "blocked": 0.0,
+    "block_avg_us": 0.0,
+    "waits": 0.0,
+    "handles_avg": 0.0,
+    "wait_all": 0.0,
+    "polled": 0.0,
+    "delays": 0.0,
+    "yields": 0.0
+   }
+  ],
+  "top": []
+ },
+ "shown": {
+  "frames": 89,
+  "per_10s": [
+   1,
+   88
+  ],
+  "longest_gap_ms": 2092
+ },
+ "broker": {
+  "local_offer": 8589934592,
+  "host_limit": 1073741824,
+  "windows": {
+   "presents": 101,
+   "effect_bytes": 388800,
+   "mica_builds": 10,
+   "thumbnail_builds": 0,
+   "compositions": 98,
+   "compose_avg_us": 2497,
+   "compose_max_us": 8659
+  },
+  "refused": [],
+  "refused_count": 0,
+  "clients": [
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": 1679,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": 1680,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": 1681,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": 1677,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": 1668,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   }
+  ],
+  "wedged": false,
+  "failure_reasons": [],
+  "host_peak": 6340608,
+  "local_peak": 0
+ },
+ "pacing": null,
+ "captures": [
+  "klog/mihawk-games-gate-2026-10-10-01-desktop-session-capture-01.png",
+  "klog/mihawk-games-gate-2026-10-10-01-desktop-session-capture-02.png",
+  "klog/mihawk-games-gate-2026-10-10-01-desktop-session-capture-03.png"
+ ],
+ "pad_script": [
+  "# The probe requests each displayed capture after the actual child/browser is ready."
+ ],
+ "cleanup_verified": true,
+ "hooks_removed": true,
+ "session_passed": true,
+ "display_pixels": [
+  {
+   "capture": "klog/mihawk-games-gate-2026-10-10-01-desktop-session-capture-01.png",
+   "architecture": 64,
+   "actual": [
+    30,
+    110,
+    210
+   ],
+   "expected": [
+    30,
+    110,
+    210
+   ],
+   "passed": true
+  },
+  {
+   "capture": "klog/mihawk-games-gate-2026-10-10-01-desktop-session-capture-02.png",
+   "architecture": 32,
+   "actual": [
+    30,
+    180,
+    70
+   ],
+   "expected": [
+    30,
+    180,
+    70
+   ],
+   "passed": true
+  },
+  {
+   "capture": "klog/mihawk-games-gate-2026-10-10-01-desktop-session-capture-03.png",
+   "window": "File Explorer",
+   "light_pixels": 556899,
+   "passed": true
+  }
+ ]
+}

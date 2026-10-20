@@ -1,0 +1,45 @@
+{
+  "name": "first-install-unattended-2026-10-19-02",
+  "launch_readiness": {
+    "ready": true,
+    "seconds": 0.149,
+    "settle_seconds": 0.0,
+    "census_seconds": 0.138,
+    "previous_cleanup_verified": false
+  },
+  "milestones": [
+    "[MihawkOS] elevation: ok (filesystem access)",
+    "[MihawkOS] setup: unattended (scripted presses, real engine)",
+    "[MihawkOS] setup: step 0",
+    "[MihawkOS] setup: starts at step 0 (record done=0 runtime=0 prefix=0 returning=0), 9 languages, language en-US",
+    "[MihawkOS] setup: step 1",
+    "[MihawkOS] setup: language en-US",
+    "[MihawkOS] setup: step 2",
+    "[MihawkOS] setup: step 3",
+    "[MihawkOS] setup: drive check: phase 1 problem 0, 1552643644 bytes",
+    "[MihawkOS] install: from /mnt/usb0/mihawkos, 143 pieces, 1552643644 bytes",
+    "[MihawkOS] setup: install starts",
+    "[MihawkOS] setup: step 4",
+    "[MihawkOS] setup: install 3 problem 0, 0 of 1529459285 bytes in 0.1 s",
+    "[MihawkOS] install: done into /data/ps5proton status=0 errno=0 path= written=1529459285 of 1529459285 files=2527 chunks=142 of 142 in 44.1 s",
+    "[MihawkOS] setup: install 4 problem 0, 1529459285 of 1529459285 bytes in 44.1 s",
+    "[MihawkOS] setup: step 5",
+    "[MihawkOS] ends: status 0",
+    "[MihawkOS] elevation: ok (filesystem access)",
+    "[MihawkOS] setup: unattended (scripted presses, real engine)",
+    "[MihawkOS] setup: step 0",
+    "[MihawkOS] setup: starts at step 0 (record done=0 runtime=1 prefix=0 returning=0), 9 languages, language en-US",
+    "[MihawkOS] setup: step 1",
+    "[MihawkOS] ends: status 0"
+  ],
+  "stop_lines": [],
+  "launches": [
+    "install",
+    "prepare"
+  ],
+  "install_done": true,
+  "storage_errors": 0,
+  "hooks_removed": true,
+  "passed": false,
+  "capture": "klog/first-install-unattended-2026-10-19-02"
+}

@@ -1,0 +1,160 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Sun, 4 Oct 2026 12:40:00 -0400
+Subject: [PATCH] ntdll: on PS5, extend win32u's narrow syscall arguments too
+
+Patch 0916 extends the BOOLEAN arguments of 36 ntdll syscalls before the call, because the console's
+clang-built Unix side assumes them extended to 32 bits and the PE caller may store only their byte. win32u
+has five syscalls with such arguments, two of them 16 bits wide: NtUserVkKeyScanEx's character (a stale
+byte above it gives another key), NtUserSetClassWord's and NtUserSetWindowWord's value, NtGdiDoPalette's
+start and count, and NtUserSetLayeredWindowAttributes' alpha. The table moves to the end of loader.c,
+where win32u's own syscall list is included for its ids; the upper half of each entry marks arguments two
+bytes wide, which are extended from their low two bytes.
+---
+  dlls/ntdll/unix/loader.c | 120 ++++++++++++++++++++++++++++-------------------
+  1 file changed, 73 insertions(+), 47 deletions(-)
+
+diff --git a/dlls/ntdll/unix/loader.c b/dlls/ntdll/unix/loader.c
+index bd04427..8115215 100644
+--- a/dlls/ntdll/unix/loader.c
++++ b/dlls/ntdll/unix/loader.c
+@@ -167,8 +167,8 @@ SYSTEM_SERVICE_TABLE KeServiceDescriptorTable[4] =
+  * assumes such an argument arrives extended to 32 bits and tests the whole register; a stale byte
+  * above it turns FALSE into TRUE. kernelbase's GetLogicalDrives looped forever on it (restart=TRUE
+  * on every NtQueryDirectoryObject call, so the same first entry came back each time). The
+- * dispatcher (signal_x86_64.c) reads this table by syscall id, and for a syscall with such
+- * arguments extends them from their low byte before the call. Bit n is argument n + 1. */
++ * dispatcher (signal_x86_64.c) reads the table (at the end of this file) by syscall id, and for a
++ * syscall with such arguments extends them from their low byte or two bytes before the call. */
+ enum
+ {
+ #define SYSCALL_ENTRY(id,name,args) PS5_SYSCALL_##name = id,
+@@ -176,51 +176,6 @@ enum
+ #undef SYSCALL_ENTRY
+ };
+ 
+-const UINT ps5_narrow_syscall_args[0x4000] =
+-{
+-    [PS5_SYSCALL_NtSetDebugFilterState] = 1u << 2,
+-    [PS5_SYSCALL_NtQueryDefaultLocale] = 1u << 0,
+-    [PS5_SYSCALL_NtSetDefaultLocale] = 1u << 0,
+-    [PS5_SYSCALL_NtQueryDirectoryFile] = 1u << 8 | 1u << 10,
+-    [PS5_SYSCALL_NtLockFile] = 1u << 8 | 1u << 9,
+-    [PS5_SYSCALL_NtNotifyChangeDirectoryFile] = 1u << 8,
+-    [PS5_SYSCALL_NtQueryEaFile] = 1u << 4 | 1u << 8,
+-    [PS5_SYSCALL_NtNotifyChangeMultipleKeys] = 1u << 8 | 1u << 11,
+-    [PS5_SYSCALL_NtNotifyChangeKey] = 1u << 6 | 1u << 9,
+-    [PS5_SYSCALL_NtOpenThreadToken] = 1u << 2,
+-    [PS5_SYSCALL_NtOpenThreadTokenEx] = 1u << 2,
+-    [PS5_SYSCALL_NtDuplicateToken] = 1u << 3,
+-    [PS5_SYSCALL_NtAdjustGroupsToken] = 1u << 1,
+-    [PS5_SYSCALL_NtAdjustPrivilegesToken] = 1u << 1,
+-    [PS5_SYSCALL_NtAccessCheckAndAuditAlarm] = 1u << 7,
+-    [PS5_SYSCALL_NtAccessCheckByTypeAndAuditAlarm] = 1u << 12,
+-    [PS5_SYSCALL_NtCloseObjectAuditAlarm] = 1u << 2,
+-    [PS5_SYSCALL_NtContinue] = 1u << 1,
+-    [PS5_SYSCALL_NtCreateEvent] = 1u << 4,
+-    [PS5_SYSCALL_NtCreateMutant] = 1u << 3,
+-    [PS5_SYSCALL_NtWaitForDebugEvent] = 1u << 1,
+-    [PS5_SYSCALL_NtQueryDirectoryObject] = 1u << 3 | 1u << 4,
+-    [PS5_SYSCALL_NtSetTimer] = 1u << 4,
+-    [PS5_SYSCALL_NtWaitForMultipleObjects] = 1u << 3,
+-    [PS5_SYSCALL_NtWaitForSingleObject] = 1u << 1,
+-    [PS5_SYSCALL_NtSignalAndWaitForSingleObject] = 1u << 2,
+-    [PS5_SYSCALL_NtDelayExecution] = 1u << 0,
+-    [PS5_SYSCALL_NtSetTimerResolution] = 1u << 1,
+-    [PS5_SYSCALL_NtWaitForKeyedEvent] = 1u << 2,
+-    [PS5_SYSCALL_NtReleaseKeyedEvent] = 1u << 2,
+-    [PS5_SYSCALL_NtRemoveIoCompletionEx] = 1u << 5,
+-    [PS5_SYSCALL_NtAcceptConnectPort] = 1u << 3,
+-    [PS5_SYSCALL_NtCommitTransaction] = 1u << 1,
+-    [PS5_SYSCALL_NtRollbackTransaction] = 1u << 1,
+-    [PS5_SYSCALL_NtInitiatePowerAction] = 1u << 3,
+-    [PS5_SYSCALL_NtCreateThread] = 1u << 7,
+-};
+-
+-void ps5_extend_syscall_args( UINT mask, ULONG_PTR *args )
+-{
+-    unsigned int i;
+-    for (i = 0; mask; i++, mask >>= 1) if (mask & 1) args[i] &= 0xff;
+-}
+ #endif
+ 
+ static const char *ntsyscall_names[] =
+@@ -3025,3 +2980,74 @@ DECLSPEC_EXPORT void __wine_main( int argc, char *argv[] )
+     startup_mark( "start_main_thread" );
+     start_main_thread();
+ }
++
++#ifdef __PROSPERO__
++/* The table of narrow syscall arguments (see above), placed last: win32u's syscall list is included here under
++ * the same macro names as ntdll's, which no code below uses. Bits 0-15: a byte wide; bits 16-31: two bytes. */
++#undef ALL_SYSCALLS32
++#undef ALL_SYSCALLS
++#undef ALL_SYSCALL_STUBS
++#include "../../win32u/win32syscalls.h"
++enum
++{
++#define SYSCALL_ENTRY(id,name,args) PS5_WIN32_##name = id,
++    ALL_SYSCALLS
++#undef SYSCALL_ENTRY
++};
++
++const UINT ps5_narrow_syscall_args[0x4000] =
++{
++    [PS5_SYSCALL_NtSetDebugFilterState] = 1u << 2,
++    [PS5_SYSCALL_NtQueryDefaultLocale] = 1u << 0,
++    [PS5_SYSCALL_NtSetDefaultLocale] = 1u << 0,
++    [PS5_SYSCALL_NtQueryDirectoryFile] = 1u << 8 | 1u << 10,
++    [PS5_SYSCALL_NtLockFile] = 1u << 8 | 1u << 9,
++    [PS5_SYSCALL_NtNotifyChangeDirectoryFile] = 1u << 8,
++    [PS5_SYSCALL_NtQueryEaFile] = 1u << 4 | 1u << 8,
++    [PS5_SYSCALL_NtNotifyChangeMultipleKeys] = 1u << 8 | 1u << 11,
++    [PS5_SYSCALL_NtNotifyChangeKey] = 1u << 6 | 1u << 9,
++    [PS5_SYSCALL_NtOpenThreadToken] = 1u << 2,
++    [PS5_SYSCALL_NtOpenThreadTokenEx] = 1u << 2,
++    [PS5_SYSCALL_NtDuplicateToken] = 1u << 3,
++    [PS5_SYSCALL_NtAdjustGroupsToken] = 1u << 1,
++    [PS5_SYSCALL_NtAdjustPrivilegesToken] = 1u << 1,
++    [PS5_SYSCALL_NtAccessCheckAndAuditAlarm] = 1u << 7,
++    [PS5_SYSCALL_NtAccessCheckByTypeAndAuditAlarm] = 1u << 12,
++    [PS5_SYSCALL_NtCloseObjectAuditAlarm] = 1u << 2,
++    [PS5_SYSCALL_NtContinue] = 1u << 1,
++    [PS5_SYSCALL_NtCreateEvent] = 1u << 4,
++    [PS5_SYSCALL_NtCreateMutant] = 1u << 3,
++    [PS5_SYSCALL_NtWaitForDebugEvent] = 1u << 1,
++    [PS5_SYSCALL_NtQueryDirectoryObject] = 1u << 3 | 1u << 4,
++    [PS5_SYSCALL_NtSetTimer] = 1u << 4,
++    [PS5_SYSCALL_NtWaitForMultipleObjects] = 1u << 3,
++    [PS5_SYSCALL_NtWaitForSingleObject] = 1u << 1,
++    [PS5_SYSCALL_NtSignalAndWaitForSingleObject] = 1u << 2,
++    [PS5_SYSCALL_NtDelayExecution] = 1u << 0,
++    [PS5_SYSCALL_NtSetTimerResolution] = 1u << 1,
++    [PS5_SYSCALL_NtWaitForKeyedEvent] = 1u << 2,
++    [PS5_SYSCALL_NtReleaseKeyedEvent] = 1u << 2,
++    [PS5_SYSCALL_NtRemoveIoCompletionEx] = 1u << 5,
++    [PS5_SYSCALL_NtAcceptConnectPort] = 1u << 3,
++    [PS5_SYSCALL_NtCommitTransaction] = 1u << 1,
++    [PS5_SYSCALL_NtRollbackTransaction] = 1u << 1,
++    [PS5_SYSCALL_NtInitiatePowerAction] = 1u << 3,
++    [PS5_SYSCALL_NtCreateThread] = 1u << 7,
++    /* win32u (table 1): bits 16 and up are arguments narrower than 32 bits that are 16 bits wide */
++    [PS5_WIN32_NtUserSetClassWord] = 1u << (16 + 2),
++    [PS5_WIN32_NtUserSetWindowWord] = 1u << (16 + 2),
++    [PS5_WIN32_NtUserVkKeyScanEx] = 1u << (16 + 0),
++    [PS5_WIN32_NtGdiDoPalette] = (1u << (16 + 1)) | (1u << (16 + 2)),
++    [PS5_WIN32_NtUserSetLayeredWindowAttributes] = 1u << 2,
++};
++
++void ps5_extend_syscall_args( UINT mask, ULONG_PTR *args )
++{
++    unsigned int i;
++    for (i = 0; i < 16; i++)
++    {
++        if (mask & (1u << i)) args[i] &= 0xff;
++        else if (mask & (1u << (16 + i))) args[i] &= 0xffff;
++    }
++}
++#endif
+-- 
+2.55.0

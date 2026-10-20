@@ -1,0 +1,32 @@
+{
+  "title": "PPSA99170",
+  "identity": "08bd23c98b4d4953b80e974516ef5325",
+  "build": {
+    "revision": "31a46b89b6a8db4eb16fe8b0fada56afad0c4dc6",
+    "sdk_revision": "611893fc25ef3e138f5bc2c90d829d8b58174cd2",
+    "source_sha256": {
+      "native/proton_child_probe.h": "a3a0c1324b7fa4c2482ea22e7a206df63a385d2467bc5abe1ba041166faf668e",
+      "native/proton_child_probe.cpp": "a58ce33bfaf2337f52613f93538279f6963618fdd4bdc2ecf3e0e228b3083b90",
+      "ps5/src/main.cpp": "0dcea5cd6aed4575c7609fa658e44d2d729dc1bc9f6d9cb3ca161658e257375e",
+      "ps5/CMakeLists.txt": "c6e22feae5b334d2a8396bc06bc635a49306393b5d3a3e5a09a9482b3a982597"
+    },
+    "radv_recipe_sha256": "bcb92ff14ae32fbee7991399a7b79c065c78bda3162c76d41c49d170a46b4022",
+    "identity": "4a1b530a861b569c07e27fb583d0a282a128e6002ab073e1f4bf57c38ab8f416",
+    "eboot_sha256": "c8310dee50456e7601b7caf1cdea4c2e9547ee3e0af20c9720f2d962fc0c9fc3"
+  },
+  "capture": "klog/child-native-03",
+  "passed": false,
+  "status": "preflight_failed",
+  "production_sha256": "8f63bbc57bd9203520653d9e3eb765798a434b737ac6c1f79b106437542761c3",
+  "production_restored": true,
+  "root_reference_balance_verified": false,
+  "forced_title_close": false,
+  "installed_readback_sha256": "d3d7cb497833ebb57876fe4465257217608ac9765f9a360a3ca0e658b845f325",
+  "production_executable_sha256": "bc5c7a75f249a59e7bce80218c6e749b9ea2f426e9bec4c96939ce7f75ceb17d",
+  "probe_readback_sha256": "49b30ea6c388abd0e803f345ecf9ee91b15492e26e19dcba39a80da9f28907c5",
+  "probe_executable_sha256": "140604f82e5a749745a27f922e9b998e989569479ca486e8921fb264e9f9c177",
+  "restored_readback_sha256": "d3d7cb497833ebb57876fe4465257217608ac9765f9a360a3ca0e658b845f325",
+  "error": "226 File deleted",
+  "title_launch_attempted": false,
+  "probe_result": "not run"
+}

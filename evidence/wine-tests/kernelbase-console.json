@@ -1,0 +1,119 @@
+{
+ "file": {
+  "failure_count": 0,
+  "failures": [],
+  "last_line": "winetest-batch: end file 0",
+  "seconds": 4.0,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 1,
+   "todo": 1
+  },
+  "todo_lines": 1
+ },
+ "memory": {
+  "failure_count": 0,
+  "failures": [],
+  "last_line": "winetest-batch: end memory 0",
+  "seconds": 4.0,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 2,
+   "todo": 0
+  },
+  "todo_lines": 0
+ },
+ "path": {
+  "failure_count": 0,
+  "failures": [],
+  "last_line": "winetest-batch: end path 0",
+  "seconds": 4.0,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 4135,
+   "todo": 0
+  },
+  "todo_lines": 0
+ },
+ "process": {
+  "failure_count": 4,
+  "failures": [
+   {
+    "file": "process.c",
+    "line": 156,
+    "text": "VirtualFree failed to split the placeholder 487"
+   },
+   {
+    "file": "process.c",
+    "line": 160,
+    "text": "MapViewOfFile3 did not map the file mapping 1132"
+   },
+   {
+    "file": "process.c",
+    "line": 163,
+    "text": "UnmapViewOfFile failed 487"
+   },
+   {
+    "file": "process.c",
+    "line": 185,
+    "text": "VirtualFree of remaining region failed: 487"
+   }
+  ],
+  "last_line": "winetest-batch: end process 4",
+  "seconds": 4.0,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 4,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 151,
+   "todo": 2
+  },
+  "todo_lines": 2
+ },
+ "security": {
+  "failure_count": 0,
+  "failures": [],
+  "last_line": "winetest-batch: end security 0",
+  "seconds": 4.0,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 6,
+   "todo": 0
+  },
+  "todo_lines": 0
+ },
+ "sync": {
+  "failure_count": 0,
+  "failures": [],
+  "last_line": "winetest-batch: done",
+  "seconds": 4.0,
+  "skipped_lines": [],
+  "status": "complete",
+  "summary": {
+   "failures": 0,
+   "flaky": 0,
+   "skipped": 0,
+   "tests": 68,
+   "todo": 0
+  },
+  "todo_lines": 0
+ }
+}

@@ -1,0 +1,201 @@
+--- a/ps5/ui/README.md
++++ b/ps5/ui/README.md
+@@ -1,87 +1,32 @@
+-# The UI module
++# PS5 Proton's UI module
+ 
+-Console-grade interfaces for a title, drawn with Vulkan: the kit of
+-BlackBearReloaded's [ps5-homebrew-ui](https://github.com/blackbearreloaded/ps5-homebrew-ui)
+-(an instanced signed-distance-field renderer, springs, a 32-voice mixer with two
+-sets of recorded cues, thirty themes, a component library and twenty-one complete
+-designs), through my fork
+-[PS5_VKHomebrewUI](https://github.com/mihawk-99/PS5_VKHomebrewUI), which adds the
+-Vulkan backend (`gfx::VkRenderer`) beside upstream's OpenGL one. The designs, the
+-themes, the components and the sounds are BlackBearReloaded's work.
++The launcher uses PS5_VulkanTemplate's Vulkan UI module at
++`ca553412935b6c50500e7dbf1329d133604446d4`. The kit itself is exported by
++`setup-kit.sh` at PS5_VKHomebrewUI `2188642afbcc8d84d36149124f3d9e39dc1b1a05`.
++BlackBearReloaded created the themes, widgets, fonts integration and sounds;
++Mihawk's fork supplies the Vulkan backend and template integration.
+ 
+-## Licence: GPL-3.0-or-later, and only where it is used
++The default is **Gloss / Skeuomorphic**. SQUARE, or the library's Themes row,
++opens all thirty themes. D-pad previews, CROSS applies, CIRCLE returns. The
++choice is saved by stable theme id in `hui/theme.txt` under the resolved title
++folder, including after `/data` elevation. Unknown or missing ids use Gloss.
++Test runs start in Gloss and never overwrite the saved preference.
+ 
+-The kit is GPL-3.0-or-later, so this module is too: everything in `ps5/ui/`, the
+-programs that draw with it (`examples/uikit/`), and the kit's assets
+-(`ps5/assets.json` lists each with its licence: OFL-1.1 and Bitstream Vera for the
+-fonts, GPL-3.0-or-later for the sounds and music). The rest of the template stays
+-MIT. A title made without the module (`new-title.py` without `--ui`) has none of
+-these files and builds none of the kit, so its source stays MIT; a built title is
+-GPL-3.0-or-later as a whole either way, since every title links the platform
+-layer (`skills/ps5-release/references/licensing.md`).
++The library and picker share one device and audio output. A game selection
++queues a restart; `main.cpp` dispatches it after the UI and device are destroyed.
++Holding OPTIONS for one second closes the title; the Close row does the same.
+ 
+-## What is here
++`kit.*` and `hui_platform.cpp` are the template module. `ui.cmake` omits its
++sample-gallery screens. `template-adaptations.patch` records the changes to the
++imported module against the template pin. The vendor export `.deps/hui` stays
++unchanged. The platform additions retain Proton's native HID/touchpad fields
++and disconnect handling.
+ 
+-| File | What it does |
+-| --- | --- |
+-| `setup-kit.sh` | exports the pinned PS5_VKHomebrewUI revision into `.deps/hui` (from `../PS5_VKHomebrewUI`, or GitHub) |
+-| `ui.cmake` | included by `ps5/CMakeLists.txt` when this folder exists: compiles the kit (not its OpenGL backend or its own console layer) into the title, defines `PS5_UI`, and tells `build-assets.py` to lay the kit's assets into `/app0/assets/hui/` |
+-| `kit.hpp`, `kit.cpp` | `ps5ui::Kit` (the renderer, the six fonts, the mixer on the console's audio output, the cues, the music, the pad as the kit's input frames, the sample covers) and `ps5ui::KitExample`, the base class a program that draws with the kit derives from |
+-| `hui_platform.cpp` | the kit's five system calls (`hui::sys::log`, the clock...) on the template's `platform.h` |
+-| `start.cpp`, `samples_menu.cpp`, `theme_picker.cpp` | the samples title's start screen (Samples, Designs, Themes), its Samples menu (`ps5_run_launcher` hands over to it) and its Themes picker |
+-| `overlay_theme.cpp` | the samples' ImGui settings windows in the title's theme: `ps5StyleOverlay` and `ps5OverlayFont`, which the base class's overlay calls (weak defaults in `ps5/src/example_ps5.cpp` keep upstream's look without the module) |
++This module, the launcher screen and the UI tests are GPL-3.0-or-later. Fonts
++retain OFL-1.1 or Bitstream Vera; sounds retain GPL-3.0-or-later. Assets and
++licence texts are recorded in `ps5/assets.json` and packaged with the title.
++The Wine runtime's source licence is unchanged.
+ 
+-**The title's theme** is `ps5ui::active_theme()`: the one picked in Themes, kept in
+-`/app0/hui/theme.txt`, `tiles` until one is picked, and always `tiles` in a test run.
+-**Leaving** a kit program is OPTIONS held for a second (`ps5ui::HoldToLeave`, which
+-shows the hold as it fills); a press is the program's.
+-
+-The template's platform layer gives the module what the kit's own console layer
+-gave it: every pad reading of the frame (`pad_readings`, so a tap shorter than a
+-frame counts), rumble (`pad_vibrate`), the light bar (`pad_light_bar`) and a 48 kHz
+-output thread (`audio_start`). They are MIT and any title may use them.
+-
+-## A program that draws with the kit
+-
+-```cpp
+-class VulkanExample : public ps5ui::KitExample
+-{
+-	std::unique_ptr<hui::app::Shell> shell; // or a design, or your own draw lists
+-public:
+-	VulkanExample() { settings.overlay = false; ps5.ownOverlay = true; }
+-	void prepare() override
+-	{
+-		VulkanExampleBase::prepare();
+-		prepareKit(); // fonts, covers, sound
+-		shell = std::make_unique<hui::app::Shell>(kit.fonts, kit.catalog, PS5_APP_ROOT "/hui",
+-			kit.renderer.glass_texture());
+-		prepared = true;
+-	}
+-	void render() override
+-	{
+-		prepareFrame();
+-		shell->update(kit.input(), std::min(frameTimer, 0.05f));
+-		kit.play(shell->feedback(), shell->sound_set());
+-		kit.tick(frameTimer);
+-		shell->compose(kit.renderer);  // queue the layers
+-		buildKitCommandBuffer();       // off-screen work, then the pass; a lambda adds a 3D scene under the UI
+-		submitFrame();
+-	}
+-};
+-```
+-
+-`examples/uikit/uikit.cpp` is the whole gallery in about 150 lines. The kit's own
+-guides say how to build a screen from its components and themes:
+-`.deps/hui/` has the source, and the fork's `docs/` (COMPONENTS.md, THEMES.md,
+-KIT.md, CRAFT.md) the rest; `docs/VULKAN.md` there describes the backend.
+-
+-## Moving the pin
+-
+-1. In PS5_VKHomebrewUI: merge upstream, then check both backends on the PC
+-   (`tools/host-snapshots.sh`, `tools/host-snapshots-vk.sh`,
+-   `tools/compare-backends.py`), commit and push.
+-2. Here: the new revision in `setup-kit.sh`, `ps5/tools/build.sh`, then
+-   `ps5/tools/host-reference.sh uikit $(python3 ps5/tools/check-run.py --resolve all | grep '^uikit\.')`
+-   and the same on the console with `ps5/tools/run.sh`.
+-3. New pictures on purpose get new references (`host-reference.sh --save`), named in
+-   the commit.
++Build: `ps5/tools/build.sh`. Host picture: `ps5/tools/host-reference.sh ps5proton`.
++State and picker checks: `python3 tools/test-launcher-ui.py --render` (after the
++host build). These are host checks, not console validation of this integration.
+--- a/ps5/ui/kit.cpp
++++ b/ps5/ui/kit.cpp
+@@ -8,6 +8,7 @@
+ #include "kit.hpp"
+ 
+ #include "platform.h"
++#include "proton_launch.h"
+ 
+ #include "core/save_file.hpp"
+ 
+@@ -128,6 +129,10 @@
+ 			input.nav = hui::Direction::down;
+ 		} else if (press.action == "cross") {
+ 			input.pressed |= hui::action_bit(hui::Action::confirm);
++		} else if (press.action == "circle") {
++			input.pressed |= hui::action_bit(hui::Action::back);
++		} else if (press.action == "square") {
++			input.pressed |= hui::action_bit(hui::Action::west);
+ 		} else if (press.action == "r1") {
+ 			input.pressed |= hui::action_bit(hui::Action::page_next);
+ 		} else if (press.action == "l1") {
+@@ -192,10 +197,10 @@
+ #ifndef PS5_APP_ROOT
+ #define PS5_APP_ROOT "/app0"
+ #endif
+-const char *const themeFolder = PS5_APP_ROOT "/hui";
+-const char *const themePath = PS5_APP_ROOT "/hui/theme.txt";
+-// Flat and charcoal: the look the start screen was drawn for
+-const char *const defaultTheme = "tiles";
++std::string themeFolder() { return proton_title_path(PS5_APP_ROOT "/hui"); }
++std::string themePath() { return themeFolder() + "/theme.txt"; }
++// Proton starts in Gloss; a saved stable theme id overrides it.
++const char *const defaultTheme = "gloss";
+ 
+ int themeIndex(const std::string &id)
+ {
+@@ -219,7 +224,7 @@
+ 	}
+ 	if (loadedTheme == -2) {
+ 		std::string id;
+-		hui::save::read_file(themePath, &id, 64);
++		hui::save::read_file(themePath(), &id, 64);
+ 		while (!id.empty() && (id.back() == '\n' || id.back() == '\r' || id.back() == ' ')) {
+ 			id.pop_back();
+ 		}
+@@ -247,11 +252,11 @@
+ 	if (ps5TestRun) {
+ 		return; // a test run leaves the title's choice alone
+ 	}
+-	hui::save::ensure_directory(themeFolder);
+-	chmod(themeFolder, 0777);
+-	const std::string error = hui::save::write_atomic(themePath, std::string(all[index].id) + "\n");
++	hui::save::ensure_directory(themeFolder());
++	chmod(themeFolder().c_str(), 0777);
++	const std::string error = hui::save::write_atomic(themePath(), std::string(all[index].id) + "\n");
+ 	if (error.empty()) {
+-		chmod(themePath, 0666);
++		chmod(themePath().c_str(), 0666);
+ 	}
+ 	say("theme: %s%s%s", all[index].id, error.empty() ? "" : ", not saved: ", error.c_str());
+ }
+--- a/ps5/ui/kit.hpp
++++ b/ps5/ui/kit.hpp
+@@ -53,7 +53,7 @@
+ 
+ // The title's theme: the one picked on the start screen's Themes, kept in
+ // /app0/hui/theme.txt. It styles the start screen, the Samples menu and the
+-// samples' settings windows. A test run always has the default (tiles), so its
++// samples' settings windows. A test run always has the default (gloss), so its
+ // pictures do not depend on what was picked.
+ const hui::ui::Theme &active_theme();
+ int active_theme_index();
+--- a/ps5/ui/ui.cmake
++++ b/ps5/ui/ui.cmake
+@@ -46,10 +46,6 @@
+ 	${ui_kit_sources}
+ 	${ui_program_sources}
+ 	${CMAKE_CURRENT_LIST_DIR}/kit.cpp
+-	${CMAKE_CURRENT_LIST_DIR}/start.cpp
+-	${CMAKE_CURRENT_LIST_DIR}/samples_menu.cpp
+-	${CMAKE_CURRENT_LIST_DIR}/theme_picker.cpp
+-	${CMAKE_CURRENT_LIST_DIR}/overlay_theme.cpp
+ 	${CMAKE_CURRENT_LIST_DIR}/hui_platform.cpp)
+ target_include_directories(samples PRIVATE ${PS5_UI_KIT}/src ${CMAKE_CURRENT_LIST_DIR})
+ target_compile_definitions(samples PRIVATE PS5_UI)

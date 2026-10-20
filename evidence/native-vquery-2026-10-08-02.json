@@ -1,0 +1,18 @@
+{
+ "run": "native-vquery-2026-10-08-02",
+ "read_only": true,
+ "payload": true,
+ "elf_sha256": "915cf19cecc97211d83fe594ab93a7e3311aa4d9a124442ecc2328138cf7192c",
+ "source_sha256": "e347e414e03ee14f59f21bc6b3702b9b909bfd1744d1f1201530f91abdebccde",
+ "passed": true,
+ "lines": [
+  "query address=0 status=0 start=400000 end=454000 protection=0x4 type=0 flags=0x65786501 canary=1",
+  "query address=10000 status=0 start=400000 end=454000 protection=0x4 type=0 flags=0x65786501 canary=1",
+  "query address=400000 status=0 start=400000 end=454000 protection=0x4 type=0 flags=0x65786501 canary=1",
+  "protection status=0 start=400000 end=454000 protection=0x4 equal=1",
+  "query address=200008820 status=0 start=200000000 end=20000c000 protection=0x3 type=0 flags=0x6f4e2801 canary=1",
+  "protection status=0 start=200000000 end=20000c000 protection=0x3 equal=1",
+  "query address=7fffffff0000 status=0x8002000d start=0 end=0 protection=0 type=0 flags=0 canary=1",
+  "PS5_PROTON_NATIVE_VQUERY PASS"
+ ]
+}

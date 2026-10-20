@@ -1,0 +1,116 @@
+From: PS5_Proton
+Subject: [PATCH] ntdll: the PS5's memory figure for programs is its direct memory
+
+A launcher's install of a Unity game said "Your RAM: 665 MB, Minimum: 8 GB" on
+the 16 GB console, and kernel32 returned a free figure of 0 and a commit
+limit of 0 (tests/system-memory-probe.c: total_mib=665 free_mib=0
+commit_limit_mib=0 in both PE32 and PE64).
+
+A program reads GlobalMemoryStatusEx: the total is SystemBasicInformation's
+page count (sysconf on the PS5, a small pool of the process) and the commit
+limit and free memory come from SystemPerformanceInformation (sysctls the
+console refuses, then patch 0912's direct memory query, which gave 0 here).
+Every allocation of a program and of its GPU comes from the console's direct
+memory, so that is the total both report; the free figure is capped at it,
+and a helper, whose kernel answers the direct memory question for the
+system partition (ENOMEM for every range), reports what its flexible pool
+has left as the free memory (8,038 MiB), reporting a figure of 0 once.
+---
+diff --git a/dlls/ntdll/unix/system.c b/dlls/ntdll/unix/system.c
+--- a/dlls/ntdll/unix/system.c
++++ b/dlls/ntdll/unix/system.c
+@@ -2806,6 +2806,16 @@
+ extern int sceKernelAvailableDirectMemorySize( long long start, long long end, size_t alignment,
+                                                long long *start_out, size_t *size_out );
+ 
++/* What a program is told it has: the console's direct memory, the memory every allocation of the process and of
++ * the GPU comes from. The figures the FreeBSD paths read are refused (the sysctls) or are a small pool of the
++ * process (sysconf): a launcher's install of a Unity game said "Your RAM: 665 MB" on the 16 GB console, 2026-10-11. */
++extern int sceKernelAvailableFlexibleMemorySize( size_t *size );
++
++ULONGLONG ps5_total_memory(void)
++{
++    return sceKernelGetDirectMemorySize();
++}
++
+ /* The free part of the console's direct memory, which is where every allocation of the process and of the GPU
+  * comes from. The kernel can only be asked where the first free run in a range is, so each answer splits the
+  * range in the part before it and the part after, and both are asked in turn. The figure is a lower bound: a
+@@ -2817,7 +2827,9 @@
+     static ULONGLONG cached, cached_at;
+     struct range { long long low, high; } waiting[64], now;
+     const size_t alignment = 0x4000;
++    static int reported_zero;
+     unsigned int count = 0, questions = 0;
++    int first_error = 0;
+     ULONGLONG free_bytes = 0, when;
+     LARGE_INTEGER time;
+ 
+@@ -2837,8 +2849,10 @@
+         long long start = 0;
+         size_t size = 0;
+ 
++        int error = 0;
++
+         if (now.high - now.low >= (long long)alignment && questions++ < 512 &&
+-            !sceKernelAvailableDirectMemorySize( now.low, now.high, alignment, &start, &size ) &&
++            !(error = sceKernelAvailableDirectMemorySize( now.low, now.high, alignment, &start, &size )) &&
+             size && start >= now.low && size <= (unsigned long long)(now.high - start))
+         {
+             struct range after = { start + (long long)size, now.high };
+@@ -2848,9 +2862,22 @@
+             now.high = start;
+             continue;
+         }
++        if (error && !first_error) first_error = error;
+         if (!count) break;
+         now = waiting[--count];
+     }
++    if (!free_bytes)
++    {
++        /* A helper is a payload: its kernel answers this question for the system partition, which is empty
++         * (ENOMEM for any range, 2026-10-11), while its allocations come from the application's pool. What it can
++         * still take is what its flexible pool has left (8,038 MiB in a helper on a fresh console). */
++        size_t flexible = 0;
++
++        if (!sceKernelAvailableFlexibleMemorySize( &flexible )) free_bytes = flexible;
++        if (!free_bytes && !reported_zero++)
++            ERR( "no free memory found out of %llu MiB (%u questions, first error %#x)\n",
++                 (ULONGLONG)now.high >> 20, questions, first_error );
++    }
+     cached = free_bytes;
+     cached_at = when;
+     pthread_mutex_unlock( &lock );
+@@ -3014,6 +3041,9 @@
+ #ifdef __PROSPERO__
+         /* the console refuses the sysctl, and a free figure of 0 makes a program think the machine is out of memory */
+         if (!freeram) freeram = ps5_free_direct_memory();
++        /* nor does it say how much memory it has: the programs' memory is the direct memory, so that is the total */
++        if (!totalram) totalram = ps5_total_memory();
++        if (freeram > totalram) freeram = totalram;
+ #endif
+ #ifdef VM_SWAPUSAGE
+         {
+diff --git a/dlls/ntdll/unix/virtual.c b/dlls/ntdll/unix/virtual.c
+--- a/dlls/ntdll/unix/virtual.c
++++ b/dlls/ntdll/unix/virtual.c
+@@ -4526,6 +4526,10 @@
+     return ((ULONG_PTR)1 << num_cpus) - 1;
+ }
+ 
++#ifdef __PROSPERO__
++extern ULONGLONG ps5_total_memory(void); /* system.c */
++#endif
++
+ /***********************************************************************
+  *           virtual_get_system_info
+  */
+@@ -4550,6 +4554,8 @@
+ 
+     if (!sysctlbyname( "hw.memsize", &memsize, &len, NULL, 0 ))
+         info->MmHighestPhysicalPage = max(1, memsize / page_size);
++#elif defined(__PROSPERO__)
++    info->MmHighestPhysicalPage = max(1, ps5_total_memory() / page_size);
+ #elif defined(_SC_PHYS_PAGES)
+     LONG64 phys_pages = sysconf( _SC_PHYS_PAGES );
+ 

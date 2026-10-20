@@ -1,0 +1,44 @@
+{
+  "launch_readiness": {
+    "ready": true,
+    "seconds": 0.169,
+    "settle_seconds": 0.0,
+    "census_seconds": 0.153,
+    "previous_cleanup_verified": true
+  },
+  "title": "PPSA99170",
+  "identity": "abbd8c90ef3647948515c4e7a54695a5",
+  "frames_requested": 300,
+  "eboot_sha256": "daea68c6abc7233a8166783645108531f155daf99416dfca1c1d6ca049c05fd8",
+  "fresh_identity_seen": true,
+  "shell_idle_after_run": true,
+  "title_finished_successfully": true,
+  "picture_and_log_check_passed": true,
+  "post_launch_fault_records": 0,
+  "post_launch_driver_errors": 0,
+  "elevation": [
+    "ok (filesystem access)"
+  ],
+  "sample": [
+    "starts",
+    "ok, 300 frames in 5.35 s, 59.9 fps after the first half"
+  ],
+  "library": [
+    "11 game(s); searched: /data/ps5proton/games (10 entries); /data/homebrew/PPSA99170/games (not there)"
+  ],
+  "startup_seconds": {
+    "exec": 0.0,
+    "starts": 0.52,
+    "elevation": 0.52,
+    "library": 0.56,
+    "ui": 0.61
+  },
+  "probe": null,
+  "probe_passed": null,
+  "probe_records": [],
+  "controls_preview": "remapped",
+  "passed": true,
+  "capture": "klog/mihawk-effects-gate-2026-10-10-02-controls-menu",
+  "forced_close": false,
+  "controls_selection_verified": true
+}

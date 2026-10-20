@@ -1,0 +1,67 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Sat, 3 Oct 2026 21:30:00 -0400
+Subject: [PATCH] kernelbase: the stored computer name where the active one is missing
+
+GetComputerNameEx's NetBIOS name is read from ActiveComputerName, a volatile key that wineboot makes
+at every start from the stored ComputerName. Where wineboot cannot run (the PS5 has no child
+processes) the key is missing, so GetComputerName failed, and with it LookupAccountSid (it names the
+computer's accounts after it) and everything that names the user, such as GetUserProfileDirectory.
+When the active key does not exist, the stored name is read instead.
+---
+  dlls/kernelbase/registry.c | 25 ++++++++++++++++++-------
+  1 file changed, 18 insertions(+), 7 deletions(-)
+
+diff --git a/dlls/kernelbase/registry.c b/dlls/kernelbase/registry.c
+index 9369024..de9d6f6 100644
+--- a/dlls/kernelbase/registry.c
++++ b/dlls/kernelbase/registry.c
+@@ -3356,6 +3356,7 @@ BOOL WINAPI GetComputerNameExA( COMPUTER_NAME_FORMAT type, char *name, DWORD *le
+ BOOL WINAPI GetComputerNameExW( COMPUTER_NAME_FORMAT type, WCHAR *name, DWORD *len )
+ {
+     const WCHAR *keyname, *valuename;
++    BOOL use_stored_name = FALSE;
+     LRESULT ret;
+     HKEY key;
+ 
+@@ -3365,6 +3366,7 @@ BOOL WINAPI GetComputerNameExW( COMPUTER_NAME_FORMAT type, WCHAR *name, DWORD *l
+     case ComputerNamePhysicalNetBIOS:
+         keyname = L"System\\CurrentControlSet\\Control\\ComputerName\\ActiveComputerName";
+         valuename = L"ComputerName";
++        use_stored_name = TRUE;
+         break;
+     case ComputerNameDnsHostname:
+     case ComputerNamePhysicalDnsHostname:
+@@ -3404,14 +3406,23 @@ BOOL WINAPI GetComputerNameExW( COMPUTER_NAME_FORMAT type, WCHAR *name, DWORD *l
+         return FALSE;
+     }
+ 
+-    if (!(ret = RegOpenKeyExW( HKEY_LOCAL_MACHINE, keyname, 0, KEY_READ, &key )))
++    for (;;)
+     {
+-        DWORD size = *len * sizeof(WCHAR);
+-        ret = RegQueryValueExW( key, valuename, NULL, NULL, (BYTE *)name, &size );
+-        if (!name) ret = ERROR_MORE_DATA;
+-        else if (!ret) size -= sizeof(WCHAR);
+-        *len = size / sizeof(WCHAR);
+-        RegCloseKey( key );
++        if (!(ret = RegOpenKeyExW( HKEY_LOCAL_MACHINE, keyname, 0, KEY_READ, &key )))
++        {
++            DWORD size = *len * sizeof(WCHAR);
++            ret = RegQueryValueExW( key, valuename, NULL, NULL, (BYTE *)name, &size );
++            if (!name) ret = ERROR_MORE_DATA;
++            else if (!ret) size -= sizeof(WCHAR);
++            *len = size / sizeof(WCHAR);
++            RegCloseKey( key );
++        }
++        /* The active name is a volatile key that wineboot makes at every start from the stored one. Where wineboot
++         * cannot run (the PS5 has no child processes) the stored name is the answer: without it, GetComputerName,
++         * LookupAccountSid and everything that names the user (GetUserProfileDirectory) fail. */
++        if (!use_stored_name || ret != ERROR_FILE_NOT_FOUND) break;
++        use_stored_name = FALSE;
++        keyname = L"System\\CurrentControlSet\\Control\\ComputerName\\ComputerName";
+     }
+     TRACE("-> %Iu %s\n", ret, debugstr_w(name) );
+     if (ret) SetLastError( ret );
+-- 
+2.43.0

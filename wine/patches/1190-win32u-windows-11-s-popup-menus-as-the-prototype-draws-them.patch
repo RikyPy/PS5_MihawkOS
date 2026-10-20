@@ -1,0 +1,980 @@
+From: PS5_Proton <local>
+Subject: [PATCH] win32u: Windows 11's popup menus as the prototype draws them
+
+The approved Windows 11 prototype (prototypes/windows11-shell, css/ui.css .menu) draws every menu as a rounded acrylic
+flyout: rows 32 px tall 4 px inside the list, an icon column and labels 11 and 39 px into a row, shortcuts in caption
+text and a 12 px chevron ending 11 px from its right edge, 1 px separators with 2 px around them, a 28 px plate with
+4 px corners under the hovered row and a focus ring round it once the keyboard drives the menu. Wine drew the classic
+square menu: a raised edge, the highlight colour across the row, Wine's own check and arrow bitmaps. The shell
+scorecard's menu states matched none of the prototype's pixels (evidence/shell-scorecard-2026-10-16-01.json).
+
+Every popup (#32768: context menus, menu bar drop-downs, the window menu, in every program) now
+- asks the compositor for the prototype's flyout (DWMWA_SYSTEMBACKDROP_TYPE PS5_DWMSBT_FLYOUT, round corners, a sheet
+  of glass, dark when COLOR_MENU is): the acrylic, the 8 px corners, the stroke and --shadow-28;
+- lays out its items as src/pw_menu_style.h measures the prototype (calc_popup_menu_size): a check column when an
+  item can be checked, an icon column when one has a picture, at least 200 px wide, at most 456 (labels then end in an
+  ellipsis); a popup's first items with a picture and no text are Windows 11's command row, 40 x 40 cells that
+  centre their pictures;
+- paints itself through one premultiplied buffer over that glass (draw_popup_menu): the plates, ring, separators,
+  check, radio dot and chevron are the prototype's own pixels (pw_menu_sprites.h, tools/build-menu-sprites.py);
+  labels (14 px) and shortcuts (12 px) are Chromium's own glyphs (pw_menu_glyphs.h, src/pw_text_glyphs.h: the
+  prototype's .menu-label and .menu-shortcut at Skia's four pen phases) at their linear advances, the menu's width the
+  widest row rounded once and right-aligned shortcuts ending at that row's fractional edge, as Chromium lays them out;
+  text the glyphs lack (and the default item's semibold) is each glyph's 256-level coverage composed with Skia's mask
+  gamma in the TextFillColor tokens; 32-bit pictures are composed with their alpha, others
+  copied opaque; owner-drawn items and HBMMENU_CALLBACK pictures are drawn by their owner on the menu's opaque colour;
+- repaints a row through that buffer when its selection changes (select_item), never piecemeal over the glass;
+- opens a submenu over its parent's 4 px edge with its first row level with the parent's row, on the left when the
+  right has no room (show_sub_popup);
+- shows the keyboard ring from the first navigation key and access-key underlines from then on, and hides the ring
+  when the pointer moves (track_menu).
+Without the compositor (the server refuses the attributes off the console) the same menu is drawn opaque.
+---
+diff --git a/dlls/win32u/menu.c b/dlls/win32u/menu.c
+index dda7d11..24fc155 100644
+--- a/dlls/win32u/menu.c
++++ b/dlls/win32u/menu.c
+@@ -75,6 +75,12 @@ struct menu
+     ULONG_PTR   dwMenuData;     /* application defined value */
+     HMENU       hSysMenuOwner;  /* handle to the dummy sys menu holder */
+     WORD        textOffset;     /* offset of text when items have both bitmaps and text */
++    BOOL        pw_glass;       /* PS5_Proton: the compositor draws the flyout's material under the popup */
++    BOOL        pw_dark;        /* ... and the popup is in the dark theme */
++    BYTE        pw_checks;      /* the popup has a check column */
++    BYTE        pw_icons;       /* ... an icon column */
++    BYTE        pw_commands;    /* ... and this many leading items are command cells */
++    int         pw_row;         /* its widest row, 16.16 as Chromium lays it out (one column; 0 for several) */
+ };
+ 
+ /* the accelerator user object */
+@@ -2847,59 +2853,658 @@ static int frame_rect( HDC hdc, const RECT *rect, HBRUSH hbrush )
+     return TRUE;
+ }
+ 
+-static void draw_popup_menu( HWND hwnd, HDC hdc, HMENU hmenu )
++/* PS5_Proton: Windows 11's popup menus as the approved prototype draws them (src/pw_menu_style.h has the measurements;
++ * pw_menu_sprites.h the prototype's own pixels, tools/build-menu-sprites.py). A popup asks the compositor for the
++ * flyout acrylic, 8 px corners, stroke and shadow (PS5_DWMSBT_FLYOUT) and paints its items over that glass: plates,
++ * separators, checks and chevrons are the prototype's pixels, labels and shortcuts Chromium's own glyphs on Skia's grid
++ * (pw_menu_glyphs.h; other text the glyphs' coverage composed as Chromium composes it). Without the compositor (the server answers the request with an error) the menu is opaque, laid out the same. */
++#include "pw_menu_style.h"
++#include "pw_menu_sprites.h"
++#include "pw_menu_glyphs.h"
++
++static BOOL pw_menu_keys;      /* the keyboard moved the selection since the pointer last did: the focus ring shows */
++static BOOL pw_menu_cues;      /* a key was used in this menu: access keys are underlined */
++static POINT pw_menu_pointer;  /* where the pointer was when tracking last looked */
++
++static BOOL pw_menu_dark(void)
+ {
+-    HBRUSH prev_hrush, brush = get_sys_color_brush( COLOR_MENU );
+-    struct menu *menu = unsafe_menu_ptr( hmenu );
+-    RECT rect;
++    COLORREF colour = get_sys_color( COLOR_MENU );
++    return ((GetRValue( colour ) * 54 + GetGValue( colour ) * 183 + GetBValue( colour ) * 19) >> 8) < 128;
++}
++
++/* 0: a label, 1: the default item's label, 2: a shortcut; in the menu font's face. */
++static HFONT pw_menu_font( int which )
++{
++    static HFONT fonts[3];
++    HFONT ret = fonts[which], prev;
++    NONCLIENTMETRICSW ncm;
++
++    if (ret) return ret;
++    ncm.cbSize = sizeof(ncm);
++    NtUserSystemParametersInfo( SPI_GETNONCLIENTMETRICS, sizeof(ncm), &ncm, 0 );
++    ncm.lfMenuFont.lfHeight = which == 2 ? -PW_MENU_SHORTCUT_TEXT : -PW_MENU_TEXT;
++    ncm.lfMenuFont.lfWeight = which == 1 ? FW_SEMIBOLD : FW_NORMAL;
++    if (!(ret = NtGdiHfontCreate( &ncm.lfMenuFont, sizeof(ncm.lfMenuFont), 0, 0, NULL ))) return get_menu_font( which == 1 );
++    if ((prev = InterlockedCompareExchangePointer( (void **)&fonts[which], ret, NULL )))
++    {
++        NtGdiDeleteObjectApp( ret );
++        ret = prev;
++    }
++    return ret;
++}
++
++/* Windows 11's command row: a popup's first items that have a picture and no text (Cut, Copy, Rename, Share, Delete). */
++static BOOL pw_menu_command( const struct menu_item *item )
++{
++    return item->hbmpItem && !IS_MAGIC_BITMAP( item->hbmpItem ) && !item->text &&
++           !(item->fType & (MF_BITMAP | MF_OWNERDRAW | MF_SEPARATOR | MF_POPUP | MF_SYSMENU | MF_MENUBREAK | MF_MENUBARBREAK));
++}
+ 
+-    TRACE( "wnd=%p dc=%p menu=%p\n", hwnd, hdc, hmenu );
++/* The label's length (up to a tab or a right-justify mark) and what follows it, the shortcut. */
++static int pw_menu_label( const WCHAR *text, const WCHAR **shortcut )
++{
++    int i = 0;
++    while (text[i] && text[i] != '\t' && text[i] != '\b') i++;
++    *shortcut = text[i] && text[i + 1] ? text + i + 1 : NULL;
++    return i;
++}
++
++struct pw_paint
++{
++    unsigned int *bits;   /* top-down premultiplied BGRA, the menu's client area */
++    int width, height;
++    HDC dc;               /* the buffer's DC, for what GDI draws */
++    BOOL dark;
++    const PwMenuChrome *chrome;
++};
++
++/* Draws (paint) or measures (paint NULL) text with the font selected in hdc: each glyph's 8-bit coverage composed in
++ * colour on the baseline from x, the access-key prefix taken out (its letter underlined when cues), ending in an
++ * ellipsis when it would pass x + max. Returns the advance. */
++static int pw_menu_glyphs( HDC hdc, struct pw_paint *paint, const WCHAR *text, int count, int x, int baseline,
++                           int max, unsigned int colour, BOOL cues )
++{
++    static const MAT2 identity = { {0,1}, {0,0}, {0,0}, {0,1} };
++    static const WCHAR ellipsis = 0x2026;
++    GLYPHMETRICS gm;
++    BYTE stack[1024], *buffer = stack;
++    DWORD capacity = sizeof(stack), size;
++    int pen = 0, i, ellipsis_width = 0, underline = 0;
++    BOOL white = paint && paint->dark;
++
++    if (max > 0 && pw_menu_glyphs( hdc, NULL, text, count, 0, 0, 0, 0, FALSE ) <= max) max = 0;
++    if (max > 0 && NtGdiGetGlyphOutline( hdc, ellipsis, GGO_METRICS, &gm, 0, NULL, &identity, FALSE ) != GDI_ERROR)
++        ellipsis_width = gm.gmCellIncX;
++    for (i = 0; i < count; i++)
++    {
++        WCHAR ch = text[i];
++        BOOL last = FALSE;
++
++        if (ch == '&' && i + 1 < count)
++        {
++            ch = text[++i];
++            underline = ch != '&' && cues;
++        }
++        else underline = FALSE;
++        if (NtGdiGetGlyphOutline( hdc, ch, GGO_METRICS, &gm, 0, NULL, &identity, FALSE ) == GDI_ERROR) continue;
++        if (max > 0 && pen + (int)gm.gmCellIncX > max - ellipsis_width)
++        {
++            /* the rest does not fit: an ellipsis in its place */
++            if (NtGdiGetGlyphOutline( hdc, ellipsis, GGO_METRICS, &gm, 0, NULL, &identity, FALSE ) == GDI_ERROR) break;
++            ch = ellipsis;
++            underline = FALSE;
++            last = TRUE;
++        }
++        if (paint && (size = NtGdiGetGlyphOutline( hdc, ch, WINE_GGO_GRAY16_BITMAP, &gm, 0, NULL, &identity, FALSE )) &&
++            size != GDI_ERROR)
++        {
++            if (size > capacity)
++            {
++                if (buffer != stack) free( buffer );
++                if (!(buffer = malloc( size ))) { buffer = stack; capacity = sizeof(stack); continue; }
++                capacity = size;
++            }
++            if (NtGdiGetGlyphOutline( hdc, ch, WINE_GGO_GRAY16_BITMAP, &gm, size, buffer, &identity, FALSE ) != GDI_ERROR)
++                pw_menu_text( paint->bits, paint->width, paint->height, x + pen + gm.gmptGlyphOrigin.x,
++                              baseline - gm.gmptGlyphOrigin.y, buffer, gm.gmBlackBoxX, gm.gmBlackBoxY,
++                              (gm.gmBlackBoxX + 3) & ~3, colour, white );
++        }
++        if (paint && underline)
++        {
++            /* text-underline-offset: 2px under the baseline, as wide as the letter */
++            for (int u = 0; u < (int)gm.gmCellIncX; u++)
++            {
++                int px = x + pen + u, py = baseline + 2;
++                if (px >= 0 && px < paint->width && py >= 0 && py < paint->height)
++                    paint->bits[py * paint->width + px] = pw_menu_over( paint->bits[py * paint->width + px], colour );
++            }
++        }
++        pen += gm.gmCellIncX;
++        if (last) break;
++    }
++    if (buffer != stack) free( buffer );
++    return pen;
++}
++
++/* A text's width, 16.16: which (0 a label, 1 a shortcut) font of Chromium's glyphs when it has them all and the text is
++ * not the default item's semibold label, else GDI's whole pixels. */
++static int pw_menu_text_width( HDC hdc, BOOL dark, int which, BOOL bold, const WCHAR *text, int count )
++{
++    unsigned short stripped[256];
++    int key, length = pw_menu_strip( text, count, stripped, &key ), width;
++    HFONT prev;
++
++    if (!bold && (width = pw_text_width( &pw_menu_fonts[dark][which], stripped, length )) >= 0) return width;
++    prev = NtGdiSelectFont( hdc, pw_menu_font( bold ? 1 : which ? 2 : 0 ));
++    width = pw_menu_glyphs( hdc, NULL, text, count, 0, 0, 0, 0, FALSE );
++    NtGdiSelectFont( hdc, prev );
++    return width * 65536;
++}
++
++/* A popup's window: the flyout's glass, rounded, in the menu's light or dark. */
++static void pw_menu_surface( struct menu *menu )
++{
++    struct ps5_dwm_params params = {.op = PS5_DWM_SET};
++
++    menu->pw_dark = pw_menu_dark();
++    params.attribute = PS5_DWM_CORNER;
++    params.value = 2; /* DWMWCP_ROUND */
++    menu->pw_glass = !NtUserPs5Dwm( menu->hWnd, &params );
++    params.attribute = PS5_DWM_DARK;
++    params.value = menu->pw_dark;
++    menu->pw_glass = menu->pw_glass && !NtUserPs5Dwm( menu->hWnd, &params );
++    params.attribute = PS5_DWM_MARGINS;
++    SetRect( &params.rect, -1, -1, -1, -1 );
++    menu->pw_glass = menu->pw_glass && !NtUserPs5Dwm( menu->hWnd, &params );
++    params.attribute = PS5_DWM_BACKDROP;
++    params.value = 7; /* PS5_DWMSBT_FLYOUT: .acrylic.surface-flyout */
++    menu->pw_glass = menu->pw_glass && !NtUserPs5Dwm( menu->hWnd, &params );
++}
++
++/* An item's height and the width its row needs, 16.16. */
++static int pw_menu_item_size( HDC hdc, struct menu *menu, struct menu_item *item, int *width )
++{
++    const WCHAR *shortcut;
++    int label, height = PW_MENU_ROW;
++
++    *width = 0;
++    if (item->fType & MF_SEPARATOR) return PW_MENU_SEPARATOR;
++    if (item->fType & MF_OWNERDRAW)
++    {
++        MEASUREITEMSTRUCT mis = {.CtlType = ODT_MENU, .itemID = item->wID, .itemData = item->dwItemData,
++                                 .itemHeight = od_item_height};
++        send_message( menu->hwndOwner, WM_MEASUREITEM, 0, (LPARAM)&mis );
++        *width = (mis.itemWidth + 2 * PW_MENU_ROW_PAD) * 65536;
++        return mis.itemHeight;
++    }
++    item->bmpsize.cx = item->bmpsize.cy = 0;
++    if (item->hbmpItem)
++    {
++        get_bitmap_item_size( item, &item->bmpsize, menu->hwndOwner );
++        if (item->bmpsize.cy + 4 > height) height = item->bmpsize.cy + 4;
++    }
++    if (item->fType & MF_BITMAP)
++    {
++        /* an old-style picture item: the picture is its content */
++        *width = (2 * PW_MENU_ROW_PAD + item->bmpsize.cx + (menu->pw_checks ? PW_MENU_ICON + PW_MENU_GAP : 0)) * 65536;
++        return height;
++    }
++    if (item->text && !(item->fType & MF_SYSMENU))
++    {
++        label = pw_menu_label( item->text, &shortcut );
++        *width = pw_menu_row_width( menu->pw_checks, menu->pw_icons,
++                                    pw_menu_text_width( hdc, menu->pw_dark, 0, !!(item->fState & MFS_DEFAULT), item->text, label ),
++                                    shortcut ? pw_menu_text_width( hdc, menu->pw_dark, 1, FALSE, shortcut, lstrlenW( shortcut )) : 0,
++                                    !!(item->fType & MF_POPUP) );
++    }
++    else *width = pw_menu_row_width( menu->pw_checks, menu->pw_icons, 0, 0, !!(item->fType & MF_POPUP) );
++    return height;
++}
++
++/* The prototype's layout (src/pw_menu_style.h): the command row, then rows and separators in columns split at
++ * MF_MENUBREAK; the list 3 px inside the menu, the rows 4 px inside the list. */
++static void pw_menu_layout( struct menu *menu, UINT max_height )
++{
++    UINT i, start, commands = 0, columns = 0;
++    int list = 0, top, bottom = 0, width;
++    BOOL checks = FALSE, icons = FALSE;
++    struct menu_item *item;
++    HDC hdc;
+ 
+-    get_client_rect( hwnd, &rect, get_thread_dpi() );
++    menu->Width = menu->Height = 0;
++    SetRectEmpty( &menu->items_rect );
++    menu->textOffset = 0;
++    if (menu->nItems == 0) return;
++    hdc = NtUserGetDC( 0 );
++    if (!menucharsize.cx)
++    {
++        int height;
++        menucharsize.cx = get_char_dimensions( hdc, NULL, &height );
++        menucharsize.cy = height;
++        od_item_height = HIWORD( get_dialog_base_units() );
++    }
+ 
+-    if (menu && menu->hbrBack) brush = menu->hbrBack;
+-    if ((prev_hrush = NtGdiSelectBrush( hdc, brush ))
+-        && NtGdiSelectFont( hdc, get_menu_font( FALSE )))
++    while (commands < menu->nItems && pw_menu_command( &menu->items[commands] )) commands++;
++    for (i = commands; i < menu->nItems; i++)
+     {
+-        HPEN prev_pen;
++        item = &menu->items[i];
++        if (item->fType & (MF_SEPARATOR | MF_OWNERDRAW)) continue;
++        if ((item->fState & MF_CHECKED) || (item->fType & MFT_RADIOCHECK) || item->hCheckBit || item->hUnCheckBit)
++            checks = TRUE;
++        if (item->hbmpItem && !(item->fType & MF_BITMAP)) icons = TRUE;
++    }
++    /* MNS_CHECKORBMP: one column, the check when there is one, the picture otherwise */
++    if ((menu->dwStyle & MNS_NOCHECK) || ((menu->dwStyle & MNS_CHECKORBMP) && icons)) checks = FALSE;
++    menu->pw_checks = checks;
++    menu->pw_icons = icons;
++    menu->pw_commands = commands;
+ 
+-        NtGdiRectangle( hdc, rect.left, rect.top, rect.right, rect.bottom );
++    for (i = 0; i < commands; i++)
++    {
++        SetRect( &menu->items[i].rect, PW_MENU_COMMAND_PAD + i * PW_MENU_COMMAND, 0,
++                 PW_MENU_COMMAND_PAD + (i + 1) * PW_MENU_COMMAND, PW_MENU_COMMAND );
++        /* the cell centres its picture */
++        get_bitmap_item_size( &menu->items[i], &menu->items[i].bmpsize, menu->hwndOwner );
++    }
++    top = commands ? PW_MENU_COMMAND : 0;
++    for (start = commands; start < menu->nItems; columns++)
++    {
++        int widest = 0, y = top;
+ 
+-        prev_pen = NtGdiSelectPen( hdc, GetStockObject( NULL_PEN ));
+-        if (prev_pen)
++        for (i = start; i < menu->nItems; i++)
+         {
+-            BOOL flat_menu = FALSE;
++            int height;
+ 
+-            NtUserSystemParametersInfo( SPI_GETFLATMENU, 0, &flat_menu, 0 );
+-            if (flat_menu)
+-                frame_rect( hdc, &rect, get_sys_color_brush( COLOR_BTNSHADOW ));
+-            else
+-                draw_rect_edge( hdc, &rect, EDGE_RAISED, BF_RECT, 1 );
++            item = &menu->items[i];
++            if (i != start && (item->fType & (MF_MENUBREAK | MF_MENUBARBREAK))) break;
++            height = pw_menu_item_size( hdc, menu, item, &width );
++            SetRect( &item->rect, list, y, list, y + height );
++            item->xTab = 0;
++            if (width > widest) widest = width;
++            y += height;
++        }
++        menu->pw_row = widest;
++        widest = (widest + 32768) / 65536 + 2 * PW_MENU_ROW_MARGIN;  /* the menu rounds its rows once */
++        for (; start < i; start++) menu->items[start].rect.right = list + widest;
++        list += widest;
++        if (y > bottom) bottom = y;
++    }
++    if (bottom < top) bottom = top;
++    if (columns > 1) menu->pw_row = 0;
++    width = pw_menu_width( list, commands, columns );
++    /* the last column takes what the minimum width (or the command row) adds; past the maximum, labels are cut */
++    for (i = commands; i < menu->nItems; i++)
++        if (menu->items[i].rect.right == list || columns <= 1)
++            menu->items[i].rect.right = width - 2 * PW_MENU_BORDER;
++
++    menu->nTotalHeight = bottom;
++    SetRect( &menu->items_rect, PW_MENU_BORDER, PW_MENU_INSET, width - PW_MENU_BORDER, PW_MENU_INSET + bottom );
++    menu->Width = width;
++    menu->Height = bottom + 2 * PW_MENU_INSET;
++    menu->bScrolling = FALSE;
++    if (menu->Height >= max_height)
++    {
++        menu->Height = max_height;
++        menu->bScrolling = columns <= 1;
++        if (menu->bScrolling)
++        {
++            menu->items_rect.top = get_scroll_arrow_height( menu );
++            menu->items_rect.bottom = menu->Height - get_scroll_arrow_height( menu );
++        }
++    }
++    NtUserReleaseDC( 0, hdc );
++}
+ 
+-            if (menu)
++/* A bitmap at (x, y), read top-down as 32 bits: with alpha it is composed as premultiplied (opacity 0-255), without it is
++ * copied opaque (a classic menu bitmap). */
++static void pw_menu_bitmap( struct pw_paint *paint, HBITMAP bitmap, int x, int y, unsigned int opacity )
++{
++    BITMAPINFO info = {{sizeof(info.bmiHeader)}};
++    unsigned int *pixels, alpha = 0;
++    BITMAP bm;
++    int w, h;
++
++    if (!NtGdiExtGetObjectW( bitmap, sizeof(bm), &bm )) return;
++    w = bm.bmWidth;
++    h = bm.bmHeight;
++    if (w <= 0 || h <= 0 || w > 1024 || h > 1024 || !(pixels = malloc( w * h * 4 ))) return;
++    info.bmiHeader.biWidth = w;
++    info.bmiHeader.biHeight = -h;
++    info.bmiHeader.biPlanes = 1;
++    info.bmiHeader.biBitCount = 32;
++    info.bmiHeader.biCompression = BI_RGB;
++    if (NtGdiGetDIBitsInternal( paint->dc, bitmap, 0, h, pixels, &info, DIB_RGB_COLORS, w * h * 4, sizeof(info) ) == h)
++    {
++        for (int i = 0; i < w * h; i++) alpha |= pixels[i] >> 24;
++        for (int j = 0; j < h; j++)
++            for (int i = 0; i < w; i++)
+             {
+-                TRACE( "hmenu %p Style %08x\n", hmenu, menu->dwStyle );
+-                /* draw menu items */
+-                if (menu->nItems)
+-                {
+-                    struct menu_item *item;
+-                    UINT u;
++                unsigned int pixel = alpha ? pixels[j * w + i] : pixels[j * w + i] | 0xff000000, a = pixel >> 24;
++                int px = x + i, py = y + j;
++
++                if (!a || px < 0 || px >= paint->width || py < 0 || py >= paint->height) continue;
++                /* premultiplied: no channel above its alpha */
++                for (int shift = 0; shift < 24; shift += 8)
++                    if ((pixel >> shift & 0xff) > a) pixel = (pixel & ~(0xffu << shift)) | a << shift;
++                if (opacity < 255) pixel = pw_menu_scale( pixel, opacity );
++                paint->bits[py * paint->width + px] = pw_menu_over( paint->bits[py * paint->width + px], pixel );
++            }
++    }
++    free( pixels );
++}
+ 
+-                    item = menu->items;
+-                    for (u = menu->nItems; u > 0; u--, item++)
+-                        draw_menu_item( hwnd, menu, menu->hwndOwner, hdc,
+-                                        item, FALSE, ODA_DRAWENTIRE );
+-                }
+-                if (menu->bScrolling) draw_scroll_arrows( menu, hdc );
++/* What GDI drew into the rectangle (alpha 0) becomes opaque. */
++static void pw_menu_opaque( struct pw_paint *paint, const RECT *rect )
++{
++    NtGdiFlush();
++    for (int j = max( rect->top, 0 ); j < min( rect->bottom, paint->height ); j++)
++        for (int i = max( rect->left, 0 ); i < min( rect->right, paint->width ); i++) paint->bits[j * paint->width + i] |= 0xff000000;
++}
++
++/* A magic bitmap of the window menu (restore, minimize, maximize, close): Marlett's glyph in the label's colour. */
++static void pw_menu_magic( struct pw_paint *paint, HBITMAP bitmap, int x, int top, unsigned int colour )
++{
++    LOGFONTW logfont = { -PW_MENU_ICON + 2, 0, 0, 0, FW_NORMAL, 0, 0, 0, SYMBOL_CHARSET, 0, 0, 0, 0, {'M','a','r','l','e','t','t'} };
++    WCHAR glyph = (INT_PTR)bitmap == (INT_PTR)HBMMENU_POPUP_CLOSE ? 0x72 : (INT_PTR)bitmap == (INT_PTR)HBMMENU_POPUP_RESTORE ? 0x32 :
++                  (INT_PTR)bitmap == (INT_PTR)HBMMENU_POPUP_MAXIMIZE ? 0x31 : (INT_PTR)bitmap == (INT_PTR)HBMMENU_POPUP_MINIMIZE ? 0x30 : 0;
++    HFONT font, prev;
++
++    if (!glyph || !(font = NtGdiHfontCreate( &logfont, sizeof(logfont), 0, 0, NULL ))) return;
++    prev = NtGdiSelectFont( paint->dc, font );
++    pw_menu_glyphs( paint->dc, paint, &glyph, 1, x + 1, top + PW_MENU_ROW / 2 + 6, 0, colour, FALSE );
++    NtGdiSelectFont( paint->dc, prev );
++    NtGdiDeleteObjectApp( font );
++}
++
++/* Draws text with Chromium's glyphs from pen x (16.16) on the baseline, in role's colour (each font is the prototype's
++ * label or shortcut colour; another role scales it); FALSE when a character has none or the text would pass right
++ * (16.16) by a pixel: less is what rounding the menu's width to whole pixels took from it. */
++static BOOL pw_menu_glyph_text( struct pw_paint *paint, int which, int role, const WCHAR *text, int count, int x,
++                                int baseline, int right, BOOL cues )
++{
++    PwGlyphFont font = pw_menu_fonts[paint->dark][which];
++    unsigned int captured = pw_menu_text_colour( paint->dark, which ? PW_MENU_SECONDARY : PW_MENU_PRIMARY ) >> 24;
++    unsigned int alpha = ((pw_menu_text_colour( paint->dark, role ) >> 24) * 255 + captured / 2) / captured;
++    unsigned short stripped[256];
++    int key, length = pw_menu_strip( text, count, stripped, &key ), width = pw_text_width( &font, stripped, length );
++
++    if (width < 0 || x + width >= right + 65536) return FALSE;
++    if (alpha > 255) alpha = 255;
++    font.color = paint->dark ? alpha * 0x01010101u : alpha << 24;
++    pw_text_draw( &font, stripped, length, x, baseline, paint->bits, paint->width, paint->height );
++    if (cues && key >= 0)
++    {
++        /* the access key's letter, underlined 2 px under the baseline */
++        int pen = x + pw_text_width( &font, stripped, key ), end = pen + pw_text_glyph( &font, stripped[key] )->advance;
++        unsigned int colour = pw_menu_text_colour( paint->dark, role );
++        for (int px = pen >> 16; px < (end + 65535) >> 16; px++)
++            if (px >= 0 && px < paint->width && baseline + 2 >= 0 && baseline + 2 < paint->height)
++                paint->bits[(baseline + 2) * paint->width + px] = pw_menu_over( paint->bits[(baseline + 2) * paint->width + px], colour );
++    }
++    return TRUE;
++}
++
++static void pw_menu_draw_item( HWND hwnd, struct menu *menu, struct menu_item *item, struct pw_paint *paint )
++{
++    BOOL disabled = (item->fState & (MF_GRAYED | MF_DISABLED)) != 0, hilite = (item->fState & MF_HILITE) != 0;
++    BOOL open = (item->fType & MF_POPUP) && (item->fState & MF_MOUSESELECT);
++    int role = disabled ? PW_MENU_DISABLED : PW_MENU_PRIMARY;
++    RECT rect = item->rect, inside;
++    int left, right;
++
++    adjust_menu_item_rect( menu, &rect );
++    if (!intersect_rect( &inside, &rect, &menu->items_rect )) return;
++    left = rect.left + PW_MENU_ROW_MARGIN;
++    right = rect.right - PW_MENU_ROW_MARGIN;
++
++    if (item->fType & MF_SEPARATOR)
++    {
++        pw_menu_separator( paint->bits, paint->width, paint->height, rect.left, rect.right, rect.top + 2, paint->chrome->separator );
++        return;
++    }
++    if (item->fType & MF_MENUBARBREAK)
++        for (int y = menu->items_rect.top; y < menu->items_rect.bottom; y++)
++            pw_menu_separator( paint->bits, paint->width, paint->height, rect.left - 1, rect.left, y, paint->chrome->separator );
++    if (item->fType & MF_OWNERDRAW)
++    {
++        /* the owner draws with GDI on the menu's opaque colour, as on a classic menu */
++        DRAWITEMSTRUCT dis = {.CtlType = ODT_MENU, .itemID = item->wID, .itemData = item->dwItemData,
++                              .itemAction = ODA_DRAWENTIRE, .hwndItem = (HWND)menu->handle, .hDC = paint->dc, .rcItem = rect};
++        if (item->fState & MF_CHECKED) dis.itemState |= ODS_CHECKED;
++        if (item->fState & MF_GRAYED) dis.itemState |= ODS_GRAYED | ODS_DISABLED;
++        if (hilite) dis.itemState |= ODS_SELECTED;
++        fill_rect( paint->dc, &rect, get_sys_color_brush( COLOR_MENU ));
++        NtGdiGetAndSetDCDword( paint->dc, NtGdiSetTextColor, get_sys_color( hilite ? COLOR_HIGHLIGHTTEXT : COLOR_MENUTEXT ), NULL );
++        NtGdiGetAndSetDCDword( paint->dc, NtGdiSetBkColor, get_sys_color( hilite ? COLOR_HIGHLIGHT : COLOR_MENU ), NULL );
++        send_message( menu->hwndOwner, WM_DRAWITEM, 0, (LPARAM)&dis );
++        pw_menu_opaque( paint, &rect );
++        if (item->fType & MF_POPUP)
++            pw_menu_sprite( paint->bits, paint->width, paint->height, right, rect.top, &paint->chrome->chevron );
++        return;
++    }
++
++    if (pw_menu_command( item ) && item - menu->items < menu->pw_commands)
++    {
++        if (hilite && !disabled)
++            pw_menu_sprite( paint->bits, paint->width, paint->height, rect.left, rect.top, &paint->chrome->command_hover );
++        pw_menu_bitmap( paint, item->hbmpItem, rect.left + (PW_MENU_COMMAND - item->bmpsize.cx) / 2,
++                        rect.top + (PW_MENU_COMMAND - item->bmpsize.cy) / 2, 255 );
++        return;
++    }
++
++    if ((hilite && !disabled) || open)
++    {
++        if (pw_menu_keys && hilite && !open)
++            pw_menu_plate( paint->bits, paint->width, paint->height, left, right, rect.top, &paint->chrome->keyboard );
++        else
++            pw_menu_plate( paint->bits, paint->width, paint->height, left, right, rect.top, &paint->chrome->hover );
++    }
++
++    /* the check column, then the icon column (MNS_CHECKORBMP: the check takes the icon's place when there is one) */
++    {
++        BOOL checked = (item->fState & MF_CHECKED) != 0;
++        HBITMAP mark = checked ? item->hCheckBit : item->hUnCheckBit;
++        int check_x = left + PW_MENU_ROW_PAD, icon_x = left + pw_menu_icon_x( menu->pw_checks );
++        BOOL shared = !menu->pw_checks && menu->pw_icons && (checked || mark) && !(menu->dwStyle & MNS_NOCHECK);
++
++        if (menu->pw_checks || shared)
++        {
++            int x = shared ? icon_x : check_x;
++            if (mark)
++            {
++                BITMAP bm;
++                if (NtGdiExtGetObjectW( mark, sizeof(bm), &bm ))
++                    pw_menu_bitmap( paint, mark, x + (PW_MENU_ICON - bm.bmWidth) / 2, rect.top + (PW_MENU_ROW - bm.bmHeight) / 2, 255 );
++            }
++            else if (checked)
++            {
++                PwMenuSprite mark_sprite = (item->fType & MFT_RADIOCHECK) ? paint->chrome->radio : paint->chrome->check;
++                pw_menu_sprite( paint->bits, paint->width, paint->height, x, rect.top, &mark_sprite );
+             }
+         }
+-        else
++        if (menu->pw_icons && item->hbmpItem && !(shared && (checked || mark)) && !(item->fType & MF_BITMAP))
++        {
++            int x = icon_x + (PW_MENU_ICON - item->bmpsize.cx) / 2, y = rect.top + (PW_MENU_ROW - item->bmpsize.cy) / 2;
++
++            if (IS_MAGIC_BITMAP( item->hbmpItem ) && item->hbmpItem != HBMMENU_CALLBACK && item->hbmpItem != HBMMENU_SYSTEM)
++                pw_menu_magic( paint, item->hbmpItem, icon_x, rect.top, pw_menu_text_colour( paint->dark, role ));
++            else if (item->hbmpItem == HBMMENU_CALLBACK || item->hbmpItem == HBMMENU_SYSTEM)
++            {
++                RECT box = {x, y, x + item->bmpsize.cx, y + item->bmpsize.cy};
++                POINT origin;
++                fill_rect( paint->dc, &box, get_sys_color_brush( COLOR_MENU ));
++                set_viewport_org( paint->dc, box.left, box.top, &origin );
++                OffsetRect( &box, -box.left, -box.top );
++                draw_bitmap_item( hwnd, paint->dc, item, &box, menu, menu->hwndOwner, ODA_DRAWENTIRE );
++                set_viewport_org( paint->dc, origin.x, origin.y, NULL );
++                OffsetRect( &box, x, y );
++                pw_menu_opaque( paint, &box );
++            }
++            else pw_menu_bitmap( paint, item->hbmpItem, x, y, disabled ? 140 : 255 ); /* .disabled .menu-icon: opacity 0.55 */
++        }
++    }
++
++    if (item->fType & MF_BITMAP)
++        pw_menu_bitmap( paint, item->hbmpItem, left + pw_menu_label_x( menu->pw_checks, 0 ),
++                        rect.top + (rect.bottom - rect.top - item->bmpsize.cy) / 2, 255 );
++    else if (item->text && !(item->fType & MF_SYSMENU))
++    {
++        const WCHAR *shortcut;
++        int label = pw_menu_label( item->text, &shortcut ), x = left + pw_menu_label_x( menu->pw_checks, menu->pw_icons );
++        /* right-aligned parts end where Chromium's fractional row does (the menu is that row rounded) */
++        int row = menu->pw_row > (right - left) * 65536 ? menu->pw_row : (right - left) * 65536;
++        int end = left * 65536 + row - (PW_MENU_ROW_PAD + ((item->fType & MF_POPUP) ? PW_MENU_GAP + PW_MENU_TAIL + PW_MENU_CHEVRON : 0)) * 65536;
++        int baseline = rect.top + PW_MENU_LABEL_INK + 1;
++        HFONT prev;
++
++        if (shortcut)
+         {
+-            NtGdiSelectBrush( hdc, prev_hrush );
++            /* right-aligned as Blink aligns a run: by its width rounded up to 1/64 px */
++            int count = lstrlenW( shortcut ), keys = disabled ? PW_MENU_DISABLED : PW_MENU_SECONDARY;
++            int start = end - ((pw_menu_text_width( paint->dc, paint->dark, 1, FALSE, shortcut, count ) + 1023) & ~1023);
++
++            if (!pw_menu_glyph_text( paint, 1, keys, shortcut, count, start, rect.top + PW_MENU_SHORTCUT_INK + 1, end, FALSE ))
++            {
++                prev = NtGdiSelectFont( paint->dc, pw_menu_font( 2 ));
++                pw_menu_glyphs( paint->dc, paint, shortcut, count, start >> 16, rect.top + PW_MENU_SHORTCUT_INK + 1, 0,
++                                pw_menu_text_colour( paint->dark, keys ), FALSE );
++                NtGdiSelectFont( paint->dc, prev );
++            }
++            end = start - (PW_MENU_GAP + PW_MENU_TAIL) * 65536;
+         }
++        if ((item->fState & MFS_DEFAULT) ||
++            !pw_menu_glyph_text( paint, 0, role, item->text, label, x * 65536, baseline, end, pw_menu_cues ))
++        {
++            prev = NtGdiSelectFont( paint->dc, pw_menu_font( (item->fState & MFS_DEFAULT) ? 1 : 0 ));
++            pw_menu_glyphs( paint->dc, paint, item->text, label, x, baseline, (end >> 16) - x, pw_menu_text_colour( paint->dark, role ),
++                            pw_menu_cues );
++            NtGdiSelectFont( paint->dc, prev );
++        }
++    }
++    if (item->fType & MF_POPUP)
++    {
++        PwMenuSprite chevron = paint->chrome->chevron;
++        unsigned int faded[PW_MENU_CHEVRON * PW_MENU_ROW];
++
++        if (disabled && chevron.w * chevron.h <= ARRAY_SIZE(faded))
++        {
++            /* .disabled .menu-chevron: TextFillColorDisabled for Secondary */
++            for (int i = 0; i < chevron.w * chevron.h; i++) faded[i] = pw_menu_scale( chevron.bits[i], paint->dark ? 120 : 149 );
++            chevron.bits = faded;
++        }
++        pw_menu_sprite( paint->bits, paint->width, paint->height, right, rect.top, &chevron );
++    }
++}
++
++/* Paints the whole popup into a premultiplied buffer and copies it, alpha and all, to the window. */
++static void pw_menu_paint( HWND hwnd, HDC hdc, HMENU hmenu )
++{
++    struct menu *menu = unsafe_menu_ptr( hmenu );
++    BITMAPINFO info = {{sizeof(info.bmiHeader)}};
++    struct pw_paint paint;
++    HBITMAP bitmap, prev_bitmap;
++    HFONT prev_font;
++    RECT client, box;
++    void *bits;
++
++    if (!menu) return;
++    get_client_rect( hwnd, &client, get_thread_dpi() );
++    if (client.right <= 0 || client.bottom <= 0) return;
++    /* only the rows the update region reaches are drawn and copied (a hover repaints two) */
++    if (NtGdiGetAppClipBox( hdc, &box ) == ERROR || !intersect_rect( &box, &box, &client )) box = client;
++    info.bmiHeader.biWidth = client.right;
++    info.bmiHeader.biHeight = -client.bottom;
++    info.bmiHeader.biPlanes = 1;
++    info.bmiHeader.biBitCount = 32;
++    info.bmiHeader.biCompression = BI_RGB;
++    if (!(paint.dc = NtGdiCreateCompatibleDC( hdc ))) return;
++    if (!(bitmap = NtGdiCreateDIBSection( paint.dc, NULL, 0, &info, DIB_RGB_COLORS, 0, 0, 0, &bits )))
++    {
++        NtGdiDeleteObjectApp( paint.dc );
++        return;
++    }
++    prev_bitmap = NtGdiSelectBitmap( paint.dc, bitmap );
++    prev_font = NtGdiSelectFont( paint.dc, get_menu_font( FALSE ));
++    NtGdiGetAndSetDCDword( paint.dc, NtGdiSetBkMode, TRANSPARENT, NULL );
++    paint.bits = bits;
++    paint.width = client.right;
++    paint.height = client.bottom;
++    paint.dark = menu->pw_dark;
++    paint.chrome = &pw_menu_chrome[paint.dark ? 1 : 0];
++
++    /* glass: transparent, the compositor's material shows; an app's own background, or no compositor: opaque */
++    if (menu->hbrBack || !menu->pw_glass)
++    {
++        fill_rect( paint.dc, &client, menu->hbrBack ? menu->hbrBack : get_sys_color_brush( COLOR_MENU ));
++        if (!menu->pw_glass && !menu->hbrBack) frame_rect( paint.dc, &client, get_sys_color_brush( COLOR_BTNSHADOW ));
++        pw_menu_opaque( &paint, &client );
++    }
++    for (UINT i = 0; i < menu->nItems; i++)
++    {
++        RECT rect = menu->items[i].rect, inside;
++
++        adjust_menu_item_rect( menu, &rect );
++        InflateRect( &rect, 0, 2 );  /* a neighbour's keyboard ring */
++        if (intersect_rect( &inside, &rect, &box )) pw_menu_draw_item( hwnd, menu, &menu->items[i], &paint );
++    }
++    if (menu->bScrolling)
++    {
++        /* Wine's arrows, on the menu's opaque colour */
++        RECT strip = {0, 0, client.right, menu->items_rect.top};
++        fill_rect( paint.dc, &strip, get_sys_color_brush( COLOR_MENU ));
++        SetRect( &strip, 0, menu->items_rect.bottom, client.right, client.bottom );
++        fill_rect( paint.dc, &strip, get_sys_color_brush( COLOR_MENU ));
++        draw_scroll_arrows( menu, paint.dc );
++        pw_menu_opaque( &paint, &strip );
++        SetRect( &strip, 0, 0, client.right, menu->items_rect.top );
++        pw_menu_opaque( &paint, &strip );
++    }
++
++    NtGdiBitBlt( hdc, box.left, box.top, box.right - box.left, box.bottom - box.top, paint.dc, box.left, box.top, SRCCOPY, 0, 0 );
++    NtGdiSelectFont( paint.dc, prev_font );
++    NtGdiSelectBitmap( paint.dc, prev_bitmap );
++    NtGdiDeleteObjectApp( bitmap );
++    NtGdiDeleteObjectApp( paint.dc );
++}
++
++/* A popup's item changed state: it is painted again through the buffer (glass is never drawn piecemeal); now paints
++ * what is invalid at once. */
++static void pw_menu_invalidate_item( struct menu *menu, struct menu_item *item, BOOL now )
++{
++    RECT rect = item->rect;
++
++    adjust_menu_item_rect( menu, &rect );
++    /* the keyboard ring reaches 2 px past the row */
++    InflateRect( &rect, 0, 2 );
++    NtUserRedrawWindow( menu->hWnd, &rect, 0, RDW_INVALIDATE | (now ? RDW_UPDATENOW : 0) );
++}
++
++/* The focus ring follows the keyboard: shown from the first key, hidden when the pointer moves. */
++static void pw_menu_track_keys( HMENU top, BOOL keys )
++{
++    HMENU hmenu = top;
++
++    if (keys) pw_menu_cues = TRUE;
++    if (pw_menu_keys == keys) return;
++    pw_menu_keys = keys;
++    while (hmenu)
++    {
++        struct menu *menu = unsafe_menu_ptr( hmenu );
++        struct menu_item *item;
++
++        if (!menu) break;
++        if (menu->hWnd && (menu->wFlags & MF_POPUP)) NtUserRedrawWindow( menu->hWnd, NULL, 0, RDW_INVALIDATE );
++        if (menu->FocusedItem == NO_SELECTED_ITEM) break;
++        item = &menu->items[menu->FocusedItem];
++        hmenu = (item->fType & MF_POPUP) && (item->fState & MF_MOUSESELECT) ? item->hSubMenu : NULL;
+     }
+ }
+ 
++static void draw_popup_menu( HWND hwnd, HDC hdc, HMENU hmenu )
++{
++    pw_menu_paint( hwnd, hdc, hmenu );
++}
++
+ LRESULT popup_menu_window_proc( HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam, BOOL ansi )
+ {
+     TRACE( "hwnd=%p msg=0x%04x wp=0x%04lx lp=0x%08lx\n", hwnd, message, (long)wparam, lparam );
+@@ -2969,95 +3574,7 @@ HWND is_menu_active(void)
+ /* Calculate the size of a popup menu */
+ static void calc_popup_menu_size( struct menu *menu, UINT max_height )
+ {
+-    BOOL textandbmp = FALSE, multi_col = FALSE;
+-    int org_x, org_y, max_tab, max_tab_width;
+-    struct menu_item *item;
+-    UINT start, i;
+-    HDC hdc;
+-
+-    menu->Width = menu->Height = 0;
+-    SetRectEmpty( &menu->items_rect );
+-
+-    if (menu->nItems == 0) return;
+-    hdc = NtUserGetDC( 0 );
+-
+-    NtGdiSelectFont( hdc, get_menu_font( FALSE ));
+-
+-    start = 0;
+-    menu->textOffset = 0;
+-
+-    while (start < menu->nItems)
+-    {
+-        item = &menu->items[start];
+-        org_x = menu->items_rect.right;
+-        if (item->fType & (MF_MENUBREAK | MF_MENUBARBREAK))
+-            org_x += MENU_COL_SPACE;
+-        org_y = menu->items_rect.top;
+-
+-        max_tab = max_tab_width = 0;
+-        /* Parse items until column break or end of menu */
+-        for (i = start; i < menu->nItems; i++, item++)
+-        {
+-            if (item->fType & (MF_MENUBREAK | MF_MENUBARBREAK))
+-            {
+-                multi_col = TRUE;
+-                if (i != start) break;
+-            }
+-
+-            calc_menu_item_size( hdc, item, menu->hwndOwner, org_x, org_y, FALSE, menu );
+-            menu->items_rect.right = max( menu->items_rect.right, item->rect.right );
+-            org_y = item->rect.bottom;
+-            if (IS_STRING_ITEM( item->fType ) && item->xTab)
+-            {
+-                max_tab = max( max_tab, item->xTab );
+-                max_tab_width = max( max_tab_width, item->rect.right-item->xTab );
+-            }
+-            if (item->text && item->hbmpItem) textandbmp = TRUE;
+-        }
+-
+-        /* Finish the column (set all items to the largest width found) */
+-        menu->items_rect.right = max( menu->items_rect.right, max_tab + max_tab_width );
+-        for (item = &menu->items[start]; start < i; start++, item++)
+-        {
+-            item->rect.right = menu->items_rect.right;
+-            if (IS_STRING_ITEM( item->fType ) && item->xTab)
+-                item->xTab = max_tab;
+-        }
+-        menu->items_rect.bottom = max( menu->items_rect.bottom, org_y );
+-    }
+-
+-    /* If none of the items have both text and bitmap then
+-     * the text and bitmaps are all aligned on the left. If there is at
+-     * least one item with both text and bitmap then bitmaps are
+-     * on the left and texts left aligned with the right hand side
+-     * of the bitmaps */
+-    if (!textandbmp) menu->textOffset = 0;
+-
+-    menu->nTotalHeight = menu->items_rect.bottom;
+-
+-    /* space for the border */
+-    OffsetRect( &menu->items_rect, MENU_MARGIN, MENU_MARGIN );
+-    menu->Height = menu->items_rect.bottom + MENU_MARGIN;
+-    menu->Width = menu->items_rect.right + MENU_MARGIN;
+-
+-    /* Adjust popup height if it exceeds maximum */
+-    if (menu->Height >= max_height)
+-    {
+-        menu->Height = max_height;
+-        menu->bScrolling = !multi_col;
+-        /* When the scroll arrows are present, don't add the top/bottom margin as well */
+-        if (menu->bScrolling)
+-        {
+-            menu->items_rect.top = get_scroll_arrow_height( menu );
+-            menu->items_rect.bottom = menu->Height - get_scroll_arrow_height( menu );
+-        }
+-    }
+-    else
+-    {
+-        menu->bScrolling = FALSE;
+-    }
+-
+-    NtUserReleaseDC( 0, hdc );
++    pw_menu_layout( menu, max_height );
+ }
+ 
+ static BOOL show_popup( HWND owner, HMENU hmenu, UINT id, UINT flags,
+@@ -3192,8 +3709,8 @@ static void select_item( HWND owner, HMENU hmenu, UINT index, BOOL send_select,
+     if (menu->FocusedItem != NO_SELECTED_ITEM)
+     {
+         menu->items[menu->FocusedItem].fState &= ~(MF_HILITE|MF_MOUSESELECT);
+-        draw_menu_item( menu->hWnd, menu, owner, hdc, &menu->items[menu->FocusedItem],
+-                        !(menu->wFlags & MF_POPUP), ODA_SELECT );
++        if (menu->wFlags & MF_POPUP) pw_menu_invalidate_item( menu, &menu->items[menu->FocusedItem], FALSE );
++        else draw_menu_item( menu->hWnd, menu, owner, hdc, &menu->items[menu->FocusedItem], TRUE, ODA_SELECT );
+     }
+ 
+     /* Highlight new item (if any) */
+@@ -3204,8 +3721,8 @@ static void select_item( HWND owner, HMENU hmenu, UINT index, BOOL send_select,
+         {
+             menu->items[index].fState |= MF_HILITE;
+             ensure_menu_item_visible( menu, index, hdc );
+-            draw_menu_item( menu->hWnd, menu, owner, hdc, &menu->items[index],
+-                            !(menu->wFlags & MF_POPUP), ODA_SELECT );
++            if (menu->wFlags & MF_POPUP) pw_menu_invalidate_item( menu, &menu->items[index], TRUE );
++            else draw_menu_item( menu->hWnd, menu, owner, hdc, &menu->items[index], TRUE, ODA_SELECT );
+         }
+         if (send_select)
+         {
+@@ -3216,9 +3733,10 @@ static void select_item( HWND owner, HMENU hmenu, UINT index, BOOL send_select,
+                           (LPARAM)hmenu );
+         }
+     }
+-    else if (send_select)
++    else
+     {
+-        if (topmenu)
++        if ((menu->wFlags & MF_POPUP) && menu->hWnd) NtUserRedrawWindow( menu->hWnd, NULL, 0, RDW_UPDATENOW );
++        if (send_select && topmenu)
+         {
+             int pos = find_submenu( &topmenu, hmenu );
+             if (pos != NO_SELECTED_ITEM)
+@@ -3287,6 +3805,7 @@ static void hide_sub_popups( HWND owner, HMENU hmenu, BOOL send_select, UINT fla
+         item = &menu->items[menu->FocusedItem];
+         if (!(item->fType & MF_POPUP) || !(item->fState & MF_MOUSESELECT)) return;
+         item->fState &= ~MF_MOUSESELECT;
++        if (menu->wFlags & MF_POPUP) pw_menu_invalidate_item( menu, item, FALSE );  /* the focus is back on this row */
+         hsubmenu = item->hSubMenu;
+ 
+         if (!(submenu = unsafe_menu_ptr( hsubmenu ))) return;
+@@ -3348,6 +3867,7 @@ static BOOL init_popup( HWND owner, HMENU hmenu, UINT flags )
+                                        WS_POPUP, 0, 0, 0, 0, owner, 0,
+                                        (HINSTANCE)get_window_long_ptr( owner, GWLP_HINSTANCE, FALSE ),
+                                        (void *)hmenu, 0, NULL, (WCHAR *)POPUPMENU_CLASS_ATOM, FALSE );
++    if (menu->hWnd) pw_menu_surface( menu );
+     return !!menu->hWnd;
+ }
+ 
+@@ -3391,13 +3911,16 @@ static HMENU show_sub_popup( HWND owner, HMENU hmenu, BOOL select_first, UINT fl
+         NtGdiSelectFont( hdc, get_menu_font( FALSE ));
+ 
+         item->fState |= MF_HILITE;
+-        draw_menu_item( menu->hWnd, menu, owner, hdc, item, !(menu->wFlags & MF_POPUP), ODA_DRAWENTIRE );
++        if (menu->wFlags & MF_POPUP) pw_menu_invalidate_item( menu, item, TRUE );
++        else draw_menu_item( menu->hWnd, menu, owner, hdc, item, TRUE, ODA_DRAWENTIRE );
+         NtUserReleaseDC( menu->hWnd, hdc );
+     }
+     if (!item->rect.top && !item->rect.left && !item->rect.bottom && !item->rect.right)
+         item->rect = rect;
+ 
+     item->fState |= MF_MOUSESELECT;
++    /* an open submenu's row loses the keyboard ring: the focus is in the submenu */
++    if (menu->wFlags & MF_POPUP) pw_menu_invalidate_item( menu, item, TRUE );
+ 
+     if (IS_SYSTEM_MENU( menu ))
+     {
+@@ -3424,10 +3947,10 @@ static HMENU show_sub_popup( HWND owner, HMENU hmenu, BOOL select_first, UINT fl
+                same y position as the focused menu item */
+             if (flags & TPM_LAYOUTRTL)
+                 rect.left += get_system_metrics( SM_CXBORDER );
+-            else
+-                rect.left += item_rect.right - get_system_metrics( SM_CXBORDER );
++            else  /* PS5_Proton: over the menu's 4 px edge, on the other side when it does not fit (prototype) */
++                rect.left += item_rect.right + PW_MENU_BORDER - PW_MENU_ROW_MARGIN;
+             rect.top += item_rect.top - MENU_MARGIN;
+-            rect.right = item_rect.left - item_rect.right + get_system_metrics( SM_CXBORDER );
++            rect.right = item_rect.left - item_rect.right + 2 * (PW_MENU_ROW_MARGIN - PW_MENU_BORDER);
+             rect.bottom = item_rect.top - item_rect.bottom - 2 * MENU_MARGIN;
+         }
+         else
+@@ -4101,6 +4624,8 @@ static BOOL track_menu( HMENU hmenu, UINT flags, int x, int y, HWND hwnd, const
+     mt.hOwnerWnd = get_full_window_handle( hwnd );
+     mt.pt.x = x;
+     mt.pt.y = y;
++    pw_menu_keys = pw_menu_cues = FALSE;
++    NtUserGetCursorPos( &pw_menu_pointer );
+ 
+     TRACE( "hmenu=%p flags=0x%08x (%d,%d) hwnd=%p %s\n",
+            hmenu, flags, x, y, hwnd, wine_dbgstr_rect( rect ));
+@@ -4217,6 +4742,11 @@ static BOOL track_menu( HMENU hmenu, UINT flags, int x, int y, HWND hwnd, const
+                     break;
+ 
+                 case WM_MOUSEMOVE:
++                    if (mt.pt.x != pw_menu_pointer.x || mt.pt.y != pw_menu_pointer.y)
++                    {
++                        pw_menu_pointer = mt.pt;
++                        pw_menu_track_keys( mt.hTopMenu, FALSE );
++                    }
+                     /* the selected menu item must be changed every time the mouse moves. */
+                     if (hmenu) exit_menu |= !menu_mouse_move( &mt, hmenu, flags );
+                     break;
+@@ -4238,6 +4768,7 @@ static BOOL track_menu( HMENU hmenu, UINT flags, int x, int y, HWND hwnd, const
+ 
+                 case VK_HOME:
+                 case VK_END:
++                    pw_menu_track_keys( mt.hTopMenu, TRUE );
+                     select_item( mt.hOwnerWnd, mt.hCurrentMenu, NO_SELECTED_ITEM, FALSE, 0 );
+                     move_selection( mt.hOwnerWnd, mt.hCurrentMenu,
+                                     msg.wParam == VK_HOME ? ITEM_NEXT : ITEM_PREV );
+@@ -4245,6 +4776,7 @@ static BOOL track_menu( HMENU hmenu, UINT flags, int x, int y, HWND hwnd, const
+ 
+                 case VK_UP:
+                 case VK_DOWN: /* If on menu bar, pull-down the menu */
++                    pw_menu_track_keys( mt.hTopMenu, TRUE );
+                     menu = unsafe_menu_ptr( mt.hCurrentMenu );
+                     if (!(menu->wFlags & MF_POPUP))
+                         mt.hCurrentMenu = show_sub_popup( mt.hOwnerWnd, mt.hTopMenu, TRUE, flags );
+@@ -4254,10 +4786,12 @@ static BOOL track_menu( HMENU hmenu, UINT flags, int x, int y, HWND hwnd, const
+                     break;
+ 
+                 case VK_LEFT:
++                    pw_menu_track_keys( mt.hTopMenu, TRUE );
+                     menu_key_left( &mt, flags, msg.message );
+                     break;
+ 
+                 case VK_RIGHT:
++                    pw_menu_track_keys( mt.hTopMenu, TRUE );
+                     menu_right_key( &mt, flags, msg.message );
+                     break;
+ 
+@@ -4301,6 +4835,7 @@ static BOOL track_menu( HMENU hmenu, UINT flags, int x, int y, HWND hwnd, const
+ 
+                     /* Hack to avoid control chars... */
+                     if (msg.wParam < 32) break;
++                    pw_menu_track_keys( mt.hTopMenu, TRUE );
+ 
+                     pos = find_item_by_key( mt.hOwnerWnd, mt.hCurrentMenu,
+                                             LOWORD( msg.wParam ), FALSE );

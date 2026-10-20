@@ -1,0 +1,38 @@
+{
+  "battery": "m4s2-2026-10-07-02",
+  "revision": "a25fce0f9c270e221e82cd43af7252afe2bf2c88",
+  "dirty": true,
+  "cases": [
+    {
+      "case": "pe32",
+      "run": "m4s2-2026-10-07-02-pe32",
+      "runner_status": 0,
+      "seconds": 9.4,
+      "result": "finished",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 2,
+      "protocol_errors": 0
+    },
+    {
+      "case": "wow64",
+      "run": "m4s2-2026-10-07-02-wow64",
+      "runner_status": 1,
+      "seconds": 58.7,
+      "result": "finished",
+      "probe_verdict": null,
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": false,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 4,
+      "protocol_errors": 0
+    }
+  ],
+  "passed": false
+}

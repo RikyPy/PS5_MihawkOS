@@ -1,0 +1,37 @@
+{
+  "battery": "l2-broker-wedge-2026-10-16-01",
+  "expected_cases": [
+    "broker-wedge64"
+  ],
+  "revision": "f3aa632b4a344d3e169a02d63e1895e648bea57e",
+  "dirty": true,
+  "cases": [
+    {
+      "case": "broker-wedge64",
+      "run": "l2-broker-wedge-2026-10-16-01-broker-wedge64",
+      "runner_status": 0,
+      "seconds": 62.8,
+      "result": "finished",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "run_seconds": 62.2,
+      "launch_readiness": {
+        "ready": true,
+        "seconds": 0.138,
+        "settle_seconds": 0.0,
+        "census_seconds": 0.126,
+        "previous_cleanup_verified": false
+      },
+      "runner_overhead_seconds": 0.6,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 8,
+      "protocol_errors": 0
+    }
+  ],
+  "complete": true,
+  "seconds": 62.9,
+  "passed": true
+}

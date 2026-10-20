@@ -1,0 +1,62 @@
+From: PS5_Proton
+Subject: [PATCH] explorer: create managed Appearance shortcut after shell startup
+
+The session root must not import GUI libraries: user32 starts an implicit
+desktop before main, preempting the configured Explorer process. Let the
+actual shell create its object after desktop initialization. Only managed
+installations participate; preserve a same-named user shortcut. Resource
+2020 is the pinned Fluent settings glyph in the managed icon inventory.
+
+--- a/programs/explorer/desktop.c
++++ b/programs/explorer/desktop.c
+@@ -913,6 +913,33 @@
+     return found;
+ }
+ 
++static HRESULT create_mihawk_appearance_shortcut(void)
++{
++    WCHAR desktop[MAX_PATH], executable[MAX_PATH], icon[MAX_PATH];
++    IShellLinkW *link = NULL;
++    IPersistFile *file = NULL;
++    HRESULT result = SHGetFolderPathW(NULL, CSIDL_DESKTOPDIRECTORY | CSIDL_FLAG_CREATE, NULL, 0, desktop);
++    if (FAILED(result)) return result;
++    if (lstrlenW(desktop) + 20 >= MAX_PATH) return E_INVALIDARG;
++    lstrcatW(desktop, L"\\Appearance.lnk");
++    /* Do not overwrite an existing user shortcut with the same name. */
++    if (GetFileAttributesW(desktop) != INVALID_FILE_ATTRIBUTES) return S_OK;
++    if (!GetWindowsDirectoryW(executable, MAX_PATH) || lstrlenW(executable) + 50 >= MAX_PATH) return E_FAIL;
++    lstrcpyW(icon, executable);
++    lstrcatW(executable, L"\\system32\\mihawk-appearance.exe");
++    lstrcatW(icon, L"\\resources\\mihawk\\icons.dll");
++    if (GetFileAttributesW(executable) == INVALID_FILE_ATTRIBUTES) return S_FALSE;
++    result = CoCreateInstance(&CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER, &IID_IShellLinkW, (void **)&link);
++    if (SUCCEEDED(result)) result = IShellLinkW_SetPath(link, executable);
++    if (SUCCEEDED(result)) result = IShellLinkW_SetDescription(link, L"Choose light or dark appearance");
++    if (SUCCEEDED(result)) result = IShellLinkW_SetIconLocation(link, icon, -2020);
++    if (SUCCEEDED(result)) result = IShellLinkW_QueryInterface(link, &IID_IPersistFile, (void **)&file);
++    if (SUCCEEDED(result)) result = IPersistFile_Save(file, desktop, TRUE);
++    if (file) IPersistFile_Release(file);
++    if (link) IShellLinkW_Release(link);
++    return result;
++}
++
+ static BOOL get_default_enable_shell( const WCHAR *name )
+ {
+     HKEY hkey;
+@@ -1374,6 +1401,16 @@
+         initialize_appbar();
+ 
+         initialize_systray( using_root, enable_shell, show_systray, no_tray_items );
++        if (enable_shell && !using_root)
++        {
++            HRESULT initialized = CoInitialize( NULL );
++            if (SUCCEEDED( initialized ))
++            {
++                HRESULT result = create_mihawk_appearance_shortcut();
++                if (FAILED( result )) WARN( "Mihawk Appearance shortcut failed: %#lx\n", result );
++                CoUninitialize();
++            }
++        }
+         if (!using_root && enable_launchers) initialize_launchers( hwnd );
+ 
+         if ((shell32 = LoadLibraryW( L"shell32.dll" )) &&

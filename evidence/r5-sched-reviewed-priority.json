@@ -1,0 +1,71 @@
+{
+ "run": "r5-sched-reviewed-priority",
+ "what": "priority-probe.exe",
+ "env": [
+  "WINE_PS5_SCHED=1"
+ ],
+ "result": "finished",
+ "seconds": 9.4,
+ "probe_verdict": "FAIL",
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": false,
+ "bench": {
+  "cpus": 16.0,
+  "equal_periods": 0.0,
+  "equal_p50_us": 0.0,
+  "equal_p99_us": 0.0,
+  "time_critical_periods": 448.0,
+  "time_critical_p50_us": 3.0,
+  "time_critical_p99_us": 8.0,
+  "below_normal_permille_of_normal": 1944.0,
+  "idle_permille_of_normal": 1966.0,
+  "inversion_holder_started": 1.0,
+  "inversion_wait_us": 56081.0
+ },
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [
+   {
+    "calls": 4085.0,
+    "per_s": 807.0,
+    "avg_us": 1103.2,
+    "selects": 643.0,
+    "blocked": 46.0,
+    "block_avg_us": 53072.9,
+    "waits": 401.0,
+    "handles_avg": 1.4,
+    "wait_all": 5.0,
+    "polled": 354.0,
+    "delays": 34016.0,
+    "yields": 33928.0
+   }
+  ],
+  "top": [
+   {
+    "select": {
+     "count": 645,
+     "avg_us": 2231.3
+    },
+    "close_handle": {
+     "count": 830,
+     "avg_us": 915.5
+    },
+    "create_event": {
+     "count": 254,
+     "avg_us": 2144.0
+    },
+    "send_hardware_message": {
+     "count": 178,
+     "avg_us": 2855.4
+    },
+    "init_thread": {
+     "count": 137,
+     "avg_us": 3274.0
+    }
+   }
+  ]
+ }
+}

@@ -1,0 +1,301 @@
+/* Flyouts: Quick Settings (tiles, sliders, subpages, edit mode), the notification centre with
+   its calendar, toasts, and the screen filter (brightness + night light).
+   Owned by the flyouts module (js/quicksettings.js, js/notifications.js). Geometry is Windows 11
+   23H2 at 100 % scale: 360 px flyouts anchored bottom-right, 12 px from the screen edge and the
+   taskbar; 96x48 tiles with 4 px corners; 364 px toasts. Colours are WinUI resources. */
+
+/* ---------- shared: bottom-right anchor and the flyout motion target ---------- */
+.qs, .nc-stack, .toast-stack {
+  position: absolute;
+  right: 12px;
+  bottom: calc(var(--taskbar-reserve, var(--taskbar-height)) + 12px); /* the work area: 0 when the taskbar auto-hides */
+  width: min(360px, calc(100% - 24px));
+  max-height: calc(100% - var(--taskbar-reserve, var(--taskbar-height)) - 24px);
+}
+/* Quick Settings and the notification centre rise from behind the taskbar: their host ends at the
+   taskbar's top edge and clips them while they move, as .start-host does for Start. */
+.fly-host { position: fixed; inset: 0 0 var(--taskbar-height) 0; overflow: clip; }
+#flyouts > .fly-host, .nc-stack, #flyouts > .toast-stack { pointer-events: none; }
+.fly-host > .qs, .nc-stack > *, .toast-stack > * { pointer-events: auto; }
+.fly-host > .qs, .fly-host > .nc-stack { bottom: 12px; max-height: calc(100% - 24px); }
+
+.fly-title { margin: 0; font: 600 14px/20px var(--font-ui); color: var(--TextFillColorPrimary); }
+.fly-empty { margin: 0; padding: 32px 16px; text-align: center; color: var(--TextFillColorSecondary); }
+
+/* Small square subtle buttons used inside flyouts (back, chevrons, dismiss, footer). They follow
+   WinUI's subtle button: transparent at rest, SubtleFillColorSecondary on hover, Tertiary pressed. */
+.fly-icon-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-width: 32px; height: 32px; padding: 0 8px;
+  border: 0; border-radius: var(--radius-control);
+  background: var(--SubtleFillColorTransparent);
+  color: var(--TextFillColorPrimary);
+  font: var(--type-body);
+  transition: background-color var(--dur-faster) linear, color var(--dur-faster) linear;
+}
+.fly-icon-btn:hover { background: var(--SubtleFillColorSecondary); }
+.fly-icon-btn:active { background: var(--SubtleFillColorTertiary); color: var(--TextFillColorSecondary); }
+.fly-icon-btn:disabled { background: var(--SubtleFillColorDisabled); color: var(--TextFillColorDisabled); }
+.fly-icon-btn[aria-pressed="true"] { color: var(--AccentTextFillColorTertiary); }
+
+/* ======================================================================================
+   Quick Settings
+   ====================================================================================== */
+.qs {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  outline: none;
+}
+.qs-pages { position: relative; flex: 1 1 auto; min-height: 0; overflow: hidden auto; scrollbar-gutter: auto; }
+.qs-page { width: 100%; }
+
+/* Tile grid: three columns of 96x48 rounded rectangles with the label under each. */
+.qs-tiles {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  column-gap: 12px;
+  row-gap: 14px;
+  padding: 24px 24px 8px;
+}
+.qs-tile { position: relative; display: flex; flex-direction: column; align-items: stretch; min-width: 0; }
+.qs-tile-btns { display: flex; height: 48px; gap: 1px; }
+.qs-tile-label {
+  margin-top: 6px;
+  font: var(--type-caption);
+  text-align: center;
+  color: var(--TextFillColorPrimary);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.qs-tile-btn {
+  position: relative;
+  flex: 1 1 auto;
+  display: flex; align-items: center; justify-content: center;
+  min-width: 0;
+  padding: 0;
+  border: 1px solid var(--ControlStrokeColorDefault);
+  border-bottom-color: var(--ControlStrokeColorSecondary);
+  border-radius: var(--radius-control);
+  background: var(--ControlFillColorDefault);
+  background-clip: padding-box;
+  color: var(--TextFillColorPrimary);
+  transition: background-color var(--dur-faster) linear, border-color var(--dur-faster) linear, color var(--dur-faster) linear;
+}
+.qs-tile-btn:hover { background-color: var(--ControlFillColorSecondary); }
+.qs-tile-btn:active { background-color: var(--ControlFillColorTertiary); border-color: var(--ControlStrokeColorDefault); color: var(--TextFillColorSecondary); }
+.qs-tile-btn:disabled { background-color: var(--ControlFillColorDisabled); color: var(--TextFillColorDisabled); }
+/* Split tiles (toggle + chevron): square where the two halves meet, as Windows draws them. */
+.qs-tile-btns > .qs-tile-btn + .qs-tile-btn { flex: 0 0 35px; border-top-left-radius: 0; border-bottom-left-radius: 0; }
+.qs-tile-btns > .qs-tile-btn:first-child:not(:last-child) { border-top-right-radius: 0; border-bottom-right-radius: 0; }
+.qs-tile-btn .qs-tile-chevron { position: absolute; right: 9px; top: 50%; translate: 0 -50%; }
+
+.qs-tile.on .qs-tile-btn {
+  background-color: var(--AccentFillColorDefault);
+  border-color: var(--ControlStrokeColorOnAccentDefault);
+  border-bottom-color: var(--ControlStrokeColorOnAccentSecondary);
+  color: var(--TextOnAccentFillColorPrimary);
+}
+.qs-tile.on .qs-tile-btn:hover { background-color: var(--AccentFillColorSecondary); }
+.qs-tile.on .qs-tile-btn:active { background-color: var(--AccentFillColorTertiary); border-color: var(--ControlStrokeColorOnAccentDefault); color: var(--TextOnAccentFillColorSecondary); }
+
+/* Edit mode: tiles turn neutral, show an unpin badge and can be dragged to reorder. */
+.qs.editing .qs-tile .qs-tile-btn {
+  background-color: var(--ControlFillColorDefault);
+  border-color: var(--ControlStrokeColorDefault);
+  border-bottom-color: var(--ControlStrokeColorSecondary);
+  color: var(--TextFillColorPrimary);
+}
+.qs.editing .qs-tile-btns { cursor: var(--cursor-arrow); } /* Windows keeps the arrow while tiles are rearranged */
+.qs-unpin {
+  position: absolute; top: -8px; right: -8px; z-index: 1;
+  display: none; align-items: center; justify-content: center;
+  width: 24px; height: 24px; padding: 0;
+  border: 1px solid var(--ControlStrokeColorDefault);
+  border-radius: 50%;
+  background: var(--ControlSolidFillColorDefault);
+  color: var(--TextFillColorPrimary);
+  box-shadow: var(--shadow-2);
+  transition: background-color var(--dur-faster) linear;
+}
+.qs-unpin:hover { background: var(--SolidBackgroundFillColorTertiary); }
+.qs-unpin:active { color: var(--TextFillColorSecondary); }
+.qs.editing .qs-unpin { display: inline-flex; }
+.qs-tile.dragging { z-index: 2; }
+.qs-tile.dragging .qs-tile-btns { cursor: var(--cursor-arrow); box-shadow: var(--shadow-16); border-radius: var(--radius-control); }
+
+/* Sliders: leading glyph, WinUI slider, trailing chevron button (volume -> Sound output). */
+.qs-sliders { display: flex; flex-direction: column; gap: 4px; padding: 14px 16px 22px 12px; }
+.qs-slider-row { display: grid; grid-template-columns: 40px minmax(0, 1fr) 40px; align-items: center; column-gap: 4px; height: 40px; }
+.qs-slider-row .qs-lead { width: 40px; height: 40px; justify-self: center; display: inline-flex; align-items: center; justify-content: center; color: var(--TextFillColorPrimary); }
+.qs-slider-row .slider { width: 100%; margin: 0; }
+.qs-slider-row .fly-icon-btn { width: 40px; height: 40px; }
+
+/* Footer: the darker strip with battery, edit and settings (or the subpage's settings link). */
+.qs-footer {
+  flex: none;
+  display: flex; align-items: center; gap: 4px;
+  height: 48px;
+  padding: 0 12px 0 12px;
+  background: var(--acrylic-base);
+  border-top: 1px solid var(--DividerStrokeColorDefault);
+}
+.qs-footer .fly-icon-btn { height: 36px; min-width: 40px; }
+.qs-footer .qs-battery { padding: 0 8px; font: var(--type-caption); }
+.qs-footer .spacer { flex: 1; }
+.qs-footer .qs-link { padding: 0 12px; font: var(--type-body); }
+.qs-footer .btn { min-width: 96px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+
+/* Subpages (Wi-Fi, Bluetooth, Sound output, Accessibility, Cast, Project). */
+.qs-sub-header { display: flex; align-items: center; gap: 8px; height: 56px; padding: 0 16px 0 12px; }
+.qs-sub-header .fly-title { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.qs-sub-header .toggle { flex: none; }
+.qs-list { display: flex; flex-direction: column; gap: 2px; padding: 0 12px 12px; min-height: 160px; }
+.qs-note { margin: 8px 12px 16px; color: var(--TextFillColorSecondary); }
+.qs-note .progress-bar { margin-top: 12px; }
+
+.qs-item {
+  position: relative;
+  border-radius: var(--radius-control);
+  transition: background-color var(--dur-faster) linear;
+}
+.qs-item.expanded, .qs-item.selected { background: var(--SubtleFillColorSecondary); }
+.qs-item-head {
+  display: flex; align-items: center; gap: 16px;
+  width: 100%; min-height: 48px; padding: 8px 12px;
+  border: 0; border-radius: var(--radius-control);
+  background: transparent;
+  text-align: left;
+  transition: background-color var(--dur-faster) linear;
+}
+.qs-item-head:hover { background: var(--SubtleFillColorSecondary); }
+.qs-item.expanded .qs-item-head:hover, .qs-item.selected .qs-item-head:hover { background: var(--SubtleFillColorTertiary); }
+.qs-item-head:active { background: var(--SubtleFillColorTertiary); }
+.qs-item-head:active .qs-item-text { opacity: .8; }
+.qs-item-text { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.qs-item-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.qs-item-status { font: var(--type-caption); color: var(--TextFillColorSecondary); }
+.qs-item-body { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 0 12px 12px 48px; }
+.qs-item-body .spacer { flex: 1; }
+.qs-item-body .btn { min-width: 120px; }
+.qs-item-body .checkbox-row { display: flex; align-items: center; gap: 8px; width: 100%; font: var(--type-body); }
+.qs-item .toggle { margin-left: auto; }
+/* ListView selection pill (Sound output, Project). */
+.qs-item.selected::before {
+  content: ""; position: absolute; left: 0; top: 50%;
+  width: 3px; height: 16px; margin-top: -8px;
+  border-radius: 2px;
+  background: var(--AccentFillColorDefault);
+}
+
+/* ======================================================================================
+   Notification centre + calendar
+   ====================================================================================== */
+.nc-stack { display: flex; flex-direction: column; gap: 12px; }
+.nc, .cal { overflow: hidden; outline: none; }
+.nc { display: flex; flex-direction: column; flex: 0 1 auto; min-height: 0; }
+.cal { flex: none; }
+
+.nc-header { display: flex; align-items: center; gap: 4px; height: 52px; padding: 0 8px 0 16px; flex: none; }
+.nc-header .fly-title { flex: 1; }
+.nc-list { flex: 1 1 auto; min-height: 0; overflow: hidden auto; padding: 0 12px 12px; display: flex; flex-direction: column; gap: 12px; }
+.nc-group, .nc-cards { display: flex; flex-direction: column; gap: 4px; }
+.nc-group-head { display: flex; align-items: center; gap: 8px; height: 32px; padding: 0 0 0 4px; font: var(--type-caption); color: var(--TextFillColorPrimary); }
+.nc-group-head .nc-app { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nc-group-head .fly-icon-btn, .nc-card .nc-dismiss { opacity: 0; transition: opacity var(--dur-faster) linear, background-color var(--dur-faster) linear; }
+.nc-group:hover .nc-group-head .fly-icon-btn, .nc-group-head .fly-icon-btn:focus-visible { opacity: 1; }
+
+/* Notification card (shared by the centre and toasts). */
+.nc-card {
+  position: relative;
+  padding: 12px 16px 14px;
+  border: 1px solid var(--CardStrokeColorDefault);
+  border-radius: var(--radius-overlay);
+  background: var(--ControlFillColorDefault);
+  background-clip: padding-box;
+  transition: background-color var(--dur-faster) linear;
+}
+.nc-card:hover { background-color: var(--ControlFillColorSecondary); }
+.nc-card:active:not(:has(button:active)) { background-color: var(--ControlFillColorTertiary); }
+.nc-card:hover .nc-dismiss, .nc-card .nc-dismiss:focus-visible { opacity: 1; }
+.nc-card .nc-dismiss { position: absolute; top: 6px; right: 6px; }
+.nc-card-title { margin: 0 28px 2px 0; font: 600 14px/20px var(--font-ui); color: var(--TextFillColorPrimary); overflow-wrap: anywhere; }
+.nc-card-body { margin: 0; color: var(--TextFillColorSecondary); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
+.nc-actions { display: flex; gap: 8px; margin-top: 12px; }
+.nc-actions .btn { flex: 1 1 0; min-width: 0; }
+
+/* Calendar */
+.cal-header { display: flex; align-items: center; height: 48px; padding: 0 8px 0 16px; }
+.cal-header .fly-title { flex: 1; }
+.cal.expanded .cal-header { border-bottom: 1px solid var(--DividerStrokeColorDefault); }
+.cal-body { overflow: hidden; }
+.cal-nav { display: flex; align-items: center; gap: 4px; height: 48px; padding: 4px 8px 0 8px; }
+.cal-nav .cal-heading { justify-content: flex-start; padding: 0 8px; font: 600 14px/20px var(--font-ui); }
+.cal-nav .spacer { flex: 1; }
+.cal-view { position: relative; height: 280px; margin: 0 12px; overflow: hidden; }
+.cal-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); grid-auto-rows: 40px; }
+.cal-grid.year { grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: 70px; }
+.cal-dow { display: flex; align-items: center; justify-content: center; font: 600 12px/16px var(--font-ui); color: var(--TextFillColorPrimary); }
+.cal-day {
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0; border: 0; background: transparent;
+  font: var(--type-body);
+  color: var(--TextFillColorPrimary);
+  font-variant-numeric: tabular-nums;
+}
+.cal-day::before {
+  content: ""; position: absolute; z-index: -1;
+  width: 38px; height: 38px; border-radius: 50%;
+  border: 1px solid transparent;
+  transition: background-color var(--dur-faster) linear, border-color var(--dur-faster) linear;
+}
+.cal-grid.year .cal-day::before { width: 56px; height: 56px; }
+.cal-view { isolation: isolate; }
+/* Secondary, not Tertiary: still dimmer than in-month days, and 4.5:1 on light acrylic. */
+.cal-day.other { color: var(--TextFillColorSecondary); }
+.cal-day:hover::before { background: var(--SubtleFillColorSecondary); }
+.cal-day:active::before { background: var(--SubtleFillColorTertiary); }
+.cal-day.selected::before { border-color: var(--AccentFillColorDefault); }
+.cal-day.today { color: var(--TextOnAccentFillColorPrimary); font-weight: 600; }
+.cal-day.today::before { background: var(--AccentFillColorDefault); border-color: var(--AccentFillColorDefault); }
+.cal-day.today:hover::before { background: var(--AccentFillColorSecondary); }
+.cal-day.today:active::before { background: var(--AccentFillColorTertiary); }
+.cal-day.today.selected::before { box-shadow: inset 0 0 0 2px var(--TextOnAccentFillColorPrimary); }
+.cal-day:focus-visible { outline: none; box-shadow: none; }
+.cal-day:focus-visible::before { outline: 2px solid var(--FocusStrokeColorOuter); outline-offset: 1px; }
+
+.cal-focus { display: flex; align-items: center; gap: 8px; height: 60px; margin-top: 8px; padding: 0 12px; border-top: 1px solid var(--DividerStrokeColorDefault); }
+.cal-focus .cal-mins { min-width: 64px; text-align: center; font-variant-numeric: tabular-nums; }
+.cal-focus .spacer { flex: 1; }
+.cal-focus .btn { display: inline-flex; align-items: center; gap: 8px; }
+.cal-focus .square { width: 32px; height: 32px; min-width: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center; }
+
+/* ======================================================================================
+   Toasts
+   ====================================================================================== */
+.toast-stack { width: min(364px, calc(100% - 24px)); display: flex; flex-direction: column; justify-content: flex-end; gap: 8px; max-height: none; }
+.toast {
+  overflow: hidden;
+  outline: none;
+}
+.toast-head { display: flex; align-items: center; gap: 8px; height: 40px; padding: 4px 6px 0 16px; font: var(--type-caption); }
+.toast-head .toast-app { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.toast-head .fly-icon-btn { opacity: 0; transition: opacity var(--dur-faster) linear, background-color var(--dur-faster) linear; }
+.toast:hover .toast-head .fly-icon-btn, .toast-head .fly-icon-btn:focus-visible { opacity: 1; }
+.toast-content { padding: 2px 16px 16px; }
+.toast-content .nc-card-title { margin-right: 0; }
+
+/* ======================================================================================
+   Screen filter: emulates the display (not UI colour), so its values are physical, not tokens.
+   ====================================================================================== */
+#overlays > .screen-filter { position: absolute; inset: 0; z-index: 10; pointer-events: none; }
+.screen-filter > div { position: absolute; inset: 0; opacity: 0; }
+/* Night light fades over a second, as Windows does; hidden when off so the backdrop costs nothing. */
+.screen-filter-warm {
+  -webkit-backdrop-filter: url(#pw-night-light);
+  backdrop-filter: url(#pw-night-light);
+  visibility: hidden;
+  transition: opacity 1s var(--ease-standard), visibility 0s 1s;
+}
+.screen-filter-warm.on { visibility: visible; opacity: 1; transition: opacity 1s var(--ease-standard); }
+.screen-filter-dim { background: #000; transition: opacity var(--dur-fast) linear; }

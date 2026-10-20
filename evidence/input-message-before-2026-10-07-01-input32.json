@@ -1,0 +1,55 @@
+{
+ "run": "input-message-before-2026-10-07-01-input32",
+ "what": "input-message32-probe.exe",
+ "env": [
+  "PROTON_LAYOUT=launcher"
+ ],
+ "result": "finished",
+ "seconds": 10.5,
+ "probe_verdict": "FAIL",
+ "clean_owner_restart": false,
+ "launcher_end_status": 0,
+ "initial_status": 1,
+ "closed_on_request": false,
+ "child_logs": [
+  "klog/input-message-before-2026-10-07-01-input32-wine-child-3289.log",
+  "klog/input-message-before-2026-10-07-01-input32-wine-child-3290.log",
+  "klog/input-message-before-2026-10-07-01-input32-wine-child-3291.log"
+ ],
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": false,
+ "bench": {},
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [],
+  "top": []
+ },
+ "shown": {
+  "frames": 0,
+  "per_10s": [],
+  "longest_gap_ms": 0
+ },
+ "broker": {
+  "local_offer": 8589934592,
+  "host_limit": 1073741824,
+  "refused": [],
+  "refused_count": 0,
+  "clients": [
+   {
+    "pid": -1,
+    "frames": 0,
+    "submissions": 0
+   },
+   {
+    "pid": 3290,
+    "frames": 0,
+    "submissions": 0
+   }
+  ],
+  "host_peak": 2113536,
+  "local_peak": 0
+ }
+}

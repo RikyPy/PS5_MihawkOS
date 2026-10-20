@@ -1,0 +1,22 @@
+{
+ "run": "wt-kernelbase-batch",
+ "what": "kernelbase_test.exe",
+ "env": [
+  "WINEDEBUG=err+all",
+  "WINETEST_FILE_TIMEOUT=60"
+ ],
+ "result": "finished",
+ "seconds": 3.7,
+ "probe_verdict": null,
+ "exit_stall": false,
+ "stop_requested": null,
+ "returned_to_launcher": true,
+ "passed": true,
+ "bench": {},
+ "steady": {},
+ "intervals": {
+  "frames": [],
+  "server": [],
+  "top": []
+ }
+}

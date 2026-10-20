@@ -1,0 +1,112 @@
+{
+  "battery": "bootstrap-focus-2026-10-10-02",
+  "expected_cases": [
+    "pe64",
+    "payload-eight",
+    "payload-memory",
+    "descendants"
+  ],
+  "revision": "0dbf647df9437d1cbe53b78dce352d84f83ec520",
+  "dirty": true,
+  "cases": [
+    {
+      "case": "pe64",
+      "run": "bootstrap-focus-2026-10-10-02-pe64",
+      "runner_status": 0,
+      "seconds": 16.4,
+      "result": "finished",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "run_seconds": 15.4,
+      "launch_readiness": {
+        "ready": true,
+        "seconds": 0.259,
+        "settle_seconds": 0.0,
+        "census_seconds": 0.209,
+        "previous_cleanup_verified": false
+      },
+      "runner_overhead_seconds": 1.0,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 8,
+      "protocol_errors": 0
+    },
+    {
+      "case": "payload-eight",
+      "run": "bootstrap-focus-2026-10-10-02-payload-eight",
+      "runner_status": 0,
+      "seconds": 21.8,
+      "result": "finished",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "run_seconds": 20.9,
+      "launch_readiness": {
+        "ready": true,
+        "seconds": 0.218,
+        "settle_seconds": 0.0,
+        "census_seconds": 0.204,
+        "previous_cleanup_verified": true
+      },
+      "runner_overhead_seconds": 0.9,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 16,
+      "protocol_errors": 0
+    },
+    {
+      "case": "payload-memory",
+      "run": "bootstrap-focus-2026-10-10-02-payload-memory",
+      "runner_status": 0,
+      "seconds": 13.2,
+      "result": "finished",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "run_seconds": 12.4,
+      "launch_readiness": {
+        "ready": true,
+        "seconds": 0.2,
+        "settle_seconds": 0.0,
+        "census_seconds": 0.177,
+        "previous_cleanup_verified": true
+      },
+      "runner_overhead_seconds": 0.8,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 10,
+      "protocol_errors": 0
+    },
+    {
+      "case": "descendants",
+      "run": "bootstrap-focus-2026-10-10-02-descendants",
+      "runner_status": 0,
+      "seconds": 14.4,
+      "result": "finished",
+      "probe_verdict": "PASS",
+      "returned_to_launcher": true,
+      "exit_stall": false,
+      "passed": true,
+      "run_seconds": 13.5,
+      "launch_readiness": {
+        "ready": true,
+        "seconds": 0.208,
+        "settle_seconds": 0.0,
+        "census_seconds": 0.194,
+        "previous_cleanup_verified": true
+      },
+      "runner_overhead_seconds": 0.9,
+      "layout": "launcher",
+      "fault_records": 0,
+      "helpers": 11,
+      "protocol_errors": 0
+    }
+  ],
+  "complete": true,
+  "seconds": 65.8,
+  "passed": true
+}

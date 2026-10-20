@@ -1,0 +1,24 @@
+{
+ "run": "section-chunks-native-2026-10-08-01",
+ "read_only": false,
+ "temporary_direct_backing_bytes": 0,
+ "kernel_reads": false,
+ "kernel_writes": false,
+ "no_overwrite": true,
+ "payload": true,
+ "elf_sha256": "fd2d6fbc7fea4911f41bcb1a44c012020158556bfc5d8e0585833bad835d9cf0",
+ "source_sha256": "3c10c56029980a13180c5fbb43bebc7ad77915ea1dd909b59957cad94439f11c",
+ "passed": false,
+ "purpose": "sparse-file shared-section placement; file stays linked until unmap and close and two-page bidirectional alias coherence; not 13.5 GiB physical capacity",
+ "lines": [
+  "section-arena reserve=0 exact=1",
+  "section-arena open=1 errno=0",
+  "section-arena truncate=0 errno=0",
+  "section-chunks first_exact=1 first_errno=0 second_exact=0 second_errno=12 total_bytes=14495514624",
+  "section-chunks first_unmap=0",
+  "section-arena close=0",
+  "section-arena unlink=0",
+  "section-arena arena_unmap=0",
+  "section-arena result=FAIL"
+ ]
+}

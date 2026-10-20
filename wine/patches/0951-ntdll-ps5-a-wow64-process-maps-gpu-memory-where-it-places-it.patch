@@ -1,0 +1,35 @@
+From 52cd02f61bd5a400bebb9f8ebb78cd8eb35fd83c Mon Sep 17 00:00:00 2001
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Date: Wed, 7 Oct 2026 19:54:41 -0400
+Subject: [PATCH] ntdll: PS5: a WoW64 process maps GPU memory where it places
+ it.
+
+winevulkan maps a 32-bit program's GPU memory below 4 GiB with
+VK_EXT_map_memory_placed; the GPU broker client in the process can map
+an allocation again only if it kept the allocation's descriptor, which
+it does when asked (PS5_Vulkan's ps5_gpu_client_keep_sources), since a
+payload process has only a few hundred descriptors. A WoW64 process
+sets WINE_PS5_GPU_PLACED=1 in its own environment for the client to
+ask; helpers do not inherit it.
+---
+ dlls/ntdll/unix/signal_x86_64.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/dlls/ntdll/unix/signal_x86_64.c b/dlls/ntdll/unix/signal_x86_64.c
+index 9da9708..b5802ec 100644
+--- a/dlls/ntdll/unix/signal_x86_64.c
++++ b/dlls/ntdll/unix/signal_x86_64.c
+@@ -3532,6 +3532,10 @@ void signal_init_process(void)
+     {
+         virtual_wow_alias_init();
+         signal_wow_alias_teb( NtCurrentTeb() );
++        /* A 32-bit program maps its GPU memory again below 4 GiB (VK_EXT_map_memory_placed): the GPU broker
++         * client, bound at the first Vulkan call, keeps what that needs (PS5_Proton native/proton_gpu_client.c).
++         * Only this process: a helper takes no WINE_PS5_GPU_* from its parent. */
++        setenv( "WINE_PS5_GPU_PLACED", "1", 1 );
+     }
+ #endif
+ 
+-- 
+2.56.0
+

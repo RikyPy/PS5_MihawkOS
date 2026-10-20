@@ -1,0 +1,145 @@
+{
+  "date": "2026-10-04",
+  "environment": "User-confirmed kstuff-only; firmware 10.01 recorded by daemon",
+  "title_eboot_sha256": "791f5acd7e4200d50f1d0de6fa8dbff15b41e16bbfaeccd532d792b906b793be",
+  "runs": [
+    {
+      "run": "elevation-repeat-01",
+      "probe": null,
+      "elevations": 1,
+      "donors_reaped": 3,
+      "daemon_records": 27,
+      "root_before": [
+        55,
+        54
+      ],
+      "root_after": [
+        55,
+        54
+      ],
+      "title_frames": 300,
+      "sample": "ok, 300 frames in 5.53 s, 59.9 fps after the first half",
+      "daemon_elf_sha256": "9438bcf8fdf527a0d6f254578b072ceaa2102be5d76410f21992437b0d9d5fd4",
+      "passed": true
+    },
+    {
+      "run": "elevation-exit-01",
+      "probe": "exit-probe.exe",
+      "elevations": 2,
+      "donors_reaped": 5,
+      "daemon_records": 43,
+      "root_before": [
+        55,
+        54
+      ],
+      "root_after": [
+        55,
+        54
+      ],
+      "title_frames": 300,
+      "sample": "ok, 300 frames in 5.33 s, 59.9 fps after the first half",
+      "daemon_elf_sha256": "61bd4302f7efb71417dd2e6171b9456072361d46e005056fd0a8d62bc6b064ac",
+      "passed": true
+    },
+    {
+      "run": "elevation-exit-02",
+      "probe": "exit-probe.exe",
+      "elevations": 2,
+      "donors_reaped": 5,
+      "daemon_records": 43,
+      "root_before": [
+        55,
+        54
+      ],
+      "root_after": [
+        55,
+        54
+      ],
+      "title_frames": 300,
+      "sample": "ok, 300 frames in 5.34 s, 59.9 fps after the first half",
+      "daemon_elf_sha256": "61bd4302f7efb71417dd2e6171b9456072361d46e005056fd0a8d62bc6b064ac",
+      "passed": true
+    },
+    {
+      "run": "compatibility-pe64-01",
+      "probe": "wine-probe.exe",
+      "elevations": 2,
+      "donors_reaped": 5,
+      "daemon_records": 43,
+      "root_before": [
+        55,
+        54
+      ],
+      "root_after": [
+        55,
+        54
+      ],
+      "title_frames": 300,
+      "sample": "ok, 300 frames in 5.34 s, 59.9 fps after the first half",
+      "daemon_elf_sha256": "61bd4302f7efb71417dd2e6171b9456072361d46e005056fd0a8d62bc6b064ac",
+      "passed": true
+    },
+    {
+      "run": "compatibility-d3d11-01",
+      "probe": "d3d11-probe.exe",
+      "elevations": 2,
+      "donors_reaped": 5,
+      "daemon_records": 43,
+      "root_before": [
+        55,
+        54
+      ],
+      "root_after": [
+        55,
+        54
+      ],
+      "title_frames": 300,
+      "sample": "ok, 300 frames in 5.34 s, 59.9 fps after the first half",
+      "daemon_elf_sha256": "61bd4302f7efb71417dd2e6171b9456072361d46e005056fd0a8d62bc6b064ac",
+      "passed": true
+    },
+    {
+      "run": "compatibility-xinput-01",
+      "probe": "xinput-probe.exe",
+      "elevations": 2,
+      "donors_reaped": 5,
+      "daemon_records": 43,
+      "root_before": [
+        55,
+        54
+      ],
+      "root_after": [
+        55,
+        54
+      ],
+      "title_frames": 300,
+      "sample": "ok, 300 frames in 5.33 s, 59.9 fps after the first half",
+      "daemon_elf_sha256": "d4948dfb4fdb40cfe9189be3c4b839c0f835b0fae9c2dcdadb03d6b5a469d790",
+      "passed": true
+    }
+  ],
+  "passed_runs": 6,
+  "total_elevations": 11,
+  "total_donors_reaped": 28,
+  "captured_faults": 0,
+  "daemon_sequence_gaps": 0,
+  "root_counters_returned_to_baseline_every_run": true,
+  "host_checks": "one-shot and two-request streams; 12 corruption/failure cases rejected; split UTF-8/address redaction checked",
+  "d3d11_readback": {
+    "size": [
+      1280,
+      720
+    ],
+    "frames": 180,
+    "visually_verified": "RGB triangle on dark background",
+    "path": "klog/compatibility-d3d11-01-title/d3d-probe.png"
+  },
+  "build_reproducibility": "Two final service rebuilds byte-identical after replacing random GNU UUID build-ID with SHA-1",
+  "final_service_elf_sha256": "d4948dfb4fdb40cfe9189be3c4b839c0f835b0fae9c2dcdadb03d6b5a469d790",
+  "limitations": [
+    "Finite attended payloads only; no unbounded service installed",
+    "No new gameplay, save/load, audio listening or long-soak evidence",
+    "Generic game runner is not itself a complete daemon lifecycle validator",
+    "Kernel log is unsequenced; absence of captured faults is not proof no message could be lost"
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "probe_sha256": "e5f1828dcab37dfa0797a6db116a1ca3aae48b061570b3863ce9cba89216b6b2",
+  "wine_revision": "a518d643873ff733bafb31595dfd01ab8bbdf790",
+  "cases": [
+    {
+      "case": "basic",
+      "exit_code": 0,
+      "seconds": 0.67
+    },
+    {
+      "case": "suspended",
+      "exit_code": 0,
+      "seconds": 0.16
+    },
+    {
+      "case": "terminate",
+      "exit_code": 0,
+      "seconds": 0.06
+    },
+    {
+      "case": "repeat",
+      "exit_code": 0,
+      "seconds": 0.21
+    }
+  ],
+  "passed": true,
+  "revision_correction": "Read the actual host build revision; previous value identified the separate PS5 Unix-side base."
+}

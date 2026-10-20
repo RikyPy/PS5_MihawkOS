@@ -1,0 +1,34 @@
+{
+ "name": "mihawk-effects-host-bench-2026-10-10-01",
+ "host": "x86_64",
+ "against": "HEAD",
+ "revision": "628168a69cf4b01f326f30c18d26eceb4cbaf8c4",
+ "unit": "ms per 1920x1080 composition, minimum of 60",
+ "scenes": [
+  {
+   "scene": "plain desktop + 2 opaque windows",
+   "before": 1.382,
+   "after": 1.492
+  },
+  {
+   "scene": "+ rounded/shadow framed windows",
+   "before": 2.752,
+   "after": 2.858
+  },
+  {
+   "scene": "+ acrylic Start 600x566",
+   "before": 14.943,
+   "after": 8.842
+  },
+  {
+   "scene": "+ Mica taskbar 1920x48",
+   "before": 16.916,
+   "after": 9.757
+  },
+  {
+   "scene": "+ full-screen Mica window",
+   "before": 63.309,
+   "after": 26.899
+  }
+ ]
+}
