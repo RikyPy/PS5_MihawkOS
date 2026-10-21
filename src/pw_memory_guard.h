@@ -18,6 +18,13 @@
  * the last 8 s, ends the game at once. A slow arrival in the same band (the launcher's 865 to 948 MiB for minutes, the
  * .NET game's 857) is not touched. It applies to the default end mark only: a run that sets its own end mark has
  * chosen to go past the limit.
+ *
+ * The census counts a shared object in every process that maps it (K14, docs/PLAN.md), so the helpers' sync device
+ * (8.6 MiB, since 2026-10-17) adds 8-9 MiB to each helper that uses it: 214 against 153 MiB for one idle desktop's
+ * helpers (the Pro, 2026-10-20). Counting it once is not safe: a build that did let a launcher's census reach
+ * about 1000 MiB, and SceShellCore's VM Stats read RSS up to 1081 MiB with swap-out going from 38 to 139 MiB, where
+ * the census as it is ended the launcher at 872-900 MiB with swap-out flat (the Pro, 2026-10-20; records kept off the tree: they name the launcher).
+ * The raw census is what tracks the console's pressure.
  */
 #ifndef PW_MEMORY_GUARD_H
 #define PW_MEMORY_GUARD_H
@@ -62,6 +69,7 @@ struct pw_memory_guard {
     uint64_t times[64];                /* and when each was taken */
     unsigned count;                    /* how many of them are kept */
     int closed, ended;                 /* each verdict is said once */
+    int steep;                         /* the END came from the steep-climb rule, not the end mark (its log names it) */
     uint64_t rise_times[32];           /* recent censuses for the steep-climb rule */
     uint64_t rise_bytes[32];
     unsigned rise_count;

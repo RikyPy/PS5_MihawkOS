@@ -69,6 +69,7 @@ int main(void)
     assert(feed(&guard, &now, 1, 930, NULL) == PW_MEMORY_FINE);
     assert(feed(&guard, &now, 6, 945, NULL) == PW_MEMORY_FINE);   /* 2.5 s since it went past */
     assert(feed(&guard, &now, 1, 945, &when) == PW_MEMORY_END);   /* 3 s */
+    assert(!guard.steep);   /* the end mark, and its log says so */
     assert(feed(&guard, &now, 60, 990, NULL) == PW_MEMORY_FINE);
 
     /* A steep climb is ended before it is asked to close, and then not asked. */
@@ -76,6 +77,7 @@ int main(void)
     now = 1000;
     assert(feed(&guard, &now, 10, 600, NULL) == PW_MEMORY_FINE);
     assert(feed(&guard, &now, 7, 960, NULL) == PW_MEMORY_END);
+    assert(guard.steep);
     assert(feed(&guard, &now, 120, 960, NULL) == PW_MEMORY_FINE);
 
     /* A launcher's 2026-10-11 run (record removed from the tree): 627 MiB steady, then a climb of about 25 MiB a second; the kernel's limit is about 989

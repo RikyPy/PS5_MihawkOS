@@ -27,6 +27,7 @@ int pw_shader_cache_configure(const char *root, const char *profile,
     unsetenv("PS5_SHADER_CACHE_DIR");
     unsetenv("MESA_SHADER_CACHE_DIR");
     unsetenv("DXVK_SHADER_CACHE_PATH");
+    unsetenv("DXVK_DXGI_ADAPTER_SUMMARY");
     if (setenv("MESA_SHADER_CACHE_DISABLE", "true", 1) || setenv("DXVK_SHADER_CACHE", "0", 1))
         return errno;
     if (!enabled) return 0;
@@ -57,6 +58,9 @@ int pw_shader_cache_configure(const char *root, const char *profile,
         for (char *p = windows; *p; ++p) if (*p == '/') *p = '\\';
         if (setenv(variables[i], i == 2 ? windows : path, 1)) { status = errno; break; }
     }
+    /* DXGI's adapters without Vulkan (platform/dxvk/patches/0004): the namespace changes with the driver and DXVK. */
+    if (!status && strlen(windows) + sizeof("\\dxgi-adapters.bin") > sizeof(windows)) status = ENAMETOOLONG;
+    if (!status && setenv("DXVK_DXGI_ADAPTER_SUMMARY", strcat(windows, "\\dxgi-adapters.bin"), 1)) status = errno;
     if (!status && (setenv("MESA_SHADER_CACHE_DISABLE", "false", 1) || setenv("DXVK_SHADER_CACHE", "1", 1)))
         status = errno;
     if (status) pw_shader_cache_configure(root, profile, version_file, 0);

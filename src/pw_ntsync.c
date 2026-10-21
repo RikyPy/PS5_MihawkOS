@@ -27,7 +27,8 @@ enum { SLOT_BITS = 20, SLOT_MASK = (1 << SLOT_BITS) - 1, GENERATION_MASK = 0x3ff
 enum {
     OBJECTS = 1 << 17, WAITERS = 4096, ENTRIES = 1 << 15, PROCESSES = 256,
     MAGIC = 0x504e5453,     /* "PNTS" */
-    LAYOUT = 2,                 /* 2: the lock word names its holder's process */
+    LAYOUT = 3,                 /* 2: the lock word names its holder's process; 3: objects name their slot, in chunks */
+    CHUNK_OBJECTS = 1024,       /* a helper maps the objects table this many at a time (pw_ntsync_set_chunk_mapper) */
 };
 enum { PROCESS_FREE, PROCESS_USING, PROCESS_GONE };
 /* A waiter's place: free, used by a wait, or kept for a wait of a process told gone that has not ended yet, whose
@@ -54,7 +55,9 @@ typedef struct Object {
     } u;
     uint32_t head, tail, queued;   /* the FIFO of waiters */
     char tag[20];               /* what it is, for the dump (pw_ntsync_note) */
+    uint32_t slot;              /* its own place in the table, which a process that maps it in chunks cannot compute */
 } Object;
+_Static_assert(sizeof(Object) == 64, "a chunk of the objects table is 64 KiB");
 
 typedef struct Waiter {
     uint32_t wake;              /* the word its thread sleeps on: 0 until served, then 1; WAKE_ENDING from a SIGQUIT */
@@ -94,10 +97,14 @@ typedef struct Shared {
     Process processes[PROCESSES];
     Waiter waiters[WAITERS];
     Entry entries[ENTRIES];
-    Object objects[OBJECTS];
+    Object objects[OBJECTS] __attribute__((aligned(CHUNK_OBJECTS * 64)));   /* each chunk at a mappable offset */
 } Shared;
 
 static Shared *shared;
+/* This process's view of the objects table: the title maps the region whole; a helper maps the fixed tables and then
+ * each 64 KiB chunk of objects the first time it reaches one, under the device's lock (pw_ntsync_set_chunk_mapper). */
+static Object *chunks[OBJECTS / CHUNK_OBJECTS];
+static void *(*map_chunk)(size_t offset, size_t bytes);
 static uint32_t me_process;     /* this process's slot */
 static int32_t me_pid;          /* getpid() once, not a system call per operation */
 static pthread_once_t private_once = PTHREAD_ONCE_INIT;
@@ -105,10 +112,20 @@ void (*pw_ntsync_test_before_lock)(void);
 void (*pw_ntsync_test_gone_holding)(void);
 uint32_t (*pw_ntsync_test_thread_number)(void);
 
-static Object *object_at(uint32_t ref) { return ref ? &shared->objects[ref - 1] : NULL; }
+static Object *slot_object(uint32_t slot)
+{
+    const uint32_t chunk = slot / CHUNK_OBJECTS;
+    if (slot >= OBJECTS) return NULL;
+    if (!chunks[chunk])
+        chunks[chunk] = map_chunk ? map_chunk(offsetof(Shared, objects) + (size_t)chunk * sizeof(Object) * CHUNK_OBJECTS,
+                                              sizeof(Object) * CHUNK_OBJECTS)
+                                  : &shared->objects[(size_t)chunk * CHUNK_OBJECTS];
+    return chunks[chunk] ? &chunks[chunk][slot % CHUNK_OBJECTS] : NULL;
+}
+static Object *object_at(uint32_t ref) { return ref ? slot_object(ref - 1) : NULL; }
 static Waiter *waiter_at(uint32_t ref) { return ref ? &shared->waiters[ref - 1] : NULL; }
 static Entry *entry_at(uint32_t ref) { return ref ? &shared->entries[ref - 1] : NULL; }
-static uint32_t object_ref(const Object *object) { return (uint32_t)(object - shared->objects) + 1; }
+static uint32_t object_ref(const Object *object) { return object->slot + 1; }
 static uint32_t waiter_ref(const Waiter *waiter) { return (uint32_t)(waiter - shared->waiters) + 1; }
 static uint32_t entry_ref(const Entry *entry) { return (uint32_t)(entry - shared->entries) + 1; }
 
@@ -353,6 +370,16 @@ size_t pw_ntsync_region_bytes(void)
     return sizeof(Shared);
 }
 
+size_t pw_ntsync_fixed_bytes(void)
+{
+    return offsetof(Shared, objects);
+}
+
+void pw_ntsync_set_chunk_mapper(void *(*map)(size_t offset, size_t bytes))
+{
+    map_chunk = map;
+}
+
 static int claim_process(void)
 {
     const int32_t pid = me_pid = (int32_t)getpid();
@@ -372,7 +399,7 @@ int pw_ntsync_attach(void *region, size_t bytes, int format)
 {
     Shared *candidate = region;
     int status;
-    if (!region || bytes < sizeof(Shared)) return -EINVAL;
+    if (!region || bytes < (map_chunk ? offsetof(Shared, objects) : sizeof(Shared))) return -EINVAL;
     if (shared) return -EBUSY;
     if (format) {
         candidate->layout = LAYOUT;
@@ -412,14 +439,14 @@ static Object *lookup(int number)
     slot = ((uint32_t)number & SLOT_MASK) - 1;
     generation = (uint32_t)number >> SLOT_BITS;
     if (slot >= shared->object_count) return NULL;
-    object = &shared->objects[slot];
-    if (!object->type || object->generation != generation) return NULL;
+    object = slot_object(slot);
+    if (!object || !object->type || object->generation != generation) return NULL;
     return object;
 }
 
 static int number_of(const Object *object)
 {
-    return (int)(((object->generation & GENERATION_MASK) << SLOT_BITS) | (uint32_t)(object - shared->objects + 1));
+    return (int)(((object->generation & GENERATION_MASK) << SLOT_BITS) | (object->slot + 1));
 }
 
 static Object *allocate(int type)
@@ -432,7 +459,11 @@ static Object *allocate(int type)
             shared->exhausted++;
             return NULL;
         }
-        object = &shared->objects[shared->object_count++];
+        if (!(object = slot_object(shared->object_count))) {
+            shared->exhausted++;
+            return NULL;
+        }
+        object->slot = shared->object_count++;
     }
     object->type = (uint32_t)type;
     object->references = 1;
@@ -1355,8 +1386,10 @@ void pw_ntsync_dump(void (*line)(void *context, const char *text), void *context
         __atomic_load_n(&signals_raised, __ATOMIC_RELAXED), (unsigned)(last_signal >> 48), last_signal ? who : "-",
         call_names[state_call(last_signal) < CALL_COUNT ? state_call(last_signal) : 0],
         __atomic_load_n(&without_slot, __ATOMIC_RELAXED));
-    for (uint32_t i = 0; i < shared->object_count; i++)
-        if (shared->objects[i].type > 0 && shared->objects[i].type < 4) kinds[shared->objects[i].type]++;
+    for (uint32_t i = 0; i < shared->object_count; i++) {
+        const Object *object = slot_object(i);
+        if (object && object->type > 0 && object->type < 4) kinds[object->type]++;
+    }
     add(&text, "device: %u objects (%u events, %u semaphores, %u mutexes), %u blocked; %llu waits, %llu blocked, "
         "%llu timed out, %llu wakes, %llu signals; %u entered again, %u unlock errors; trace %llu operations, keeps %u",
         shared->live_objects, kinds[EVENT], kinds[SEMAPHORE], kinds[MUTEX], shared->blocked,

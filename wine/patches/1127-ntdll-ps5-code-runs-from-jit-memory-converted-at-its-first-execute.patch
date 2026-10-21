@@ -16,7 +16,7 @@ virtual_handle_fault, under the virtual mutex, now:
     on a page the host allows takes the upstream path (a pager error raises SIGBUS on a mapped page), so it cannot
     loop, while a second race at the same address after another conversion still runs again;
 (b) on an execute fault Wine allows in a private or image view, converts the faulting host page and its neighbours
-    with the same host protection, within the view and a 64 KiB window, into one JIT object of exactly that size
+    with the same host protection, within the view and a 16 KiB window, into one JIT object of exactly that size
     (__wine_ps5_exec_convert, wine/ps5/pw_wine_dmem_ps5.c), and runs the instruction again, also when another piece
     of the cluster failed after the faulting page's own became JIT memory (counted as convert_failed);
 (c) counts an execute fault Wine allows that is still an access violation (a section view, which must stay coherent
@@ -68,11 +68,11 @@ index 4626be1..900d4a3 100644
  
  
 +#ifdef __PROSPERO__
-+/* 64 KiB (docs/CONSOLE_QUEUE.md, "MihawkBrowser"): 256 KiB, the first guess, copied code that never ran, 55-73%
-+ * of CEF 150's conversions. 16 KiB copied least but is not the default until a gate passes with it (its first stalled
-+ * winedevice.exe's exit, gate-2026-10-16-browser-01: the race patch 1171 closes). A JIT object keeps every page until
-+ * its last mapping goes, so a partial decommit keeps the cut pages (at most 4 host pages an object). */
-+#define PS5_EXEC_CLUSTER (64 * 1024)
++/* 16 KiB (docs/CONSOLE_QUEUE.md, "MihawkBrowser"): 256 KiB, the first guess, copied code that never ran, 55-73%
++ * of CEF 150's conversions, and 64 KiB a third more than 16 KiB (CEF 281 against 214 MiB). 16 KiB first stalled
++ * winedevice.exe's exit (gate-2026-10-16-browser-01), the race patch 1171 closes. A JIT object keeps every page until
++ * its last mapping goes, so a partial decommit keeps the cut pages (at most one host page an object). */
++#define PS5_EXEC_CLUSTER (16 * 1024)
 +
 +/* Conversions tried, under the virtual mutex: each changes host protection, so a fault the host allows after one is a
 + * new race, not a loop. */

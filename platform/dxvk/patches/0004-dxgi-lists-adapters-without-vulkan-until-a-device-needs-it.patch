@@ -1,0 +1,495 @@
+DXVK 601930949d111edbbcf9dd463948426d9f8f6ddd
+
+A DXGI factory creates the Vulkan instance in its constructor, and every
+adapter it lists holds a Vulkan adapter. A process that only lists adapters
+and outputs, as a browser's main process does for its displays, then loads
+the Vulkan driver: on a PS5 the GPU client, an image of about 23 MiB that is
+wired, so about 20 MiB of each such helper's flexible-memory census. In
+a launcher's start on the PS5 Pro (2026-10-20), 18 of its processes loaded
+DXGI and the driver ("Found device" logged, no "Creating device"), and the
+census ended its browser 17 times at 868-902 MiB of a 870/940 MiB limit.
+
+DXVK_DXGI_ADAPTER_SUMMARY names a file that holds what DXGI needs of each
+adapter before a device exists: its DxvkAdapterInfo, whether it is linked to
+a discrete GPU, and its linked integrated GPU's LUID. A factory that finds
+the file lists adapters, matches monitors and describes adapters and outputs
+from it, and creates the instance, and an adapter its Vulkan adapter, only
+when something needs Vulkan: a device (GetDXVKAdapter), a swap chain, the
+Vulkan interop, the memory budget. A factory that creates the instance
+writes the file (a temporary file, then a replacing move). Without the
+variable, or with a file of another size or version, nothing changes. The
+file's name must change with the driver and DXVK; PS5_Proton puts it in the
+runtime's cache namespace (src/pw_shader_cache.c).
+
+The factory's monitors and outputs go through the WSI driver, which only the
+instance started (wsi::init); a factory without an instance dereferenced a
+null driver in wsi::enumMonitors (the standard PS5, 2026-10-20: the
+browser's main process, a null read at dxgi+0x67fc9 from DxgiFactory's
+constructor). Each factory now holds its own WSI reference, and the WSI
+reference count, which a factory and the instance can now take on different
+threads, is taken under a lock.
+
+--- a/src/dxgi/dxgi_adapter.cpp
++++ b/src/dxgi/dxgi_adapter.cpp
+@@ -17,6 +17,24 @@
+ 
+ namespace dxvk {
+ 
++  DxgiAdapterSummary DxgiAdapterSummary::fromAdapter(const Rc<DxvkAdapter>& adapter) {
++    DxgiAdapterSummary summary;
++    summary.info = adapter->info();
++    summary.linkedToDGPU = adapter->isLinkedToDGPU();
++
++    auto linked = adapter->linkedIGPUAdapter();
++
++    if (linked != nullptr) {
++      auto linkedInfo = linked->info();
++      summary.hasLinkedIGPU = 1u;
++      summary.linkedIGPULuidIsValid = linkedInfo.luidIsValid;
++      std::memcpy(summary.linkedIGPULuid, linkedInfo.deviceLuid, VK_LUID_SIZE);
++    }
++
++    return summary;
++  }
++
++
+   DxgiVkAdapter::DxgiVkAdapter(DxgiAdapter* pAdapter)
+   : m_adapter(pAdapter) {
+ 
+@@ -58,10 +76,10 @@
+ 
+   DxgiAdapter::DxgiAdapter(
+           DxgiFactory*      factory,
+-    const Rc<DxvkAdapter>&  adapter,
++    const DxgiAdapterSummary& summary,
+           UINT              index)
+   : m_factory (factory),
+-    m_adapter (adapter),
++    m_summary (summary),
+     m_interop (this),
+     m_index   (index),
+     m_desc    (GetAdapterDesc()),
+@@ -171,12 +189,12 @@
+     if (ppOutput == nullptr)
+       return E_INVALIDARG;
+ 
+-    auto adapterInfo = m_adapter->info();
++    const auto& adapterInfo = m_summary.info;
+ 
+     small_vector<LUID, 2> adapterLUIDs = { };
+     small_vector<const LUID*, 2> luidPointers;
+ 
+-    if (m_adapter->isLinkedToDGPU())
++    if (m_summary.linkedToDGPU)
+       return DXGI_ERROR_NOT_FOUND;
+ 
+     if (adapterInfo.luidIsValid) {
+@@ -184,15 +202,11 @@
+       std::memcpy(&luid, adapterInfo.deviceLuid, sizeof(luid));
+     }
+ 
+-    auto linkedAdapter = m_adapter->linkedIGPUAdapter();
+-
+     // If either LUID is not valid, enumerate all monitors.
+-    if (!adapterLUIDs.empty() && linkedAdapter != nullptr) {
+-      auto linkedInfo = linkedAdapter->info();
+-
+-      if (linkedInfo.luidIsValid) {
++    if (!adapterLUIDs.empty() && m_summary.hasLinkedIGPU) {
++      if (m_summary.linkedIGPULuidIsValid) {
+         auto& luid = adapterLUIDs.emplace_back();
+-        std::memcpy(&luid, linkedInfo.deviceLuid, sizeof(luid));
++        std::memcpy(&luid, m_summary.linkedIGPULuid, sizeof(luid));
+       } else {
+         adapterLUIDs.clear();
+       }
+@@ -291,7 +305,12 @@
+      && MemorySegmentGroup != DXGI_MEMORY_SEGMENT_GROUP_NON_LOCAL)
+       return E_INVALIDARG;
+     
+-    DxvkAdapterMemoryInfo memInfo = m_adapter->getMemoryHeapInfo();
++    Rc<DxvkAdapter> adapter = resolveAdapter();
++
++    if (adapter == nullptr)
++      return DXGI_ERROR_DEVICE_REMOVED;
++
++    DxvkAdapterMemoryInfo memInfo = adapter->getMemoryHeapInfo();
+ 
+     VkMemoryHeapFlags heapFlagMask = VK_MEMORY_HEAP_DEVICE_LOCAL_BIT;
+     VkMemoryHeapFlags heapFlags    = 0;
+@@ -387,6 +406,20 @@
+ 
+ 
+   Rc<DxvkAdapter> STDMETHODCALLTYPE DxgiAdapter::GetDXVKAdapter() {
++    return resolveAdapter();
++  }
++
++
++  Rc<DxvkAdapter> DxgiAdapter::resolveAdapter() {
++    std::lock_guard<dxvk::mutex> lock(m_adapterMutex);
++
++    if (m_adapter == nullptr) {
++      m_adapter = m_factory->GetDXVKInstance()->enumAdapters(m_index);
++
++      if (m_adapter == nullptr)
++        Logger::err(str::format("DXGI: Adapter ", m_index, " of the summary has no Vulkan adapter"));
++    }
++
+     return m_adapter;
+   }
+ 
+@@ -401,7 +434,7 @@
+ 
+     const DxgiOptions* options = m_factory->GetOptions();
+ 
+-    auto adapterInfo = m_adapter->info();
++    auto adapterInfo = m_summary.info;
+ 
+     // Custom Vendor / Device ID
+     if (options->customVendorId >= 0)
+@@ -465,7 +498,7 @@
+     // which can be an integrated GPU on some systems. Report available memory as shared
+     // memory and a small amount as dedicated carve-out if a dedicated GPU is present,
+     // otherwise report memory normally to not unnecessarily confuse games on Deck.
+-    if ((m_adapter->isLinkedToDGPU() && adapterInfo.deviceType == VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU)) {
++    if ((m_summary.linkedToDGPU && adapterInfo.deviceType == VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU)) {
+       sharedMemory = std::max(sharedMemory, deviceMemory);
+       deviceMemory = 512ull << 20;
+     }
+@@ -521,8 +554,13 @@
+   void DxgiAdapter::runEventThread() {
+     env::setThreadName(str::format("dxvk-adapter-", m_index));
+ 
++    Rc<DxvkAdapter> adapter = resolveAdapter();
++
++    if (adapter == nullptr)
++      return;
++
+     std::unique_lock<dxvk::mutex> lock(m_mutex);
+-    DxvkAdapterMemoryInfo memoryInfoOld = m_adapter->getMemoryHeapInfo();
++    DxvkAdapterMemoryInfo memoryInfoOld = adapter->getMemoryHeapInfo();
+ 
+     while (true) {
+       m_cond.wait_for(lock, std::chrono::milliseconds(1500),
+@@ -531,7 +569,7 @@
+       if (m_eventCookie == ~0u)
+         return;
+ 
+-      auto memoryInfoNew = m_adapter->getMemoryHeapInfo();
++      auto memoryInfoNew = adapter->getMemoryHeapInfo();
+       bool budgetChanged = false;
+ 
+       for (uint32_t i = 0; i < memoryInfoNew.heapCount; i++) {
+--- a/src/dxgi/dxgi_adapter.h
++++ b/src/dxgi/dxgi_adapter.h
+@@ -14,6 +14,27 @@
+   class DxgiOutput;
+ 
+ 
++  /**
++   * \brief What DXGI needs of an adapter before a device exists
++   *
++   * The factory's monitor matching, an adapter's descriptions and its
++   * outputs read only this. A process that lists adapters and outputs
++   * and creates no device, as a browser's main process does for its
++   * displays, then never creates the Vulkan instance, which on a PS5
++   * loads the GPU driver into it (PS5_Proton: dxgi_factory.cpp,
++   * DXVK_DXGI_ADAPTER_SUMMARY).
++   */
++  struct DxgiAdapterSummary {
++    DxvkAdapterInfo info = { };
++    uint32_t linkedToDGPU = 0u;
++    uint32_t hasLinkedIGPU = 0u;
++    uint32_t linkedIGPULuidIsValid = 0u;
++    uint8_t  linkedIGPULuid[VK_LUID_SIZE] = { };
++
++    static DxgiAdapterSummary fromAdapter(const Rc<DxvkAdapter>& adapter);
++  };
++
++
+   class DxgiVkAdapter : public IDXGIVkInteropAdapter {
+ 
+   public:
+@@ -45,7 +66,7 @@
+     
+     DxgiAdapter(
+             DxgiFactory*              factory,
+-      const Rc<DxvkAdapter>&          adapter,
++      const DxgiAdapterSummary&       summary,
+             UINT                      index);
+ 
+     ~DxgiAdapter();
+@@ -109,7 +130,9 @@
+   private:
+     
+     Com<DxgiFactory>  m_factory;
+-    Rc<DxvkAdapter>   m_adapter;
++    DxgiAdapterSummary m_summary;
++    dxvk::mutex       m_adapterMutex;
++    Rc<DxvkAdapter>   m_adapter;      /* the Vulkan adapter, made when something needs it */
+     DxgiVkAdapter     m_interop;
+ 
+     UINT              m_index = 0u;
+@@ -128,6 +151,8 @@
+ 
+     DXGI_ADAPTER_DESC3 GetAdapterDesc() const;
+ 
++    Rc<DxvkAdapter> resolveAdapter();
++
+     void runEventThread();
+ 
+   };
+--- a/src/dxgi/dxgi_factory.cpp
++++ b/src/dxgi/dxgi_factory.cpp
+@@ -1,4 +1,7 @@
+ #include <algorithm>
++#include <cstring>
++#include <fstream>
++#include <type_traits>
+ 
+ #include "dxgi_factory.h"
+ #include "dxgi_surface.h"
+@@ -7,11 +10,85 @@
+ 
+ #include "../util/util_singleton.h"
+ 
++#include "../wsi/wsi_platform.h"
++
+ namespace dxvk {
+ 
+   static Singleton<DxvkInstance>   g_dxvkInstance;
+   static Singleton<DxgiOptions>    g_dxgiOptions;
+ 
++  /* PS5_Proton: DXGI's adapters without Vulkan. DXVK_DXGI_ADAPTER_SUMMARY names
++   * a file holding what DXGI needs of each adapter before a device exists
++   * (DxgiAdapterSummary). A factory that finds it lists adapters and outputs from
++   * it and creates the Vulkan instance only when something needs Vulkan: a
++   * device, a swap chain, the interop, the memory budget. A factory that creates
++   * the instance writes the file. Its name must change with the driver and DXVK:
++   * MihawkOS puts it in the runtime's cache namespace, keyed by both
++   * (src/pw_shader_cache.c). Without the variable nothing changes. On a PS5 the
++   * instance loads the GPU driver, about 20 MiB that every helper shares the
++   * budget of: a browser's main process and a launcher's lister paid it only to
++   * read their displays (the PS5 Pro, 2026-10-20). */
++  static_assert(std::is_trivially_copyable_v<DxgiAdapterSummary>);
++
++  struct DxgiAdapterSummaryHeader {
++    char     magic[8];
++    uint32_t version;
++    uint32_t entrySize;
++    uint32_t count;
++  };
++
++  static std::vector<DxgiAdapterSummary> loadAdapterSummaries() {
++    std::vector<DxgiAdapterSummary> summaries;
++    std::string path = env::getEnvVar("DXVK_DXGI_ADAPTER_SUMMARY");
++
++    if (path.empty())
++      return summaries;
++
++    std::ifstream file(str::topath(path.c_str()).c_str(), std::ios::binary);
++    DxgiAdapterSummaryHeader header = { };
++
++    if (!file.read(reinterpret_cast<char*>(&header), sizeof(header))
++     || std::memcmp(header.magic, "DXVKDXAS", sizeof(header.magic))
++     || header.version != 1u || header.entrySize != sizeof(DxgiAdapterSummary)
++     || !header.count || header.count > 16u)
++      return summaries;
++
++    summaries.resize(header.count);
++
++    if (!file.read(reinterpret_cast<char*>(summaries.data()), sizeof(DxgiAdapterSummary) * header.count))
++      summaries.clear();
++
++    return summaries;
++  }
++
++  static void saveAdapterSummaries(const std::vector<DxgiAdapterSummary>& summaries) {
++    std::string path = env::getEnvVar("DXVK_DXGI_ADAPTER_SUMMARY");
++
++    if (path.empty() || summaries.empty() || summaries.size() > 16u)
++      return;
++
++    std::string temporary = str::format(path, ".", GetCurrentProcessId(), ".tmp");
++    DxgiAdapterSummaryHeader header = { { 'D', 'X', 'V', 'K', 'D', 'X', 'A', 'S' }, 1u,
++      uint32_t(sizeof(DxgiAdapterSummary)), uint32_t(summaries.size()) };
++    bool written = false;
++
++    { std::ofstream file(str::topath(temporary.c_str()).c_str(), std::ios::binary | std::ios::trunc);
++      file.write(reinterpret_cast<const char*>(&header), sizeof(header));
++      file.write(reinterpret_cast<const char*>(summaries.data()), sizeof(DxgiAdapterSummary) * summaries.size());
++      written = bool(file.flush());
++    }
++
++    if (!written || !MoveFileExW(str::tows(temporary.c_str()).c_str(), str::tows(path.c_str()).c_str(),
++                                 MOVEFILE_REPLACE_EXISTING))
++      DeleteFileW(str::tows(temporary.c_str()).c_str());
++  }
++
++  static Config dxgiConfig() {
++    Config config = Config::getUserConfig();
++    config.merge(Config::getAppConfig(env::getExePath()));
++    return config;
++  }
++
+   static dxvk::mutex               s_globalHDRStateMutex;
+   static DXVK_VK_GLOBAL_HDR_STATE  s_globalHDRState{};
+ 
+@@ -80,13 +157,18 @@
+ 
+ 
+   DxgiFactory::DxgiFactory(UINT Flags)
+-  : m_instance        (g_dxvkInstance.acquire(0)),
++  : m_summaries       (loadAdapterSummaries()),
++    m_instance        (m_summaries.empty() ? g_dxvkInstance.acquire(0) : nullptr),
+     m_interop         (this),
+-    m_options         (g_dxgiOptions.acquire(m_instance->config())),
++    m_options         (g_dxgiOptions.acquire(m_instance != nullptr ? m_instance->config() : dxgiConfig())),
+     m_monitorInfo     (this, *m_options),
+     m_flags           (Flags),
+     m_monitorFallback (false),
+     m_destructionNotifier(this) {
++    // The factory's outputs and monitors go through the WSI driver, which only
++    // the Vulkan instance started before; the factory may now have no instance.
++    wsi::init();
++
+     // Be robust against situations where some monitors are not
+     // associated with any adapter. This can happen if device
+     // filter options are used.
+@@ -101,12 +183,19 @@
+       monitors.push_back(hmon);
+     }
+ 
+-    for (uint32_t i = 0; m_instance->enumAdapters(i) != nullptr; i++) {
+-      auto adapter = m_instance->enumAdapters(i);
++    if (m_instance != nullptr) {
++      for (uint32_t i = 0; m_instance->enumAdapters(i) != nullptr; i++)
++        m_summaries.push_back(DxgiAdapterSummary::fromAdapter(m_instance->enumAdapters(i)));
+ 
++      saveAdapterSummaries(m_summaries);
++    } else {
++      Logger::info(str::format("DXGI: ", m_summaries.size(), " adapter(s) from the summary; Vulkan when a device needs it"));
++    }
++
++    for (const auto& summary : m_summaries) {
+       // Remove all monitors that are associated
+       // with the current adapter from the list.
+-      auto info = adapter->info();
++      const auto& info = summary.info;
+ 
+       if (info.luidIsValid) {
+         LUID luid = {};
+@@ -136,7 +225,21 @@
+   
+   DxgiFactory::~DxgiFactory() {
+     g_dxgiOptions.release();
+-    g_dxvkInstance.release();
++
++    if (m_instance != nullptr)
++      g_dxvkInstance.release();
++
++    wsi::quit();
++  }
++
++
++  Rc<DxvkInstance> DxgiFactory::GetDXVKInstance() const {
++    std::lock_guard<dxvk::mutex> lock(m_instanceMutex);
++
++    if (m_instance == nullptr)
++      m_instance = g_dxvkInstance.acquire(0);
++
++    return m_instance;
+   }
+   
+   
+@@ -321,13 +424,10 @@
+     if (ppAdapter == nullptr)
+       return DXGI_ERROR_INVALID_CALL;
+     
+-    Rc<DxvkAdapter> dxvkAdapter
+-      = m_instance->enumAdapters(Adapter);
+-    
+-    if (dxvkAdapter == nullptr)
++    if (Adapter >= m_summaries.size())
+       return DXGI_ERROR_NOT_FOUND;
+     
+-    *ppAdapter = ref(new DxgiAdapter(this, dxvkAdapter, Adapter));
++    *ppAdapter = ref(new DxgiAdapter(this, m_summaries[Adapter], Adapter));
+     return S_OK;
+   }
+   
+@@ -364,7 +464,7 @@
+           REFIID                riid,
+           void**                ppvAdapter) {
+     InitReturnPtr(ppvAdapter);
+-    uint32_t adapterCount = m_instance->adapterCount();
++    uint32_t adapterCount = uint32_t(m_summaries.size());
+ 
+     if (Adapter >= adapterCount)
+       return DXGI_ERROR_NOT_FOUND;
+@@ -557,7 +657,7 @@
+ 
+     if (SUCCEEDED(pDevice->QueryInterface(IID_PPV_ARGS(&dxvkFactory)))) {
+       Com<IDXGIVkSurfaceFactory> surfaceFactory = new DxgiSurfaceFactory(
+-        m_instance->vki()->getLoaderProc(), hWnd);
++        GetDXVKInstance()->vki()->getLoaderProc(), hWnd);
+ 
+       Com<IDXGIVkSwapChain> presenter;
+       HRESULT hr = dxvkFactory->CreateSwapChain(surfaceFactory.ptr(), &desc, &presenter);
+--- a/src/dxgi/dxgi_factory.h
++++ b/src/dxgi/dxgi_factory.h
+@@ -182,9 +182,7 @@
+       return m_monitorFallback;
+     }
+ 
+-    Rc<DxvkInstance> GetDXVKInstance() const {
+-      return m_instance;
+-    }
++    Rc<DxvkInstance> GetDXVKInstance() const;
+ 
+     const DxgiOptions* GetOptions() const {
+       return m_options.ptr();
+@@ -198,7 +196,9 @@
+     
+   private:
+     
+-    Rc<DxvkInstance> m_instance;
++    std::vector<DxgiAdapterSummary> m_summaries;
++    mutable dxvk::mutex      m_instanceMutex;
++    mutable Rc<DxvkInstance> m_instance;    /* made when something needs Vulkan (dxgi_factory.cpp) */
+     DxgiVkFactory    m_interop;
+     Rc<DxgiOptions>  m_options;
+     DxgiMonitorInfo  m_monitorInfo;
+--- a/src/wsi/wsi_platform.cpp
++++ b/src/wsi/wsi_platform.cpp
+@@ -3,10 +3,12 @@
+ #include "wsi_window.h"
+ #include "../util/util_env.h"
+ #include "../util/util_error.h"
++#include "../util/thread.h"
+ 
+ namespace dxvk::wsi {
+   static WsiDriver* s_driver = nullptr;
+   static int s_refcount = 0;
++  static dxvk::mutex s_mutex;   /* a DXGI factory and the Vulkan instance each hold a reference */
+ 
+   static const WsiBootstrap *wsiBootstrap[] = {
+ #if defined(DXVK_WSI_WIN32)
+@@ -24,6 +26,8 @@
+   };
+ 
+   void init() {
++    std::lock_guard<dxvk::mutex> lock(s_mutex);
++
+     if (s_refcount++ > 0)
+       return;
+ 
+@@ -51,6 +55,8 @@
+   }
+ 
+   void quit() {
++    std::lock_guard<dxvk::mutex> lock(s_mutex);
++
+     if (s_refcount == 0)
+       return;
+ 

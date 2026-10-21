@@ -56,21 +56,43 @@ const struct ps5_ntsync_ops *pw_wine_ntsync_ops(void)
     return &ops;
 }
 
+/* A helper's chunks of the objects table, mapped from the region it joined, the first time it reaches each
+ * (src/pw_ntsync.h, pw_ntsync_set_chunk_mapper): the census counts what it maps. */
+static int chunk_region = -1;
+static void *map_chunk(size_t offset, size_t bytes)
+{
+    void *map = mmap(NULL, bytes, PROT_READ | PROT_WRITE, MAP_SHARED, chunk_region, (off_t)offset);
+    if (map != MAP_FAILED) return map;
+    fprintf(stderr, "wine-ps5: synchronization device: objects at %zu not mapped (errno %d)\n", offset, errno);
+    return NULL;
+}
+
 /* The device in this process, over the region of shared memory every process of the session maps
- * (src/pw_ntsync.h): format it (the title, first) or join it (a helper). NULL, with the descriptor closed, when it
- * cannot be used. */
+ * (src/pw_ntsync.h): format it (the title, first, which maps it whole) or join it (a helper, which maps the fixed
+ * tables and its chunks of objects as it reaches them, and keeps the descriptor for them). NULL, with the descriptor
+ * closed, when it cannot be used. */
 static const struct ps5_ntsync_ops *attach(int region, int format)
 {
-    const size_t bytes = pw_ntsync_region_bytes();
+    const size_t bytes = format ? pw_ntsync_region_bytes() : pw_ntsync_fixed_bytes();
     void *map = region < 0 ? MAP_FAILED : mmap(NULL, bytes, PROT_READ | PROT_WRITE, MAP_SHARED, region, 0);
-    int status = map == MAP_FAILED ? -errno : pw_ntsync_attach(map, bytes, format);
-    if (region >= 0) close(region);
+    int status;
+    if (!format && map != MAP_FAILED && chunk_region < 0) {
+        chunk_region = region;
+        pw_ntsync_set_chunk_mapper(map_chunk);
+    }
+    status = map == MAP_FAILED ? -errno : pw_ntsync_attach(map, bytes, format);
+    if (region >= 0 && region != chunk_region) close(region);
     if (status == -EBUSY) {     /* this process has the device already: keep the one it has */
         munmap(map, bytes);
         return pw_wine_ntsync_ops();
     }
     if (status) {
         if (map != MAP_FAILED) munmap(map, bytes);
+        if (region >= 0 && region == chunk_region) {
+            pw_ntsync_set_chunk_mapper(NULL);
+            close(region);
+            chunk_region = -1;
+        }
         fprintf(stderr, "wine-ps5: synchronization device unavailable here: %d\n", status);
         return NULL;
     }

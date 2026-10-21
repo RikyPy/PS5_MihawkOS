@@ -1,0 +1,72 @@
+From: Mihawk <163614687+mihawk-99@users.noreply.github.com>
+Subject: [PATCH] win32u: PS5: a process publishes the display only when its mode is new
+
+Every process that took the desktop window published the PS5 driver's display (ps5_SetDesktopWindow), and publishing
+is update_display_cache( TRUE ), which enumerates the Vulkan GPUs and so loads the GPU driver (libvulkan-helper.prx,
+RADV) into the process. On a PS5 that is about 30 MiB of the console's system memory per process, the budget every
+helper shares: a process with it held a Unix heap of 40-43 MiB and 53-61 MiB resident, one without 9 MiB and 22-28 MiB
+(PS5_Proton, the PS5 Pro, 2026-10-20), and it was in a menu builder's, a console host's, an installer's and a
+launcher's update dialog's, none of which draws with the GPU. That launcher's first start on the Pro was ended by the
+memory guard 202 times.
+
+The desktop window, which every process of the session sees, now carries the mode last published as a property
+(width, height and rate, from the process's own WINE_PS5_REFRESH). A process publishes only when its own mode is not
+that one, and then records it, so the last process with another rate still wins (patch 1187): a game with
+PROTON_120HZ=1 in a 60 Hz session publishes 120 Hz as before. A process that does not publish reads the display from
+the registry the first one wrote, as Wine does in every process but the one that changes it.
+---
+--- a/dlls/win32u/ps5drv.c
++++ b/dlls/win32u/ps5drv.c
+@@ -213,6 +213,14 @@
+ /***********************************************************************
+  *           display
+  */
++/* The rate this process publishes: WINE_PS5_REFRESH, the rate the title asked of the display (120 for a game that opts
++ * in to 119.88 Hz output), else 60 */
++static UINT ps5_refresh(void)
++{
++    const char *refresh = getenv( "WINE_PS5_REFRESH" );
++    return refresh && atoi( refresh ) > 0 ? atoi( refresh ) : 60;
++}
++
+ static UINT ps5_UpdateDisplayDevices( const struct gdi_device_manager *manager, void *param )
+ {
+     struct pci_id pci_id = {0};
+@@ -228,7 +236,7 @@
+     mode.dmBitsPerPel = 32;
+     mode.dmPelsWidth = screen_width;
+     mode.dmPelsHeight = screen_height;
+-    mode.dmDisplayFrequency = refresh && atoi( refresh ) > 0 ? atoi( refresh ) : 60;
++    mode.dmDisplayFrequency = ps5_refresh();
+ 
+     SetRect( &monitor.rc_monitor, 0, 0, screen_width, screen_height );
+     monitor.rc_work = monitor.rc_monitor;
+@@ -574,11 +582,26 @@
+     SERVER_END_REQ;
+ 
+     /* the prefix may hold another driver's display config: publish ours,
+-     * which also gives the server the monitor that bounds the cursor */
++     * which also gives the server the monitor that bounds the cursor.
++     * Publishing enumerates the Vulkan GPUs (update_display_cache( TRUE )),
++     * which loads the GPU driver into the process: its Unix heap went from 9
++     * to 42 MiB of the console's system memory in every process that takes
++     * the desktop window, a menu builder's and a console host's too
++     * (PS5_Proton, the PS5 Pro, 2026-10-20). So a process publishes only
++     * when its mode is not the one the desktop window, which every process of
++     * the session sees, says was published last: the last one still wins. */
+     if (!display_published)
+     {
++        static const WCHAR published_modeW[] =
++            {'_','_','w','i','n','e','_','p','s','5','_','d','i','s','p','l','a','y','_','m','o','d','e',0};
++        const UINT64 mode = (UINT64)screen_width | (UINT64)screen_height << 16 | (UINT64)ps5_refresh() << 32;
++
+         display_published = TRUE;
+-        update_display_cache( TRUE );
++        if ((UINT64)(UINT_PTR)NtUserGetProp( hwnd, published_modeW ) != mode)
++        {
++            NtUserSetProp( hwnd, published_modeW, (HANDLE)(UINT_PTR)mode );
++            update_display_cache( TRUE );
++        }
+     }
+ }
+ 

@@ -685,6 +685,15 @@ static void round_trips(void)
 static const char *self_path;
 static int region_fd;
 
+/* The second pass's children map the region as a helper does (src/pw_ntsync.h, pw_ntsync_set_chunk_mapper): the
+ * fixed tables, then each 64 KiB chunk of objects the first time they reach it. */
+static int chunk_fd = -1;
+static void *map_test_chunk(size_t offset, size_t bytes)
+{
+    void *map = mmap(NULL, bytes, PROT_READ | PROT_WRITE, MAP_SHARED, chunk_fd, (off_t)offset);
+    return map == MAP_FAILED ? NULL : map;
+}
+
 static void *map_region(int fd)
 {
     void *map = mmap(NULL, pw_ntsync_region_bytes(), PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
@@ -763,7 +772,16 @@ static void gone_holding(void)
 /* A child's part: attach to the parent's region, then play its role. */
 static int child(const char *role, int fd, int a, int b)
 {
-    assert(!pw_ntsync_attach(map_region(fd), pw_ntsync_region_bytes(), 0));
+    if (getenv("PW_NTSYNC_TEST_CHUNKS")) {
+        void *fixed = mmap(NULL, pw_ntsync_fixed_bytes(), PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+        assert(fixed != MAP_FAILED);
+        chunk_fd = fd;
+        pw_ntsync_set_chunk_mapper(map_test_chunk);
+        assert(pw_ntsync_attach(fixed, pw_ntsync_fixed_bytes() - 1, 0) == -EINVAL);
+        assert(!pw_ntsync_attach(fixed, pw_ntsync_fixed_bytes(), 0));
+    } else {
+        assert(!pw_ntsync_attach(map_region(fd), pw_ntsync_region_bytes(), 0));
+    }
     if (!strcmp(role, "ponger")) {
         for (int i = 0; i < 20000; i++) {
             assert(!wait_for(&a, 1, 0, 2, 0, -1, NULL));
@@ -789,6 +807,12 @@ static int child(const char *role, int fd, int a, int b)
             pw_ntsync_event_read(a, &manual, &set);
             usleep(1000);
         }
+    } else if (!strcmp(role, "far")) {
+        /* an object in a later chunk than any this process reached: set it, read it back, and wait on it */
+        uint32_t manual = 2, set = 2;
+        assert(!pw_ntsync_event_set(a, NULL));
+        assert(!pw_ntsync_event_read(a, &manual, &set) && manual == 1 && set == 1);
+        assert(!wait_for(&b, 1, 0, 0x99, 0, -1, NULL));
     } else if (!strcmp(role, "spinner")) {
         pthread_t threads[3];
         assert(!pw_ntsync_event_set(a, NULL));
@@ -940,6 +964,25 @@ static void processes(void)
     printf("processes: %u waits dropped with their process\n", counters.dropped);
 }
 
+/* Objects three chunks in (past 2048 more), which a chunked child reaches for the first time by number. */
+static void far_chunks(void)
+{
+    int far = 0, back, made[2200];
+    for (int i = 0; i < 2200; i++) assert((made[i] = pw_ntsync_create_event(1, 0)) > 0);
+    far = made[2199];
+    assert((back = pw_ntsync_create_event(1, 0)) > 0);
+    {
+        const pid_t pid = spawn("far", far, back);
+        uint32_t manual, set;
+        assert(!wait_for(&far, 1, 0, 0x98, 0, -1, NULL));
+        assert(!pw_ntsync_event_read(far, &manual, &set) && set == 1);
+        assert(!pw_ntsync_event_set(back, NULL));
+        reap(pid, 0);
+    }
+    for (int i = 0; i < 2200; i++) assert(!pw_ntsync_release(made[i]));
+    assert(!pw_ntsync_release(back));
+}
+
 int main(int argc, char **argv)
 {
     char name[64];
@@ -966,6 +1009,19 @@ int main(int argc, char **argv)
     diagnostics();
     round_trips();
     processes();
-    puts("pw_ntsync: ok");
+    far_chunks();
+    if (!getenv("PW_NTSYNC_TEST_CHUNKS")) {
+        /* The whole suite again, with every child mapping the objects in chunks as a helper does. */
+        const pid_t pid = fork();
+        int status;
+        assert(pid >= 0);
+        if (!pid) {
+            setenv("PW_NTSYNC_TEST_CHUNKS", "1", 1);
+            execl(self_path, self_path, (char *)NULL);
+            _exit(127);
+        }
+        assert(waitpid(pid, &status, 0) == pid && WIFEXITED(status) && !WEXITSTATUS(status));
+    }
+    puts(getenv("PW_NTSYNC_TEST_CHUNKS") ? "pw_ntsync (children in chunks): ok" : "pw_ntsync: ok");
     return 0;
 }

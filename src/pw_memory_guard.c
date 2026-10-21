@@ -74,7 +74,7 @@ enum pw_memory_verdict pw_memory_guard_sample(struct pw_memory_guard *guard, uin
         if (!guard->ended && guard->end <= (guard->limit + ((uint64_t)PW_MEMORY_GUARD_END_MARGIN_MIB << 20)) &&
             system + ((uint64_t)PW_MEMORY_GUARD_STEEP_NEAR_MIB << 20) >= guard->limit &&
             system - lowest >= ((uint64_t)PW_MEMORY_GUARD_STEEP_RISE_MIB << 20)) {
-            guard->ended = guard->closed = 1;
+            guard->ended = guard->closed = guard->steep = 1;
             return PW_MEMORY_END;
         }
     }

@@ -500,3 +500,10 @@ LookupAccountSid's first user), so a new prefix's profile is `C:\users\Mihawk`. 
 moved once by the title before Wine starts on it: the folder, its registry's paths and a link from the old name
 (`src/pw_wine_profile.h`, `tests/test_pw_wine_profile.c`). The Unix `USER` the title gives Wine, and so
 `WINEUSERNAME`, is Mihawk too. A new and a moved prefix passed on the base PS5 (`docs/PLAN.md`).
+
+Patch 1241 publishes the display only from a process whose mode is new. Publishing (`update_display_cache( TRUE )`)
+enumerates the Vulkan GPUs and loads RADV into the process, about 30 MiB of the console's system memory, and every
+process that took the desktop window did it: a menu builder, a console host, an installer and a launcher's update
+dialog each held a 40-43 MiB Unix heap where a process without it held 9 MiB (the Pro, 2026-10-20).
+The desktop window now carries the mode last published (width, height, rate), and a process publishes only when its
+own differs, so the last rate still wins as patch 1187 describes; the others read the display from the registry.

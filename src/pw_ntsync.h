@@ -69,6 +69,14 @@ enum {
 /* The bytes of shared memory the device needs (about 10 MiB: 131072 objects, 4096 blocked waits, 32768 queue
  * entries, 256 processes). */
 size_t pw_ntsync_region_bytes(void);
+/* The census counts a shared region in full in every process that maps it (docs/PLAN.md, K14): all 8.6 MiB of this
+ * one in each helper, 214 against 153 MiB for an idle desktop's helpers (the Pro, 2026-10-20), 17 helpers in a
+ * launcher's start, where the objects it used, 8558 at most, fill 0.5 MiB. So a helper maps only the fixed
+ * tables (the first pw_ntsync_fixed_bytes()) and gives the device a mapper, which it calls, under its lock, the first
+ * time the process reaches a 64 KiB chunk of 1024 objects: map(offset, bytes) maps that much of the region from offset
+ * and returns where. The title maps the region whole and sets none. Set before pw_ntsync_attach. */
+size_t pw_ntsync_fixed_bytes(void);
+void pw_ntsync_set_chunk_mapper(void *(*map)(size_t offset, size_t bytes));
 /* Uses region for this process's device: format it (the first process; region zeroed) or join it (format 0).
  * 0, or -EINVAL (too small, not formatted, another layout), -EBUSY (attached already), -ENOSPC (no room for another
  * process). A process that never attaches gets a region of its own on its first call. */

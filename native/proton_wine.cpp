@@ -2247,10 +2247,18 @@ void proton_run_wine()
                     notice_set(verdict == PW_MEMORY_CLOSE ? NOTICE_MEMORY_CLOSE : NOTICE_MEMORY_END,
                                "The PS5's memory is nearly full: the program using the most was %s.",
                                verdict == PW_MEMORY_CLOSE ? "asked to close" : "ended");
-                    say("Wine: the console's system memory stood %s %u MiB (now %llu MiB; helpers %llu MiB in %u, the "
-                        "largest %llu MiB in process %d): %s that process, not the desktop session (%d)",
-                        verdict == PW_MEMORY_CLOSE ? "at" : "past",
-                        verdict == PW_MEMORY_CLOSE ? memory_limit : memory_end, (unsigned long long)(census.system >> 20),
+                    // The END line names the rule that fired: the steep climb ends below the end mark (a launcher's run
+                    // on the Pro, 2026-10-20, read "stood past 940 MiB" at 872-900).
+                    char why[96];
+                    if (verdict == PW_MEMORY_CLOSE) snprintf(why, sizeof(why), "stood at %u MiB", memory_limit);
+                    else if (memory_guard.steep)
+                        snprintf(why, sizeof(why), "rose %u MiB or more in %u s to within %u MiB of %u MiB",
+                                 PW_MEMORY_GUARD_STEEP_RISE_MIB, PW_MEMORY_GUARD_STEEP_WINDOW_MS / 1000,
+                                 PW_MEMORY_GUARD_STEEP_NEAR_MIB, memory_limit);
+                    else snprintf(why, sizeof(why), "stood past %u MiB for %u s", memory_end, PW_MEMORY_GUARD_END_MS / 1000);
+                    say("Wine: the console's system memory %s (now %llu MiB; helpers %llu MiB in %u, "
+                        "the largest %llu MiB in process %d): %s that process, not the desktop session (%d)",
+                        why, (unsigned long long)(census.system >> 20),
                         (unsigned long long)(census.helpers >> 20), census.helper_count,
                         (unsigned long long)(census.largest >> 20), census.largest_pid,
                         verdict == PW_MEMORY_CLOSE ? "closing" : "ending", delivered);
@@ -2273,9 +2281,14 @@ void proton_run_wine()
                     const bool can_end = programs_in_helpers && list_helpers;
                     notice_set(NOTICE_MEMORY_END, "The PS5's memory stayed full: %s", can_end ? "the game was ended." :
                                "close " PS5_TITLE_NAME " from the home screen.");
-                    say("Wine: the console's system memory stood past %u MiB for %u s (now %llu MiB; helpers %llu MiB in %u, "
-                        "the largest %llu MiB in process %d): %s", memory_end,
-                        PW_MEMORY_GUARD_END_MS / 1000, (unsigned long long)(census.system >> 20),
+                    char why[96];
+                    if (memory_guard.steep)
+                        snprintf(why, sizeof(why), "rose %u MiB or more in %u s to within %u MiB of %u MiB",
+                                 PW_MEMORY_GUARD_STEEP_RISE_MIB, PW_MEMORY_GUARD_STEEP_WINDOW_MS / 1000,
+                                 PW_MEMORY_GUARD_STEEP_NEAR_MIB, memory_limit);
+                    else snprintf(why, sizeof(why), "stood past %u MiB for %u s", memory_end, PW_MEMORY_GUARD_END_MS / 1000);
+                    say("Wine: the console's system memory %s (now %llu MiB; helpers %llu MiB in %u, "
+                        "the largest %llu MiB in process %d): %s", why, (unsigned long long)(census.system >> 20),
                         (unsigned long long)(census.helpers >> 20), census.helper_count,
                         (unsigned long long)(census.largest >> 20), census.largest_pid,
                         can_end ? "ending the game now: its helpers by SIGKILL" :

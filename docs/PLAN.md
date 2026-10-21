@@ -1,5 +1,63 @@
 # Plan
 
+## A launcher to its sign-in window on the standard PS5 (2026-10-20, console; the Pro not yet)
+
+The goal (the owner, 2026-10-20): a launcher end to end, installer, start from the installer, the launcher itself, its
+sign-in window, run honestly (no launch options or per-program settings). Records of these runs are kept off the tree:
+they name the launcher.
+- **Installer and its Finish start the launcher** on both consoles (2026-10-20). The launcher then updates itself and
+  restarts.
+- **End to end from a new prefix, standard PS5, build `f94586d65070fca6`** (2026-10-21), in one 15-minute run:
+  - The installer (Next, Next, Install, Finish with "Run" checked), then the launcher's update and restart.
+  - Its sign-in window from about 8 minutes to the end, with a caret in the account field. The installer had also
+    made its desktop shortcut.
+  - No memory-guard end. The census peaked at 1671 MiB, past the 1670 MiB end mark for under the 3 s the rule needs.
+  - The first try's clicks fell on a black screen: a new prefix's desktop drew after 20 s, before the first click.
+- **Its sign-in window, on the standard PS5** (13.40, guard 1600 MiB), build `09acfc9faec09198`: drawn from the
+  2-minute capture to the end of a 10-minute run (account name, password, and a sign-in QR code that came from its
+  servers). No memory-guard end. Helpers 886 MiB in 16, census peak 1631 MiB, no steep climb; SceShellCore's swap-out
+  went from 359 to 364 MiB.
+- **The gate on that build**, standard PS5: 96 of 96 in 2124.7 s. Its klogs hold no maxpipekva, TTY(STDIN) or
+  errno=5 line. Its record is kept off the tree too: its name has the launcher's.
+
+What it took, each measured on the console:
+- **The sync device maps its objects in 64 KiB chunks per helper** (`src/pw_ntsync.c`, layout 3). The census counts a
+  shared region in full in every helper that maps it (K14), and the whole table was 8.6 MiB per helper. A helper now
+  maps the fixed tables, then each 64 KiB chunk of 1024 objects the first time it reaches one. An idle desktop's 9
+  helpers: 160 MiB (the whole table: 214 MiB; the device off: 153 MiB). At the launcher's guard ends on the Pro,
+  helpers stood at 613-647 MiB in 15-16 (was 831-881).
+- **Counting the sync region once in the census was tried and reverted.** It let the census reach about 1000 MiB raw on
+  the Pro, where VM Stats read RSS 1081 MiB and swap-out went from 38 to 139 MiB. The raw census is what tracks the
+  console's pressure; `src/pw_memory_guard.h` says so.
+- **Patch 1241: a process publishes the display only when its mode is new.** Publishing loads the GPU driver (about 30
+  MiB). Every process that took the desktop window did it, a menu builder's and an installer's too. Now 1 publish in
+  place of one per GUI process.
+- **DXVK patch 0004: DXGI lists adapters without Vulkan.** A factory reads what DXGI needs of each adapter from a
+  summary file in the runtime's cache namespace (`DXVK_DXGI_ADAPTER_SUMMARY`, set by `src/pw_shader_cache.c`). It
+  creates the Vulkan instance only when a device, a swap chain, the interop or the memory budget needs it. In the
+  launcher's start, 18 processes had loaded the GPU driver only to list displays. Now only the browser's GPU process
+  loads it; the browser's main process and the launcher read the summary.
+  - The first build crashed the browser's main process in `wsi::enumMonitors`: only the instance had started DXVK's WSI
+    driver. Each factory now holds its own WSI reference, and WSI's reference count is taken under a lock.
+- **Patch 1127's code cluster is 16 KiB** (was 64). A payload runs code only from JIT memory, so each helper copies the
+  code it runs in clusters charged to its own flexible memory.
+  - At 64 KiB, each start of the browser's renderer took the census up 120 MiB or more in 8 s, to 1591-1629 MiB. The
+    steep rule ended the browser 45 times in 10 minutes (helpers 949-985 MiB in 16, the browser's main process 153-158
+    MiB).
+  - At 16 KiB: 0 ends. The browser's five processes copy 15-57 MB of code each, 181 MB in all (at 64 KiB: 28-71 MB,
+    257 MB).
+  - 16 KiB had stalled `winedevice.exe`'s exit once (`gate-2026-10-16-browser-01`), the race patch 1171 closed.
+- **The memory guard's end line names the rule that fired.** The steep climb ends below the end mark, and the line
+  had said "stood past 940 MiB" at 872-900 MiB.
+
+**The Pro** (10.01, guard 870/940 MiB) has not run this build: it needs a restart, as one helper outlived the last
+launcher run. Its kernel's own limit is about 1014 MiB of RSS, and the launcher's start stands at about 1530-1570 MiB
+of census on the standard PS5, which tracks that RSS within 9 MiB. So the Pro is short by about 500 MiB, not by a
+few tens.
+- The browser's five processes copy 181 MB of code between them, mostly the same `libcef.dll` pages.
+- Sharing those copies does not lower the kernel's figure: measured (K18 below). The owner, 2026-10-20, had called
+  cross-process code sharing "the best long-term solution"; on this kernel it is not one.
+
 ## The combined alpha-3 gates (2026-10-20, console: both, one build)
 
 One tree with every alpha-3 change (the user Mihawk, Settings > Logging, the taskbar fix, the firmware-keyed decisions,
@@ -366,6 +424,29 @@ K14, `sceKernelGetResidentFmemCount`, the figure the census sums:
 
 **Decision** (2026-10-18): no gate and no merge of the sharing code; branch and sources kept. Next is the hold run
 (CONSOLE_QUEUE.md, "Shared code copies"), which reads the kernel's own figure by phase, in an owner-present slot.
+
+**K18, the kernel's own figure, measured in Wine (2026-10-21, standard PS5).** The sharing design was ported onto the
+tree of the launcher's sign-in window (build `ae34b5fe4283bec4`, 147 host tests; not committed, backed up off the tree
+in `~/PS5-Backups/unmerged-2026-10-21/`) and run in place of the hold probe: the launcher's 10-minute start, against
+the same start without sharing on build `09acfc9faec09198`. Records kept off the tree: they name the launcher.
+
+| Steady state | Without sharing | With sharing |
+| --- | --- | --- |
+| Clusters mapped from another helper's copy | 0 | 28,054 (448,864 KiB of mappings; 0 mismatched, 2 failed) |
+| Census (helpers) | 1532 MiB (886 in 16) | 1568 MiB (892 in 16) |
+| SceShellCore VM Stats RSS | 1524 MiB | 1560 MiB |
+| VM Stats kernel | 431 MiB | 464 MiB |
+| Page tables, CPU | 6840 of 8192 | 5170 of 8192 |
+| Memory-guard ends in 10 minutes | 0 | 4 |
+
+- The kernel's RSS counts a shared JIT object in every process that maps it, as the census does (K14): 449 MB of
+  shared mappings moved neither figure down.
+- About 27,000 objects of 16 KiB cost the kernel about 33 MiB more of its own memory.
+- Only the CPU page tables fell, by about a fifth.
+- An idle desktop ran clean with it (930 clusters shared, 0 mismatched).
+
+**Decision** (2026-10-21): shared code copies stay off the tree. On this kernel they save no memory that counts and
+cost kernel memory.
 
 ## The helpers' synchronization device, patch 1180 (2026-10-17, console; on by default since a5a0d88)
 
